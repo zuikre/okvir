@@ -137,7 +137,14 @@ export const useOkvirStore = create<OkvirState>()(
       activeSimulation: 'ols',
       isCommandPaletteOpen: false,
       setCurrentView: (currentView) => set({ currentView }),
-      setActiveLessonId: (activeLessonId) => set({ activeLessonId, currentView: 'lesson' }),
+      setActiveLessonId: (activeLessonId) =>
+        set((state) => {
+          const lesson = state.lessons[activeLessonId];
+          if (lesson?.status === 'locked') {
+            return { activeLessonId, currentView: 'constellation' };
+          }
+          return { activeLessonId, currentView: 'lesson' };
+        }),
       setActiveSimulation: (activeSimulation) => set({ activeSimulation }),
       setCommandPaletteOpen: (isCommandPaletteOpen) => set({ isCommandPaletteOpen }),
 
@@ -294,7 +301,7 @@ export const useOkvirStore = create<OkvirState>()(
         set((state) => {
           state.recordActivityToday();
           const lesson = state.lessons[lessonId];
-          if (!lesson) return {};
+          if (!lesson || lesson.status === 'locked') return {};
           const completedBeats = lesson.completedBeats.includes(beat)
             ? lesson.completedBeats
             : ([...lesson.completedBeats, beat].sort((a, b) => a - b) as BeatNumber[]);
@@ -305,7 +312,7 @@ export const useOkvirStore = create<OkvirState>()(
                 ...lesson,
                 currentBeat: beat,
                 completedBeats,
-                status: lesson.status === 'locked' ? 'in_progress' : lesson.status,
+                status: lesson.status === 'available' ? 'in_progress' : lesson.status,
               },
             },
           };
@@ -366,16 +373,17 @@ export const useOkvirStore = create<OkvirState>()(
     {
       name: 'okvir-local-storage-v1',
       version: 1,
-      migrate: (persistedState: any) => {
-        if (!persistedState || persistedState.xp === 1420 || persistedState.streakDays === 14) {
+      migrate: (persistedState: unknown) => {
+        const state = persistedState as (Partial<OkvirState> & { xp?: number; streakDays?: number }) | undefined;
+        if (!state || state.xp === 1420 || state.streakDays === 14) {
           return {
-            ...persistedState,
+            ...state,
             xp: 0,
             streakDays: 0,
             lessons: recalculateLessonStatuses(initialLessons),
           };
         }
-        return persistedState;
+        return state;
       },
       onRehydrateStorage: () => (state) => {
         if (state) {

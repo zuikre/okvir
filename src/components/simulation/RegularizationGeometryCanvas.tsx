@@ -1,57 +1,194 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
-import { KaTeXMath } from '@/components/common/KaTeXMath';
+import { MultiTierDisclosure, TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 
 type RegType = 'lasso' | 'ridge';
+type RegPreset = 'horizontal_sparse' | 'vertical_sparse' | 'correlated' | 'heavy_penalty';
 
-export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ compact }) => {
+const PRESETS: Record<RegPreset, {
+  name: { en: string; ar: string };
+  olsW: { x: number; y: number };
+  lambda: number;
+  mode: RegType;
+  description: { en: string; ar: string };
+}> = {
+  horizontal_sparse: {
+    name: { en: 'Sparsity (w₂ = 0)', ar: 'تناثر أفقي (w₂ = ٠)' },
+    olsW: { x: 2.4, y: 1.1 },
+    lambda: 1.3,
+    mode: 'lasso',
+    description: {
+      en: 'Contour strikes the horizontal diamond corner, zeroing out feature 2 completely.',
+      ar: 'يصطدم خط الكنتور برأس المعين الأفقي، مصفراً الميزة الثانية بالكامل.',
+    },
+  },
+  vertical_sparse: {
+    name: { en: 'Sparsity (w₁ = 0)', ar: 'تناثر عمودي (w₁ = ٠)' },
+    olsW: { x: 0.9, y: 2.6 },
+    lambda: 1.4,
+    mode: 'lasso',
+    description: {
+      en: 'Contour strikes the vertical diamond corner, driving feature 1 to zero.',
+      ar: 'يصطدم خط الكنتور برأس المعين العمودي، مصفراً الميزة الأولى.',
+    },
+  },
+  correlated: {
+    name: { en: 'Collinear Features', ar: 'ميزات عالية الارتباط' },
+    olsW: { x: 2.2, y: 2.0 },
+    lambda: 1.0,
+    mode: 'ridge',
+    description: {
+      en: 'Ridge smoothly shrinks collinear weights together, preventing variance explosion.',
+      ar: 'يقوم تنظيم ريدج بتقليص الأوزان المرتبطة معاً بنعومة لمنع تشتت التباين.',
+    },
+  },
+  heavy_penalty: {
+    name: { en: 'Heavy Penalty (Origin)', ar: 'جزاء قوي (انكماش للمركز)' },
+    olsW: { x: 2.0, y: 1.5 },
+    lambda: 2.8,
+    mode: 'lasso',
+    description: {
+      en: 'Severe regularization budget collapses both weights into the origin.',
+      ar: 'ميزانية تنظيمية مقيدة جداً تؤدي لانكماش الأوزان نحو الصفر.',
+    },
+  },
+};
+
+const REG_PEDAGOGY: TierContent = {
+  intuition: {
+    analogy: {
+      en: 'Think of regularization as a budget constraint. In Lasso (L1), the budget region is a diamond with sharp pointy corners sticking out along the coordinate axes. As the elliptical contours of the unconstrained OLS solution expand, they almost always touch one of these sharp corners first!',
+      ar: 'تخيل التنظيم كميزانية مقيدة. في لاسو (L1)، تكون منطقة الميزانية معينية الشكل ذات زوايا حادة تبرز عند محاور الإحداثيات. ومع توسع خطوط كنتور OLS البيضاوية، فإنها تصطدم حتماً بإحدى هذه الزوايا الحادة أولاً!',
+    },
+    keyTakeaway: {
+      en: 'Lasso performs automatic feature selection because corners sit strictly on the axes (where at least one parameter is exactly zero). Ridge only shrinks weights smoothly without zeroing them.',
+      ar: 'يقوم لاسو باختيار الميزات تلقائياً لأن زوايا المعين تقع تماماً على المحاور (حيث يكون وزن واحد على الأقل صفراً مطلقاً)، بينما يكتفي ريدج بتقليص الأوزان دون تصفيرها.',
+    },
+  },
+  geometry: {
+    visualDescription: {
+      en: 'The optimal solution w* is the tangency point between the level sets of the quadratic loss function (w - ŵ)^T (X^T X) (w - ŵ) = c and the L1 norm ball ||w||₁ ≤ C or L2 norm ball ||w||₂² ≤ C.',
+      ar: 'الحل الأمثل *w هو نقطة التماس بين مجموعات المستوى لدالة الخسارة التربيعية لـ OLS وكرة المعيار ||w||₁ ≤ C أو كرة المعيار ||w||₂² ≤ C.',
+    },
+    conservedQuantity: {
+      en: 'At tangency, the negative gradient of the loss -∇L(w*) lies in the normal cone (or subgradient) of the constraint ball.',
+      ar: 'عند نقطة التماس، يقع معكوس تدرج الخسارة داخل المخروط العمودي (أو شبه التدرج) لمنطقة القيد.',
+    },
+  },
+  formal: {
+    equation: '\\min_{\\mathbf{w}} \\frac{1}{2n}\\|\\mathbf{y} - \\mathbf{X}\\mathbf{w}\\|^2 + \\lambda \\|\\mathbf{w}\\|_p',
+    derivationSteps: [
+      {
+        step: '\\text{Ridge (L2): } \\mathbf{w}^* = (\\mathbf{X}^T \\mathbf{X} + \\lambda \\mathbf{I})^{-1} \\mathbf{X}^T \\mathbf{y}',
+        note: {
+          en: 'Closed-form analytical solution: adds lambda to eigenvalues of X^T X, preventing matrix inversion singularity',
+          ar: 'حل تحليلي مغلق: يضيف معامل الجزاء للقيم الذاتية للمصفوفة لمنع انفجار الانعكاس عند الارتباط الخطي',
+        },
+      },
+      {
+        step: '\\partial |w_j| = \\begin{cases} \\{1\\} & w_j > 0 \\\\ [-1, 1] & w_j = 0 \\\\ \\{-1\\} & w_j < 0 \\end{cases}',
+        note: {
+          en: 'Subgradient of the absolute value function at the non-differentiable kink w = 0',
+          ar: 'شبه تدرج دالة القيمة المطلقة عند النقطة الحادة غير القابلة للاشتقاق عند الصفر',
+        },
+      },
+      {
+        step: 'w_j^* = \\mathcal{S}_{\\lambda}(z_j) = \\text{sign}(z_j) \\max(|z_j| - \\lambda, 0)',
+        note: {
+          en: 'Soft-Thresholding Operator: drives parameters with magnitude less than lambda strictly to zero',
+          ar: 'مؤثر العتبة الناعمة: يصفر الأوزان التي يقل مقدارها عن عتبة الجزاء بالكامل',
+        },
+      },
+    ],
+  },
+  code: {
+    snippet: `import numpy as np
+
+def soft_threshold(rho: float, lam: float) -> float:
+    """Soft-thresholding operator for Lasso coordinate descent."""
+    if rho < -lam:
+        return rho + lam
+    elif rho > lam:
+        return rho - lam
+    else:
+        return 0.0  # Exact sparsity!
+
+def lasso_coordinate_descent(X: np.ndarray, y: np.ndarray, lam: float, max_iter: int = 100):
+    """
+    Vectorized cyclic coordinate descent for L1 regularized regression.
+    Complexity: O(max_iter * N * D).
+    """
+    n_samples, n_features = X.shape
+    w = np.zeros(n_features)
+    
+    # Precompute column norms: ||x_j||^2
+    col_norms = np.sum(X ** 2, axis=0)
+    
+    for _ in range(max_iter):
+        for j in range(n_features):
+            # Compute partial residual without feature j
+            r_j = y - (X @ w - X[:, j] * w[j])
+            rho = np.dot(X[:, j], r_j)
+            w[j] = soft_threshold(rho, lam * n_samples) / col_norms[j]
+            
+    return w`,
+    explanation: {
+      en: 'Cyclic Coordinate Descent iteratively updates one weight at a time using closed-form soft thresholding, guaranteeing convergence for convex Lasso objectives.',
+      ar: 'طريقة الهبوط الإحداثي الدائري تحدث كل وزن منفرداً عبر عتبة ناعمة مغلقة، مما يضمن التقارب نحو الحل الأمثل للاسو.',
+    },
+  },
+};
+
+export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = () => {
   const { language, config } = useOkvirStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const [mode, setMode] = useState<RegType>('lasso');
-  const [lambda, setLambda] = useState<number>(1.2); // Regularization penalty (larger lambda = smaller budget)
+  const [lambda, setLambda] = useState<number>(1.2);
+  const [olsW, setOlsW] = useState<{ x: number; y: number }>({ x: 2.2, y: 1.4 });
+  const [draggingOls, setDraggingOls] = useState(false);
+  const [activePreset, setActivePreset] = useState<RegPreset | 'custom'>('horizontal_sparse');
 
-  // Unconstrained OLS point in weight space (w1, w2)
-  const olsW = { x: 2.2, y: 1.6 };
-
-  // Calculate constraint boundary size: radius or diamond extent C
-  // Inverse relation: C = 3.5 / (1 + 0.8 * lambda)
+  // Calculate constraint boundary size C
   const C = Math.max(0.4, 3.8 / (1 + 0.9 * lambda));
-
-  // Determine optimal constrained solution w* (point of tangency)
-  // For Lasso: diamond corners at (C, 0), (0, C), (-C, 0), (0, -C).
-  // Given olsW.x > olsW.y, tangency typically hits the corner (C, 0) on the horizontal axis!
-  // For Ridge: circle touches at point proportional to olsW scaled by C / |olsW|
   const olsNorm = Math.hypot(olsW.x, olsW.y);
 
-  let solW = { x: 0, y: 0 };
-  if (mode === 'lasso') {
-    // If contour touches corner:
-    // With tilted ellipse, corner at (C, 0) gives exact zero for w2!
-    if (lambda > 0.6) {
-      solW = { x: C, y: 0 }; // Exact sparsity: w2 = 0!
+  // Optimal tangency solution w*
+  const { solW, isExactZero } = useMemo(() => {
+    let sol = { x: 0, y: 0 };
+    let exactZero = false;
+
+    if (mode === 'lasso') {
+      // Check if unconstrained point projects into corner cone
+      const absX = Math.abs(olsW.x);
+      const absY = Math.abs(olsW.y);
+      const signX = Math.sign(olsW.x) || 1;
+      const signY = Math.sign(olsW.y) || 1;
+
+      if (absX >= absY * 1.5) {
+        // Hits horizontal corner (w2 = 0)
+        sol = { x: signX * Math.min(absX, C), y: 0 };
+        exactZero = true;
+      } else if (absY >= absX * 1.5) {
+        // Hits vertical corner (w1 = 0)
+        sol = { x: 0, y: signY * Math.min(absY, C) };
+        exactZero = true;
+      } else {
+        // Along facet
+        const factor = Math.min(1, C / (absX + absY));
+        sol = { x: olsW.x * factor, y: olsW.y * factor };
+        exactZero = false;
+      }
     } else {
-      // Along edge
-      solW = { x: C * 0.82, y: C * 0.18 };
+      // Ridge: smooth radial shrinkage
+      const scale = Math.min(1, C / Math.max(0.01, olsNorm));
+      sol = { x: olsW.x * scale, y: olsW.y * scale };
+      exactZero = false;
     }
-  } else {
-    // Ridge: smooth shrinkage along ray
-    const scale = Math.min(1, C / olsNorm);
-    solW = { x: olsW.x * scale, y: olsW.y * scale };
-  }
 
-  const isExactZero = Math.abs(solW.y) < 1e-4;
-
-  const handleModeChange = (m: RegType) => {
-    setMode(m);
-    if (config.soundEnabled) audio.playClick();
-  };
-
-  const handleSlider = (val: number) => {
-    setLambda(val);
-    if (config.soundEnabled) audio.playClick();
-  };
+    return { solW: sol, isExactZero: exactZero };
+  }, [mode, olsW, C, olsNorm]);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -59,11 +196,23 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = canvas.width;
-    const height = canvas.height;
-    const originX = width * 0.35;
-    const originY = height * 0.68;
-    const scale = Math.min(width, height) / 5.5; // pixels per unit
+    const dpr = window.devicePixelRatio || 1;
+    const cssWidth = canvas.clientWidth || 540;
+    const cssHeight = canvas.clientHeight || 360;
+
+    if (canvas.width !== cssWidth * dpr || canvas.height !== cssHeight * dpr) {
+      canvas.width = cssWidth * dpr;
+      canvas.height = cssHeight * dpr;
+    }
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
+
+    const width = cssWidth;
+    const height = cssHeight;
+    const originX = width * 0.38;
+    const originY = height * 0.65;
+    const scale = Math.min(width, height) / 5.2;
 
     ctx.clearRect(0, 0, width, height);
 
@@ -99,7 +248,7 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
     ctx.lineTo(originX, height);
     ctx.stroke();
 
-    // Labels w1, w2
+    // Axis Labels
     ctx.fillStyle = '#a1a1aa';
     ctx.font = '11px monospace';
     ctx.fillText('w₁', width - 20, originY - 8);
@@ -109,19 +258,21 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
     const olsPx = originX + olsW.x * scale;
     const olsPy = originY - olsW.y * scale;
 
-    const contourR = Math.hypot(olsPx - (originX + solW.x * scale), olsPy - (originY - solW.y * scale));
+    const solPx = originX + solW.x * scale;
+    const solPy = originY - solW.y * scale;
+    const contourR = Math.hypot(olsPx - solPx, olsPy - solPy);
 
-    const ellipseCount = 5;
+    const ellipseCount = 4;
     for (let i = 1; i <= ellipseCount; i++) {
-      const r = (contourR / 2) * (i * 0.5);
+      const r = (contourR / 1.5) * (i * 0.5);
       ctx.save();
       ctx.translate(olsPx, olsPy);
-      ctx.rotate(-Math.PI / 6); // Tilted covariance
-      ctx.scale(1.4, 0.7);
+      ctx.rotate(-Math.PI / 6); // Tilted covariance matrix
+      ctx.scale(1.35, 0.75);
 
       ctx.beginPath();
-      ctx.arc(0, 0, r, 0, Math.PI * 2);
-      ctx.strokeStyle = i === 2 ? 'rgba(244, 63, 94, 0.7)' : 'rgba(244, 63, 94, 0.18)';
+      ctx.arc(0, 0, Math.max(2, r), 0, Math.PI * 2);
+      ctx.strokeStyle = i === 2 ? 'rgba(244, 63, 94, 0.7)' : 'rgba(244, 63, 94, 0.16)';
       ctx.lineWidth = i === 2 ? 2 : 1;
       if (i === 2) ctx.setLineDash([4, 3]);
       ctx.stroke();
@@ -130,7 +281,6 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
 
     // 4. Constraint Region (L1 Diamond or L2 Circle)
     if (mode === 'lasso') {
-      // L1 Diamond: vertices at (C,0), (0,C), (-C,0), (0,-C)
       ctx.fillStyle = 'rgba(16, 185, 129, 0.12)';
       ctx.strokeStyle = 'rgba(16, 185, 129, 0.85)';
       ctx.lineWidth = 2;
@@ -145,7 +295,6 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
       ctx.fill();
       ctx.stroke();
     } else {
-      // L2 Circle of radius C
       ctx.fillStyle = 'rgba(56, 189, 248, 0.12)';
       ctx.strokeStyle = 'rgba(56, 189, 248, 0.85)';
       ctx.lineWidth = 2;
@@ -157,19 +306,20 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
       ctx.stroke();
     }
 
-    // 5. Draw Unconstrained OLS Point
+    // 5. Unconstrained OLS Point (Draggable)
     ctx.fillStyle = '#f43f5e';
     ctx.beginPath();
-    ctx.arc(olsPx, olsPy, 5, 0, Math.PI * 2);
+    ctx.arc(olsPx, olsPy, 7, 0, Math.PI * 2);
     ctx.fill();
-    ctx.font = '10px monospace';
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.font = 'bold 11px monospace';
     ctx.fillStyle = '#f43f5e';
-    ctx.fillText('ŵ (OLS)', olsPx + 8, olsPy - 4);
+    ctx.fillText(`ŵ OLS (${olsW.x.toFixed(1)}, ${olsW.y.toFixed(1)})`, olsPx + 10, olsPy - 6);
 
-    // 6. Draw Constrained Optimum Point w*
-    const solPx = originX + solW.x * scale;
-    const solPy = originY - solW.y * scale;
-
+    // 6. Constrained Optimum Point w*
     ctx.fillStyle = mode === 'lasso' ? '#10b981' : '#38bdf8';
     ctx.beginPath();
     ctx.arc(solPx, solPy, 6, 0, Math.PI * 2);
@@ -182,19 +332,81 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
     ctx.fillStyle = mode === 'lasso' ? '#10b981' : '#38bdf8';
     ctx.fillText(`w* (${solW.x.toFixed(2)}, ${solW.y.toFixed(2)})`, solPx + 10, solPy + (isExactZero ? 18 : -8));
 
-    // Highlight axis zero hit
+    // Highlight axis zero hit (Sparsity Halo)
     if (mode === 'lasso' && isExactZero) {
       ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.arc(solPx, solPy, 12, 0, Math.PI * 2);
+      ctx.arc(solPx, solPy, 14, 0, Math.PI * 2);
       ctx.stroke();
     }
+
+    ctx.restore();
   }, [mode, C, solW, isExactZero, olsW]);
 
   useEffect(() => {
     draw();
   }, [draw]);
+
+  // Pointer interactions for dragging OLS point
+  const getUnitCoords = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+    const originX = rect.width * 0.38;
+    const originY = rect.height * 0.65;
+    const scale = Math.min(rect.width, rect.height) / 5.2;
+
+    const x = Math.round(((px - originX) / scale) * 10) / 10;
+    const y = Math.round(((originY - py) / scale) * 10) / 10;
+    return {
+      x: Math.max(-2.5, Math.min(3.5, x)),
+      y: Math.max(-2.0, Math.min(3.5, y)),
+    };
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const coords = getUnitCoords(e);
+    const dist = Math.hypot(coords.x - olsW.x, coords.y - olsW.y);
+    if (dist < 0.8) {
+      setDraggingOls(true);
+      e.currentTarget.setPointerCapture(e.pointerId);
+      setActivePreset('custom');
+      if (config.soundEnabled) audio.playClick();
+    }
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!draggingOls) return;
+    const coords = getUnitCoords(e);
+    setOlsW(coords);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (draggingOls) {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+      setDraggingOls(false);
+      if (isExactZero && config.soundEnabled) {
+        audio.playSuccess();
+      }
+    }
+  };
+
+  const applyPreset = (key: RegPreset) => {
+    const p = PRESETS[key];
+    setOlsW(p.olsW);
+    setLambda(p.lambda);
+    setMode(p.mode);
+    setActivePreset(key);
+    if (config.soundEnabled) {
+      if (p.mode === 'lasso') audio.playSuccess();
+      else audio.playClick();
+    }
+  };
 
   return (
     <div className="flex flex-col gap-5 p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
@@ -208,15 +420,19 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
           </div>
           <p className="text-xs text-[var(--text-secondary)] mt-0.5">
             {language === 'ar'
-              ? 'شاهد كيف تصطدم خطوط كنتور OLS بزاوية معين L1 لتصفير الوزن w2 تماماً (التناثر).'
-              : 'Observe how OLS loss contours tangentially strike the sharp corner of the L1 diamond, driving w₂ strictly to 0.'}
+              ? 'اسحب نقطة OLS الحمراء لمشاهدة اصطدام خطوط الكنتور بزاوية المعين وتصفير المتغيرات.'
+              : 'Drag the unconstrained red OLS point to watch contours strike diamond corners and zero out coefficients.'}
           </p>
         </div>
 
         {/* Regularizer Selector Pills */}
         <div className="flex items-center gap-2">
           <button
-            onClick={() => handleModeChange('lasso')}
+            onClick={() => {
+              setMode('lasso');
+              setActivePreset('custom');
+              if (config.soundEnabled) audio.playClick();
+            }}
             className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
               mode === 'lasso'
                 ? 'border-emerald-500 bg-emerald-500/15 text-emerald-300 font-bold shadow-sm'
@@ -226,7 +442,11 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
             {language === 'ar' ? 'Lasso (L1 المعين)' : 'Lasso (L1 Diamond)'}
           </button>
           <button
-            onClick={() => handleModeChange('ridge')}
+            onClick={() => {
+              setMode('ridge');
+              setActivePreset('custom');
+              if (config.soundEnabled) audio.playClick();
+            }}
             className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
               mode === 'ridge'
                 ? 'border-sky-500 bg-sky-500/15 text-sky-300 font-bold shadow-sm'
@@ -238,15 +458,42 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
         </div>
       </div>
 
+      {/* Preset Scenarios Strip */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+        <span className="text-[11px] font-mono text-[var(--text-tertiary)] uppercase tracking-wider">
+          {language === 'ar' ? 'سيناريوهات التنظيم:' : 'Regularization Scenarios:'}
+        </span>
+        <div className="flex flex-wrap gap-2">
+          {(Object.keys(PRESETS) as RegPreset[]).map((key) => (
+            <button
+              key={key}
+              onClick={() => applyPreset(key)}
+              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+                activePreset === key
+                  ? 'border-amber-400 bg-amber-500/15 text-amber-300 font-bold shadow-sm'
+                  : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
+              }`}
+            >
+              {PRESETS[key].name[language]}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Canvas and Readouts */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
-        <div className="lg:col-span-8 flex justify-center bg-[var(--bg-app)] p-3 rounded-xl border border-[var(--border-subtle)]">
+        <div className="lg:col-span-8 relative flex justify-center bg-[var(--bg-app)] p-3 rounded-xl border border-[var(--border-subtle)]">
           <canvas
             ref={canvasRef}
-            width={480}
-            height={340}
-            className="w-full max-w-[480px] h-[340px] rounded-lg"
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            className="w-full max-w-[540px] h-[360px] rounded-lg cursor-grab active:cursor-grabbing select-none touch-none"
           />
+          <div className="absolute top-4 start-4 px-2.5 py-1 rounded bg-[var(--bg-surface)]/80 backdrop-blur-md border border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-tertiary)] select-none">
+            {language === 'ar' ? 'اسحب النقطة الحمراء ŵ (OLS)' : 'Drag the red ŵ (OLS) point'}
+          </div>
         </div>
 
         {/* Inspector Panel */}
@@ -265,7 +512,11 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
               max="3.0"
               step="0.05"
               value={lambda}
-              onChange={(e) => handleSlider(parseFloat(e.target.value))}
+              onChange={(e) => {
+                setLambda(parseFloat(e.target.value));
+                setActivePreset('custom');
+                if (config.soundEnabled) audio.playClick();
+              }}
               className="w-full accent-[var(--math-gradient)] cursor-pointer"
             />
             <div className="text-[10px] text-[var(--text-tertiary)] font-mono flex justify-between">
@@ -288,7 +539,7 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
               </span>
               <span className="text-[10px] uppercase tracking-wider font-semibold">
                 {mode === 'lasso' && isExactZero ? (
-                  <span className="text-emerald-400">✓ w₂ = 0.0 (SPARSE)</span>
+                  <span className="text-emerald-400">✓ EXACT ZERO (SPARSE)</span>
                 ) : (
                   <span className="text-sky-400">Dense w ≠ 0</span>
                 )}
@@ -299,15 +550,15 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
               {mode === 'lasso' ? (
                 isExactZero ? (
                   language === 'ar' ? (
-                    'الزاوية الحادة للمعين L1 تتقاطع مع كنتور الخطأ تماماً عند المحور، مما يؤدي إلى تصفير الميزة w₂ بالكامل واختيار الميزة w₁ فقط.'
+                    'الزاوية الحادة للمعين L1 تتقاطع مع كنتور الخطأ تماماً عند المحور، مما يؤدي إلى تصفير الميزة بالكامل واختيار الميزة الأخرى.'
                   ) : (
-                    'The acute corner of the L1 diamond touches the error contour directly on the axis, setting w₂ exactly to 0.0 (automatic feature selection).'
+                    'The sharp corner of the L1 diamond touches the contour directly on the axis, driving one feature strictly to zero (feature selection).'
                   )
                 ) : (
                   language === 'ar' ? (
-                    'مع زيادة λ، سينكمش المعين حتى تصطدم زاوية المعين بكنتور الخطأ على المحور.'
+                    'مع زيادة λ، سينكمش المعين حتى تصطدم زاوية المعين بكنتور الخطأ على أحد المحاور.'
                   ) : (
-                    'Increasing λ contracts the diamond until a sharp corner touches the contour on the coordinate axis.'
+                    'Increasing λ contracts the diamond until a sharp corner touches the contour on a coordinate axis.'
                   )
                 )
               ) : (
@@ -319,17 +570,11 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
               )}
             </p>
           </div>
-
-          {/* Mathematical Form */}
-          <div dir="ltr" className="p-3 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)] text-center text-xs font-mono">
-            {mode === 'lasso' ? (
-              <KaTeXMath math="\min_w \mathcal{L}(w) + \lambda \|w\|_1 \quad (\|w\|_1 = |w_1| + |w_2|)" block={false} />
-            ) : (
-              <KaTeXMath math="\min_w \mathcal{L}(w) + \lambda \|w\|_2^2 \quad (\|w\|_2^2 = w_1^2 + w_2^2)" block={false} />
-            )}
-          </div>
         </div>
       </div>
+
+      {/* 4-Tier Cognitive Disclosure */}
+      <MultiTierDisclosure content={REG_PEDAGOGY} />
     </div>
   );
 };

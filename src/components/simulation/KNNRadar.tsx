@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useOkvirStore } from '@/lib/store';
-import { tr } from '@/lib/i18n';
+import { MultiTierDisclosure, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
+import { audio } from '@/lib/audio';
+import { Layers, Grid } from 'lucide-react';
 
 interface Point {
   x: number;
@@ -8,37 +10,182 @@ interface Point {
   cls: 0 | 1;
 }
 
-// 40 Grounded Data Points across 2 Distinct Clusters
-const KNN_POINTS: Point[] = [
-  // Class A (Sky Blue - Feature Cluster 0)
-  { x: 1.5, y: 2.2, cls: 0 }, { x: 2.0, y: 3.1, cls: 0 }, { x: 2.5, y: 2.0, cls: 0 },
-  { x: 2.8, y: 4.0, cls: 0 }, { x: 1.2, y: 3.5, cls: 0 }, { x: 3.2, y: 2.8, cls: 0 },
-  { x: 2.2, y: 4.8, cls: 0 }, { x: 3.8, y: 2.1, cls: 0 }, { x: 1.8, y: 4.2, cls: 0 },
-  { x: 3.0, y: 5.2, cls: 0 }, { x: 2.7, y: 3.7, cls: 0 }, { x: 1.9, y: 5.5, cls: 0 },
-  { x: 3.5, y: 4.5, cls: 0 }, { x: 4.0, y: 3.5, cls: 0 }, { x: 2.4, y: 6.0, cls: 0 },
-  { x: 3.9, y: 5.0, cls: 0 }, { x: 1.6, y: 2.8, cls: 0 }, { x: 4.2, y: 2.7, cls: 0 },
-  { x: 3.1, y: 3.3, cls: 0 }, { x: 2.6, y: 4.6, cls: 0 },
+type DistanceMetric = 'L2' | 'L1' | 'Linf';
+type KNNPreset = 'two_blobs' | 'concentric' | 'xor';
 
-  // Class B (Amber - Feature Cluster 1)
-  { x: 6.0, y: 6.8, cls: 1 }, { x: 7.0, y: 8.0, cls: 1 }, { x: 6.5, y: 6.2, cls: 1 },
-  { x: 7.5, y: 7.4, cls: 1 }, { x: 5.8, y: 8.1, cls: 1 }, { x: 8.0, y: 6.5, cls: 1 },
-  { x: 7.2, y: 8.9, cls: 1 }, { x: 6.2, y: 8.4, cls: 1 }, { x: 8.4, y: 8.0, cls: 1 },
-  { x: 7.1, y: 6.0, cls: 1 }, { x: 5.5, y: 7.0, cls: 1 }, { x: 8.1, y: 9.0, cls: 1 },
-  { x: 6.7, y: 7.7, cls: 1 }, { x: 7.8, y: 7.1, cls: 1 }, { x: 6.3, y: 9.2, cls: 1 },
-  { x: 8.6, y: 7.3, cls: 1 }, { x: 5.9, y: 6.4, cls: 1 }, { x: 7.4, y: 8.5, cls: 1 },
-  { x: 6.8, y: 6.6, cls: 1 }, { x: 8.0, y: 8.2, cls: 1 },
-];
+const PRESETS: Record<KNNPreset, { name: { en: string; ar: string }; points: Point[] }> = {
+  two_blobs: {
+    name: { en: 'Two Gaussian Blobs', ar: 'عنقودان غاوسيان' },
+    points: [
+      // Class 0 (Sky Blue)
+      { x: 1.5, y: 2.2, cls: 0 }, { x: 2.0, y: 3.1, cls: 0 }, { x: 2.5, y: 2.0, cls: 0 },
+      { x: 2.8, y: 4.0, cls: 0 }, { x: 1.2, y: 3.5, cls: 0 }, { x: 3.2, y: 2.8, cls: 0 },
+      { x: 2.2, y: 4.8, cls: 0 }, { x: 3.8, y: 2.1, cls: 0 }, { x: 1.8, y: 4.2, cls: 0 },
+      { x: 3.0, y: 5.2, cls: 0 }, { x: 2.7, y: 3.7, cls: 0 }, { x: 1.9, y: 5.5, cls: 0 },
+      // Class 1 (Amber)
+      { x: 6.0, y: 6.8, cls: 1 }, { x: 7.0, y: 8.0, cls: 1 }, { x: 6.5, y: 6.2, cls: 1 },
+      { x: 7.5, y: 7.4, cls: 1 }, { x: 5.8, y: 8.1, cls: 1 }, { x: 8.0, y: 6.5, cls: 1 },
+      { x: 7.2, y: 8.9, cls: 1 }, { x: 6.2, y: 8.4, cls: 1 }, { x: 8.4, y: 8.0, cls: 1 },
+      { x: 7.1, y: 6.0, cls: 1 }, { x: 5.5, y: 7.0, cls: 1 }, { x: 8.1, y: 9.0, cls: 1 },
+    ],
+  },
+  concentric: {
+    name: { en: 'Concentric Rings (Non-linear)', ar: 'حلقات متحدة المركز (غير خطي)' },
+    points: [
+      // Inner Circle (Class 0)
+      { x: 5.0, y: 5.0, cls: 0 }, { x: 4.2, y: 5.0, cls: 0 }, { x: 5.8, y: 5.0, cls: 0 },
+      { x: 5.0, y: 4.2, cls: 0 }, { x: 5.0, y: 5.8, cls: 0 }, { x: 4.5, y: 4.5, cls: 0 },
+      { x: 5.5, y: 5.5, cls: 0 }, { x: 4.5, y: 5.5, cls: 0 }, { x: 5.5, y: 4.5, cls: 0 },
+      // Outer Ring (Class 1)
+      { x: 2.0, y: 5.0, cls: 1 }, { x: 8.0, y: 5.0, cls: 1 }, { x: 5.0, y: 2.0, cls: 1 },
+      { x: 5.0, y: 8.0, cls: 1 }, { x: 2.8, y: 2.8, cls: 1 }, { x: 7.2, y: 7.2, cls: 1 },
+      { x: 2.8, y: 7.2, cls: 1 }, { x: 7.2, y: 2.8, cls: 1 }, { x: 2.2, y: 4.0, cls: 1 },
+      { x: 7.8, y: 6.0, cls: 1 }, { x: 4.0, y: 7.8, cls: 1 }, { x: 6.0, y: 2.2, cls: 1 },
+    ],
+  },
+  xor: {
+    name: { en: 'XOR Topology', ar: 'بنية XOR المنطقية' },
+    points: [
+      // Top-Left Class 0
+      { x: 2.5, y: 7.5, cls: 0 }, { x: 3.0, y: 8.0, cls: 0 }, { x: 2.0, y: 7.0, cls: 0 },
+      // Bottom-Right Class 0
+      { x: 7.5, y: 2.5, cls: 0 }, { x: 8.0, y: 3.0, cls: 0 }, { x: 7.0, y: 2.0, cls: 0 },
+      // Bottom-Left Class 1
+      { x: 2.5, y: 2.5, cls: 1 }, { x: 3.0, y: 2.0, cls: 1 }, { x: 2.0, y: 3.0, cls: 1 },
+      // Top-Right Class 1
+      { x: 7.5, y: 7.5, cls: 1 }, { x: 8.0, y: 8.0, cls: 1 }, { x: 7.0, y: 7.0, cls: 1 },
+    ],
+  },
+};
 
-export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
+const KNN_TIER_CONTENT: TierContent = {
+  intuition: {
+    analogy: {
+      en: 'Imagine asking your K closest neighbors for advice. If 4 say "Yes" and 1 says "No", you take the majority recommendation. The definition of "closest" changes depending on whether you walk city blocks (Manhattan) or fly straight lines (Euclidean).',
+      ar: 'تخيّل أنك تسأل أقرب K من جيرانك للحصول على مشورة. إذا قال ٤ منهم "نعم" و١ قال "لا"، فإنك تتبع الأغلبية. يختلف تعريف "الأقرب" بحسب ما إذا كنت تمشي في شوارع متعامدة (مانهاتن) أو تطير بخط مستقيم (إقليدي).',
+    },
+    keyTakeaway: {
+      en: 'Non-parametric local consensus: KNN memorizes training data without explicit parameter learning, classifying query points by local metric neighborhoods.',
+      ar: 'إجماع موضعي لا معلمي: خوارزمية الجيران الأقرب تستذكر البيانات دون معاملات صريحة، وتصنف النقاط عبر كرات الفضاء المتري المحلي.',
+    },
+  },
+  geometry: {
+    visualDescription: {
+      en: 'The decision boundary is formed by the intersection of Voronoi partitions. As K increases, small noisy islands disappear and the decision boundary becomes smooth and generalized.',
+      ar: 'تتكون حدود القرار من تقاطع مضلعات فورونوي. مع زيادة قيمة K، تختفي الجزر المتناثرة الشاذة وتصبح حدود القرار ناعمة وأكثر تعميماً.',
+    },
+    conservedQuantity: {
+      en: 'The number of neighbors K is strictly conserved across query evaluations.',
+      ar: 'عدد الجيران K ثابت ومحفوظ في كل عمليات الاستعلام.',
+    },
+  },
+  formal: {
+    equation: '\\hat{y}_q = \\arg\\max_{c \\in \\mathcal{C}} \\sum_{i=1}^K w_i \\mathbb{I}(y_{(i)} = c), \\quad w_i = \\frac{1}{d(x_q, x_{(i)})^p}',
+    derivationSteps: [
+      {
+        step: 'd_p(\\mathbf{u}, \\mathbf{v}) = \\left(\\sum_{j=1}^D |u_j - v_j|^p\\right)^{1/p}',
+        note: { en: 'Minkowski metric space distance definition (p=1: L1, p=2: L2, p=∞: Linf)', ar: 'تعريف المسافة في فضاء مينكوفسكي المتري' },
+      },
+      {
+        step: 'P(Y=1 \\mid X=x) \\approx \\frac{1}{K} \\sum_{i \\in N_K(x)} y_i',
+        note: { en: 'Local empirical probability density estimate', ar: 'تقدير كثافة الاحتمال التجريبية الموضعية' },
+      },
+    ],
+  },
+  code: {
+    snippet: `import numpy as np
+
+def knn_predict_weighted(X_train: np.ndarray, y_train: np.ndarray, x_query: np.ndarray, k: int = 5, weighted: bool = False):
+    dists = np.linalg.norm(X_train - x_query, axis=1)
+    top_k = np.argpartition(dists, k)[:k]
+    
+    if not weighted:
+        # Uniform majority
+        return int(np.bincount(y_train[top_k]).argmax())
+    else:
+        # Distance-weighted voting
+        weights = 1.0 / (dists[top_k] + 1e-6)
+        classes = np.unique(y_train)
+        class_scores = [np.sum(weights[y_train[top_k] == c]) for c in classes]
+        return int(classes[np.argmax(class_scores)])`,
+    explanation: {
+      en: 'Distance weighting gives exponentially higher voting power to immediate neighbors while maintaining O(N) partitioning.',
+      ar: 'الوزن بالمسافة يمنح الجيران الأقرب تأثيراً تصويتياً أعلى مع الحفاظ على سرعة فرز خطية.',
+    },
+  },
+};
+
+export const KNNRadar: React.FC<{ compact?: boolean }> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { knnK, setKnnK, theme, language } = useOkvirStore();
+  const { knnK, setKnnK, theme, language, config } = useOkvirStore();
+
+  const [points, setPoints] = useState<Point[]>(PRESETS.two_blobs.points);
+  const [selectedPreset, setSelectedPreset] = useState<KNNPreset>('two_blobs');
   const [query, setQuery] = useState({ x: 4.8, y: 5.5 });
-  const [pulseR, setPulseR] = useState(0);
+  const [metric, setMetric] = useState<DistanceMetric>('L2');
+  const [addModeClass, setAddModeClass] = useState<0 | 1>(0);
+  const [isWeighted, setIsWeighted] = useState(false);
+  const [showBoundaryField, setShowBoundaryField] = useState(true);
   const [prediction, setPrediction] = useState<0 | 1>(0);
   const [votes, setVotes] = useState({ blue: 0, amber: 0 });
   const dragging = useRef(false);
-  const animRef = useRef<number>(0);
 
+  // Distance computation function
+  const computeDistance = useCallback(
+    (x1: number, y1: number, x2: number, y2: number, m: DistanceMetric) => {
+      const dx = Math.abs(x1 - x2);
+      const dy = Math.abs(y1 - y2);
+      switch (m) {
+        case 'L1':
+          return dx + dy;
+        case 'Linf':
+          return Math.max(dx, dy);
+        case 'L2':
+        default:
+          return Math.hypot(dx, dy);
+      }
+    },
+    []
+  );
+
+  // Classify any arbitrary (qx, qy)
+  const classifyPoint = useCallback(
+    (qx: number, qy: number, kVal: number, m: DistanceMetric, weighted: boolean) => {
+      const sorted = points
+        .map((p) => ({
+          ...p,
+          d: computeDistance(qx, qy, p.x, p.y, m),
+        }))
+        .sort((a, b) => a.d - b.d);
+
+      const kNearest = sorted.slice(0, Math.min(kVal, sorted.length));
+      let score0 = 0;
+      let score1 = 0;
+
+      kNearest.forEach((p) => {
+        const weight = weighted ? 1 / Math.max(0.05, p.d) : 1;
+        if (p.cls === 0) score0 += weight;
+        else score1 += weight;
+      });
+
+      return {
+        cls: (score0 >= score1 ? 0 : 1) as 0 | 1,
+        radius: kNearest.length > 0 ? kNearest[kNearest.length - 1].d : 1,
+        score0,
+        score1,
+      };
+    },
+    [points, computeDistance]
+  );
+
+  // Update live query prediction
+  useEffect(() => {
+    const res = classifyPoint(query.x, query.y, knnK, metric, isWeighted);
+    setPrediction(res.cls);
+    setVotes({ blue: res.score0, amber: res.score1 });
+  }, [query, points, knnK, metric, isWeighted, classifyPoint]);
+
+  // Main Render Loop
   const render = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -46,246 +193,422 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = false }) =
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
 
-    const width = rect.width;
-    const height = rect.height;
+    ctx.save();
+    ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, width, height);
 
-    const pad = 24;
-    const plotW = width - pad * 2;
-    const plotH = height - pad * 2;
-    const xMax = 10;
-    const yMax = 10;
-    const toCanvasX = (x: number) => pad + (x / xMax) * plotW;
-    const toCanvasY = (y: number) => pad + plotH - (y / yMax) * plotH;
+    const toPx = (x: number, y: number) => ({
+      px: (x / 10) * width,
+      py: (1 - y / 10) * height,
+    });
 
-    // 1. Grid
+    // 1. Decision Boundary Background Grid Shading
+    if (showBoundaryField && points.length >= 3) {
+      const gridCols = 40;
+      const gridRows = 30;
+      const cellW = width / gridCols;
+      const cellH = height / gridRows;
+
+      for (let r = 0; r < gridRows; r++) {
+        for (let c = 0; c < gridCols; c++) {
+          const gx = (c + 0.5) / gridCols * 10;
+          const gy = (1 - (r + 0.5) / gridRows) * 10;
+          const pred = classifyPoint(gx, gy, knnK, metric, isWeighted).cls;
+
+          ctx.fillStyle =
+            pred === 0
+              ? 'rgba(56, 189, 248, 0.07)'
+              : 'rgba(245, 158, 11, 0.07)';
+          ctx.fillRect(c * cellW, r * cellH, cellW + 0.5, cellH + 0.5);
+        }
+      }
+    }
+
+    // 2. Coordinate Grid
     ctx.strokeStyle = theme === 'dark' ? '#27272a' : '#e4e4e7';
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= 10; i += 2) {
+      const pX = (i / 10) * width;
+      const pY = (1 - i / 10) * height;
       ctx.beginPath();
-      ctx.moveTo(toCanvasX(i), pad);
-      ctx.lineTo(toCanvasX(i), pad + plotH);
+      ctx.moveTo(pX, 0);
+      ctx.lineTo(pX, height);
       ctx.stroke();
-
       ctx.beginPath();
-      ctx.moveTo(pad, toCanvasY(i));
-      ctx.lineTo(pad + plotW, toCanvasY(i));
+      ctx.moveTo(0, pY);
+      ctx.lineTo(width, pY);
       ctx.stroke();
     }
 
-    // 2. Compute Distances and Sort with Partial Insertion Sort
-    const dists = KNN_POINTS.map((p) => ({
-      ...p,
-      d: Math.sqrt((p.x - query.x) ** 2 + (p.y - query.y) ** 2),
-    })).sort((a, b) => a.d - b.d);
+    // 3. Neighbors Evaluation & Radar Iso-ball
+    const sorted = points
+      .map((p) => ({
+        ...p,
+        d: computeDistance(query.x, query.y, p.x, p.y, metric),
+      }))
+      .sort((a, b) => a.d - b.d);
 
-    const kNearest = dists.slice(0, knnK);
-    const searchR = kNearest[kNearest.length - 1]?.d || 1.5;
+    const kNearest = sorted.slice(0, Math.min(knnK, sorted.length));
+    const kRadius = kNearest.length > 0 ? kNearest[kNearest.length - 1].d : 0;
+    const qPx = toPx(query.x, query.y);
 
-    // 3. Dynamic Expanding Concentric Radar Pulse
-    const pulseRadiusPx = ((pulseR % searchR) / xMax) * plotW;
+    // Draw Metric Radar Envelope
+    ctx.strokeStyle = prediction === 0 ? 'rgba(56, 189, 248, 0.8)' : 'rgba(245, 158, 11, 0.8)';
+    ctx.fillStyle = prediction === 0 ? 'rgba(56, 189, 248, 0.06)' : 'rgba(245, 158, 11, 0.06)';
+    ctx.lineWidth = 2;
+
+    const rPx = (kRadius / 10) * width;
     ctx.beginPath();
-    ctx.arc(toCanvasX(query.x), toCanvasY(query.y), pulseRadiusPx, 0, Math.PI * 2);
-    ctx.strokeStyle = theme === 'dark' ? 'rgba(56, 189, 248, 0.45)' : 'rgba(2, 132, 199, 0.4)';
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([2, 3]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // 4. K-Distance Perimeter Circle
-    const searchRPx = (searchR / xMax) * plotW;
-    ctx.beginPath();
-    ctx.arc(toCanvasX(query.x), toCanvasY(query.y), searchRPx, 0, Math.PI * 2);
-    ctx.fillStyle = theme === 'dark' ? 'rgba(56, 189, 248, 0.05)' : 'rgba(2, 132, 199, 0.04)';
+    if (metric === 'L2') {
+      ctx.arc(qPx.px, qPx.py, rPx, 0, Math.PI * 2);
+    } else if (metric === 'L1') {
+      ctx.moveTo(qPx.px, qPx.py - rPx);
+      ctx.lineTo(qPx.px + rPx, qPx.py);
+      ctx.lineTo(qPx.px, qPx.py + rPx);
+      ctx.lineTo(qPx.px - rPx, qPx.py);
+      ctx.closePath();
+    } else if (metric === 'Linf') {
+      ctx.rect(qPx.px - rPx, qPx.py - rPx, rPx * 2, rPx * 2);
+    }
     ctx.fill();
-    ctx.strokeStyle = theme === 'dark' ? 'rgba(56, 189, 248, 0.5)' : 'rgba(2, 132, 199, 0.4)';
-    ctx.lineWidth = 1.2;
     ctx.stroke();
 
-    // 5. Elastic Connection Lines to K Nearest Neighbors
-    let blueCount = 0;
-    let amberCount = 0;
-
+    // 4. Connect Radar Rays from Query to K Neighbors
     kNearest.forEach((p) => {
-      if (p.cls === 0) blueCount++;
-      else amberCount++;
+      const ptPx = toPx(p.x, p.y);
+      ctx.beginPath();
+      ctx.setLineDash([3, 3]);
+      ctx.moveTo(qPx.px, qPx.py);
+      ctx.lineTo(ptPx.px, ptPx.py);
+      ctx.strokeStyle = p.cls === 0 ? 'rgba(56, 189, 248, 0.6)' : 'rgba(245, 158, 11, 0.6)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    // 5. Render Data Points
+    points.forEach((p) => {
+      const ptPx = toPx(p.x, p.y);
+      const isNeighbor = kNearest.some((kn) => kn.x === p.x && kn.y === p.y);
+
+      // Neighbor highlight halo
+      if (isNeighbor) {
+        ctx.beginPath();
+        ctx.arc(ptPx.px, ptPx.py, 10, 0, Math.PI * 2);
+        ctx.fillStyle = p.cls === 0 ? 'rgba(56, 189, 248, 0.3)' : 'rgba(245, 158, 11, 0.3)';
+        ctx.fill();
+      }
 
       ctx.beginPath();
-      ctx.moveTo(toCanvasX(query.x), toCanvasY(query.y));
-      ctx.lineTo(toCanvasX(p.x), toCanvasY(p.y));
-      ctx.strokeStyle = p.cls === 0
-        ? (theme === 'dark' ? 'rgba(56, 189, 248, 0.7)' : 'rgba(2, 132, 199, 0.65)')
-        : (theme === 'dark' ? 'rgba(245, 158, 11, 0.7)' : 'rgba(217, 119, 6, 0.65)');
+      ctx.arc(ptPx.px, ptPx.py, 5, 0, Math.PI * 2);
+      ctx.fillStyle = p.cls === 0 ? '#38bdf8' : '#f59e0b';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
       ctx.lineWidth = 1.5;
       ctx.stroke();
     });
 
-    setVotes({ blue: blueCount, amber: amberCount });
-    setPrediction(blueCount >= amberCount ? 0 : 1);
-
-    // 6. Observation Points
-    const neighborSet = new Set(kNearest.map((n) => `${n.x},${n.y}`));
-    KNN_POINTS.forEach((p) => {
-      const isNeighbor = neighborSet.has(`${p.x},${p.y}`);
-      ctx.beginPath();
-      ctx.arc(toCanvasX(p.x), toCanvasY(p.y), isNeighbor ? 5.5 : 4.0, 0, Math.PI * 2);
-      ctx.fillStyle = p.cls === 0 ? 'var(--math-data)' : 'var(--math-gradient)';
-      ctx.fill();
-
-      ctx.strokeStyle = isNeighbor
-        ? (theme === 'dark' ? '#fafafa' : '#09090b')
-        : (theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)');
-      ctx.lineWidth = isNeighbor ? 2 : 1;
-      ctx.stroke();
-    });
-
-    // 7. Draggable Query Point
-    const qX = toCanvasX(query.x);
-    const qY = toCanvasY(query.y);
-
+    // 6. Render Query Point (Draggable Star / Core)
     ctx.beginPath();
-    ctx.arc(qX, qY, 7.5, 0, Math.PI * 2);
-    ctx.fillStyle = prediction === 0 ? 'var(--math-data)' : 'var(--math-gradient)';
+    ctx.arc(qPx.px, qPx.py, 8, 0, Math.PI * 2);
+    ctx.fillStyle = prediction === 0 ? '#38bdf8' : '#f59e0b';
     ctx.fill();
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = '#fafafa';
     ctx.lineWidth = 2.5;
     ctx.stroke();
 
-    // 8. Dynamic Voting Donut Badge in Top-Right
-    const donutX = width - 42;
-    const donutY = 38;
-    const donutR = 16;
-    const total = blueCount + amberCount || 1;
-    let startAngle = -Math.PI / 2;
+    ctx.font = 'bold 11px monospace';
+    ctx.fillStyle = prediction === 0 ? '#38bdf8' : '#f59e0b';
+    ctx.fillText(`Query (${query.x.toFixed(1)}, ${query.y.toFixed(1)})`, qPx.px + 12, qPx.py - 10);
 
-    if (blueCount > 0) {
-      const sweep = (blueCount / total) * Math.PI * 2;
-      ctx.beginPath();
-      ctx.arc(donutX, donutY, donutR, startAngle, startAngle + sweep);
-      ctx.strokeStyle = 'var(--math-data)';
-      ctx.lineWidth = 4;
-      ctx.stroke();
-      startAngle += sweep;
-    }
-    if (amberCount > 0) {
-      const sweep = (amberCount / total) * Math.PI * 2;
-      ctx.beginPath();
-      ctx.arc(donutX, donutY, donutR, startAngle, startAngle + sweep);
-      ctx.strokeStyle = 'var(--math-gradient)';
-      ctx.lineWidth = 4;
-      ctx.stroke();
-    }
-
-    ctx.fillStyle = theme === 'dark' ? '#fafafa' : '#09090b';
-    ctx.font = 'bold 9px JetBrains Mono';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`K=${knnK}`, donutX, donutY);
-  }, [query, knnK, pulseR, theme, prediction]);
+    ctx.restore();
+  }, [
+    points,
+    query,
+    knnK,
+    metric,
+    prediction,
+    isWeighted,
+    showBoundaryField,
+    theme,
+    computeDistance,
+    classifyPoint,
+  ]);
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
     render();
   }, [render]);
 
-  // Expanding Radar Pulse Loop
-  useEffect(() => {
-    let r = 0;
-    const animate = () => {
-      r += 0.08;
-      setPulseR(r);
-      animRef.current = requestAnimationFrame(animate);
-    };
-    animRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animRef.current);
-  }, []);
-
-  const handlePointer = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!dragging.current && e.type !== 'pointerdown') return;
-    if (e.type === 'pointerdown') dragging.current = true;
-    if (e.type === 'pointerup' || e.type === 'pointerleave') dragging.current = false;
-
+  // Pointer interactions
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const pad = 24;
-    const plotW = rect.width - pad * 2;
-    const plotH = rect.height - pad * 2;
     const px = e.clientX - rect.left;
     const py = e.clientY - rect.top;
 
-    const x = Math.max(0.5, Math.min(9.5, ((px - pad) / plotW) * 10));
-    const y = Math.max(0.5, Math.min(9.5, ((rect.height - pad - py) / plotH) * 10));
+    const qPx = {
+      px: (query.x / 10) * rect.width,
+      py: (1 - query.y / 10) * rect.height,
+    };
 
-    setQuery({ x: Number(x.toFixed(2)), y: Number(y.toFixed(2)) });
+    if (Math.hypot(px - qPx.px, py - qPx.py) < 22) {
+      dragging.current = true;
+      e.currentTarget.setPointerCapture(e.pointerId);
+      if (config.soundEnabled) audio.playClick();
+    } else {
+      // Add data point
+      const newX = Number(((px / rect.width) * 10).toFixed(2));
+      const newY = Number(((1 - py / rect.height) * 10).toFixed(2));
+      setPoints((prev) => [...prev, { x: newX, y: newY, cls: addModeClass }]);
+      if (config.soundEnabled) audio.playClick();
+    }
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!dragging.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+    const py = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+
+    setQuery({
+      x: Number(((px / rect.width) * 10).toFixed(2)),
+      y: Number(((1 - py / rect.height) * 10).toFixed(2)),
+    });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (dragging.current) {
+      dragging.current = false;
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+      if (config.soundEnabled) audio.playClick();
+    }
+  };
+
+  // Right-click to remove point
+  const handleContextMenu = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+
+    let targetIdx: number | null = null;
+    points.forEach((p, idx) => {
+      const ptPx = {
+        px: (p.x / 10) * rect.width,
+        py: (1 - p.y / 10) * rect.height,
+      };
+      if (Math.hypot(px - ptPx.px, py - ptPx.py) < 16) {
+        targetIdx = idx;
+      }
+    });
+
+    if (targetIdx !== null && points.length > 2) {
+      setPoints((prev) => prev.filter((_, idx) => idx !== targetIdx));
+      if (config.soundEnabled) audio.playWarning();
+    }
+  };
+
+  const applyPreset = (key: KNNPreset) => {
+    setSelectedPreset(key);
+    setPoints(PRESETS[key].points);
+    if (config.soundEnabled) audio.playSuccess();
   };
 
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
-      {/* HUD Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-mono">
-            {tr('predictedClass', language)}:
+    <div className="flex flex-col gap-4 select-none">
+      {/* Scenario Presets Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-xs font-mono text-[var(--text-tertiary)] uppercase tracking-wider me-1">
+            {language === 'ar' ? 'البيئات المترية:' : 'Datasets:'}
           </span>
-          <span
-            className="font-mono text-xs px-2.5 py-1 rounded-md font-semibold border tabular-nums"
-            style={{
-              color: prediction === 0 ? 'var(--math-data)' : 'var(--math-gradient)',
-              borderColor: prediction === 0 ? 'rgba(56,189,248,0.4)' : 'rgba(245,158,11,0.4)',
-              backgroundColor: prediction === 0 ? 'rgba(56,189,248,0.1)' : 'rgba(245,158,11,0.1)',
-            }}
-          >
-            {prediction === 0 ? 'Class Blue (Feature A)' : 'Class Amber (Feature B)'}
-          </span>
-          <span className="text-xs font-mono text-[var(--text-secondary)] tabular-nums">
-            ({votes.blue} Blue vs {votes.amber} Amber)
-          </span>
+          {(Object.keys(PRESETS) as KNNPreset[]).map((key) => (
+            <button
+              key={key}
+              onClick={() => applyPreset(key)}
+              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+                selectedPreset === key
+                  ? 'border-[var(--math-prediction)] bg-[var(--math-prediction)]/15 text-[var(--math-prediction)] font-semibold shadow-sm'
+                  : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
+              }`}
+            >
+              {PRESETS[key].name[language]}
+            </button>
+          ))}
         </div>
 
-        <div className="flex items-center gap-1.5 font-mono text-xs text-[var(--text-secondary)]">
-          <span>{tr('kValue', language)}:</span>
-          <span className="text-[var(--text-primary)] font-semibold">{knnK}</span>
+        {/* Action Toggles */}
+        <div className="flex items-center gap-2">
+          {/* Toggle Decision Boundary Field */}
+          <button
+            onClick={() => setShowBoundaryField(!showBoundaryField)}
+            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              showBoundaryField
+                ? 'border-purple-400 bg-purple-500/15 text-purple-300 font-bold'
+                : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+            }`}
+            title="Toggle Decision Boundary Background Field"
+          >
+            <Grid size={12} />
+            <span>{language === 'ar' ? 'حد القرار' : 'Boundary Field'}</span>
+          </button>
+
+          {/* Toggle Weighted Voting */}
+          <button
+            onClick={() => setIsWeighted(!isWeighted)}
+            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              isWeighted
+                ? 'border-emerald-400 bg-emerald-500/15 text-emerald-300 font-bold'
+                : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+            }`}
+            title="Weight votes by inverse distance 1/d"
+          >
+            <Layers size={12} />
+            <span>{language === 'ar' ? 'موزون بالمسافة' : '1/d Weighted'}</span>
+          </button>
         </div>
       </div>
 
-      {/* Canvas */}
-      <div className="relative w-full h-72 rounded-lg overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+      {/* Main Interactive Radar Canvas */}
+      <div className="relative rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-app)] overflow-hidden shadow-inner p-2">
         <canvas
           ref={canvasRef}
-          className="w-full h-full block cursor-crosshair"
-          onPointerDown={handlePointer}
-          onPointerMove={handlePointer}
-          onPointerUp={handlePointer}
-          onPointerLeave={handlePointer}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onContextMenu={handleContextMenu}
+          className="w-full h-80 rounded-xl cursor-crosshair touch-none"
         />
-        <div className="absolute bottom-2 start-2 text-[10px] font-mono text-[var(--text-tertiary)] bg-[var(--bg-surface)]/80 px-2 py-0.5 rounded border border-[var(--border-subtle)]">
-          {tr('queryPoint', language)}: ({query.x.toFixed(1)}, {query.y.toFixed(1)}) — Click / Drag anywhere
+
+        {/* Instructions Badge */}
+        <div className="absolute top-4 start-4 px-2.5 py-1 rounded-md bg-[var(--bg-surface)]/80 backdrop-blur-md border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-tertiary)]">
+          {language === 'ar'
+            ? 'اسحب نقطة الاستعلام • انقر لإضافة بيانات • انقر يمين لحذف نقطة'
+            : 'Drag query point • Click to add data • Right-click to remove'}
+        </div>
+
+        {/* Classification Result Floating Card */}
+        <div className="absolute top-4 end-4 flex items-center gap-3 px-3 py-1.5 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-xs font-mono shadow-sm">
+          <div>
+            <span className="text-[var(--text-tertiary)]">Class: </span>
+            <span
+              className={`font-bold uppercase ${
+                prediction === 0 ? 'text-sky-400' : 'text-amber-400'
+              }`}
+            >
+              {prediction === 0 ? 'Class A (Blue)' : 'Class B (Amber)'}
+            </span>
+          </div>
+          <div className="w-px h-3 bg-[var(--border-subtle)]" />
+          <div className="text-[11px] text-[var(--text-secondary)] tabular-nums">
+            Score: <strong className="text-sky-400">{votes.blue.toFixed(1)}</strong> vs{' '}
+            <strong className="text-amber-400">{votes.amber.toFixed(1)}</strong>
+          </div>
         </div>
       </div>
 
-      {/* Hardware Slider for K */}
-      {!compact && (
-        <div className="flex flex-col gap-1.5 pt-1">
-          <div className="flex justify-between text-xs font-mono text-[var(--text-secondary)]">
-            <span>{tr('kValue', language)}:</span>
-            <span className="tabular-nums font-semibold text-[var(--math-data)]">{knnK}</span>
+      {/* Interactive Parameter Controls */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+        {/* K Slider */}
+        <div className="space-y-1.5">
+          <div className="flex justify-between text-xs font-mono">
+            <span className="text-[var(--text-secondary)]">Neighbors (K):</span>
+            <span className="text-purple-400 font-bold tabular-nums">{knnK}</span>
           </div>
           <input
             type="range"
             min="1"
-            max="11"
-            step="2"
+            max="15"
+            step="2" // Odd numbers to prevent ties
             value={knnK}
-            onChange={(e) => setKnnK(parseInt(e.target.value, 10))}
-            className="w-full accent-[var(--math-data)] cursor-pointer"
+            onChange={(e) => {
+              setKnnK(parseInt(e.target.value, 10));
+              if (config.soundEnabled) audio.playClick();
+            }}
+            className="w-full accent-purple-500 cursor-pointer"
           />
+          <div className="text-[10px] text-[var(--text-tertiary)] font-mono flex justify-between">
+            <span>K=1 (Local Voronoi)</span>
+            <span>K=15 (Smooth Boundary)</span>
+          </div>
         </div>
-      )}
+
+        {/* Metric Selector */}
+        <div className="space-y-1.5">
+          <span className="text-xs font-mono text-[var(--text-secondary)] block">
+            {language === 'ar' ? 'المعيار المتري للمسافة:' : 'Distance Metric:'}
+          </span>
+          <div className="flex gap-1.5">
+            {(['L2', 'L1', 'Linf'] as DistanceMetric[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => {
+                  setMetric(m);
+                  if (config.soundEnabled) audio.playClick();
+                }}
+                className={`flex-1 py-1.5 text-xs font-mono rounded-lg border transition-all ${
+                  metric === m
+                    ? 'border-sky-500 bg-sky-500/15 text-sky-300 font-bold'
+                    : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+                }`}
+              >
+                {m === 'L2' && 'L₂ (Euclidean)'}
+                {m === 'L1' && 'L₁ (Manhattan)'}
+                {m === 'Linf' && 'L∞ (Chebyshev)'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Add Class Toggle */}
+        <div className="space-y-1.5">
+          <span className="text-xs font-mono text-[var(--text-secondary)] block">
+            {language === 'ar' ? 'فئة النقطة الجديدة:' : 'Click to Add:'}
+          </span>
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => setAddModeClass(0)}
+              className={`flex-1 py-1.5 text-xs font-mono rounded-lg border transition-all ${
+                addModeClass === 0
+                  ? 'border-sky-500 bg-sky-500/15 text-sky-300 font-bold'
+                  : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+              }`}
+            >
+              Class A (Blue)
+            </button>
+            <button
+              onClick={() => setAddModeClass(1)}
+              className={`flex-1 py-1.5 text-xs font-mono rounded-lg border transition-all ${
+                addModeClass === 1
+                  ? 'border-amber-500 bg-amber-500/15 text-amber-300 font-bold'
+                  : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+              }`}
+            >
+              Class B (Amber)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 4-Tier Cognitive Disclosure */}
+      <MultiTierDisclosure content={KNN_TIER_CONTENT} />
     </div>
   );
 };

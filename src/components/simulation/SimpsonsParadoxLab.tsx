@@ -3,7 +3,7 @@ import { useOkvirStore } from '@/lib/store';
 import { KaTeXMath } from '@/components/common/KaTeXMath';
 import { CanvasCoordinateTransformer, computeFullOLS, type DataPoint } from '@/lib/canvas/CanvasMath';
 import { audio } from '@/lib/audio';
-import { AlertCircle, HelpCircle, Check, Eye } from 'lucide-react';
+import { AlertCircle, Eye } from 'lucide-react';
 
 interface SubgroupCluster {
   id: number;
@@ -20,7 +20,6 @@ export const SimpsonsParadoxLab: React.FC = () => {
 
   const [stratified, setStratified] = useState(false);
   const [draggedGroup, setDraggedGroup] = useState<number | null>(null);
-  const [selectedHypothesis, setSelectedHypothesis] = useState<number | null>(null);
 
   // 3 cohorts: Exercise hours (X) vs Cardiovascular Risk (Y)
   // Inside each age cohort: More exercise = Lower risk (slope = -0.85)
@@ -252,7 +251,9 @@ export const SimpsonsParadoxLab: React.FC = () => {
     if (canvas && draggedGroup !== null) {
       try {
         canvas.releasePointerCapture(e.pointerId);
-      } catch {}
+      } catch (_err) {
+        // Pointer capture already released or not supported
+      }
       setDraggedGroup(null);
     }
   };

@@ -1,8 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { RefreshCw, Clock, Brain, ChevronRight, RotateCcw, Sparkles } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Clock, Brain, ChevronRight, RotateCcw, Sparkles } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
-import { curriculum } from '@/lib/curriculum';
 import { createNewCard, updateCard, retrievability, getRatingLabel } from '@/lib/fsrs';
 import { KaTeXMath } from '@/components/common/KaTeXMath';
 import type { FSRSState, Rating } from '@/lib/fsrs';
@@ -223,7 +222,6 @@ export const DailyCalibration: React.FC = () => {
                   const isAgain = rating === 1;
                   const isHard = rating === 2;
                   const isGood = rating === 3;
-                  const isEasy = rating === 4;
 
                   return (
                     <button

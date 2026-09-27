@@ -1,8 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
+import { Play, Pause, SkipForward, SkipBack, RotateCcw } from 'lucide-react';
+import { MultiTierDisclosure, TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 
-type KernelType = 'edge' | 'sobel_x' | 'sobel_y' | 'sharpen' | 'box_blur' | 'ridge';
+type KernelType = 'edge' | 'sobel_x' | 'sobel_y' | 'sharpen' | 'box_blur' | 'ridge' | 'gaussian';
 
 interface KernelDef {
   name: { en: string; ar: string };
@@ -13,14 +15,14 @@ interface KernelDef {
 
 const KERNELS: Record<KernelType, KernelDef> = {
   edge: {
-    name: { en: 'Edge Detection (Laplacian)', ar: 'كشف الحواف (لابلاسيان)' },
+    name: { en: 'Laplacian Edge', ar: 'كشف الحواف (لابلاسيان)' },
     matrix: [
       [-1, -1, -1],
       [-1, 8, -1],
       [-1, -1, -1],
     ],
     description: {
-      en: 'Highlights rapid intensity changes in all directions.',
+      en: 'Highlights rapid intensity changes omnidirectionally.',
       ar: 'يبرز التغيرات السريعة في الشدة الضوئية بجميع الاتجاهات.',
     },
   },
@@ -32,8 +34,8 @@ const KERNELS: Record<KernelType, KernelDef> = {
       [-1, 0, 1],
     ],
     description: {
-      en: 'Calculates vertical edges by approximating the horizontal gradient.',
-      ar: 'يحسب الحواف العمودية بتقريب التدرج الأفقي.',
+      en: 'Detects vertical edges by calculating horizontal luminance gradient.',
+      ar: 'يكتشف الحواف العمودية بحساب التدرج الأفقي للضوء.',
     },
   },
   sobel_y: {
@@ -44,8 +46,8 @@ const KERNELS: Record<KernelType, KernelDef> = {
       [1, 2, 1],
     ],
     description: {
-      en: 'Calculates horizontal edges by approximating the vertical gradient.',
-      ar: 'يحسب الحواف الأفقية بتقريب التدرج العمودي.',
+      en: 'Detects horizontal edges by calculating vertical luminance gradient.',
+      ar: 'يكتشف الحواف الأفقية بحساب التدرج العمودي للضوء.',
     },
   },
   sharpen: {
@@ -56,12 +58,12 @@ const KERNELS: Record<KernelType, KernelDef> = {
       [0, -1, 0],
     ],
     description: {
-      en: 'Amplifies center pixel differences against immediate orthogonal neighbors.',
-      ar: 'يضخم الفروق في البكسل المركزي مقارنة بجيرانه المتعامدين.',
+      en: 'Amplifies center pixel high-frequency contrast relative to neighbors.',
+      ar: 'يضخم التباين عالي التردد للبكسل المركزي مقارنة بجيرانه.',
     },
   },
   box_blur: {
-    name: { en: 'Box Blur (Smoothing)', ar: 'تنعيم متساوي (Box Blur)' },
+    name: { en: 'Box Blur (Smoothing)', ar: 'تنعيم متساوي' },
     matrix: [
       [1, 1, 1],
       [1, 1, 1],
@@ -69,12 +71,25 @@ const KERNELS: Record<KernelType, KernelDef> = {
     ],
     divisor: 9,
     description: {
-      en: 'Uniform spatial averaging filter to suppress high-frequency noise.',
-      ar: 'مرشح متوسط مكاني منتظم لقمع الضوضاء عالية التردد.',
+      en: 'Uniform 3x3 local averaging filter to suppress high-frequency noise.',
+      ar: 'مرشح متوسط مكاني ٣×٣ منتظم لقمع الضوضاء عالية التردد.',
+    },
+  },
+  gaussian: {
+    name: { en: 'Gaussian Blur (3×3)', ar: 'تنعيم غاوسي' },
+    matrix: [
+      [1, 2, 1],
+      [2, 4, 2],
+      [1, 2, 1],
+    ],
+    divisor: 16,
+    description: {
+      en: 'Distance-weighted isotropic smoothing preserving overall structural edges.',
+      ar: 'تنعيم متناظر موزون بالمسافة يحافظ على الهيكل العام للصورة.',
     },
   },
   ridge: {
-    name: { en: 'Ridge / Line Filter', ar: 'مرشح الخطوط البارزة' },
+    name: { en: 'Ridge / Line', ar: 'مرشح الخطوط' },
     matrix: [
       [-2, 1, -2],
       [1, 4, 1],
@@ -82,13 +97,12 @@ const KERNELS: Record<KernelType, KernelDef> = {
     ],
     description: {
       en: 'Emphasizes diagonal ridge structures and thin contours.',
-      ar: 'يركز على الهياكل والخطوط القطرية والخطوط الدقيقة.',
+      ar: 'يركز على الخطوط القطرية والحدود الدقيقة.',
     },
   },
 };
 
-// 6x6 Synthesized image containing a clear diagonal edge / shape
-const INPUT_IMAGE: number[][] = [
+const DEFAULT_IMAGE: number[][] = [
   [10, 10, 10, 240, 240, 240],
   [10, 20, 30, 240, 240, 240],
   [10, 30, 220, 240, 240, 240],
@@ -97,20 +111,103 @@ const INPUT_IMAGE: number[][] = [
   [240, 240, 240, 20, 10, 10],
 ];
 
-export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compact }) => {
+const CONV_PEDAGOGY: TierContent = {
+  intuition: {
+    analogy: {
+      en: 'Think of a convolution filter as a stencil or rubber stamp sliding across every patch of an image. Wherever the image pattern under the stamp matches the stencil values, the mathematical product peaks with high intensity!',
+      ar: 'تخيل مرشح الالتفاف كقالب ختم يتحرك فوق كل رقعة من الصورة. أينما تطابق نمط الصورة تحت القالب مع قيم المرشح، فإن حاصل الضرب الرياضي يصل إلى ذروته بكثافة عالية!',
+    },
+    keyTakeaway: {
+      en: 'Weight sharing gives CNNs translation equivariance: if a cat ear shifts 5 pixels to the right in the image, the corresponding activation in the feature map shifts 5 units to the right without needing new parameters.',
+      ar: 'تشارك الأوزان يمنح الشبكات الالتفافية خاصية التكافؤ الانتقالي: إذا تحركت ميزة معينة ٥ بكسلات لليمين، فإن الاستجابة في خريطة الخصائص تتحرك أيضاً ٥ وحدات لليمين بنفس المعاملات.',
+    },
+  },
+  geometry: {
+    visualDescription: {
+      en: 'A 3×3 kernel slides with stride S=1 across an H×W image without padding, compressing the spatial dimensions to (H - K + 1) × (W - K + 1) = 4×4. Each output pixel represents a local receptive field.',
+      ar: 'ينزلق مرشح ٣×٣ بخطوة ١ عبر صورة ٦×٦ بدون حشو، مقلصاً الأبعاد المكانية إلى ٤×٤، حيث يمثل كل بكسل في الخريطة الناتجة حقل استقبال موضعي.',
+    },
+    conservedQuantity: {
+      en: 'Linear spatial superposition: Conv(A + B, K) = Conv(A, K) + Conv(B, K).',
+      ar: 'خاصية التراكب الخطي المكاني: الالتفاف على مجموع صورتين يكافئ مجموع الالتفافين بشكل متطابق.',
+    },
+  },
+  formal: {
+    equation: '(I \\star K)(i, j) = \\sum_{m=0}^{K_h-1} \\sum_{n=0}^{K_w-1} I(i + m, j + n) K(m, n)',
+    derivationSteps: [
+      {
+        step: 'O_{h, w} = \\left\\lfloor \\frac{H - K_h + 2P}{S} \\right\\rfloor + 1',
+        note: {
+          en: 'Spatial output dimension formula with padding P and stride S',
+          ar: 'صيغة أبعاد الخريطة المكانية الناتجة بدلالة الحشو وخطوة الانزلاق',
+        },
+      },
+      {
+        step: '\\frac{\\partial \\mathcal{L}}{\\partial K(m, n)} = \\sum_{i} \\sum_{j} \\frac{\\partial \\mathcal{L}}{\\partial O(i, j)} I(i + m, j + n)',
+        note: {
+          en: 'Weight gradient accumulation: cross-correlation between input patches and upstream error',
+          ar: 'تراكم تدرج الأوزان: ترابط متقاطع بين رقع المدخلات وخطأ الطبقة اللاحقة',
+        },
+      },
+      {
+        step: '\\frac{\\partial \\mathcal{L}}{\\partial I} = \\frac{\\partial \\mathcal{L}}{\\partial O} \\star \\text{rot}_{180}(K)',
+        note: {
+          en: 'Input error propagation requires convolving upstream gradients with 180°-rotated kernel',
+          ar: 'انتشار الخطأ للمدخلات يتطلب تطبيق الالتفاف مع تدوير المرشح ١٨٠ درجة',
+        },
+      },
+    ],
+  },
+  code: {
+    snippet: `import numpy as np
+
+def im2col_indices(x: np.ndarray, kh: int = 3, kw: int = 3, stride: int = 1):
+    """
+    Transforms 2D image patches into 2D matrix columns for accelerated GEMM.
+    Replaces slow nested for-loops with highly-optimized BLAS matrix multiplication.
+    """
+    H, W = x.shape
+    out_h = (H - kh) // stride + 1
+    out_w = (W - kw) // stride + 1
+    
+    # Extract patches into matrix rows
+    cols = []
+    for r in range(0, H - kh + 1, stride):
+        for c in range(0, W - kw + 1, stride):
+            patch = x[r:r+kh, c:c+kw].flatten()
+            cols.append(patch)
+            
+    cols = np.array(cols) # Shape: (out_h * out_w, kh * kw)
+    return cols, (out_h, out_w)
+
+def conv2d_gemm(image: np.ndarray, kernel: np.ndarray):
+    cols, (out_h, out_w) = im2col_indices(image, kernel.shape[0], kernel.shape[1])
+    # Single BLAS matrix-vector product!
+    out = cols @ kernel.flatten()
+    return out.reshape(out_h, out_w)`,
+    explanation: {
+      en: 'The Im2Col algorithm restructures sliding spatial patches into contiguous memory columns so that convolution becomes a single high-performance GEMM (General Matrix Multiply).',
+      ar: 'تقوم خوارزمية Im2Col بإعادة ترتيب الرقع المكانية في أعمدة ذاكرة متجاورة ليتحول الالتفاف إلى ضرب مصفوفي فائق السرعة عبر مكتبات BLAS.',
+    },
+  },
+};
+
+export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = () => {
   const { language, config } = useOkvirStore();
 
   const [activeKernel, setActiveKernel] = useState<KernelType>('edge');
   const [windowRow, setWindowRow] = useState<number>(1);
   const [windowCol, setWindowCol] = useState<number>(1);
+  const [image, setImage] = useState<number[][]>(DEFAULT_IMAGE);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const timerRef = useRef<number | null>(null);
 
   const kernelDef = KERNELS[activeKernel];
   const K = kernelDef.matrix;
   const divisor = kernelDef.divisor || 1;
 
-  // Output feature map size: (H - Kh + 1) x (W - Kw + 1) = (6 - 3 + 1) = 4x4
-  const outRows = INPUT_IMAGE.length - 2;
-  const outCols = INPUT_IMAGE[0].length - 2;
+  const outRows = image.length - 2;
+  const outCols = image[0].length - 2;
 
   // Calculate full output feature map
   const featureMap = useMemo(() => {
@@ -121,7 +218,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
         let sum = 0;
         for (let kr = 0; kr < 3; kr++) {
           for (let kc = 0; kc < 3; kc++) {
-            sum += INPUT_IMAGE[r + kr][c + kc] * K[kr][kc];
+            sum += image[r + kr][c + kc] * K[kr][kc];
           }
         }
         rowArr.push(Math.round(sum / divisor));
@@ -129,7 +226,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
       res.push(rowArr);
     }
     return res;
-  }, [K, divisor, outRows, outCols]);
+  }, [K, divisor, outRows, outCols, image]);
 
   // Current window calculation breakdown
   const currentDetails = useMemo(() => {
@@ -137,7 +234,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
     let sum = 0;
     for (let kr = 0; kr < 3; kr++) {
       for (let kc = 0; kc < 3; kc++) {
-        const inVal = INPUT_IMAGE[windowRow + kr][windowCol + kc];
+        const inVal = image[windowRow + kr][windowCol + kc];
         const kVal = K[kr][kc];
         const prod = inVal * kVal;
         terms.push({ inVal, kVal, prod });
@@ -146,7 +243,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
     }
     const finalVal = Math.round(sum / divisor);
     return { terms, sum, finalVal };
-  }, [windowRow, windowCol, K, divisor]);
+  }, [windowRow, windowCol, K, divisor, image]);
 
   const selectWindow = (r: number, c: number) => {
     setWindowRow(r);
@@ -154,8 +251,70 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
     if (config.soundEnabled) audio.playClick();
   };
 
-  const handleKernelChange = (k: KernelType) => {
-    setActiveKernel(k);
+  const handleNextWindow = () => {
+    let nextC = windowCol + 1;
+    let nextR = windowRow;
+    if (nextC >= outCols) {
+      nextC = 0;
+      nextR = windowRow + 1;
+      if (nextR >= outRows) {
+        nextR = 0;
+      }
+    }
+    setWindowRow(nextR);
+    setWindowCol(nextC);
+    if (config.soundEnabled) audio.playClick();
+  };
+
+  const handlePrevWindow = () => {
+    let prevC = windowCol - 1;
+    let prevR = windowRow;
+    if (prevC < 0) {
+      prevC = outCols - 1;
+      prevR = windowRow - 1;
+      if (prevR < 0) {
+        prevR = outRows - 1;
+      }
+    }
+    setWindowRow(prevR);
+    setWindowCol(prevC);
+    if (config.soundEnabled) audio.playClick();
+  };
+
+  // Automated traversal playback loop
+  useEffect(() => {
+    if (!isPlaying) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    timerRef.current = window.setInterval(() => {
+      setWindowCol((c) => {
+        if (c + 1 < outCols) {
+          return c + 1;
+        } else {
+          setWindowRow((r) => (r + 1 < outRows ? r + 1 : 0));
+          return 0;
+        }
+      });
+      if (config.soundEnabled) audio.playClick();
+    }, 600);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isPlaying, outCols, outRows, config.soundEnabled]);
+
+  // Click pixel on image to cycle luminance (0 -> 128 -> 240 -> 0)
+  const cyclePixel = (r: number, c: number) => {
+    setImage((prev) => {
+      const next = prev.map((row) => [...row]);
+      const cur = next[r][c];
+      if (cur < 50) next[r][c] = 130;
+      else if (cur < 200) next[r][c] = 240;
+      else next[r][c] = 10;
+      return next;
+    });
     if (config.soundEnabled) audio.playClick();
   };
 
@@ -179,7 +338,10 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
           {(Object.keys(KERNELS) as KernelType[]).map((k) => (
             <button
               key={k}
-              onClick={() => handleKernelChange(k)}
+              onClick={() => {
+                setActiveKernel(k);
+                if (config.soundEnabled) audio.playClick();
+              }}
               className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
                 activeKernel === k
                   ? 'border-[var(--math-prediction)] bg-[var(--math-prediction)]/15 text-[var(--math-prediction)] font-semibold shadow-sm'
@@ -192,32 +354,72 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
         </div>
       </div>
 
+      {/* Traversal Playback Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-strong)] bg-[var(--bg-surface)] text-xs font-mono font-bold text-[var(--text-primary)] hover:border-emerald-500 transition-all shadow-sm"
+          >
+            {isPlaying ? <Pause size={13} className="text-amber-400" /> : <Play size={13} className="text-emerald-400" />}
+            <span>{isPlaying ? (language === 'ar' ? 'إيقاف' : 'Pause') : (language === 'ar' ? 'تشغيل المسح' : 'Scan Image')}</span>
+          </button>
+
+          <button
+            onClick={handlePrevWindow}
+            className="p-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] text-[var(--text-secondary)]"
+            title="Step Backward"
+          >
+            <SkipBack size={13} />
+          </button>
+
+          <button
+            onClick={handleNextWindow}
+            className="p-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] text-[var(--text-secondary)]"
+            title="Step Forward"
+          >
+            <SkipForward size={13} />
+          </button>
+
+          <button
+            onClick={() => {
+              setImage(DEFAULT_IMAGE);
+              setWindowRow(0);
+              setWindowCol(0);
+              if (config.soundEnabled) audio.playClick();
+            }}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-tertiary)] hover:border-[var(--border-strong)]"
+            title="Reset to default image"
+          >
+            <RotateCcw size={11} />
+            <span>{language === 'ar' ? 'إعادة ضبط الصورة' : 'Reset Image'}</span>
+          </button>
+        </div>
+
+        <div className="text-xs font-mono text-emerald-400">
+          Receptive Field Window: [{windowRow}, {windowCol}]
+        </div>
+      </div>
+
       {/* Main Grid: Input Image + Kernel + Output Map */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        {/* 1. Input Image 6x6 (5 cols) */}
+        {/* 1. Input Image 6x6 */}
         <div className="lg:col-span-4 flex flex-col items-center gap-2 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
           <div className="w-full flex justify-between items-center text-xs font-mono">
             <span className="text-[var(--text-primary)] font-semibold">
-              {language === 'ar' ? 'صورة الإدخال (6×6)' : 'Input Image I (6×6)'}
-            </span>
-            <span className="text-[10px] text-[var(--text-tertiary)]">
-              {language === 'ar' ? 'انقر لتغيير نافذة المرشح' : 'Click to place kernel'}
+              {language === 'ar' ? 'صورة الإدخال (انقر لتعديل البكسل)' : 'Input Image I (Click to paint)'}
             </span>
           </div>
 
           <div className="grid grid-cols-6 gap-1 p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
-            {INPUT_IMAGE.map((row, r) =>
+            {image.map((row, r) =>
               row.map((val, c) => {
                 const inKernel =
                   r >= windowRow && r < windowRow + 3 && c >= windowCol && c < windowCol + 3;
                 return (
                   <button
                     key={`${r}-${c}`}
-                    onClick={() => {
-                      const targetR = Math.max(0, Math.min(outRows - 1, r - 1));
-                      const targetC = Math.max(0, Math.min(outCols - 1, c - 1));
-                      selectWindow(targetR, targetC);
-                    }}
+                    onClick={() => cyclePixel(r, c)}
                     style={{
                       backgroundColor: `rgb(${val}, ${val}, ${val})`,
                       color: val > 128 ? '#09090b' : '#fafafa',
@@ -225,9 +427,9 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
                     className={`w-8 h-8 rounded text-[10px] font-mono font-bold flex items-center justify-center transition-all ${
                       inKernel
                         ? 'ring-2 ring-amber-400 scale-105 z-10 shadow-lg'
-                        : 'opacity-85 hover:opacity-100'
+                        : 'opacity-85 hover:opacity-100 hover:scale-95'
                     }`}
-                    title={`(${r}, ${c}) = ${val}`}
+                    title={`Click to cycle (${r}, ${c}) = ${val}`}
                   >
                     {val}
                   </button>
@@ -236,11 +438,11 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
             )}
           </div>
           <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
-            {language === 'ar' ? 'إطار التحديد الأصفر يمثل نافذة المرشح 3×3' : 'Yellow ring shows sliding 3×3 receptive field'}
+            {language === 'ar' ? 'انقر على أي بكسل لتغيير إضاءته ومشاهدة استجابة المرشح' : 'Click any pixel to cycle brightness (0 -> 130 -> 240)'}
           </span>
         </div>
 
-        {/* 2. Kernel Matrix 3x3 (3 cols) */}
+        {/* 2. Kernel Matrix 3x3 */}
         <div className="lg:col-span-3 flex flex-col items-center gap-2 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
           <div className="w-full flex justify-between items-center text-xs font-mono">
             <span className="text-[var(--text-primary)] font-semibold">
@@ -264,11 +466,11 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
             )}
           </div>
           <span className="text-[10px] font-mono text-[var(--text-tertiary)] text-center">
-            {language === 'ar' ? 'معاملات الأوزان المشتركة المطبقة' : 'Shared weights convolved across spatial dimensions'}
+            {language === 'ar' ? 'أوزان مشتركة تُطبق مكانياً عبر الصورة' : 'Shared weights convolved across 2D spatial plane'}
           </span>
         </div>
 
-        {/* 3. Output Feature Map 4x4 (5 cols) */}
+        {/* 3. Output Feature Map 4x4 */}
         <div className="lg:col-span-5 flex flex-col items-center gap-2 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
           <div className="w-full flex justify-between items-center text-xs font-mono">
             <span className="text-emerald-400 font-semibold">
@@ -283,7 +485,6 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
             {featureMap.map((row, r) =>
               row.map((val, c) => {
                 const isSelected = r === windowRow && c === windowCol;
-                // Clamp display brightness 0..255 for feature visualization
                 const displayLum = Math.max(0, Math.min(255, Math.abs(val)));
                 return (
                   <button
@@ -336,6 +537,9 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
           {divisor !== 1 && ` = (${currentDetails.sum}) / ${divisor}`} = <strong className="text-emerald-300">{currentDetails.finalVal}</strong>
         </div>
       </div>
+
+      {/* 4-Tier Cognitive Disclosure */}
+      <MultiTierDisclosure content={CONV_PEDAGOGY} />
     </div>
   );
 };

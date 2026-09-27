@@ -16,10 +16,7 @@ function App() {
     currentView,
     isCommandPaletteOpen,
     setCommandPaletteOpen,
-    toggleTheme,
-    setLanguage,
     setCurrentView,
-    setActiveSimulation,
   } = useOkvirStore();
 
   // Initialize theme + language attributes on mount

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
 
@@ -14,14 +14,14 @@ export const RaycastActionBar: React.FC = () => {
     updateLessonBeat,
   } = useOkvirStore();
 
-  const handleNextBeat = () => {
+  const handleNextBeat = useCallback(() => {
     if (currentView === 'lesson') {
       const lesson = lessons[activeLessonId];
       if (lesson && lesson.currentBeat < 4) {
         updateLessonBeat(activeLessonId, (lesson.currentBeat + 1) as 1 | 2 | 3 | 4);
       }
     }
-  };
+  }, [currentView, lessons, activeLessonId, updateLessonBeat]);
 
   // Keyboard shortcut listener
   useEffect(() => {
@@ -48,7 +48,7 @@ export const RaycastActionBar: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCommandPaletteOpen, setCommandPaletteOpen, currentView, activeLessonId, lessons, setCurrentView]);
+  }, [isCommandPaletteOpen, setCommandPaletteOpen, currentView, setCurrentView, handleNextBeat]);
 
   const actions = [
     {

@@ -1,66 +1,110 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useOkvirStore } from '@/lib/store';
-import { tr } from '@/lib/i18n';
 import { TimelinePlaybackBar } from '@/components/simulation/TimelinePlaybackBar';
 import { MultiTierDisclosure, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 import { audio } from '@/lib/audio';
+import { sonifier } from '@/lib/audio/WebAudioSonifier';
+import { GitCompare } from 'lucide-react';
 
-// Non-convex loss surface with ripples and bowl
-const f = (x: number, y: number) => 0.5 * (x * x + y * y) + 0.18 * Math.sin(x * y);
-const dfdx = (x: number, y: number) => x + 0.18 * y * Math.cos(x * y);
-const dfdy = (x: number, y: number) => y + 0.18 * x * Math.cos(x * y);
+type OptimizerType = 'sgd' | 'momentum' | 'rmsprop' | 'adam';
+type SurfaceType = 'bowl' | 'rosenbrock' | 'saddle';
+
+interface LossSurfaceDef {
+  name: { en: string; ar: string };
+  f: (x: number, y: number) => number;
+  grad: (x: number, y: number) => [number, number];
+  bounds: { minX: number; maxX: number; minY: number; maxY: number };
+  defaultStart: { x: number; y: number };
+}
+
+const SURFACES: Record<SurfaceType, LossSurfaceDef> = {
+  bowl: {
+    name: { en: 'Rippled Quadratic Bowl', ar: 'حوض تربيعي متموج' },
+    f: (x, y) => 0.5 * (x * x + y * y) + 0.18 * Math.sin(x * y),
+    grad: (x, y) => [
+      x + 0.18 * y * Math.cos(x * y),
+      y + 0.18 * x * Math.cos(x * y),
+    ],
+    bounds: { minX: -5, maxX: 5, minY: -5, maxY: 5 },
+    defaultStart: { x: 3.5, y: 3.5 },
+  },
+  rosenbrock: {
+    name: { en: 'Rosenbrock Banana Valley', ar: 'وادي روزنبروك المنحني' },
+    f: (x, y) => Math.pow(1 - x, 2) + 10 * Math.pow(y - x * x, 2),
+    grad: (x, y) => [
+      -2 * (1 - x) - 40 * x * (y - x * x),
+      20 * (y - x * x),
+    ],
+    bounds: { minX: -2.5, maxX: 2.5, minY: -1.5, maxY: 3.5 },
+    defaultStart: { x: -1.8, y: 2.2 },
+  },
+  saddle: {
+    name: { en: 'Saddle Point (Minimax)', ar: 'نقطة السرج' },
+    f: (x, y) => 0.5 * (x * x - y * y),
+    grad: (x, y) => [x, -y],
+    bounds: { minX: -4, maxX: 4, minY: -4, maxY: 4 },
+    defaultStart: { x: 0.1, y: 2.5 },
+  },
+};
 
 const GD_TIER_CONTENT: TierContent = {
   intuition: {
     analogy: {
-      en: 'Imagine being blindfolded on a rugged mountain in heavy fog. You feel the ground with your boots for the steepest downward slope and take a careful step in that direction.',
-      ar: 'تخيّل أنك معصوب العينين على منحدر جبل وعر يغطيه ضباب كثيف. تتحسس الأرض بحذائك لتعرف الاتجاه الأكثر انحداراً نحو الأسفل، ثم تخطو خطوة حذرة في ذلك الاتجاه.',
+      en: 'Imagine rolling a heavy steel marble down a foggy mountain valley. Pure SGD is like a lightweight ping-pong ball that bounces helplessly between valley walls; Momentum is like a heavy cannonball whose inertia carries it straight through narrow ravines.',
+      ar: 'تخيّل دحرجة كرة فولاذية ثقيلة أسفل وادٍ جبلي يلفه الضباب. الانحدار البسيط SGD يشبه كرة تنس خفيفة تتخبط عشوائياً بين الجدران، بينما يشبه الزخم كرة مدفع ثقيلة يحملها عزم القصور الذاتي مباشرة نحو المصب.',
     },
     keyTakeaway: {
-      en: 'Gradient Descent moves iteratively in the opposite direction of the gradient vector to find a local or global minimum.',
-      ar: 'يتحرك الانحدار التدرجي تكرارياً في الاتجاه المعاكس لمتجه التدرج للوصول إلى القاع أو النهاية الصغرى.',
+      en: 'First-order optimization methods navigate parameter space using gradient vectors; momentum and adaptive preconditioners (Adam) accelerate convergence in ill-conditioned ravines.',
+      ar: 'طرق التحسين من الدرجة الأولى توجه المعاملات عكس متجه التدرج؛ ويعمل الزخم وتكييف الخطوة (Adam) على تسريع التقارب في المنحدرات غير المتوازنة.',
     },
   },
   geometry: {
     visualDescription: {
-      en: 'The gradient vector ∇f(θ) points in the direction of greatest rate of increase and is always strictly orthogonal to the level curve contours.',
-      ar: 'يشير متجه التدرج ∇f(θ) إلى اتجاه أقصى زيادة في الدالة، ويكون دائماً عمودياً تماماً على خطوط الكنتور.',
+      en: 'The gradient vector ∇f(θ) is always strictly perpendicular to the level curves. In narrow ravines with high condition number κ = λ_max / λ_min, SGD oscillates violently perpendicular to the valley instead of progressing along it.',
+      ar: 'يكون متجه التدرج ∇f(θ) عمودياً دائماً على خطوط الكنتور. في الأخاديد الضيقة ذات رقم التكيف العالي κ، يتذبذب SGD بعنف عمودياً على الوادي بدلاً من التقدم على طوله.',
     },
     conservedQuantity: {
-      en: 'Monotonic loss decay in convex regimes: f(θ_{t+1}) ≤ f(θ_t) when learning rate satisfies the Lipschitz smoothness condition η ≤ 1/L.',
-      ar: 'تناقص رتيب لدالة الخسارة عند تحقق شرط ليبشيتز لنعومة السطح: η ≤ 1/L.',
+      en: 'Monotonic Lyapunov function in damped momentum systems: E(t) = f(θ_t) + 0.5 ||v_t||^2 decays monotonically.',
+      ar: 'دالة لياكونوف التناقصية في أنظمة الزخم المخمد: تنخفض الطاقة الكلية بشكل رتيب مع الوقت.',
     },
   },
   formal: {
-    equation: '\\theta_{t+1} = \\theta_t - \\eta \\nabla L(\\theta_t) + \\beta v_t',
+    equation: '\\mathbf{m}_t = \\beta_1 \\mathbf{m}_{t-1} + (1-\\beta_1)\\mathbf{g}_t, \\quad \\mathbf{v}_t = \\beta_2 \\mathbf{v}_{t-1} + (1-\\beta_2)\\mathbf{g}_t^2, \\quad \\theta_{t+1} = \\theta_t - \\frac{\\eta}{\\sqrt{\\hat{\\mathbf{v}}_t} + \\epsilon} \\hat{\\mathbf{m}}_t',
     derivationSteps: [
       {
-        step: 'v_t = \\beta v_{t-1} + (1 - \\beta) \\nabla L(\\theta_t)',
-        note: { en: 'Polyak heavy-ball momentum accumulator', ar: 'مراكم الزخم لكرات بلياك الثقيلة لتسريع الوديان' },
+        step: '\\hat{\\mathbf{m}}_t = \\frac{\\mathbf{m}_t}{1 - \\beta_1^t}, \\quad \\hat{\\mathbf{v}}_t = \\frac{\\mathbf{v}_t}{1 - \\beta_2^t}',
+        note: { en: 'Bias correction compensating for zero initialization at early steps', ar: 'تصحيح الانحياز لتعويض التهيئة الصفرية في الخطوات الأولى' },
       },
       {
-        step: '\\theta_{t+1} = \\theta_t - \\eta v_t',
-        note: { en: 'Parameter translation along momentum vector', ar: 'تحديث المعاملات باتجاه متجه الزخم' },
+        step: '\\kappa = \\frac{\\lambda_{\\max}(\\mathbf{H})}{\\lambda_{\\min}(\\mathbf{H})} \\implies \\text{Convergence rate: } \\mathcal{O}\\left(\\frac{\\kappa - 1}{\\kappa + 1}\\right)',
+        note: { en: 'Hessian condition number dictates convergence speed of first-order algorithms', ar: 'رقم تكيف مصفوفة هيسيان يحدد سرعة التقارب لخوارزميات التدرج' },
       },
     ],
   },
   code: {
     snippet: `import numpy as np
 
-def gradient_descent(x0: float, y0: float, lr=0.08, beta=0.85, steps=100):
-    pos = np.array([x0, y0], dtype=float)
-    vel = np.zeros(2)
-    trajectory = [pos.copy()]
+def adam_optimizer(grad_fn, theta0: np.ndarray, lr=0.05, beta1=0.9, beta2=0.999, eps=1e-8, steps=100):
+    theta = theta0.copy()
+    m = np.zeros_like(theta)
+    v = np.zeros_like(theta)
+    trajectory = [theta.copy()]
     
-    for _ in range(steps):
-        grad = np.array([dfdx(pos[0], pos[1]), dfdy(pos[0], pos[1])])
-        vel = beta * vel - lr * grad
-        pos += vel
-        trajectory.append(pos.copy())
+    for t in range(1, steps + 1):
+        g = grad_fn(theta[0], theta[1])
+        m = beta1 * m + (1.0 - beta1) * g
+        v = beta2 * v + (1.0 - beta2) * (g ** 2)
+        
+        # Bias-corrected moments
+        m_hat = m / (1.0 - beta1 ** t)
+        v_hat = v / (1.0 - beta2 ** t)
+        
+        theta -= lr * m_hat / (np.sqrt(v_hat) + eps)
+        trajectory.append(theta.copy())
     return np.array(trajectory)`,
     explanation: {
-      en: 'Momentum dampens high-frequency transverse oscillations in narrow ravines while accelerating along the longitudinal gradient valley.',
-      ar: 'يخمد الزخم التذبذبات العرضية المشتتة في الأخاديد الضيقة بينما يسرع الحركة على طول مسار القاع.',
+      en: 'Adam combines Polyak momentum with AdaGrad elementwise root-mean-square scaling, automatically tuning step sizes per coordinate.',
+      ar: 'تدمج خوارزمية آدم بين الزخم والتحجيم التكيفي لكل إحداثي منفرداً لمقاومة تشتت التدرج.',
     },
   },
 };
@@ -73,339 +117,457 @@ interface TrajectorySnapshot {
   gradNorm: number;
 }
 
-export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
+export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { learningRate, momentum, setLearningRate, setMomentum, theme, language, config } = useOkvirStore();
 
+  const [surfaceType, setSurfaceType] = useState<SurfaceType>('bowl');
+  const [optimizer, setOptimizer] = useState<OptimizerType>('momentum');
   const [startPos, setStartPos] = useState({ x: 3.5, y: 3.5 });
   const [trajectory, setTrajectory] = useState<TrajectorySnapshot[]>([]);
+  const [ghostSgdTrajectory, setGhostSgdTrajectory] = useState<TrajectorySnapshot[]>([]);
+  const [showComparison, setShowComparison] = useState<boolean>(true);
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
-  const [showPedagogy, setShowPedagogy] = useState(false);
+  const dragging = useRef(false);
 
-  // Pre-generate trajectory snapshots whenever startPos, lr, or momentum changes
-  const computeTrajectory = useCallback(() => {
-    const snaps: TrajectorySnapshot[] = [];
-    let p = { ...startPos };
-    let v = { x: 0, y: 0 };
+  const surface = SURFACES[surfaceType];
+
+  // Compute trajectories for active optimizer & reference SGD
+  const computeTrajectories = useCallback(() => {
+    const curSurface = SURFACES[surfaceType];
     const maxSteps = 80;
 
-    for (let step = 0; step <= maxSteps; step++) {
-      const currentLoss = f(p.x, p.y);
-      const gx = dfdx(p.x, p.y);
-      const gy = dfdy(p.x, p.y);
-      const gradNorm = Math.hypot(gx, gy);
+    const runOpt = (opt: OptimizerType): TrajectorySnapshot[] => {
+      const snaps: TrajectorySnapshot[] = [];
+      const p = { ...startPos };
+      const v = { x: 0, y: 0 };
+      const s = { x: 0, y: 0 };
+      const eps = 1e-6;
 
-      snaps.push({
-        step,
-        x: p.x,
-        y: p.y,
-        loss: currentLoss,
-        gradNorm,
-      });
+      for (let t = 0; t <= maxSteps; t++) {
+        const loss = curSurface.f(p.x, p.y);
+        const [gx, gy] = curSurface.grad(p.x, p.y);
+        const gradNorm = Math.hypot(gx, gy);
 
-      if (gradNorm < 0.005 || Math.abs(p.x) > 12 || Math.abs(p.y) > 12) break;
+        snaps.push({ step: t, x: p.x, y: p.y, loss, gradNorm });
 
-      // Momentum step
-      v = {
-        x: momentum * v.x - learningRate * gx,
-        y: momentum * v.y - learningRate * gy,
-      };
-      p = {
-        x: p.x + v.x,
-        y: p.y + v.y,
-      };
-    }
-    setTrajectory(snaps);
-    setCurrentStepIdx(0);
-  }, [startPos, learningRate, momentum]);
+        if (opt === 'sgd') {
+          p.x -= learningRate * gx;
+          p.y -= learningRate * gy;
+        } else if (opt === 'momentum') {
+          v.x = momentum * v.x - learningRate * gx;
+          v.y = momentum * v.y - learningRate * gy;
+          p.x += v.x;
+          p.y += v.y;
+        } else if (opt === 'rmsprop') {
+          s.x = 0.9 * s.x + 0.1 * gx * gx;
+          s.y = 0.9 * s.y + 0.1 * gy * gy;
+          p.x -= (learningRate / Math.sqrt(s.x + eps)) * gx;
+          p.y -= (learningRate / Math.sqrt(s.y + eps)) * gy;
+        } else if (opt === 'adam') {
+          const stepNum = t + 1;
+          v.x = 0.9 * v.x + 0.1 * gx;
+          v.y = 0.9 * v.y + 0.1 * gy;
+          s.x = 0.999 * s.x + 0.001 * gx * gx;
+          s.y = 0.999 * s.y + 0.001 * gy * gy;
+
+          const mHatX = v.x / (1 - Math.pow(0.9, stepNum));
+          const mHatY = v.y / (1 - Math.pow(0.9, stepNum));
+          const sHatX = s.x / (1 - Math.pow(0.999, stepNum));
+          const sHatY = s.y / (1 - Math.pow(0.999, stepNum));
+
+          p.x -= (learningRate / (Math.sqrt(sHatX) + eps)) * mHatX;
+          p.y -= (learningRate / (Math.sqrt(sHatY) + eps)) * mHatY;
+        }
+
+        // Clamp to prevent infinite explosion
+        p.x = Math.max(-10, Math.min(10, p.x));
+        p.y = Math.max(-10, Math.min(10, p.y));
+      }
+      return snaps;
+    };
+
+    const mainTraj = runOpt(optimizer);
+    const sgdTraj = runOpt('sgd');
+    setTrajectory(mainTraj);
+    setGhostSgdTrajectory(sgdTraj);
+  }, [surfaceType, optimizer, startPos, learningRate, momentum]);
 
   useEffect(() => {
-    computeTrajectory();
-  }, [computeTrajectory]);
+    computeTrajectories();
+  }, [computeTrajectories]);
 
-  const activeSnap = trajectory[currentStepIdx] || {
-    step: 0,
-    x: startPos.x,
-    y: startPos.y,
-    loss: f(startPos.x, startPos.y),
-    gradNorm: 0,
-  };
+  // Sonification on step change
+  useEffect(() => {
+    if (!config.soundEnabled || trajectory.length === 0) return;
+    const snap = trajectory[Math.min(currentStepIdx, trajectory.length - 1)];
+    if (!snap) return;
 
-  // Render Canvas
-  const renderFrame = useCallback(() => {
+    if (currentStepIdx === trajectory.length - 1 && snap.loss < 0.1) {
+      sonifier.playConvergenceChime();
+    } else {
+      sonifier.updateLoss(snap.loss);
+    }
+  }, [currentStepIdx, trajectory, config.soundEnabled]);
+
+  // Render Frame
+  const render = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
 
-    const width = rect.width;
-    const height = rect.height;
+    ctx.save();
+    ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, width, height);
 
-    const pad = 24;
-    const plotW = width - pad * 2;
-    const plotH = height - pad * 2;
-    const range = 5.2;
-    const toCanvasX = (x: number) => pad + ((x + range) / (2 * range)) * plotW;
-    const toCanvasY = (y: number) => pad + ((range - y) / (2 * range)) * plotH;
-
-    // 1. Concentric Contour Field Lines
-    const levels = [0.15, 0.4, 0.9, 1.8, 3.2, 5.5, 9.0, 14.0, 20.0];
-    const res = 4;
-    levels.forEach((level, li) => {
-      ctx.beginPath();
-      for (let py = 0; py <= height; py += res) {
-        for (let px = 0; px <= width; px += res) {
-          const wx = ((px - pad) / plotW) * (2 * range) - range;
-          const wy = range - ((py - pad) / plotH) * (2 * range);
-          const val = f(wx, wy);
-          const valX = f(wx + (res / plotW) * 2 * range, wy);
-          const valY = f(wx, wy + (res / plotH) * 2 * range);
-          if (
-            (val < level && valX >= level) ||
-            (val >= level && valX < level) ||
-            (val < level && valY >= level) ||
-            (val >= level && valY < level)
-          ) {
-            ctx.rect(px, py, 1.2, 1.2);
-          }
-        }
-      }
-      const opacity = 0.05 + (1 - li / levels.length) * 0.12;
-      ctx.fillStyle = theme === 'dark' ? `rgba(245, 158, 11, ${opacity})` : `rgba(217, 119, 6, ${opacity})`;
-      ctx.fill();
+    const b = surface.bounds;
+    const toPx = (x: number, y: number) => ({
+      px: ((x - b.minX) / (b.maxX - b.minX)) * width,
+      py: (1 - (y - b.minY) / (b.maxY - b.minY)) * height,
     });
 
-    // 2. Coordinate Axes
-    ctx.strokeStyle = theme === 'dark' ? '#27272a' : '#e4e4e7';
-    ctx.lineWidth = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(toCanvasX(0), pad);
-    ctx.lineTo(toCanvasX(0), pad + plotH);
-    ctx.moveTo(pad, toCanvasY(0));
-    ctx.lineTo(pad + plotW, toCanvasY(0));
-    ctx.stroke();
-
-    // 3. Optimization Trajectory Trail up to current step
-    if (trajectory.length > 1) {
-      // Full future trail (faint)
+    // 1. Loss Contours
+    const numLevels = 10;
+    for (let l = 1; l <= numLevels; l++) {
       ctx.beginPath();
-      trajectory.forEach((t, i) => {
-        const cx = toCanvasX(t.x);
-        const cy = toCanvasY(t.y);
-        if (i === 0) ctx.moveTo(cx, cy);
-        else ctx.lineTo(cx, cy);
-      });
-      ctx.strokeStyle = theme === 'dark' ? 'rgba(168, 85, 247, 0.25)' : 'rgba(124, 58, 237, 0.2)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      ctx.strokeStyle =
+        theme === 'dark'
+          ? `rgba(168, 85, 247, ${0.05 + (l / numLevels) * 0.18})`
+          : `rgba(147, 51, 234, ${0.05 + (l / numLevels) * 0.16})`;
+      ctx.lineWidth = 1;
 
-      // Active trail (solid)
-      ctx.beginPath();
-      for (let i = 0; i <= currentStepIdx; i++) {
-        const t = trajectory[i];
-        if (!t) break;
-        const cx = toCanvasX(t.x);
-        const cy = toCanvasY(t.y);
-        if (i === 0) ctx.moveTo(cx, cy);
-        else ctx.lineTo(cx, cy);
-      }
-      ctx.strokeStyle = theme === 'dark' ? '#a855f7' : '#7c3aed';
-      ctx.lineWidth = 2.5;
+      // Draw approximate contour circles/ellipses
+      const r = (l / numLevels) * (surfaceType === 'rosenbrock' ? 1.8 : 4.0);
+      const center = toPx(surfaceType === 'rosenbrock' ? 1.0 : 0, surfaceType === 'rosenbrock' ? 1.0 : 0);
+      const rx = (r / (b.maxX - b.minX)) * width;
+      const ry = (r / (b.maxY - b.minY)) * height;
+      ctx.ellipse(center.px, center.py, rx, ry, 0, 0, Math.PI * 2);
       ctx.stroke();
     }
 
-    // 4. Global Minimum Target Crosshair (0, 0)
-    ctx.beginPath();
-    ctx.arc(toCanvasX(0), toCanvasY(0), 5, 0, Math.PI * 2);
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    // 2. Ghost SGD Trajectory (Comparison Mode)
+    if (showComparison && optimizer !== 'sgd' && ghostSgdTrajectory.length > 0) {
+      ctx.beginPath();
+      ctx.setLineDash([4, 4]);
+      ghostSgdTrajectory.forEach((snap, idx) => {
+        const pt = toPx(snap.x, snap.y);
+        if (idx === 0) ctx.moveTo(pt.px, pt.py);
+        else ctx.lineTo(pt.px, pt.py);
+      });
+      ctx.strokeStyle = 'rgba(244, 63, 94, 0.45)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
 
-    // 5. Active Optimization Particle
-    const curX = toCanvasX(activeSnap.x);
-    const curY = toCanvasY(activeSnap.y);
+    // 3. Active Optimizer Trajectory Path
+    if (trajectory.length > 0) {
+      const activeSnaps = trajectory.slice(0, currentStepIdx + 1);
+      ctx.beginPath();
+      activeSnaps.forEach((snap, idx) => {
+        const pt = toPx(snap.x, snap.y);
+        if (idx === 0) ctx.moveTo(pt.px, pt.py);
+        else ctx.lineTo(pt.px, pt.py);
+      });
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
 
-    // Radial Glow Halo
-    const gradient = ctx.createRadialGradient(curX, curY, 0, curX, curY, 15);
-    gradient.addColorStop(0, 'rgba(168, 85, 247, 0.7)');
-    gradient.addColorStop(1, 'rgba(168, 85, 247, 0)');
+      // Path dots
+      activeSnaps.forEach((snap, idx) => {
+        if (idx % 2 === 0) {
+          const pt = toPx(snap.x, snap.y);
+          ctx.beginPath();
+          ctx.arc(pt.px, pt.py, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#10b981';
+          ctx.fill();
+        }
+      });
+
+      // 4. Current Marble Bead
+      const cur = activeSnaps[activeSnaps.length - 1];
+      if (cur) {
+        const curPx = toPx(cur.x, cur.y);
+        // Halo
+        ctx.beginPath();
+        ctx.arc(curPx.px, curPx.py, 12, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
+        ctx.fill();
+        // Core
+        ctx.beginPath();
+        ctx.arc(curPx.px, curPx.py, 7, 0, Math.PI * 2);
+        ctx.fillStyle = '#10b981';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.font = 'bold 11px monospace';
+        ctx.fillStyle = '#10b981';
+        ctx.fillText(`L = ${cur.loss.toFixed(3)}`, curPx.px + 12, curPx.py - 6);
+      }
+    }
+
+    // 5. Start Position Marker (Draggable)
+    const startPx = toPx(startPos.x, startPos.y);
     ctx.beginPath();
-    ctx.arc(curX, curY, 15, 0, Math.PI * 2);
-    ctx.fillStyle = gradient;
+    ctx.arc(startPx.px, startPx.py, 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#f59e0b';
     ctx.fill();
-
-    // Solid core
-    ctx.beginPath();
-    ctx.arc(curX, curY, 5.5, 0, Math.PI * 2);
-    ctx.fillStyle = '#fafafa';
-    ctx.fill();
-    ctx.strokeStyle = '#a855f7';
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Negative Gradient Vector Arrow (-∇L)
-    const gx = dfdx(activeSnap.x, activeSnap.y);
-    const gy = dfdy(activeSnap.x, activeSnap.y);
-    const arrowLen = 18;
-    const gNorm = Math.hypot(gx, gy) || 1;
-    const arrowEndX = curX - (gx / gNorm) * arrowLen;
-    const arrowEndY = curY + (gy / gNorm) * arrowLen;
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillText('Start θ₀', startPx.px + 8, startPx.py + 12);
 
-    ctx.beginPath();
-    ctx.moveTo(curX, curY);
-    ctx.lineTo(arrowEndX, arrowEndY);
-    ctx.strokeStyle = '#f43f5e';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  }, [trajectory, currentStepIdx, activeSnap, theme]);
+    ctx.restore();
+  }, [
+    surface,
+    surfaceType,
+    optimizer,
+    startPos,
+    trajectory,
+    ghostSgdTrajectory,
+    showComparison,
+    currentStepIdx,
+    theme,
+  ]);
 
   useEffect(() => {
-    renderFrame();
-  }, [renderFrame]);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    render();
+  }, [render]);
 
-  // Click on Canvas to Reposition Particle
+  // Pointer interactions to drag startPos
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const rect = canvas.getBoundingClientRect();
     const px = e.clientX - rect.left;
     const py = e.clientY - rect.top;
-    const width = rect.width;
-    const height = rect.height;
+    const b = surface.bounds;
 
-    const pad = 24;
-    const plotW = width - pad * 2;
-    const plotH = height - pad * 2;
-    const range = 5.2;
+    const dataX = b.minX + (px / rect.width) * (b.maxX - b.minX);
+    const dataY = b.minY + (1 - py / rect.height) * (b.maxY - b.minY);
 
-    const newX = Number((((px - pad) / plotW) * (2 * range) - range).toFixed(2));
-    const newY = Number((range - ((py - pad) / plotH) * (2 * range)).toFixed(2));
+    setStartPos({
+      x: Number(dataX.toFixed(2)),
+      y: Number(dataY.toFixed(2)),
+    });
+    dragging.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    if (config.soundEnabled) audio.playClick();
+  };
 
-    setStartPos({ x: newX, y: newY });
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!dragging.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+    const py = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+    const b = surface.bounds;
+
+    const dataX = b.minX + (px / rect.width) * (b.maxX - b.minX);
+    const dataY = b.minY + (1 - py / rect.height) * (b.maxY - b.minY);
+
+    setStartPos({
+      x: Number(dataX.toFixed(2)),
+      y: Number(dataY.toFixed(2)),
+    });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (dragging.current) {
+      dragging.current = false;
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+      if (config.soundEnabled) audio.playClick();
+    }
+  };
+
+  const handleSelectSurface = (s: SurfaceType) => {
+    setSurfaceType(s);
+    setStartPos(SURFACES[s].defaultStart);
+    setCurrentStepIdx(0);
     if (config.soundEnabled) audio.playClick();
   };
 
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
-      {/* 1. Header */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-mono">
-              Loss f(x, y):
-            </span>
-            <span className="font-mono text-sm font-semibold tabular-nums text-[var(--math-loss)]">
-              {activeSnap.loss.toFixed(4)}
-            </span>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-[var(--text-secondary)]">
-            <span>||∇L||:</span>
-            <span className="font-semibold text-purple-400 tabular-nums">
-              {activeSnap.gradNorm.toFixed(3)}
-            </span>
-          </div>
+    <div className="flex flex-col gap-4 select-none">
+      {/* Top Toolbar: Surfaces & Optimizers */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
+        {/* Surface selector */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-xs font-mono text-[var(--text-tertiary)] uppercase tracking-wider me-1">
+            {language === 'ar' ? 'السطح:' : 'Loss Surface:'}
+          </span>
+          {(Object.keys(SURFACES) as SurfaceType[]).map((st) => (
+            <button
+              key={st}
+              onClick={() => handleSelectSurface(st)}
+              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+                surfaceType === st
+                  ? 'border-[var(--math-gradient)] bg-[var(--math-gradient)]/15 text-[var(--math-gradient)] font-bold shadow-sm'
+                  : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
+              }`}
+            >
+              {SURFACES[st].name[language]}
+            </button>
+          ))}
         </div>
 
-        <button
-          onClick={() => setShowPedagogy(!showPedagogy)}
-          className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
-            showPedagogy
-              ? 'border-[var(--math-gradient)] bg-[var(--math-gradient)]/10 text-[var(--math-gradient)]'
-              : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
-          }`}
-        >
-          {language === 'ar' ? 'التحليل المعرفي' : '4-Tier Deep Dive'}
-        </button>
+        {/* Optimizer selector pills */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-xs font-mono text-[var(--text-tertiary)] uppercase tracking-wider me-1">
+            Optimizer:
+          </span>
+          {(['sgd', 'momentum', 'rmsprop', 'adam'] as OptimizerType[]).map((opt) => (
+            <button
+              key={opt}
+              onClick={() => {
+                setOptimizer(opt);
+                if (config.soundEnabled) audio.playClick();
+              }}
+              className={`px-2.5 py-1 text-xs font-mono rounded-lg border uppercase transition-all ${
+                optimizer === opt
+                  ? 'border-emerald-400 bg-emerald-500/15 text-emerald-300 font-bold shadow-sm'
+                  : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
+              }`}
+            >
+              {opt}
+            </button>
+          ))}
+
+          {/* Toggle SGD Ghost Comparison */}
+          {optimizer !== 'sgd' && (
+            <button
+              onClick={() => setShowComparison(!showComparison)}
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+                showComparison
+                  ? 'border-rose-400 bg-rose-500/15 text-rose-300 font-bold'
+                  : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+              }`}
+              title="Compare against Vanilla SGD path"
+            >
+              <GitCompare size={12} />
+              <span>vs SGD</span>
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* 2. Interactive Canvas */}
-      <div className="relative w-full h-80 rounded-lg overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+      {/* Main Interactive Loss Surface Canvas */}
+      <div className="relative rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-app)] overflow-hidden shadow-inner p-2">
         <canvas
           ref={canvasRef}
           onPointerDown={handlePointerDown}
-          className="w-full h-full block cursor-crosshair"
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          className="w-full h-80 rounded-xl cursor-crosshair touch-none"
         />
 
-        <div className="absolute top-2.5 start-2.5 pointer-events-none">
-          <span className="text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--bg-surface)]/90 backdrop-blur-md px-2 py-0.5 rounded border border-[var(--border-subtle)]">
-            Click anywhere on contour surface to relocate starting marble
-          </span>
+        <div className="absolute top-4 start-4 px-2.5 py-1 rounded-md bg-[var(--bg-surface)]/80 backdrop-blur-md border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-tertiary)]">
+          {language === 'ar' ? 'انقر في أي مكان لوضع كرة البداية θ₀' : 'Click anywhere on contour surface to drop marble θ₀'}
         </div>
 
-        <div className="absolute top-2.5 end-2.5 pointer-events-none">
-          <span className="text-[10px] font-mono text-purple-300 bg-[var(--bg-surface)]/90 backdrop-blur-md px-2 py-0.5 rounded border border-[var(--border-subtle)]">
-            ({activeSnap.x.toFixed(2)}, {activeSnap.y.toFixed(2)})
-          </span>
+        {/* Live Step Badge */}
+        {trajectory.length > 0 && (
+          <div className="absolute top-4 end-4 flex items-center gap-3 px-3 py-1.5 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-xs font-mono shadow-sm">
+            <div>
+              <span className="text-[var(--text-tertiary)]">Loss: </span>
+              <span className="text-emerald-400 font-bold tabular-nums">
+                {trajectory[Math.min(currentStepIdx, trajectory.length - 1)]?.loss.toFixed(3)}
+              </span>
+            </div>
+            <div className="w-px h-3 bg-[var(--border-subtle)]" />
+            <div>
+              <span className="text-[var(--text-tertiary)]">Step: </span>
+              <span className="text-purple-400 font-bold tabular-nums">
+                {currentStepIdx} / {trajectory.length - 1}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Bidirectional Playback Timeline Bar */}
+      <TimelinePlaybackBar
+        currentStep={currentStepIdx}
+        totalSteps={Math.max(1, trajectory.length - 1)}
+        stepPhase={optimizer.toUpperCase()}
+        metricLabel="Loss"
+        metricValue={trajectory[Math.min(currentStepIdx, trajectory.length - 1)]?.loss || 0}
+        onStepChange={(step) => setCurrentStepIdx(step)}
+      />
+
+      {/* Hardware-Style Precision Parameter Sliders */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
+        <div className="flex flex-col gap-1.5">
+          <div className="flex justify-between text-xs font-mono text-[var(--text-secondary)]">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[var(--math-gradient)]" />
+              <span>{language === 'ar' ? 'معدل التعلم (η):' : 'Learning Rate (η):'}</span>
+            </span>
+            <span className="tabular-nums text-[var(--math-gradient)] font-semibold font-mono">{learningRate.toFixed(2)}</span>
+          </div>
+          <input
+            type="range"
+            min="0.01"
+            max="1.20"
+            step="0.01"
+            value={learningRate}
+            onChange={(e) => setLearningRate(parseFloat(e.target.value))}
+            className="w-full accent-[var(--math-gradient)] cursor-pointer"
+          />
+          <div className="text-[10px] text-[var(--text-tertiary)] font-mono flex justify-between">
+            <span>η=0.01 (Slow)</span>
+            <span>η=0.35 (Smooth)</span>
+            <span>η=1.20 (Overshoot)</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <div className="flex justify-between text-xs font-mono text-[var(--text-secondary)]">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[var(--math-vector)]" />
+              <span>{language === 'ar' ? 'معامل الزخم (β):' : 'Momentum (β):'}</span>
+            </span>
+            <span className="tabular-nums text-[var(--math-vector)] font-semibold font-mono">{momentum.toFixed(2)}</span>
+          </div>
+          <input
+            type="range"
+            min="0.00"
+            max="0.99"
+            step="0.01"
+            value={momentum}
+            onChange={(e) => setMomentum(parseFloat(e.target.value))}
+            className="w-full accent-[var(--math-vector)] cursor-pointer"
+          />
+          <div className="text-[10px] text-[var(--text-tertiary)] font-mono flex justify-between">
+            <span>β=0.00 (Pure SGD)</span>
+            <span>β=0.80 (Heavy Ball)</span>
+            <span>β=0.99 (High Inertia)</span>
+          </div>
         </div>
       </div>
 
-      {/* 3. Timeline Playback & Loss Sonification Bar */}
-      {!compact && (
-        <TimelinePlaybackBar
-          totalSteps={Math.max(0, trajectory.length - 1)}
-          currentStep={currentStepIdx}
-          metricLabel="Loss"
-          metricValue={activeSnap.loss}
-          onStepChange={(step) => setCurrentStepIdx(step)}
-        />
-      )}
-
-      {/* 4. Hyperparameter Hardware Sliders */}
-      {!compact && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-          <div className="flex flex-col gap-1.5">
-            <div className="flex justify-between text-xs font-mono text-[var(--text-secondary)]">
-              <span>{tr('learningRate', language)} (η):</span>
-              <span className="tabular-nums font-semibold text-[var(--math-gradient)]">
-                {learningRate.toFixed(3)}
-              </span>
-            </div>
-            <input
-              type="range"
-              min="0.01"
-              max="0.30"
-              step="0.005"
-              value={learningRate}
-              onChange={(e) => setLearningRate(parseFloat(e.target.value))}
-              className="w-full accent-[var(--math-gradient)] cursor-pointer"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <div className="flex justify-between text-xs font-mono text-[var(--text-secondary)]">
-              <span>{tr('momentum', language)} (β):</span>
-              <span className="tabular-nums font-semibold text-[var(--math-gradient)]">
-                {momentum.toFixed(2)}
-              </span>
-            </div>
-            <input
-              type="range"
-              min="0.0"
-              max="0.95"
-              step="0.05"
-              value={momentum}
-              onChange={(e) => setMomentum(parseFloat(e.target.value))}
-              className="w-full accent-[var(--math-gradient)] cursor-pointer"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* 5. Pedagogical Deep Dive */}
-      {showPedagogy && !compact && (
-        <div className="pt-2">
-          <MultiTierDisclosure content={GD_TIER_CONTENT} />
-        </div>
-      )}
+      {/* 4-Tier Cognitive Disclosure */}
+      <MultiTierDisclosure content={GD_TIER_CONTENT} />
     </div>
   );
 };

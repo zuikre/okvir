@@ -118,7 +118,9 @@ export class WebAudioSonifier {
           this.subOsc?.stop();
           this.osc?.disconnect();
           this.subOsc?.disconnect();
-        } catch {}
+        } catch (_err) {
+          // Ignore disconnection error if already stopped
+        }
         this.osc = null;
         this.subOsc = null;
         this.isActive = false;
@@ -156,7 +158,9 @@ export class WebAudioSonifier {
 
         osc.start(start);
         osc.stop(start + 0.42);
-      } catch {}
+      } catch (_err) {
+        // Audio node playback error ignored in background
+      }
     });
   }
 
@@ -186,7 +190,9 @@ export class WebAudioSonifier {
 
         osc.start(now);
         osc.stop(now + 0.32);
-      } catch {}
+      } catch (_err) {
+        // Alarm node error ignored in background
+      }
     });
   }
 

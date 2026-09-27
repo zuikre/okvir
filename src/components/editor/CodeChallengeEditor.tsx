@@ -1,8 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Terminal, Check, X, Copy, Zap } from 'lucide-react';
+import { Play, Terminal, Check, Copy } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
 import type { CodeChallenge } from '@/lib/types';
+
+const DEFAULT_STARTER = `import numpy as np
+
+def compute_squared_loss(y: np.ndarray, y_hat: np.ndarray) -> float:
+    """
+    Vectorized computation of Sum of Squared Residuals (SSR).
+    Parameters:
+      y: true targets vector
+      y_hat: predicted outputs vector
+    Returns:
+      float scalar sum of squared residuals
+    """
+    residuals = y - y_hat
+    return float(np.sum(residuals ** 2))`;
 
 function highlightPython(code: string): string {
   const keywords = /\b(import|from|def|return|if|else|elif|for|while|in|not|and|or|None|True|False|class|lambda|with|as|try|except|finally|raise|yield|global|nonlocal|pass|break|continue|assert|del|async|await)\b/g;
@@ -31,20 +45,6 @@ export const CodeChallengeEditor: React.FC<{
 }> = ({ challenge, onComplete }) => {
   const { language, addXp } = useOkvirStore();
 
-  const DEFAULT_STARTER = `import numpy as np
-
-def compute_squared_loss(y: np.ndarray, y_hat: np.ndarray) -> float:
-    """
-    Vectorized computation of Sum of Squared Residuals (SSR).
-    Parameters:
-      y: true targets vector
-      y_hat: predicted outputs vector
-    Returns:
-      float scalar sum of squared residuals
-    """
-    residuals = y - y_hat
-    return float(np.sum(residuals ** 2))`;
-
   const initialCode = challenge?.starterCode || DEFAULT_STARTER;
   const [code, setCode] = useState(initialCode);
   const [output, setOutput] = useState<{ lines: string[]; passed: boolean | null }>({ lines: [], passed: null });
@@ -56,7 +56,7 @@ def compute_squared_loss(y: np.ndarray, y_hat: np.ndarray) -> float:
   useEffect(() => {
     setCode(challenge?.starterCode || DEFAULT_STARTER);
     setOutput({ lines: [], passed: null });
-  }, [challenge?.id]);
+  }, [challenge?.id, challenge?.starterCode]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {

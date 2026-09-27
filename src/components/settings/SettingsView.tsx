@@ -3,7 +3,6 @@ import {
   HardDrive,
   Download,
   Upload,
-  RotateCcw,
   User,
   ShieldCheck,
   Cpu,
@@ -22,7 +21,6 @@ import {
   FileCheck2,
 } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
-import { tr } from '@/lib/i18n';
 import {
   MILESTONE_BADGES,
   checkBadgeEligibility,

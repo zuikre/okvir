@@ -140,6 +140,15 @@ class AudioManager {
     }
   }
 
+  // Aliases for intuitive semantic call sites
+  playSuccess() {
+    this.playSuccessChime();
+  }
+
+  playWarning() {
+    this.playErrorTick();
+  }
+
   private triggerHaptic(pattern: number | number[]) {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       try {

@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useOkvirStore } from '@/lib/store';
-import { tr } from '@/lib/i18n';
+import { MultiTierDisclosure, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
+import { audio } from '@/lib/audio';
+import { RotateCcw, Sparkles, Split } from 'lucide-react';
 
 interface Point {
   x: number;
@@ -8,7 +10,7 @@ interface Point {
   cls: 0 | 1;
 }
 
-const POINTS: Point[] = [
+const INITIAL_TREE_POINTS: Point[] = [
   { x: 1.5, y: 1.5, cls: 0 }, { x: 2.0, y: 1.0, cls: 0 }, { x: 1.0, y: 2.0, cls: 0 },
   { x: 1.5, y: 3.0, cls: 0 }, { x: 2.5, y: 2.0, cls: 0 }, { x: 3.0, y: 1.5, cls: 0 },
   { x: 2.0, y: 3.5, cls: 0 }, { x: 1.0, y: 1.0, cls: 0 }, { x: 3.0, y: 3.0, cls: 0 },
@@ -19,20 +21,126 @@ const POINTS: Point[] = [
   { x: 5.5, y: 6.0, cls: 1 }, { x: 8.0, y: 5.5, cls: 1 }, { x: 7.0, y: 8.5, cls: 1 },
 ];
 
-const SPLITS = [
-  { axis: 'x' as const, threshold: 4.5, depth: 0, label: 'X₁ ≤ 4.5' },
-  { axis: 'y' as const, threshold: 4.2, depth: 1, label: 'X₂ ≤ 4.2' },
-  { axis: 'x' as const, threshold: 2.2, depth: 2, label: 'X₁ ≤ 2.2' },
-];
+const TREE_TIER_CONTENT: TierContent = {
+  intuition: {
+    analogy: {
+      en: 'Imagine playing 20 Questions to isolate a secret object. At each turn, you ask a simple yes/no question that cuts the remaining possibilities in half, minimizing confusion as rapidly as possible.',
+      ar: 'تخيّل أنك تلعب لعبة "عشرون سؤالاً". في كل خطوة، تطرح سؤالاً بسيطاً بنعم/لا يقسم الاحتمالات المتبقية إلى نصفين متجانسين، مما يقلل الحيرة والغموض بأسرع وتيرة ممكنة.',
+    },
+    keyTakeaway: {
+      en: 'Decision Trees recursively partition feature space into axis-aligned hyper-rectangles using greedy Information Gain maximization.',
+      ar: 'تقوم أشجار القرار بتقسيم فضاء الخصائص تكرارياً إلى مستطيلات متعامدة باستخدام التعظيم الجشع لكسب المعلومات.',
+    },
+  },
+  geometry: {
+    visualDescription: {
+      en: 'Space is partitioned by orthogonal laser slices. Each internal node represents an axis-aligned hyperplane split: X_j ≤ θ. Each leaf node represents an isolated hyper-rectangle.',
+      ar: 'يتم تقطيع الفضاء بواسطة خطوط ليزرية متعامدة على المحاور. كل عقدة تمثل مستوى فائقاً متعامداً: X_j ≤ θ، وكل ورقة تمثل صندوقاً فضائياً مستقلاً.',
+    },
+    conservedQuantity: {
+      en: 'Gini impurity and Shannon entropy are guaranteed to decrease or remain constant across greedy splits by Jensen’s inequality.',
+      ar: 'مؤشر جيني والإنتروبيا ينخفضان بالضرورة أو يثبتان بعد كل انقسام استناداً إلى متباينة جينسن للدوال المقعرة.',
+    },
+  },
+  formal: {
+    equation: '\\Delta I = I(S) - \\left(\\frac{|S_L|}{|S|} I(S_L) + \\frac{|S_R|}{|S|} I(S_R)\\right)',
+    derivationSteps: [
+      {
+        step: 'Gini(p) = 1 - \\sum_{c=1}^C p_c^2',
+        note: { en: 'Gini impurity measure for multinomial probabilities', ar: 'مقياس شوائب جيني للاحتمالات متعددة الحدود' },
+      },
+      {
+        step: 'H(p) = -\\sum_{c=1}^C p_c \\log_2 p_c',
+        note: { en: 'Shannon information entropy', ar: 'إنتروبيا شانون للمعلومات واللايقين' },
+      },
+      {
+        step: '\\Delta I \\ge 0 \\quad \\text{via Jensen’s inequality for concave functions}',
+        note: { en: 'Proof that optimal greedy splits always reduce impurity', ar: 'برهان أن الانقسام الأمثل يقلل دائماً من الشوائب' },
+      },
+    ],
+  },
+  code: {
+    snippet: `import numpy as np
 
-export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
+def best_split(x: np.ndarray, y: np.ndarray):
+    # Sort feature values: O(N log N)
+    idx = np.argsort(x)
+    x_s, y_s = x[idx], y[idx]
+    
+    n = len(y)
+    best_gain, best_thresh = -1.0, None
+    for i in range(1, n):
+        if x_s[i] == x_s[i-1]: continue
+        thresh = (x_s[i] + x_s[i-1]) / 2.0
+        y_l, y_r = y_s[:i], y_s[i:]
+        gain = gini(y) - (len(y_l)/n * gini(y_l) + len(y_r)/n * gini(y_r))
+        if gain > best_gain:
+            best_gain, best_thresh = gain, thresh
+    return best_thresh, best_gain`,
+    explanation: {
+      en: 'Evaluating candidate thresholds along sorted unique feature values scans all O(N) splits efficiently.',
+      ar: 'مسح العتبات المرشحة على طول القيم المرتبة يفحص جميع الانقسامات الممكنة بكفاءة O(N).',
+    },
+  },
+};
+
+export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { theme, language } = useOkvirStore();
-  const [activeSplits, setActiveSplits] = useState(0);
-  const [laserProgress, setLaserProgress] = useState(1);
-  const animRef = useRef<number>(0);
+  const { theme, language, config } = useOkvirStore();
 
-  const render = useCallback(() => {
+  const [points, setPoints] = useState<Point[]>(INITIAL_TREE_POINTS);
+  const [thresholdX, setThresholdX] = useState<number>(4.5);
+  const [thresholdY, setThresholdY] = useState<number>(4.2);
+  const [secondSplitActive, setSecondSplitActive] = useState<boolean>(true);
+  const [addModeClass, setAddModeClass] = useState<0 | 1>(0);
+  const [draggedLaser, setDraggedLaser] = useState<'x' | 'y' | null>(null);
+
+  // Compute Gini Impurity
+  const computeGini = (pts: Point[]) => {
+    if (pts.length === 0) return 0;
+    const p0 = pts.filter((p) => p.cls === 0).length / pts.length;
+    const p1 = 1 - p0;
+    return 1 - (p0 * p0 + p1 * p1);
+  };
+
+  const leftPts = points.filter((p) => p.x <= thresholdX);
+  const rightPts = points.filter((p) => p.x > thresholdX);
+
+  const giniLeft = computeGini(leftPts);
+  const giniRight = computeGini(rightPts);
+
+  const totalGini =
+    points.length > 0
+      ? (leftPts.length / points.length) * giniLeft +
+        (rightPts.length / points.length) * giniRight
+      : 0;
+
+  const initialGini = computeGini(points);
+  const infoGain = Math.max(0, initialGini - totalGini);
+
+  // Find greedy best split on X
+  const handleFindBestSplit = () => {
+    let bestGain = -1;
+    let bestT = thresholdX;
+
+    for (let t = 1.0; t <= 9.0; t += 0.1) {
+      const l = points.filter((p) => p.x <= t);
+      const r = points.filter((p) => p.x > t);
+      if (l.length === 0 || r.length === 0) continue;
+      const curGini = (l.length / points.length) * computeGini(l) + (r.length / points.length) * computeGini(r);
+      const curGain = initialGini - curGini;
+      if (curGain > bestGain) {
+        bestGain = curGain;
+        bestT = t;
+      }
+    }
+
+    setThresholdX(Number(bestT.toFixed(2)));
+    if (config.soundEnabled) audio.playSuccess();
+  };
+
+  // Render Canvas
+  const renderFrame = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -51,54 +159,22 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = f
     const pad = 24;
     const plotW = width - pad * 2;
     const plotH = height - pad * 2;
-    const xMax = 10;
-    const yMax = 10;
-    const toCanvasX = (x: number) => pad + (x / xMax) * plotW;
-    const toCanvasY = (y: number) => pad + plotH - (y / yMax) * plotH;
+    const toCanvasX = (x: number) => pad + (x / 10) * plotW;
+    const toCanvasY = (y: number) => pad + plotH - (y / 10) * plotH;
 
-    // Region partitioning
-    const getRegion = (p: { x: number; y: number }) => {
-      let region = 0;
-      for (let s = 0; s < activeSplits; s++) {
-        const split = SPLITS[s];
-        if (split.axis === 'x') {
-          region = region * 2 + (p.x <= split.threshold ? 0 : 1);
-        } else {
-          region = region * 2 + (p.y <= split.threshold ? 0 : 1);
-        }
-      }
-      return region;
-    };
+    const cutXPx = toCanvasX(thresholdX);
+    const cutYPx = toCanvasY(thresholdY);
 
-    // Calculate majority class per region
-    const regionColors: Record<number, 0 | 1> = {};
-    POINTS.forEach((p) => {
-      const r = getRegion(p);
-      const count0 = POINTS.filter((q) => getRegion(q) === r && q.cls === 0).length;
-      const count1 = POINTS.filter((q) => getRegion(q) === r && q.cls === 1).length;
-      regionColors[r] = count0 >= count1 ? 0 : 1;
-    });
+    // 1. Shaded Region Partitions
+    // Left region
+    ctx.fillStyle = theme === 'dark' ? 'rgba(56, 189, 248, 0.08)' : 'rgba(2, 132, 199, 0.06)';
+    ctx.fillRect(pad, pad, cutXPx - pad, plotH);
 
-    // 1. Shaded Region Backgrounds
-    const res = 4;
-    for (let py = 0; py < height; py += res) {
-      for (let px = 0; px < width; px += res) {
-        const wx = ((px - pad) / plotW) * xMax;
-        const wy = yMax - ((py - pad) / plotH) * yMax;
-        if (wx < 0 || wx > xMax || wy < 0 || wy > yMax) continue;
+    // Right region
+    ctx.fillStyle = theme === 'dark' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(217, 119, 6, 0.06)';
+    ctx.fillRect(cutXPx, pad, pad + plotW - cutXPx, plotH);
 
-        const fakePt = { x: wx, y: wy };
-        const r = getRegion(fakePt);
-        const majClass = regionColors[r] ?? 0;
-        const color = majClass === 0
-          ? (theme === 'dark' ? 'rgba(56, 189, 248, 0.08)' : 'rgba(2, 132, 199, 0.06)')
-          : (theme === 'dark' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(217, 119, 6, 0.06)');
-        ctx.fillStyle = color;
-        ctx.fillRect(px, py, res, res);
-      }
-    }
-
-    // 2. Subtle Grid
+    // 2. Grid lines
     ctx.strokeStyle = theme === 'dark' ? '#27272a' : '#e4e4e7';
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= 10; i += 2) {
@@ -113,189 +189,334 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = f
       ctx.stroke();
     }
 
-    // 3. Established Orthogonal Split Lines
-    for (let s = 0; s < activeSplits; s++) {
-      const split = SPLITS[s];
-      const isCurrentAnimating = s === activeSplits - 1 && laserProgress < 1;
+    // 3. Glowing Laser Knife Cut Lines
+    // Primary Cut: Vertical X threshold
+    ctx.beginPath();
+    ctx.moveTo(cutXPx, pad);
+    ctx.lineTo(cutXPx, pad + plotH);
+    ctx.strokeStyle = '#f43f5e';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
 
-      if (!isCurrentAnimating) {
-        ctx.beginPath();
-        if (split.axis === 'x') {
-          ctx.moveTo(toCanvasX(split.threshold), pad);
-          ctx.lineTo(toCanvasX(split.threshold), pad + plotH);
-        } else {
-          ctx.moveTo(pad, toCanvasY(split.threshold));
-          ctx.lineTo(pad + plotW, toCanvasY(split.threshold));
-        }
-        ctx.strokeStyle = 'var(--math-prediction)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
-    }
+    // Laser glow
+    ctx.beginPath();
+    ctx.moveTo(cutXPx, pad);
+    ctx.lineTo(cutXPx, pad + plotH);
+    ctx.strokeStyle = 'rgba(244, 63, 94, 0.35)';
+    ctx.lineWidth = 9;
+    ctx.stroke();
 
-    // 4. Laser Knife-Cut Animation with Spark Particles
-    if (activeSplits > 0 && laserProgress < 1) {
-      const split = SPLITS[activeSplits - 1];
-      const prog = laserProgress;
+    // Grab handle for X laser
+    ctx.beginPath();
+    ctx.arc(cutXPx, pad + 15, 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#f43f5e';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Secondary Cut: Horizontal Y threshold if active
+    if (secondSplitActive) {
       ctx.beginPath();
-
-      let sparkX = 0;
-      let sparkY = 0;
-
-      if (split.axis === 'x') {
-        const lineX = toCanvasX(split.threshold);
-        const yStart = pad;
-        const yEnd = pad + plotH * prog;
-        ctx.moveTo(lineX, yStart);
-        ctx.lineTo(lineX, yEnd);
-        sparkX = lineX;
-        sparkY = yEnd;
-      } else {
-        const lineY = toCanvasY(split.threshold);
-        const xStart = pad;
-        const xEnd = pad + plotW * prog;
-        ctx.moveTo(xStart, lineY);
-        ctx.lineTo(xEnd, lineY);
-        sparkX = xEnd;
-        sparkY = lineY;
-      }
-
-      ctx.strokeStyle = '#10b981';
-      ctx.lineWidth = 2.5;
-      ctx.shadowColor = '#10b981';
-      ctx.shadowBlur = 12;
+      ctx.moveTo(pad, cutYPx);
+      ctx.lineTo(cutXPx, cutYPx);
+      ctx.strokeStyle = '#a855f7';
+      ctx.lineWidth = 2.0;
+      ctx.setLineDash([4, 4]);
       ctx.stroke();
-      ctx.shadowBlur = 0;
+      ctx.setLineDash([]);
 
-      // Spark explosion particles at the cutting edge
-      for (let i = 0; i < 6; i++) {
-        const angle = (Math.PI * 2 * i) / 6 + prog * 10;
-        const dist = 3 + (i % 3) * 3;
-        ctx.beginPath();
-        ctx.arc(sparkX + Math.cos(angle) * dist, sparkY + Math.sin(angle) * dist, 1.8, 0, Math.PI * 2);
-        ctx.fillStyle = '#f59e0b';
-        ctx.fill();
-      }
-
-      // Spark tip
+      // Grab handle for Y laser
       ctx.beginPath();
-      ctx.arc(sparkX, sparkY, 4, 0, Math.PI * 2);
-      ctx.fillStyle = '#ffffff';
+      ctx.arc(pad + 15, cutYPx, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#a855f7';
       ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
     }
 
-    // 5. Data Points
-    POINTS.forEach((p) => {
+    // 4. Observation Points
+    points.forEach((p) => {
+      const cx = toCanvasX(p.x);
+      const cy = toCanvasY(p.y);
       ctx.beginPath();
-      ctx.arc(toCanvasX(p.x), toCanvasY(p.y), 4.2, 0, Math.PI * 2);
-      ctx.fillStyle = p.cls === 0 ? 'var(--math-data)' : 'var(--math-gradient)';
+      ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = p.cls === 0 ? '#38bdf8' : '#f59e0b';
       ctx.fill();
-      ctx.strokeStyle = theme === 'dark' ? '#09090b' : '#fafafa';
-      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = theme === 'dark' ? '#fafafa' : '#09090b';
+      ctx.lineWidth = 1.5;
       ctx.stroke();
     });
-  }, [activeSplits, laserProgress, theme]);
+
+    // 5. Labels on split thresholds
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#f43f5e';
+    ctx.fillText(`X₁ ≤ ${thresholdX.toFixed(2)}`, cutXPx + 8, pad + 14);
+
+    if (secondSplitActive) {
+      ctx.fillStyle = '#a855f7';
+      ctx.fillText(`X₂ ≤ ${thresholdY.toFixed(2)}`, pad + 25, cutYPx - 6);
+    }
+  }, [thresholdX, thresholdY, secondSplitActive, points, theme]);
 
   useEffect(() => {
-    render();
-  }, [render]);
+    renderFrame();
+  }, [renderFrame]);
 
-  const addSplit = () => {
-    if (activeSplits >= SPLITS.length) return;
-    setActiveSplits((s) => s + 1);
-    setLaserProgress(0);
+  // Direct pointer drag for laser lines + click to add
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
 
-    const t0 = performance.now();
-    const duration = 320;
+    const pad = 24;
+    const plotW = rect.width - pad * 2;
+    const plotH = rect.height - pad * 2;
+    const toCanvasX = (x: number) => pad + (x / 10) * plotW;
+    const toCanvasY = (y: number) => pad + plotH - (y / 10) * plotH;
 
-    const animate = () => {
-      const elapsed = performance.now() - t0;
-      const t = Math.min(1, elapsed / duration);
-      setLaserProgress(t);
-      if (t < 1) {
-        animRef.current = requestAnimationFrame(animate);
-      }
-    };
-    animRef.current = requestAnimationFrame(animate);
-  };
+    const cutXPx = toCanvasX(thresholdX);
+    const cutYPx = toCanvasY(thresholdY);
 
-  useEffect(() => () => cancelAnimationFrame(animRef.current), []);
-
-  const reset = () => {
-    setActiveSplits(0);
-    setLaserProgress(1);
-  };
-
-  // Compute Gini / Purity metric
-  let correct = 0;
-  const getRegionCount = (p: Point, splitsCount: number) => {
-    let region = 0;
-    for (let s = 0; s < splitsCount; s++) {
-      const split = SPLITS[s];
-      if (split.axis === 'x') {
-        region = region * 2 + (p.x <= split.threshold ? 0 : 1);
-      } else {
-        region = region * 2 + (p.y <= split.threshold ? 0 : 1);
-      }
+    if (Math.abs(px - cutXPx) <= 16) {
+      setDraggedLaser('x');
+      e.currentTarget.setPointerCapture(e.pointerId);
+      if (config.soundEnabled) audio.playClick();
+    } else if (secondSplitActive && Math.abs(py - cutYPx) <= 16 && px <= cutXPx) {
+      setDraggedLaser('y');
+      e.currentTarget.setPointerCapture(e.pointerId);
+      if (config.soundEnabled) audio.playClick();
+    } else {
+      // Add data point
+      const newX = Number(Math.max(0.5, Math.min(9.5, ((px - pad) / plotW) * 10)).toFixed(2));
+      const newY = Number(Math.max(0.5, Math.min(9.5, (1 - (py - pad) / plotH) * 10)).toFixed(2));
+      setPoints((prev) => [...prev, { x: newX, y: newY, cls: addModeClass }]);
+      if (config.soundEnabled) audio.playClick();
     }
-    return region;
   };
 
-  POINTS.forEach((p) => {
-    const r = getRegionCount(p, activeSplits);
-    let count0 = 0;
-    let count1 = 0;
-    POINTS.forEach((q) => {
-      if (getRegionCount(q, activeSplits) === r) {
-        if (q.cls === 0) count0++;
-        else count1++;
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!draggedLaser) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+    const pad = 24;
+    const plotW = rect.width - pad * 2;
+    const plotH = rect.height - pad * 2;
+
+    if (draggedLaser === 'x') {
+      const newX = Math.max(1.0, Math.min(9.0, ((px - pad) / plotW) * 10));
+      setThresholdX(Number(newX.toFixed(2)));
+    } else if (draggedLaser === 'y') {
+      const newY = Math.max(1.0, Math.min(9.0, (1 - (py - pad) / plotH) * 10));
+      setThresholdY(Number(newY.toFixed(2)));
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (draggedLaser) {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+      setDraggedLaser(null);
+      if (config.soundEnabled) audio.playClick();
+    }
+  };
+
+  // Right click point deletion
+  const handleContextMenu = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+
+    const pad = 24;
+    const plotW = rect.width - pad * 2;
+    const plotH = rect.height - pad * 2;
+    const toCanvasX = (x: number) => pad + (x / 10) * plotW;
+    const toCanvasY = (y: number) => pad + plotH - (y / 10) * plotH;
+
+    let targetIdx: number | null = null;
+    points.forEach((p, idx) => {
+      const cx = toCanvasX(p.x);
+      const cy = toCanvasY(p.y);
+      if (Math.hypot(px - cx, py - cy) <= 14) {
+        targetIdx = idx;
       }
     });
-    const pred = count0 >= count1 ? 0 : 1;
-    if (pred === p.cls) correct++;
-  });
-  const purity = activeSplits === 0 ? 50 : Math.round((correct / POINTS.length) * 100);
+
+    if (targetIdx !== null && points.length > 4) {
+      setPoints((prev) => prev.filter((_, idx) => idx !== targetIdx));
+      if (config.soundEnabled) audio.playWarning();
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-mono">
-            {language === 'ar' ? 'النقاء' : 'Purity'}:
+    <div className="flex flex-col gap-4 select-none">
+      {/* Top Action Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
+        {/* Class Selector for adding points */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-mono text-[var(--text-tertiary)] uppercase tracking-wider">
+            {language === 'ar' ? 'فئة النقطة:' : 'Add Point:'}
           </span>
-          <span className="font-mono text-sm font-semibold tabular-nums text-[var(--math-vector)]">
-            {purity}%
-          </span>
-          <span className="text-xs font-mono text-[var(--text-tertiary)] tabular-nums">
-            {language === 'ar' ? 'القطوع' : 'Splits'}: {activeSplits}/{SPLITS.length}
-          </span>
+          <button
+            onClick={() => setAddModeClass(0)}
+            className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              addModeClass === 0
+                ? 'border-sky-500 bg-sky-500/15 text-sky-300 font-bold'
+                : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+            }`}
+          >
+            Class 0 (Blue)
+          </button>
+          <button
+            onClick={() => setAddModeClass(1)}
+            className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              addModeClass === 1
+                ? 'border-amber-500 bg-amber-500/15 text-amber-300 font-bold'
+                : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+            }`}
+          >
+            Class 1 (Amber)
+          </button>
         </div>
 
+        {/* Buttons: Secondary Split & Greedy Best Split */}
         <div className="flex items-center gap-2">
-          {!compact && (
-            <button
-              onClick={reset}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] transition-colors font-mono"
-            >
-              {tr('reset', language)}
-            </button>
-          )}
           <button
-            onClick={addSplit}
-            disabled={activeSplits >= SPLITS.length}
-            className="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-[var(--math-prediction)] text-white font-mono transition-transform active:scale-95 disabled:opacity-50 hover:brightness-110 shadow-sm"
+            onClick={() => setSecondSplitActive(!secondSplitActive)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              secondSplitActive
+                ? 'border-purple-400 bg-purple-500/15 text-purple-300 font-bold'
+                : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+            }`}
+            title="Toggle second-level split"
           >
-            {language === 'ar' ? 'قطع ليزري جديد' : 'Execute Laser Cut'}
+            <Split size={12} />
+            <span>{language === 'ar' ? 'انقسام فرعي ثنائي' : '2nd Split (Y)'}</span>
+          </button>
+
+          <button
+            onClick={handleFindBestSplit}
+            className="flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition-all shadow-sm"
+            title="Greedily find threshold maximizing Information Gain"
+          >
+            <Sparkles size={13} className="text-emerald-400" />
+            <span>{language === 'ar' ? 'الانقسام الأمثل' : 'Find Best Split'}</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setPoints(INITIAL_TREE_POINTS);
+              setThresholdX(4.5);
+              setThresholdY(4.2);
+              if (config.soundEnabled) audio.playClick();
+            }}
+            className="p-1.5 rounded-lg border border-[var(--border-subtle)] hover:border-[var(--border-strong)] text-[var(--text-secondary)]"
+            title="Reset"
+          >
+            <RotateCcw size={13} />
           </button>
         </div>
       </div>
 
-      <div className="relative w-full h-72 rounded-lg overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-app)]">
-        <canvas ref={canvasRef} className="w-full h-full block" />
-        <div className="absolute bottom-2 start-2 text-[10px] font-mono text-[var(--text-tertiary)] bg-[var(--bg-surface)]/80 px-2 py-0.5 rounded border border-[var(--border-subtle)]">
-          Axis-Aligned Orthogonal Knife-Cuts with Spark Emission
+      {/* Main Interactive Laser Canvas */}
+      <div className="relative rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-app)] overflow-hidden shadow-inner p-2">
+        <canvas
+          ref={canvasRef}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onContextMenu={handleContextMenu}
+          className="w-full h-80 rounded-xl cursor-crosshair touch-none"
+        />
+
+        <div className="absolute top-4 start-4 px-2.5 py-1 rounded-md bg-[var(--bg-surface)]/80 backdrop-blur-md border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-tertiary)]">
+          {language === 'ar'
+            ? 'اسحب خطوط الليزر مباشرة • انقر لإضافة نقاط • انقر يمين لحذف نقطة'
+            : 'Drag laser lines directly • Click to add data • Right-click to remove'}
+        </div>
+
+        {/* Floating Telemetry: Gini & Information Gain */}
+        <div className="absolute top-4 end-4 flex items-center gap-3 px-3 py-1.5 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-xs font-mono shadow-sm">
+          <div>
+            <span className="text-[var(--text-tertiary)]">Gini Split: </span>
+            <span className="text-rose-400 font-bold tabular-nums">
+              {totalGini.toFixed(3)}
+            </span>
+          </div>
+          <div className="w-px h-3 bg-[var(--border-subtle)]" />
+          <div>
+            <span className="text-[var(--text-tertiary)]">Info Gain (ΔI): </span>
+            <span className="text-emerald-400 font-bold tabular-nums">
+              +{infoGain.toFixed(3)}
+            </span>
+          </div>
         </div>
       </div>
+
+      {/* Reactive Gini Breakdown Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col gap-0.5">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-tertiary)]">
+            Root Impurity I(S)
+          </span>
+          <span className="text-base font-mono font-bold tabular-nums text-[var(--text-primary)]">
+            {initialGini.toFixed(3)}
+          </span>
+          <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
+            Total Samples: {points.length}
+          </span>
+        </div>
+
+        <div className="p-3 rounded-xl border border-sky-500/30 bg-sky-500/5 flex flex-col gap-0.5">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-sky-400 font-semibold">
+            Left Child (X₁ ≤ {thresholdX.toFixed(1)})
+          </span>
+          <span className="text-base font-mono font-bold tabular-nums text-sky-300">
+            {giniLeft.toFixed(3)}
+          </span>
+          <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
+            {leftPts.length} points
+          </span>
+        </div>
+
+        <div className="p-3 rounded-xl border border-amber-500/30 bg-amber-500/5 flex flex-col gap-0.5">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-semibold">
+            Right Child (X₁ &gt; {thresholdX.toFixed(1)})
+          </span>
+          <span className="text-base font-mono font-bold tabular-nums text-amber-300">
+            {giniRight.toFixed(3)}
+          </span>
+          <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
+            {rightPts.length} points
+          </span>
+        </div>
+
+        <div className="p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 flex flex-col gap-0.5">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-semibold">
+            Information Gain ΔI
+          </span>
+          <span className="text-base font-mono font-bold tabular-nums text-emerald-400">
+            +{infoGain.toFixed(3)}
+          </span>
+          <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
+            {infoGain > 0.15 ? '✓ Strong Split' : 'Weak Split'}
+          </span>
+        </div>
+      </div>
+
+      {/* 4-Tier Cognitive Disclosure */}
+      <MultiTierDisclosure content={TREE_TIER_CONTENT} />
     </div>
   );
 };

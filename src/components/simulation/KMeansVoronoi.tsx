@@ -1,11 +1,9 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useOkvirStore } from '@/lib/store';
-import { tr } from '@/lib/i18n';
 import { computeVoronoiPolygons, type Vec2 } from '@/lib/canvas/VoronoiClipping';
 import { TimelinePlaybackBar } from '@/components/simulation/TimelinePlaybackBar';
 import { MultiTierDisclosure, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 import { audio } from '@/lib/audio';
-import { Sparkles, RotateCcw } from 'lucide-react';
 
 const CLUSTER_COLORS = ['#38bdf8', '#f59e0b', '#10b981', '#ec4899', '#8b5cf6'];
 const CLUSTER_COLORS_BG = [
@@ -16,12 +14,11 @@ const CLUSTER_COLORS_BG = [
   'rgba(139, 92, 246, 0.12)',
 ];
 
-// Presets
 function generateGaussianClusters(): Vec2[] {
   const points: Vec2[] = [];
   const seeds = [
-    { cx: 2.8, cy: 2.8, spread: 1.0 },
-    { cx: 7.2, cy: 2.6, spread: 1.1 },
+    { cx: 2.8, cy: 2.8, spread: 0.9 },
+    { cx: 7.2, cy: 2.6, spread: 1.0 },
     { cx: 2.8, cy: 7.4, spread: 0.9 },
     { cx: 7.4, cy: 7.4, spread: 1.0 },
   ];
@@ -33,7 +30,7 @@ function generateGaussianClusters(): Vec2[] {
   };
 
   seeds.forEach((cluster) => {
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 14; i++) {
       const u1 = pseudoRandom();
       const u2 = pseudoRandom();
       const radius = cluster.spread * Math.sqrt(-2 * Math.log(u1 || 0.001));
@@ -50,20 +47,18 @@ function generateConcentricRings(): Vec2[] {
   const points: Vec2[] = [];
   const cx = 5.0, cy = 5.0;
 
-  // Inner ring: r = 1.3
-  for (let i = 0; i < 22; i++) {
-    const theta = (2 * Math.PI * i) / 22;
-    const r = 1.3 + (Math.sin(i * 3) * 0.15);
+  for (let i = 0; i < 20; i++) {
+    const theta = (2 * Math.PI * i) / 20;
+    const r = 1.3 + Math.sin(i * 3) * 0.15;
     points.push({
       x: Number((cx + r * Math.cos(theta)).toFixed(2)),
       y: Number((cy + r * Math.sin(theta)).toFixed(2)),
     });
   }
 
-  // Outer ring: r = 3.6
-  for (let i = 0; i < 38; i++) {
-    const theta = (2 * Math.PI * i) / 38;
-    const r = 3.6 + (Math.cos(i * 4) * 0.2);
+  for (let i = 0; i < 34; i++) {
+    const theta = (2 * Math.PI * i) / 34;
+    const r = 3.6 + Math.cos(i * 4) * 0.2;
     points.push({
       x: Number((cx + r * Math.cos(theta)).toFixed(2)),
       y: Number((cy + r * Math.sin(theta)).toFixed(2)),
@@ -71,6 +66,50 @@ function generateConcentricRings(): Vec2[] {
   }
   return points;
 }
+
+function generateAnisotropicStreaks(): Vec2[] {
+  const points: Vec2[] = [];
+  for (let i = 0; i < 25; i++) {
+    const t = (i / 25) * 4.0 - 2.0;
+    points.push({
+      x: Number((3.0 + t + (Math.random() - 0.5) * 0.4).toFixed(2)),
+      y: Number((3.0 + t * 1.5 + (Math.random() - 0.5) * 0.4).toFixed(2)),
+    });
+  }
+  for (let i = 0; i < 25; i++) {
+    const t = (i / 25) * 4.0 - 2.0;
+    points.push({
+      x: Number((7.0 + t + (Math.random() - 0.5) * 0.4).toFixed(2)),
+      y: Number((7.0 + t * 1.5 + (Math.random() - 0.5) * 0.4).toFixed(2)),
+    });
+  }
+  return points;
+}
+
+const DEFAULT_CENTROIDS_BY_K: Record<number, Vec2[]> = {
+  2: [
+    { x: 3.0, y: 5.0 },
+    { x: 7.0, y: 5.0 },
+  ],
+  3: [
+    { x: 3.0, y: 3.0 },
+    { x: 7.0, y: 3.0 },
+    { x: 5.0, y: 7.5 },
+  ],
+  4: [
+    { x: 2.5, y: 2.5 },
+    { x: 7.5, y: 2.5 },
+    { x: 2.5, y: 7.5 },
+    { x: 7.5, y: 7.5 },
+  ],
+  5: [
+    { x: 2.0, y: 2.0 },
+    { x: 8.0, y: 2.0 },
+    { x: 5.0, y: 5.0 },
+    { x: 2.0, y: 8.0 },
+    { x: 8.0, y: 8.0 },
+  ],
+};
 
 const KMEANS_TIER_CONTENT: TierContent = {
   intuition: {
@@ -132,22 +171,16 @@ interface StepSnapshot {
   phase: string;
 }
 
-export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
+export const KMeansVoronoi: React.FC<{ compact?: boolean }> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { theme, language, config } = useOkvirStore();
 
   const [points, setPoints] = useState<Vec2[]>(generateGaussianClusters());
-  const [k, setK] = useState(4);
-  const [centroids, setCentroids] = useState<Vec2[]>([
-    { x: 2.0, y: 2.0 },
-    { x: 8.0, y: 2.0 },
-    { x: 2.0, y: 8.0 },
-    { x: 8.0, y: 8.0 },
-  ]);
+  const [k, setK] = useState<number>(4);
+  const [centroids, setCentroids] = useState<Vec2[]>(DEFAULT_CENTROIDS_BY_K[4]);
   const [draggedCentroid, setDraggedCentroid] = useState<number | null>(null);
   const [hoveredCentroid, setHoveredCentroid] = useState<number | null>(null);
-  const [showPedagogy, setShowPedagogy] = useState(false);
-  const [preset, setPreset] = useState<'gaussian' | 'rings'>('gaussian');
+  const [preset, setPreset] = useState<'gaussian' | 'rings' | 'anisotropic'>('gaussian');
 
   // History snapshots for TimelinePlaybackBar
   const [history, setHistory] = useState<StepSnapshot[]>([]);
@@ -175,7 +208,7 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = false
     []
   );
 
-  // Pre-generate full convergence history on points/K change
+  // Pre-generate full convergence history
   const buildHistory = useCallback(
     (initCentroids: Vec2[], dataPts: Vec2[]) => {
       const snaps: StepSnapshot[] = [];
@@ -201,7 +234,6 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = false
           };
         });
 
-        // Measure shift
         let maxShift = 0;
         for (let i = 0; i < c.length; i++) {
           const shift = Math.hypot(nextC[i].x - c[i].x, nextC[i].y - c[i].y);
@@ -227,14 +259,24 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = false
 
   useEffect(() => {
     buildHistory(centroids, points);
-  }, [points, k]);
+  }, [points, centroids, buildHistory]);
 
-  // Read active state from history or fallback to live
-  const activeSnapshot = history[currentStepIdx] || {
-    centroids,
-    labels: points.map(() => 0),
-    inertia: 0,
-    phase: 'Initial',
+  const activeSnapshot: StepSnapshot = useMemo(() => {
+    return history[currentStepIdx] || {
+      centroids,
+      labels: points.map(() => 0),
+      inertia: 0,
+      phase: 'Initial',
+    };
+  }, [history, currentStepIdx, centroids, points]);
+
+  // Change K dynamically
+  const handleChangeK = (newK: number) => {
+    setK(newK);
+    const newCentroids = DEFAULT_CENTROIDS_BY_K[newK] || DEFAULT_CENTROIDS_BY_K[4];
+    setCentroids(newCentroids);
+    buildHistory(newCentroids, points);
+    if (config.soundEnabled) audio.playClick();
   };
 
   // Canvas Drawing
@@ -259,126 +301,159 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = false
     const plotH = height - pad * 2;
     const toCanvasX = (x: number) => pad + (x / 10) * plotW;
     const toCanvasY = (y: number) => pad + (1 - y / 10) * plotH;
-    const fromCanvasX = (px: number) => Math.max(0.2, Math.min(9.8, ((px - pad) / plotW) * 10));
-    const fromCanvasY = (py: number) => Math.max(0.2, Math.min(9.8, (1 - (py - pad) / plotH) * 10));
 
-    const curCentroids = activeSnapshot.centroids;
+    // 1. Grid Lines
+    ctx.strokeStyle = theme === 'dark' ? '#27272a' : '#e4e4e7';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i <= 10; i += 2) {
+      const cx = toCanvasX(i);
+      const cy = toCanvasY(i);
+      ctx.beginPath();
+      ctx.moveTo(cx, pad);
+      ctx.lineTo(cx, pad + plotH);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(pad, cy);
+      ctx.lineTo(pad + plotW, cy);
+      ctx.stroke();
+    }
 
-    // 1. Vector Voronoi Polygon Cells (Sutherland-Hodgman 120fps)
+    // 2. Vector Voronoi Tessellation
     const voronoiPolys = computeVoronoiPolygons(
-      curCentroids.map((c) => ({ x: toCanvasX(c.x), y: toCanvasY(c.y) })),
-      { minX: pad, minY: pad, maxX: pad + plotW, maxY: pad + plotH }
+      activeSnapshot.centroids,
+      { minX: 0, maxX: 10, minY: 0, maxY: 10 }
     );
 
     voronoiPolys.forEach((poly, idx) => {
-      if (poly.length === 0) return;
+      if (poly.length < 3) return;
       ctx.beginPath();
-      ctx.moveTo(poly[0].x, poly[0].y);
-      for (let i = 1; i < poly.length; i++) {
-        ctx.lineTo(poly[i].x, poly[i].y);
+      ctx.moveTo(toCanvasX(poly[0].x), toCanvasY(poly[0].y));
+      for (let p = 1; p < poly.length; p++) {
+        ctx.lineTo(toCanvasX(poly[p].x), toCanvasY(poly[p].y));
       }
       ctx.closePath();
       ctx.fillStyle = CLUSTER_COLORS_BG[idx % CLUSTER_COLORS_BG.length];
       ctx.fill();
 
-      ctx.strokeStyle = theme === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)';
-      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = CLUSTER_COLORS[idx % CLUSTER_COLORS.length];
+      ctx.lineWidth = 1.5;
       ctx.stroke();
     });
 
-    // 2. Observations colored by cluster assignment
+    // 3. Connect observations to assigned centroid
+    ctx.setLineDash([2, 3]);
     points.forEach((p, idx) => {
-      const clusterIdx = activeSnapshot.labels[idx] ?? 0;
-      const color = CLUSTER_COLORS[clusterIdx % CLUSTER_COLORS.length];
-      const cx = toCanvasX(p.x);
-      const cy = toCanvasY(p.y);
+      const label = activeSnapshot.labels[idx] ?? 0;
+      const cent = activeSnapshot.centroids[label];
+      if (!cent) return;
 
       ctx.beginPath();
-      ctx.arc(cx, cy, 3.8, 0, Math.PI * 2);
+      ctx.moveTo(toCanvasX(p.x), toCanvasY(p.y));
+      ctx.lineTo(toCanvasX(cent.x), toCanvasY(cent.y));
+      ctx.strokeStyle = CLUSTER_COLORS[label % CLUSTER_COLORS.length];
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
+    // 4. Data Observation Points
+    points.forEach((p, idx) => {
+      const label = activeSnapshot.labels[idx] ?? 0;
+      const color = CLUSTER_COLORS[label % CLUSTER_COLORS.length];
+      const px = toCanvasX(p.x);
+      const py = toCanvasY(p.y);
+
+      ctx.beginPath();
+      ctx.arc(px, py, 4, 0, Math.PI * 2);
       ctx.fillStyle = color;
       ctx.fill();
-      ctx.strokeStyle = theme === 'dark' ? '#18181b' : '#ffffff';
-      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1;
       ctx.stroke();
     });
 
-    // 3. Cluster Centroids (Draggable Diamonds)
-    curCentroids.forEach((c, idx) => {
+    // 5. Cluster Centroids (Draggable Diamonds)
+    activeSnapshot.centroids.forEach((c, idx) => {
       const cx = toCanvasX(c.x);
       const cy = toCanvasY(c.y);
+      const color = CLUSTER_COLORS[idx % CLUSTER_COLORS.length];
       const isHovered = hoveredCentroid === idx;
       const isDragged = draggedCentroid === idx;
-      const color = CLUSTER_COLORS[idx % CLUSTER_COLORS.length];
 
-      // Halo
+      // Glow Halo
       ctx.beginPath();
-      ctx.arc(cx, cy, isDragged ? 14 : isHovered ? 12 : 9, 0, Math.PI * 2);
-      ctx.fillStyle = `${color}25`;
+      ctx.arc(cx, cy, isDragged ? 16 : isHovered ? 14 : 10, 0, Math.PI * 2);
+      ctx.fillStyle = isDragged ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.15)';
       ctx.fill();
 
-      // Diamond marker
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(Math.PI / 4);
+      // Diamond Marker
+      const r = isDragged ? 9 : 7;
       ctx.beginPath();
-      const dSize = isDragged ? 9 : 7;
-      ctx.rect(-dSize, -dSize, dSize * 2, dSize * 2);
+      ctx.moveTo(cx, cy - r);
+      ctx.lineTo(cx + r, cy);
+      ctx.lineTo(cx, cy + r);
+      ctx.lineTo(cx - r, cy);
+      ctx.closePath();
+
       ctx.fillStyle = color;
       ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#fafafa';
+      ctx.lineWidth = 2.5;
       ctx.stroke();
-      ctx.restore();
 
-      // Label: μ_k
-      ctx.font = '10px monospace';
-      ctx.fillStyle = theme === 'dark' ? '#fafafa' : '#09090b';
+      // Label
+      ctx.font = 'bold 11px monospace';
+      ctx.fillStyle = color;
       ctx.fillText(`μ${idx + 1}`, cx + 12, cy - 8);
     });
-  }, [activeSnapshot, points, hoveredCentroid, draggedCentroid, theme]);
+  }, [
+    activeSnapshot,
+    points,
+    hoveredCentroid,
+    draggedCentroid,
+    theme,
+  ]);
 
   useEffect(() => {
     renderFrame();
   }, [renderFrame]);
 
-  // Pointer Handling for Centroid Dragging & Point Adding
+  // Pointer interactions
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const rect = canvas.getBoundingClientRect();
     const px = e.clientX - rect.left;
     const py = e.clientY - rect.top;
-    const width = rect.width;
-    const height = rect.height;
 
     const pad = 24;
-    const plotW = width - pad * 2;
-    const plotH = height - pad * 2;
+    const plotW = rect.width - pad * 2;
+    const plotH = rect.height - pad * 2;
     const toCanvasX = (x: number) => pad + (x / 10) * plotW;
     const toCanvasY = (y: number) => pad + (1 - y / 10) * plotH;
-    const fromCanvasX = (xPx: number) => Math.max(0.5, Math.min(9.5, ((xPx - pad) / plotW) * 10));
-    const fromCanvasY = (yPx: number) => Math.max(0.5, Math.min(9.5, (1 - (yPx - pad) / plotH) * 10));
 
-    // Hit test centroids first (screen radius <= 16px)
     let hitCentroid: number | null = null;
     activeSnapshot.centroids.forEach((c, idx) => {
       const cx = toCanvasX(c.x);
       const cy = toCanvasY(c.y);
-      if (Math.hypot(px - cx, py - cy) <= 16) {
+      if (Math.hypot(px - cx, py - cy) <= 18) {
         hitCentroid = idx;
       }
     });
 
     if (hitCentroid !== null) {
-      canvas.setPointerCapture(e.pointerId);
       setDraggedCentroid(hitCentroid);
+      try {
+        canvas.setPointerCapture(e.pointerId);
+      } catch (_err) {
+        // Pointer capture not supported or already lost
+      }
       if (config.soundEnabled) audio.playClick();
     } else {
-      // Click on canvas: Add new observation point
-      const dataX = Number(fromCanvasX(px).toFixed(2));
-      const dataY = Number(fromCanvasY(py).toFixed(2));
-      setPoints((prev) => [...prev, { x: dataX, y: dataY }]);
+      // Add data point
+      const newX = Number(Math.max(0.5, Math.min(9.5, ((px - pad) / plotW) * 10)).toFixed(2));
+      const newY = Number(Math.max(0.5, Math.min(9.5, (1 - (py - pad) / plotH) * 10)).toFixed(2));
+      setPoints((prev) => [...prev, { x: newX, y: newY }]);
       if (config.soundEnabled) audio.playClick();
     }
   };
@@ -386,16 +461,13 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = false
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const rect = canvas.getBoundingClientRect();
     const px = e.clientX - rect.left;
     const py = e.clientY - rect.top;
-    const width = rect.width;
-    const height = rect.height;
 
     const pad = 24;
-    const plotW = width - pad * 2;
-    const plotH = height - pad * 2;
+    const plotW = rect.width - pad * 2;
+    const plotH = rect.height - pad * 2;
     const toCanvasX = (x: number) => pad + (x / 10) * plotW;
     const toCanvasY = (y: number) => pad + (1 - y / 10) * plotH;
     const fromCanvasX = (xPx: number) => Math.max(0.5, Math.min(9.5, ((xPx - pad) / plotW) * 10));
@@ -408,7 +480,6 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = false
         idx === draggedCentroid ? { x: newX, y: newY } : c
       );
       setCentroids(updated);
-      buildHistory(updated, points);
     } else {
       let hit: number | null = null;
       activeSnapshot.centroids.forEach((c, idx) => {
@@ -427,139 +498,181 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = false
     if (canvas && draggedCentroid !== null) {
       try {
         canvas.releasePointerCapture(e.pointerId);
-      } catch {}
+      } catch (_err) {
+        // Pointer capture already released or not supported
+      }
       setDraggedCentroid(null);
+      if (config.soundEnabled) audio.playClick();
     }
   };
 
-  const handleSelectPreset = (p: 'gaussian' | 'rings') => {
+  // Right-click point deletion
+  const handleContextMenu = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+
+    const pad = 24;
+    const plotW = rect.width - pad * 2;
+    const plotH = rect.height - pad * 2;
+    const toCanvasX = (x: number) => pad + (x / 10) * plotW;
+    const toCanvasY = (y: number) => pad + (1 - y / 10) * plotH;
+
+    let targetIdx: number | null = null;
+    points.forEach((p, idx) => {
+      const cx = toCanvasX(p.x);
+      const cy = toCanvasY(p.y);
+      if (Math.hypot(px - cx, py - cy) <= 14) {
+        targetIdx = idx;
+      }
+    });
+
+    if (targetIdx !== null && points.length > 5) {
+      setPoints((prev) => prev.filter((_, idx) => idx !== targetIdx));
+      if (config.soundEnabled) audio.playWarning();
+    }
+  };
+
+  const handleSelectPreset = (p: 'gaussian' | 'rings' | 'anisotropic') => {
     setPreset(p);
     if (p === 'gaussian') {
       const pts = generateGaussianClusters();
       setPoints(pts);
-      const initialC = [
-        { x: 2.0, y: 2.0 },
-        { x: 8.0, y: 2.0 },
-        { x: 2.0, y: 8.0 },
-        { x: 8.0, y: 8.0 },
-      ];
-      setCentroids(initialC);
-      buildHistory(initialC, pts);
-    } else {
+      setCentroids(DEFAULT_CENTROIDS_BY_K[k]);
+    } else if (p === 'rings') {
       const pts = generateConcentricRings();
       setPoints(pts);
-      const initialC = [
+      setCentroids([
         { x: 4.5, y: 5.0 },
         { x: 5.5, y: 5.0 },
         { x: 5.0, y: 4.5 },
         { x: 5.0, y: 5.5 },
-      ];
-      setCentroids(initialC);
-      buildHistory(initialC, pts);
+      ].slice(0, k));
+    } else {
+      const pts = generateAnisotropicStreaks();
+      setPoints(pts);
+      setCentroids(DEFAULT_CENTROIDS_BY_K[k]);
     }
-    if (config.soundEnabled) audio.playClick();
+    if (config.soundEnabled) audio.playSuccess();
   };
 
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
-      {/* 1. Header */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-mono">
-              Inertia (WCSS):
-            </span>
-            <span className="font-mono text-sm font-semibold tabular-nums text-[var(--math-loss)]">
-              J = {activeSnapshot.inertia.toFixed(1)}
-            </span>
-          </div>
-          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-            Vector Voronoi 120 FPS
+    <div className="flex flex-col gap-4 select-none">
+      {/* Top Toolbar: Cluster Count K & Presets */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
+        {/* Preset Selector */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-xs font-mono text-[var(--text-tertiary)] uppercase tracking-wider me-1">
+            {language === 'ar' ? 'البيئة:' : 'Dataset:'}
           </span>
+          <button
+            onClick={() => handleSelectPreset('gaussian')}
+            className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              preset === 'gaussian'
+                ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/15 text-[var(--math-vector)] font-bold shadow-sm'
+                : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
+            }`}
+          >
+            {language === 'ar' ? 'عناقيد غاوسية' : 'Gaussian Blobs'}
+          </button>
+          <button
+            onClick={() => handleSelectPreset('rings')}
+            className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              preset === 'rings'
+                ? 'border-rose-400 bg-rose-500/15 text-rose-300 font-bold shadow-sm'
+                : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
+            }`}
+          >
+            {language === 'ar' ? 'حلقات متحدة المركز (فشل K-Means)' : 'Concentric Rings'}
+          </button>
+          <button
+            onClick={() => handleSelectPreset('anisotropic')}
+            className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              preset === 'anisotropic'
+                ? 'border-purple-400 bg-purple-500/15 text-purple-300 font-bold shadow-sm'
+                : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
+            }`}
+          >
+            {language === 'ar' ? 'عناقيد بيضاوية مائلة' : 'Anisotropic Streaks'}
+          </button>
         </div>
 
-        <button
-          onClick={() => setShowPedagogy(!showPedagogy)}
-          className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
-            showPedagogy
-              ? 'border-[var(--math-gradient)] bg-[var(--math-gradient)]/10 text-[var(--math-gradient)]'
-              : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
-          }`}
-        >
-          {language === 'ar' ? 'التحليل المعرفي' : '4-Tier Deep Dive'}
-        </button>
+        {/* Cluster Count K Selector */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-mono text-[var(--text-tertiary)] uppercase tracking-wider">
+            K Clusters:
+          </span>
+          <div className="flex gap-1">
+            {[2, 3, 4, 5].map((kVal) => (
+              <button
+                key={kVal}
+                onClick={() => handleChangeK(kVal)}
+                className={`w-7 h-7 text-xs font-mono font-bold rounded-lg border transition-all ${
+                  k === kVal
+                    ? 'border-emerald-400 bg-emerald-500/20 text-emerald-300 shadow-sm'
+                    : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
+                }`}
+              >
+                {kVal}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* 2. Presets Selector */}
-      {!compact && (
-        <div className="flex items-center justify-between p-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)]">
-          <div className="flex items-center gap-1.5 text-xs font-mono">
-            <span className="text-[var(--text-tertiary)] px-1">{language === 'ar' ? 'النمط:' : 'Preset:'}</span>
-            <button
-              onClick={() => handleSelectPreset('gaussian')}
-              className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
-                preset === 'gaussian'
-                  ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] font-semibold border border-[var(--border-subtle)]'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              {language === 'ar' ? 'عناقيد غاوسية' : '4 Gaussian Clusters'}
-            </button>
-            <button
-              onClick={() => handleSelectPreset('rings')}
-              className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
-                preset === 'rings'
-                  ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] font-semibold border border-[var(--border-subtle)]'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              {language === 'ar' ? 'حلقات متحدة المركز (فشل K-Means)' : 'Concentric Rings (Failure Mode)'}
-            </button>
-          </div>
-
-          <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
-            Click to add points • Drag diamond centroids
-          </span>
-        </div>
-      )}
-
-      {/* 3. High-DPI Vector Voronoi Canvas */}
-      <div className="relative w-full h-80 rounded-lg overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+      {/* Main Interactive Vector Voronoi Canvas */}
+      <div className="relative rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-app)] overflow-hidden shadow-inner p-2">
         <canvas
           ref={canvasRef}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          className={`w-full h-full block ${
-            hoveredCentroid !== null ? 'cursor-grab' : draggedCentroid !== null ? 'cursor-grabbing' : 'cursor-crosshair'
+          onContextMenu={handleContextMenu}
+          className={`w-full h-80 rounded-xl touch-none ${
+            hoveredCentroid !== null
+              ? 'cursor-grab'
+              : draggedCentroid !== null
+              ? 'cursor-grabbing'
+              : 'cursor-crosshair'
           }`}
         />
 
-        <div className="absolute top-2.5 start-2.5 flex items-center gap-2 pointer-events-none">
-          <span className="text-[10px] font-mono text-[var(--text-secondary)] bg-[var(--bg-surface)]/90 backdrop-blur-md px-2 py-0.5 rounded border border-[var(--border-subtle)]">
-            {points.length} points • {k} centroids
-          </span>
+        <div className="absolute top-4 start-4 px-2.5 py-1 rounded-md bg-[var(--bg-surface)]/80 backdrop-blur-md border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-tertiary)]">
+          {language === 'ar'
+            ? 'اسحب معينات المراكز μ • انقر لإضافة نقاط • انقر يمين لحذف نقطة'
+            : 'Drag diamond centroids μ • Click to add points • Right-click to remove'}
+        </div>
+
+        {/* Floating WCSS Telemetry */}
+        <div className="absolute top-4 end-4 flex items-center gap-3 px-3 py-1.5 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-xs font-mono shadow-sm">
+          <div>
+            <span className="text-[var(--text-tertiary)]">Inertia (WCSS): </span>
+            <span className="text-rose-400 font-bold tabular-nums">
+              J = {activeSnapshot.inertia.toFixed(1)}
+            </span>
+          </div>
+          <div className="w-px h-3 bg-[var(--border-subtle)]" />
+          <div className="text-emerald-400">
+            {points.length} pts • {k} centroids
+          </div>
         </div>
       </div>
 
-      {/* 4. Timeline Playback & Lloyd's Micro-Phase Scrubber */}
-      {!compact && (
-        <TimelinePlaybackBar
-          totalSteps={Math.max(0, history.length - 1)}
-          currentStep={currentStepIdx}
-          stepPhase={activeSnapshot.phase}
-          metricLabel="Inertia"
-          metricValue={activeSnapshot.inertia}
-          onStepChange={(step) => setCurrentStepIdx(step)}
-        />
-      )}
+      {/* Timeline Playback Bar */}
+      <TimelinePlaybackBar
+        totalSteps={Math.max(1, history.length - 1)}
+        currentStep={currentStepIdx}
+        stepPhase={activeSnapshot.phase}
+        metricLabel="Inertia"
+        metricValue={activeSnapshot.inertia}
+        onStepChange={(step) => setCurrentStepIdx(step)}
+      />
 
-      {/* 5. Pedagogical Deep Dive */}
-      {showPedagogy && !compact && (
-        <div className="pt-2">
-          <MultiTierDisclosure content={KMEANS_TIER_CONTENT} />
-        </div>
-      )}
+      {/* 4-Tier Cognitive Disclosure */}
+      <MultiTierDisclosure content={KMEANS_TIER_CONTENT} />
     </div>
   );
 };

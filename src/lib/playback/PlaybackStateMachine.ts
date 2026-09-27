@@ -16,6 +16,7 @@ export type PlaybackAction =
   | { type: 'PAUSE' }
   | { type: 'STEP_FORWARD' }
   | { type: 'STEP_BACKWARD' }
+  | { type: 'GO_TO_STEP'; step: number }
   | { type: 'SCRUB_START' }
   | { type: 'SCRUB_MOVE'; targetStep: number }
   | { type: 'SCRUB_END' }
@@ -28,7 +29,7 @@ export type PlaybackAction =
 export function playbackReducer(state: PlaybackState, action: PlaybackAction): PlaybackState {
   switch (action.type) {
     case 'PLAY':
-      if (state.status === 'CONVERGED' || state.status === 'DIVERGED') {
+      if (state.status === 'CONVERGED' || state.status === 'DIVERGED' || state.currentStep >= state.totalSteps) {
         return { ...state, currentStep: 0, status: 'PLAYING' };
       }
       return { ...state, status: 'PLAYING' };
@@ -36,22 +37,33 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
     case 'PAUSE':
       return { ...state, status: 'PAUSED' };
 
-    case 'STEP_FORWARD':
-      if (state.status === 'PLAYING') return state;
+    case 'STEP_FORWARD': {
       const nextStep = Math.min(state.currentStep + 1, state.totalSteps);
+      const isEnd = nextStep >= state.totalSteps;
       return {
         ...state,
         currentStep: nextStep,
-        status: nextStep >= state.totalSteps ? 'CONVERGED' : 'PAUSED',
+        status: isEnd ? 'CONVERGED' : state.status === 'PLAYING' ? 'PLAYING' : 'PAUSED',
       };
+    }
 
-    case 'STEP_BACKWARD':
-      if (state.status === 'PLAYING') return state;
+    case 'STEP_BACKWARD': {
+      const prevStep = Math.max(state.currentStep - 1, 0);
       return {
         ...state,
-        currentStep: Math.max(state.currentStep - 1, 0),
+        currentStep: prevStep,
         status: 'PAUSED',
       };
+    }
+
+    case 'GO_TO_STEP': {
+      const clamped = Math.max(0, Math.min(action.step, state.totalSteps));
+      return {
+        ...state,
+        currentStep: clamped,
+        status: clamped >= state.totalSteps && state.totalSteps > 0 ? 'CONVERGED' : state.status === 'PLAYING' ? 'PLAYING' : 'PAUSED',
+      };
+    }
 
     case 'SCRUB_START':
       return {
@@ -60,9 +72,10 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
         status: 'SCRUBBING',
       };
 
-    case 'SCRUB_MOVE':
+    case 'SCRUB_MOVE': {
       const clamped = Math.max(0, Math.min(action.targetStep, state.totalSteps));
       return { ...state, currentStep: clamped };
+    }
 
     case 'SCRUB_END':
       return {

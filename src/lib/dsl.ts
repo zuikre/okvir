@@ -5,7 +5,7 @@
  * :::simulation-widget directives, and :::python-challenge AST nodes.
  */
 
-import type { CurriculumModule, Beat, CodeChallenge, SimulationType, BeatNumber } from './types';
+import type { CurriculumModule, BeatNumber } from './types';
 
 export interface OkvirFrontmatter {
   id: string;

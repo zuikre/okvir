@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Search, CornerDownLeft, ArrowUp, ArrowDown, RotateCcw } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { Search, CornerDownLeft, ArrowUp, ArrowDown } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
 import { curriculum } from '@/lib/curriculum';
@@ -27,14 +27,14 @@ export const CommandPalette: React.FC = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const resetAllParameters = () => {
+  const resetAllParameters = useCallback(() => {
     setSlope(0.25);
     setIntercept(4.0);
     setKnnK(5);
     setLearningRate(0.1);
     setMomentum(0.8);
     setCommandPaletteOpen(false);
-  };
+  }, [setSlope, setIntercept, setKnnK, setLearningRate, setMomentum, setCommandPaletteOpen]);
 
   const actions: CommandAction[] = useMemo(() => {
     const base: CommandAction[] = [
@@ -190,7 +190,7 @@ export const CommandPalette: React.FC = () => {
     });
 
     return base;
-  }, [language, toggleTheme, setLanguage, setCurrentView, setActiveSimulation, startLesson, setCommandPaletteOpen]);
+  }, [language, toggleTheme, setLanguage, setCurrentView, setActiveSimulation, startLesson, setCommandPaletteOpen, lessons, resetAllParameters]);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return actions;

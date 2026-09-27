@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRight, Check, Lightbulb, ChevronRight, Sparkles, Lock, HelpCircle, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Lightbulb, Sparkles, Lock, X, AlertTriangle } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
 import { curriculum } from '@/lib/curriculum';
 import { SimulationView } from '@/components/simulation/SimulationView';
 import { CodeChallengeEditor } from '@/components/editor/CodeChallengeEditor';
 import { KaTeXMath } from '@/components/common/KaTeXMath';
+import { MathText } from '@/components/common/MathText';
 import { audio } from '@/lib/audio';
 import type { BeatNumber } from '@/lib/types';
 
@@ -40,12 +41,14 @@ export const LessonPlayer: React.FC = () => {
   const [selectedTransferOption, setSelectedTransferOption] = useState<number | null>(null);
   const [isHintOpen, setIsHintOpen] = useState(false);
   const [hintTier, setHintTier] = useState<1 | 2 | 3>(1);
+  const [hasPassedCode, setHasPassedCode] = useState(false);
 
-  // Reset selected option and hint state when active lesson or beat changes
+  // Reset selected option, hint, and sync passed code state when active lesson or beat changes
   useEffect(() => {
     setSelectedTransferOption(null);
     setIsHintOpen(false);
-  }, [activeLessonId, currentBeat]);
+    setHasPassedCode(Boolean(progress.completedBeats?.includes(3)));
+  }, [activeLessonId, currentBeat, progress.completedBeats]);
 
   // Keyboard shortcut listener for Hint [H] & custom event
   useEffect(() => {
@@ -81,6 +84,11 @@ export const LessonPlayer: React.FC = () => {
       setBeat((currentBeat + 1) as BeatNumber);
       if (config.soundEnabled) audio.playSuccessChime();
     } else {
+      // Beat 4: Verify correct answer is selected before completion
+      const beat4 = mod.beats.find((b) => b.number === 4);
+      const isCorrect = selectedTransferOption !== null && (beat4?.question?.options[selectedTransferOption]?.correct ?? (selectedTransferOption === 1));
+      if (!isCorrect) return;
+
       completeLesson(mod.id);
       if (config.soundEnabled) audio.playFanfare();
       setCurrentView('constellation');
@@ -98,11 +106,10 @@ export const LessonPlayer: React.FC = () => {
 
   const handleTransferSubmit = (idx: number) => {
     setSelectedTransferOption(idx);
-    const beatObj = mod.beats.find((b) => b.number === currentBeat);
-    const isCorrect = beatObj?.question?.options[idx]?.correct ?? (idx === 1);
+    const beat4 = mod.beats.find((b) => b.number === 4);
+    const isCorrect = beat4?.question?.options[idx]?.correct ?? (idx === 1);
     if (isCorrect) {
       if (config.soundEnabled) audio.playSuccessChime();
-      completeLesson(mod.id);
     } else {
       if (config.soundEnabled) audio.playErrorTick();
     }
@@ -270,20 +277,26 @@ export const LessonPlayer: React.FC = () => {
               const beatNum = b as BeatNumber;
               const isActive = currentBeat === beatNum;
               const isDone = (progress.completedBeats || []).includes(beatNum);
+              const canAccess = beatNum <= currentBeat || isDone;
 
               return (
                 <button
                   key={b}
-                  onClick={() => setBeat(beatNum)}
-                  className={`px-3 py-1 text-xs font-mono rounded-md border transition-all ${
+                  disabled={!canAccess}
+                  onClick={() => canAccess && setBeat(beatNum)}
+                  className={`flex items-center gap-1 px-3 py-1 text-xs font-mono rounded-md border transition-all ${
                     isActive
                       ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/10 text-[var(--math-vector)] font-semibold shadow-sm'
                       : isDone
                       ? 'border-[var(--border-strong)] text-[var(--math-vector)] hover:bg-[var(--bg-surface-hover)]'
-                      : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
+                      : canAccess
+                      ? 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
+                      : 'border-[var(--border-subtle)] text-[var(--text-tertiary)] opacity-35 cursor-not-allowed'
                   }`}
+                  title={!canAccess ? (language === 'ar' ? 'أكمل النبضات السابقة أولاً' : 'Complete preceding beats first') : undefined}
                 >
-                  {language === 'ar' ? `النبضة ${b}` : `Beat ${b}`}
+                  {!canAccess && <Lock size={10} className="shrink-0" />}
+                  <span>{language === 'ar' ? `النبضة ${b}` : `Beat ${b}`}</span>
                 </button>
               );
             })}
@@ -501,6 +514,8 @@ export const LessonPlayer: React.FC = () => {
            ========================================================================= */}
         {currentBeat === 3 && (() => {
           const beat3 = mod.beats.find((b) => b.number === 3);
+          const isCodeChallengePassed = !beat3?.code || hasPassedCode || (progress.completedBeats || []).includes(3);
+
           return (
             <div className="space-y-4 fade-in">
               <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm text-[var(--text-secondary)] leading-relaxed">
@@ -510,11 +525,13 @@ export const LessonPlayer: React.FC = () => {
               <CodeChallengeEditor
                 challenge={beat3?.code}
                 onComplete={() => {
+                  setHasPassedCode(true);
+                  updateLessonBeat(mod.id, 3);
                   if (config.soundEnabled) audio.playSuccessChime();
                 }}
               />
 
-              <div className="flex justify-between pt-2">
+              <div className="flex justify-between items-center pt-2">
                 <button
                   onClick={handlePrev}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
@@ -524,8 +541,15 @@ export const LessonPlayer: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setBeat(4)}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--text-primary)] text-[var(--bg-app)] font-medium text-xs transition-transform active:scale-95 hover:brightness-90 shadow-sm"
+                  disabled={!isCodeChallengePassed}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg font-medium text-xs transition-all shadow-sm ${
+                    isCodeChallengePassed
+                      ? 'bg-[var(--text-primary)] text-[var(--bg-app)] active:scale-95 hover:brightness-90 cursor-pointer'
+                      : 'bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-tertiary)] opacity-40 cursor-not-allowed'
+                  }`}
+                  title={!isCodeChallengePassed ? (language === 'ar' ? 'اجتز اختبارات الكود للمتابعة' : 'Pass code tests to advance') : undefined}
                 >
+                  {!isCodeChallengePassed && <Lock size={12} className="shrink-0" />}
                   <span>{tr('nextBeat', language)}: {tr('beat4', language)}</span>
                   <ArrowRight size={13} className={language === 'ar' ? 'rotate-180' : ''} />
                 </button>
@@ -599,56 +623,74 @@ export const LessonPlayer: React.FC = () => {
               </div>
 
               <h2 className="text-base font-semibold text-[var(--text-primary)] leading-relaxed">
-                {promptText}
+                <MathText text={promptText} />
               </h2>
 
               <div className="space-y-2.5">
-                {options.map((option, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleTransferSubmit(idx)}
-                    className={`w-full p-4 rounded-xl border text-start text-xs font-medium transition-all ${
-                      selectedTransferOption === idx
-                        ? option.correct
-                          ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300'
-                          : 'border-rose-500 bg-rose-500/10 text-rose-300'
-                        : 'border-[var(--border-subtle)] hover:border-[var(--border-strong)] text-[var(--text-secondary)]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`w-6 h-6 rounded-full flex items-center justify-center font-mono text-xs shrink-0 ${
-                          selectedTransferOption === idx
-                            ? option.correct
-                              ? 'bg-emerald-500 text-black'
-                              : 'bg-rose-500 text-white'
-                            : 'bg-[var(--border-subtle)] text-[var(--text-secondary)]'
-                        }`}
-                      >
-                        {selectedTransferOption === idx ? (option.correct ? '✓' : '✗') : String.fromCharCode(65 + idx)}
-                      </span>
-                      <span>{option.text[language]}</span>
-                    </div>
-                  </button>
-                ))}
+                {options.map((option, idx) => {
+                  const isChosen = selectedTransferOption === idx;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => handleTransferSubmit(idx)}
+                      className={`w-full p-4 rounded-xl border text-start text-xs font-medium transition-all ${
+                        isChosen
+                          ? option.correct
+                            ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/40'
+                            : 'border-rose-500 bg-rose-500/10 text-rose-300 ring-1 ring-rose-500/40'
+                          : 'border-[var(--border-subtle)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-app)] text-[var(--text-secondary)]'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3.5">
+                        <span
+                          className={`w-6 h-6 rounded-full flex items-center justify-center font-mono text-xs shrink-0 mt-0.5 font-bold ${
+                            isChosen
+                              ? option.correct
+                                ? 'bg-emerald-500 text-black shadow-sm'
+                                : 'bg-rose-500 text-white shadow-sm'
+                              : 'bg-[var(--border-subtle)] text-[var(--text-secondary)]'
+                          }`}
+                        >
+                          {isChosen ? (option.correct ? '✓' : '✗') : String.fromCharCode(65 + idx)}
+                        </span>
+                        <div className="flex-1 text-xs leading-relaxed">
+                          <MathText text={option.text[language]} />
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
 
               {selectedOptionObj && (
                 <div
                   className={`p-4 rounded-xl border text-xs font-medium leading-relaxed slide-up ${
                     isSelectedCorrect
-                      ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
-                      : 'border-rose-500/30 bg-rose-500/10 text-rose-400'
+                      ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
+                      : 'border-amber-500/30 bg-amber-500/10 text-amber-300'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    {isSelectedCorrect ? <Sparkles size={16} className="shrink-0" /> : <span className="text-rose-400 font-bold shrink-0">!</span>}
-                    <span>{selectedOptionObj.explanation[language]}</span>
+                  <div className="flex items-start gap-2.5">
+                    {isSelectedCorrect ? (
+                      <Sparkles size={16} className="text-emerald-400 shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertTriangle size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                    )}
+                    <div className="space-y-1">
+                      <div className="font-bold">
+                        {isSelectedCorrect
+                          ? (language === 'ar' ? 'إجابة صحيحة وترسيخ دقيق!' : 'Insight Verified!')
+                          : (language === 'ar' ? 'فرضية غير دقيقة — أعد النظر في الأساس الرياضي:' : 'Hypothesis Refuted — Reconsider:')}
+                      </div>
+                      <div className="text-[var(--text-secondary)] leading-relaxed">
+                        <MathText text={selectedOptionObj.explanation[language]} />
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
 
-              <div className="flex justify-between pt-3 border-t border-[var(--border-subtle)]">
+              <div className="flex justify-between items-center pt-3 border-t border-[var(--border-subtle)]">
                 <button
                   onClick={handlePrev}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
@@ -659,10 +701,17 @@ export const LessonPlayer: React.FC = () => {
 
                 <button
                   onClick={handleNext}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--math-vector)] text-black font-semibold text-xs transition-transform active:scale-95 hover:brightness-110 shadow-sm"
+                  disabled={!isSelectedCorrect}
+                  className={`flex items-center gap-1.5 px-5 py-2.5 rounded-lg font-semibold text-xs transition-all shadow-md ${
+                    isSelectedCorrect
+                      ? 'bg-[var(--math-vector)] text-black hover:brightness-110 active:scale-95 cursor-pointer shadow-[0_0_15px_rgba(56,189,248,0.25)]'
+                      : 'bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-tertiary)] opacity-40 cursor-not-allowed'
+                  }`}
+                  title={!isSelectedCorrect ? (language === 'ar' ? 'اختر الإجابة الصحيحة أولاً لإتمام الدرس' : 'Select the correct hypothesis to complete') : undefined}
                 >
+                  {!isSelectedCorrect && <Lock size={13} className="shrink-0" />}
                   <Check size={14} />
-                  <span>{language === 'ar' ? 'إتمام الدرس وترسيخ المفهوم' : 'Complete & Anchor Concept'}</span>
+                  <span>{language === 'ar' ? 'إتمام الدرس وترسيخ المفهوم (+50 XP)' : 'Complete & Anchor Concept (+50 XP)'}</span>
                 </button>
               </div>
             </div>

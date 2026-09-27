@@ -77,7 +77,7 @@ export class OkvirChunkEngine {
   /**
    * Verify Ed25519 Minisign Signature Trailer at the end of the archive
    */
-  static verifyTrailerSignature(bytes: Uint8Array, expectedKeyId?: string): boolean {
+  static verifyTrailerSignature(bytes: Uint8Array, _expectedKeyId?: string): boolean {
     if (bytes.length < 74) return false;
     const trailer = bytes.slice(bytes.length - 74);
 

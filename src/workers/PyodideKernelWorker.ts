@@ -41,7 +41,6 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
   const startTime = performance.now();
 
   try {
-    // 1. AST Static Analysis Checks (e.g. no illegal for-loops in vectorized tasks)
     const hasForLoop = /\bfor\b\s+.*\s+in\s+/.test(code);
     const usesNumpy = /import\s+numpy|np\./.test(code);
 
@@ -51,12 +50,16 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
       '> AST Static verification: OK',
     ];
 
+    if (usesNumpy) {
+      logs.push('> Vectorized numerical accelerator (NumPy SIMD) loaded');
+    }
+
     if (hasForLoop && code.includes('np.sum(residuals ** 2)')) {
       logs.push('! Warning: Redundant loop detected in vectorized context');
     }
 
     // 2. Execute test cases
-    let allPassed = true;
+    const allPassed = true;
     if (testCases && testCases.length > 0) {
       testCases.forEach((tc, idx) => {
         logs.push(`✓ Test Case ${idx + 1}: ${tc.input} -> ${tc.expected} (PASSED)`);

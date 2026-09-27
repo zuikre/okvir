@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useRef, useCallback } from 'react';
-import { PlaybackState, PlaybackAction, playbackReducer } from '@/lib/playback/PlaybackStateMachine';
+import { playbackReducer } from '@/lib/playback/PlaybackStateMachine';
 import { sonifier } from '@/lib/audio/WebAudioSonifier';
 import { Volume2, VolumeX, RotateCcw, ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 
@@ -42,11 +42,24 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
     dispatch({ type: 'SET_TOTAL_STEPS', totalSteps });
   }, [totalSteps]);
 
+  // Sync state.currentStep when parent changes
+  useEffect(() => {
+    if (state.status !== 'SCRUBBING' && state.status !== 'PLAYING') {
+      if (currentStep !== state.currentStep) {
+        dispatch({ type: 'GO_TO_STEP', step: currentStep });
+      }
+    }
+  }, [currentStep, state.status, state.currentStep]);
+
   // Sync parent step callback
   useEffect(() => {
     onStepChange(state.currentStep);
+  }, [state.currentStep, onStepChange]);
+
+  // Update sonifier loss metric
+  useEffect(() => {
     sonifier.updateLoss(metricValue);
-  }, [state.currentStep, onStepChange, metricValue]);
+  }, [metricValue]);
 
   // Handle status sounds
   useEffect(() => {
