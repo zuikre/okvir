@@ -1,0 +1,21 @@
+[package]
+name = "okvir-desktop"
+version = "1.0.0"
+description = "OKVIR (إطار): The Open-Source Desktop Framework for Learning Data Science, Econometrics & AI"
+authors = ["Zakarya Roubhi <contact@okvir.dev>"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rusqlite = { version = "0.31", features = ["bundled"] }
+sha2 = "0.10"
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

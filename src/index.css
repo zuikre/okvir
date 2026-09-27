@@ -1,0 +1,279 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import 'katex/dist/katex.min.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   DARK THEME: "OLED Charcoal" (Default Studio Mode)
+   ========================================================================== */
+[data-theme="dark"], :root {
+  --bg-app: #09090b;             /* Deep obsidian background */
+  --bg-surface: #121215;         /* Elevated panel background */
+  --bg-surface-hover: #18181b;   /* Interactive hover card */
+  --bg-surface-active: #202024;  /* Pressed state */
+  
+  --border-subtle: #27272a;      /* Structural 1px border */
+  --border-strong: #3f3f46;      /* Focused / active border */
+  --border-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.06); /* 1px top sheen */
+
+  --text-primary: #fafafa;       /* Crisp high-contrast white */
+  --text-secondary: #a1a1aa;     /* Precision metadata */
+  --text-tertiary: #71717a;      /* Inactive / hints */
+  --text-disabled: #52525b;
+
+  /* High-Contrast Semantic Mathematical Accents (WCAG AAA >= 7:1) */
+  --math-vector: #10b981;        /* Emerald: Vectors, true positives, feature columns */
+  --math-gradient: #f59e0b;      /* Amber: Slopes, learning rates, optimizers */
+  --math-loss: #f43f5e;          /* Vivid Rose: Residuals, squared errors, loss values */
+  --math-prediction: #a855f7;    /* Violet: Decision boundaries, regression lines, hypotheses */
+  --math-data: #38bdf8;          /* Electric Sky: Raw data points, observations */
+  --math-cluster: #ec4899;       /* Pink: Secondary classification / centroid */
+
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   LIGHT THEME: "Warm Paper" (Classrooms, Projectors, Daylight)
+   ========================================================================== */
+[data-theme="light"] {
+  --bg-app: #fcfcfc;             /* Warm off-white (never blinding pure #ffffff) */
+  --bg-surface: #f4f4f5;         /* Elevated panel */
+  --bg-surface-hover: #e4e4e7;   /* Interactive hover */
+  --bg-surface-active: #d4d4d8;  /* Pressed state */
+
+  --border-subtle: #e4e4e7;      /* Structural border */
+  --border-strong: #d4d4d8;      /* Focused state */
+  --border-specular: inset 0 1px 0 0 rgba(0, 0, 0, 0.04);
+
+  --text-primary: #09090b;       /* Deep charcoal text */
+  --text-secondary: #52525b;     /* Muted metadata */
+  --text-tertiary: #a1a1aa;      /* Inactive / hints */
+  --text-disabled: #d4d4d8;
+
+  /* High-Contrast Semantic Mathematical Accents (Light Mode - WCAG AAA >= 7:1) */
+  --math-vector: #059669;        /* Emerald */
+  --math-gradient: #d97706;      /* Amber */
+  --math-loss: #e11d48;          /* Vivid Rose */
+  --math-prediction: #7c3aed;    /* Violet */
+  --math-data: #0284c7;          /* Sky Blue */
+  --math-cluster: #db2777;       /* Pink */
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[dir='rtl'] body {
+  font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom range slider styling - Teenage Engineering Tactility */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--border-subtle);
+  outline: none;
+  transition: background 0.15s ease;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  cursor: grab;
+  border: 1.5px solid var(--border-strong);
+  background: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+input[type='range']:active::-webkit-slider-thumb {
+  cursor: grabbing;
+  transform: scale(1.15);
+  background: var(--math-gradient);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  cursor: grab;
+  border: 1.5px solid var(--border-strong);
+  background: var(--text-primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(56, 189, 248, 0);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.slide-up {
+  animation: slide-up 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.15s ease-out;
+}
+
+@keyframes flash-green {
+  0%,
+  100% {
+    color: var(--math-loss);
+  }
+  50% {
+    color: var(--math-vector);
+  }
+}
+
+.flash-green {
+  animation: flash-green 0.4s ease;
+}
+
+/* Specular inner border for instrument-grade surfaces */
+.specular {
+  box-shadow: var(--border-specular);
+}
+
+/* Code block styling */
+.code-block {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  white-space: pre;
+  tab-size: 4;
+}
+
+/* Syntax highlight token colors */
+.tok-keyword {
+  color: #c084fc;
+}
+.tok-func {
+  color: #60a5fa;
+}
+.tok-string {
+  color: #4ade80;
+}
+.tok-comment {
+  color: var(--text-tertiary);
+}
+.tok-num {
+  color: #fb923c;
+}
+.tok-def {
+  color: #fbbf24;
+}
+
+[data-theme='light'] .tok-keyword {
+  color: #7c3aed;
+}
+[data-theme='light'] .tok-func {
+  color: #2563eb;
+}
+[data-theme='light'] .tok-string {
+  color: #059669;
+}
+[data-theme='light'] .tok-comment {
+  color: #71717a;
+}
+[data-theme='light'] .tok-num {
+  color: #ea580c;
+}
+[data-theme='light'] .tok-def {
+  color: #d97706;
+}
+
+/* KaTeX formula container styling */
+.katex {
+  font-size: 1.08em;
+  color: var(--text-primary);
+}
+
+.katex-display {
+  margin: 0.75em 0;
+}
+
+/* Grid background pattern */
+.grid-bg {
+  background-image: radial-gradient(circle at 1px 1px, var(--border-subtle) 1px, transparent 0);
+  background-size: 20px 20px;
+}

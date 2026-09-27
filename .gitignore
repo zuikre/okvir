@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build artifacts
+dist/
+build/
+target/
+src-tauri/target/
+
+# Environment and secrets
+.env
+.env.local
+*.pem
+*.key
+*.minisig.secret
+
+# Cache and temporary files
+.cache/
+.parcel-cache/
+.turbo/
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE settings
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
