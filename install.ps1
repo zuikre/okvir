@@ -67,8 +67,53 @@ if ($DownloadSuccess -and (Test-Path $InstallerTmp)) {
         Write-Host "! Web archive fallback skipped." -ForegroundColor Gray
     }
 
+    # Download portable CLI script
+    $CliDestDir = "$env:USERPROFILE\.okvir\bin"
+    New-Item -ItemType Directory -Path $CliDestDir -Force | Out-Null
+    $CliScriptUrl = "https://raw.githubusercontent.com/$Repo/main/bin/okvir.js"
+    try {
+        Invoke-WebRequest -Uri $CliScriptUrl -OutFile "$CliDestDir\okvir.js" -UseBasicParsing -TimeoutSec 15
+    } catch {
+        Write-Host "! CLI script download skipped." -ForegroundColor Gray
+    }
+
     Write-Host "! Generating lightweight Okvir CMD launcher stub..." -ForegroundColor Yellow
-    $CmdStub = "@echo off`r`nif exist `"%USERPROFILE%\.okvir\web\index.html`" (`r`n  start `"`" `"%USERPROFILE%\.okvir\web\index.html`"`r`n) else (`r`n  npx --yes okvir %*`r`n)"
+    $CmdStub = @"
+@echo off
+set APP_DIR=%USERPROFILE%\.okvir
+if not "%~1"=="" (
+  if exist "%CD%\bin\okvir.js" (
+    node "%CD%\bin\okvir.js" %*
+    exit /b %ERRORLEVEL%
+  )
+  if exist "%APP_DIR%\bin\okvir.js" (
+    node "%APP_DIR%\bin\okvir.js" %*
+    exit /b %ERRORLEVEL%
+  )
+)
+if exist "%CD%\package.json" (
+  npm run dev
+  exit /b %ERRORLEVEL%
+)
+if exist "%APP_DIR%\web\index.html" (
+  where python >nul 2>nul
+  if %ERRORLEVEL% EQU 0 (
+    echo Starting Okvir local engine on http://localhost:5173...
+    start http://localhost:5173
+    cd /d "%APP_DIR%\web" && python -m http.server 5173
+    exit /b 0
+  )
+  where node >nul 2>nul
+  if %ERRORLEVEL% EQU 0 (
+    echo Starting Okvir local engine on http://localhost:5173...
+    start http://localhost:5173
+    node -e "const http=require('http'),fs=require('fs'),path=require('path'),root=process.env.USERPROFILE+'/.okvir/web',m={'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json','.wasm':'application/wasm'};http.createServer((q,s)=>{let f=path.join(root,q.url==='/'?'index.html':q.url);if(!fs.existsSync(f))f=path.join(root,'index.html');s.writeHead(200,{'Content-Type':m[path.extname(f)]||'application/octet-stream'});fs.createReadStream(f).pipe(s);}).listen(5173);"
+    exit /b 0
+  )
+)
+echo Please install Node.js 18+ or Python 3 to launch Okvir.
+exit /b 1
+"@
     Set-Content -Path "$BinDir\okvir.cmd" -Value $CmdStub
     Write-Host "✔ Created launcher stub at $BinDir\okvir.cmd" -ForegroundColor Green
 }

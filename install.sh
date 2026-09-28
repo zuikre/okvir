@@ -9,8 +9,8 @@ set -euo pipefail
 
 OKVIR_REPO="zuikre/okvir"
 OKVIR_VERSION="${OKVIR_VERSION:-latest}"
-INSTALL_DIR="${HOME}/.local/bin"
-APP_DIR="${HOME}/.okvir"
+INSTALL_DIR="${INSTALL_DIR:-${HOME}/.local/bin}"
+APP_DIR="${APP_DIR:-${HOME}/.okvir}"
 
 # Text Styling
 BOLD="$(tput bold 2>/dev/null || echo '')"
@@ -136,17 +136,25 @@ else
     rm -rf "${TMP_WEB_DIR}"
   fi
 
+  mkdir -p "${APP_DIR}/bin"
+  download_file "https://raw.githubusercontent.com/${OKVIR_REPO}/main/bin/okvir.js" "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
+  chmod +x "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
+
   echo "${YELLOW}! Creating portable launcher script at ${INSTALL_DIR}/okvir...${RESET}"
 
   cat << 'LAUNCHER' > "${INSTALL_DIR}/okvir"
 #!/usr/bin/env bash
 # Okvir launcher script
-APP_WEB="${HOME}/.okvir/web"
+APP_DIR="${HOME}/.okvir"
+APP_WEB="${APP_DIR}/web"
+APP_BIN="${APP_DIR}/bin/okvir.js"
 
 # Handle CLI Subcommands: init, test, pack, dev, version, help
 if [ "$#" -gt 0 ] && [ "$1" != "start" ]; then
   if [ -f "$(pwd)/bin/okvir.js" ]; then
     exec node "$(pwd)/bin/okvir.js" "$@"
+  elif [ -f "${APP_BIN}" ]; then
+    exec node "${APP_BIN}" "$@"
   elif [ -f "${HOME}/okvir/bin/okvir.js" ]; then
     exec node "${HOME}/okvir/bin/okvir.js" "$@"
   fi
@@ -156,19 +164,46 @@ fi
 if [ -f "$(pwd)/package.json" ] && [ -f "$(pwd)/bin/okvir.js" ]; then
   echo "🚀 Launching Okvir interactive learning engine..."
   exec npm run dev
-elif [ -d "${APP_WEB}" ] && command -v python3 >/dev/null 2>&1; then
-  echo "Starting Okvir local engine on http://localhost:5173..."
-  (cd "${APP_WEB}" && python3 -m http.server 5173 >/dev/null 2>&1) &
-  SERVER_PID=$!
-  sleep 0.8
-  if command -v xdg-open >/dev/null 2>&1; then
-    xdg-open "http://localhost:5173" >/dev/null 2>&1 || true
-  elif command -v open >/dev/null 2>&1; then
-    open "http://localhost:5173" >/dev/null 2>&1 || true
+elif [ -d "${APP_WEB}" ]; then
+  if command -v python3 >/dev/null 2>&1; then
+    echo "Starting Okvir local engine on http://localhost:5173..."
+    (cd "${APP_WEB}" && python3 -m http.server 5173 >/dev/null 2>&1) &
+    SERVER_PID=$!
+    sleep 0.8
+    if command -v xdg-open >/dev/null 2>&1; then
+      xdg-open "http://localhost:5173" >/dev/null 2>&1 || true
+    elif command -v open >/dev/null 2>&1; then
+      open "http://localhost:5173" >/dev/null 2>&1 || true
+    fi
+    echo "Okvir is running at http://localhost:5173 (Press Ctrl+C to stop)"
+    trap "kill $SERVER_PID 2>/dev/null" EXIT INT TERM
+    wait $SERVER_PID
+  elif command -v node >/dev/null 2>&1; then
+    echo "Starting Okvir local engine via Node on http://localhost:5173..."
+    node -e "
+      const http = require('http');
+      const fs = require('fs');
+      const path = require('path');
+      const root = process.env.HOME + '/.okvir/web';
+      const mimes = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json', '.wasm': 'application/wasm' };
+      http.createServer((req, res) => {
+        let f = path.join(root, req.url === '/' ? 'index.html' : req.url);
+        if (!fs.existsSync(f)) f = path.join(root, 'index.html');
+        res.writeHead(200, { 'Content-Type': mimes[path.extname(f)] || 'application/octet-stream' });
+        fs.createReadStream(f).pipe(res);
+      }).listen(5173, () => {});
+    " &
+    SERVER_PID=$!
+    sleep 0.8
+    if command -v xdg-open >/dev/null 2>&1; then
+      xdg-open "http://localhost:5173" >/dev/null 2>&1 || true
+    elif command -v open >/dev/null 2>&1; then
+      open "http://localhost:5173" >/dev/null 2>&1 || true
+    fi
+    echo "Okvir is running at http://localhost:5173 (Press Ctrl+C to stop)"
+    trap "kill $SERVER_PID 2>/dev/null" EXIT INT TERM
+    wait $SERVER_PID
   fi
-  echo "Okvir is running at http://localhost:5173 (Press Ctrl+C to stop)"
-  trap "kill $SERVER_PID 2>/dev/null" EXIT INT TERM
-  wait $SERVER_PID
 else
   echo "Please install Node.js 18+ or Python 3 to launch Okvir, or visit https://github.com/zuikre/okvir/releases"
   exit 1
