@@ -55,12 +55,12 @@ When you learn Linear Regression in Okvir, you don't memorize the OLS equation. 
 
 #### Linux & macOS
 ```bash
-curl -fsSL https://okvir.dev/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/zuikre/okvir/main/install.sh | bash
 ```
 
 #### Windows (PowerShell)
 ```powershell
-irm https://okvir.dev/install.ps1 | iex
+irm https://raw.githubusercontent.com/zuikre/okvir/main/install.ps1 | iex
 ```
 
 ### Local Development from Source

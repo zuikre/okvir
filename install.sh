@@ -117,16 +117,49 @@ if download_file "${RELEASE_URL}" "${TMP_DEST}" 2>/dev/null; then
     echo "${GREEN}✔ Installed Okvir.app to /Applications/Okvir.app${RESET}"
   fi
 else
-  echo "${YELLOW}! GitHub Release artifact not found or host offline.${RESET}"
-  echo "${YELLOW}! Installing portable CLI launcher script to ${INSTALL_DIR}/okvir...${RESET}"
+  echo "${YELLOW}! Desktop binary packaging in progress on GitHub CI.${RESET}"
+  echo "${BOLD}==> Fetching Okvir standalone distribution (${OKVIR_VERSION})...${RESET}"
+
+  WEB_ZIP_URL="https://github.com/${OKVIR_REPO}/releases/download/v1.0.0/okvir-web-v1.0.0.zip"
+  TMP_WEB_DIR="$(mktemp -d)"
+  TMP_WEB_ZIP="${TMP_WEB_DIR}/web.zip"
+
+  if download_file "${WEB_ZIP_URL}" "${TMP_WEB_ZIP}" 2>/dev/null; then
+    mkdir -p "${APP_DIR}/web"
+    if command -v unzip >/dev/null 2>&1; then
+      unzip -q -o "${TMP_WEB_ZIP}" -d "${APP_DIR}/web"
+      echo "${GREEN}✔ Installed Okvir standalone web engine to ${APP_DIR}/web${RESET}"
+    elif command -v python3 >/dev/null 2>&1; then
+      python3 -c "import zipfile; zipfile.ZipFile('${TMP_WEB_ZIP}').extractall('${APP_DIR}/web')"
+      echo "${GREEN}✔ Installed Okvir standalone web engine to ${APP_DIR}/web${RESET}"
+    fi
+    rm -rf "${TMP_WEB_DIR}"
+  fi
+
+  echo "${YELLOW}! Creating portable launcher script at ${INSTALL_DIR}/okvir...${RESET}"
 
   cat << 'LAUNCHER' > "${INSTALL_DIR}/okvir"
 #!/usr/bin/env bash
 # Okvir launcher script
-if command -v npm >/dev/null 2>&1; then
-  exec npx --yes okvir-cli "$@"
+APP_WEB="${HOME}/.okvir/web"
+
+if [ -d "${APP_WEB}" ] && command -v python3 >/dev/null 2>&1; then
+  echo "Starting Okvir local engine on http://localhost:5173..."
+  (cd "${APP_WEB}" && python3 -m http.server 5173 >/dev/null 2>&1) &
+  SERVER_PID=$!
+  sleep 0.8
+  if command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "http://localhost:5173" >/dev/null 2>&1 || true
+  elif command -v open >/dev/null 2>&1; then
+    open "http://localhost:5173" >/dev/null 2>&1 || true
+  fi
+  echo "Okvir is running at http://localhost:5173 (Press Ctrl+C to stop)"
+  trap "kill $SERVER_PID 2>/dev/null" EXIT INT TERM
+  wait $SERVER_PID
+elif command -v npm >/dev/null 2>&1; then
+  exec npx --yes okvir "$@"
 else
-  echo "Please install Node.js 18+ or download the native AppImage / DMG from https://github.com/zuikre/okvir/releases"
+  echo "Please install Node.js 18+ or Python 3 to launch Okvir, or visit https://github.com/zuikre/okvir/releases"
   exit 1
 fi
 LAUNCHER

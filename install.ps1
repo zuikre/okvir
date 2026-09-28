@@ -46,7 +46,7 @@ try {
     Invoke-WebRequest -Uri $ReleaseUrl -OutFile $InstallerTmp -UseBasicParsing -TimeoutSec 30
     $DownloadSuccess = $true
 } catch {
-    Write-Host "! Release binary not yet available on CDN or host offline." -ForegroundColor Yellow
+    Write-Host "! Desktop installer exe packaging in progress on GitHub CI." -ForegroundColor Yellow
 }
 
 if ($DownloadSuccess -and (Test-Path $InstallerTmp)) {
@@ -54,8 +54,21 @@ if ($DownloadSuccess -and (Test-Path $InstallerTmp)) {
     Start-Process -FilePath $InstallerTmp -ArgumentList "/S", "/currentuser" -Wait
     Write-Host "✔ Okvir installed successfully!" -ForegroundColor Green
 } else {
+    Write-Host "==> Fetching Okvir standalone distribution ($Version)..." -ForegroundColor Gray
+    $WebZipUrl = "https://github.com/$Repo/releases/download/v1.0.0/okvir-web-v1.0.0.zip"
+    $WebZipTmp = "$env:TEMP\okvir-web.zip"
+    $WebDest = "$env:USERPROFILE\.okvir\web"
+
+    try {
+        Invoke-WebRequest -Uri $WebZipUrl -OutFile $WebZipTmp -UseBasicParsing -TimeoutSec 30
+        Expand-Archive -Path $WebZipTmp -DestinationPath $WebDest -Force
+        Write-Host "✔ Installed Okvir standalone web engine to $WebDest" -ForegroundColor Green
+    } catch {
+        Write-Host "! Web archive fallback skipped." -ForegroundColor Gray
+    }
+
     Write-Host "! Generating lightweight Okvir CMD launcher stub..." -ForegroundColor Yellow
-    $CmdStub = "@echo off`r`nif exist `"%~dp0okvir.exe`" (`r`n  `"%~dp0okvir.exe`" %*`r`n) else (`r`n  npx --yes okvir-cli %*`r`n)"
+    $CmdStub = "@echo off`r`nif exist `"%USERPROFILE%\.okvir\web\index.html`" (`r`n  start `"`" `"%USERPROFILE%\.okvir\web\index.html`"`r`n) else (`r`n  npx --yes okvir %*`r`n)"
     Set-Content -Path "$BinDir\okvir.cmd" -Value $CmdStub
     Write-Host "✔ Created launcher stub at $BinDir\okvir.cmd" -ForegroundColor Green
 }
