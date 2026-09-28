@@ -19,11 +19,12 @@ function App() {
     setCurrentView,
   } = useOkvirStore();
 
-  // Initialize theme + language attributes on mount
+  // Initialize theme + language attributes on mount and sync SQLite profile
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.setAttribute('dir', language === 'ar' ? 'rtl' : 'ltr');
     document.documentElement.setAttribute('lang', language);
+    useOkvirStore.getState().syncWithTauriProfile?.();
   }, [theme, language]);
 
   // Global keyboard shortcuts

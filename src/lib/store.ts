@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Theme, Language, ViewName, SimulationType, BeatNumber, LessonProgress, LocalConfig } from './types';
 import { initialLessons, curriculum } from './curriculum';
+import { tauriBridge } from './tauri-bridge';
 
 export function recalculateLessonStatuses(lessons: Record<string, LessonProgress>): Record<string, LessonProgress> {
   const updated = { ...lessons };
@@ -81,6 +82,7 @@ export interface OkvirState {
   updateLessonBeat: (lessonId: string, beat: BeatNumber) => void;
   completeLesson: (lessonId: string) => void;
   startLesson: (lessonId: string) => void;
+  syncWithTauriProfile: () => Promise<void>;
 }
 
 // Self-healing: Purge any legacy mock values (1420 XP or 14 streak) from client localStorage
@@ -336,6 +338,9 @@ export const useOkvirStore = create<OkvirState>()(
           // Re-evaluate the entire DAG: unlock the next lessons whose prerequisites are now satisfied!
           const dynamicallyUnlocked = recalculateLessonStatuses(updatedLessons);
 
+          // Persist to native SQLite via Tauri bridge (PRD Section 17.2 & Section 2)
+          tauriBridge.completeLesson(lessonId, 360).catch(console.error);
+
           return {
             xp: state.xp + 50,
             lessons: dynamicallyUnlocked,
@@ -369,6 +374,24 @@ export const useOkvirStore = create<OkvirState>()(
             },
           };
         }),
+      syncWithTauriProfile: async () => {
+        try {
+          const profile = await tauriBridge.getUserProfile();
+          if (profile && profile.id && (profile.xp > 0 || profile.streak_days > 0)) {
+            set((state) => ({
+              xp: Math.max(state.xp, Number(profile.xp) || 0),
+              streakDays: Math.max(state.streakDays, Number(profile.streak_days) || 0),
+              config: {
+                ...state.config,
+                username: profile.username || state.config.username,
+                streakFreezes: profile.streak_freezes_remaining ?? state.config.streakFreezes,
+              },
+            }));
+          }
+        } catch (e) {
+          console.error('Failed to sync with Tauri SQLite profile:', e);
+        }
+      },
     }),
     {
       name: 'okvir-local-storage-v1',

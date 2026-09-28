@@ -17,6 +17,7 @@ import { tr } from '@/lib/i18n';
 import { createNewCard, updateCard, retrievability, getRatingLabel } from '@/lib/fsrs';
 import { KaTeXMath } from '@/components/common/KaTeXMath';
 import { audio } from '@/lib/audio';
+import { tauriBridge } from '@/lib/tauri-bridge';
 import type { FSRSState, Rating } from '@/lib/fsrs';
 
 export type DrillFormat = 'flashcard' | 'mcq' | 'boolean' | 'formula_fill';
@@ -411,6 +412,31 @@ export const DailyCalibration: React.FC = () => {
   const [cards, setCards] = useState<Record<string, FSRSState>>({});
   const [selectedFormatFilter, setSelectedFormatFilter] = useState<'all' | DrillFormat>('all');
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Pre-load due cards from embedded SQLite database via Tauri Bridge
+  useEffect(() => {
+    tauriBridge.getDueFsrsCards().then((dueCards) => {
+      if (dueCards && dueCards.length > 0) {
+        setCards((prev) => {
+          const updated = { ...prev };
+          dueCards.forEach((c) => {
+            updated[c.concept_id] = {
+              cardId: c.card_id,
+              conceptId: c.concept_id,
+              stability: c.stability,
+              difficulty: c.difficulty,
+              reps: Number(c.reps) || 0,
+              lapses: Number(c.lapses) || 0,
+              state: (c.state || 0) as 0 | 1 | 2 | 3,
+              lastReview: c.last_review ? new Date(c.last_review).getTime() : null,
+              due: new Date(c.due_date).getTime(),
+            };
+          });
+          return updated;
+        });
+      }
+    }).catch(console.error);
+  }, []);
 
   // Interaction States
   const [isFlipped, setIsFlipped] = useState(false); // For flashcard

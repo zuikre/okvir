@@ -46,7 +46,7 @@ Okvir is architected as an **instrument-grade, local-first interactive computati
 
 ## 2. Layer 1: Embedded SQLite Storage (WAL Mode)
 
-Okvir stores all user state locally on the user's disk (`~/.okvir/storage.db`) without telemetry or third-party tracking.
+Okvir stores all user state locally on the user's disk (`~/.okvir/okvir.db`) without telemetry or third-party tracking.
 
 ### 2.1 Pragmas & Performance Tuning
 ```sql
