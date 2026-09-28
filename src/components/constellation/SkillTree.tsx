@@ -19,7 +19,7 @@ export const SkillTree: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 lg:p-8 grid-bg">
+    <div className="flex-1 overflow-y-auto p-6 lg:p-8 pb-6 grid-bg">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col gap-1 border-b border-[var(--border-subtle)] pb-5">
@@ -170,6 +170,9 @@ export const SkillTree: React.FC = () => {
             );
           })}
         </div>
+
+        {/* Guaranteed clearance spacer so fixed bottom bar never overlaps controls */}
+        <div className="h-16 shrink-0 pointer-events-none" aria-hidden="true" />
       </div>
 
       {/* Module Detail Slide-over Inspection Drawer */}

@@ -57,7 +57,7 @@ export const Sandbox: React.FC = () => {
     .filter((m) => m && lessons[m.id]?.status !== 'mastered');
 
   return (
-    <div className="flex-1 overflow-y-auto p-6">
+    <div className="flex-1 overflow-y-auto p-6 pb-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">
@@ -171,6 +171,9 @@ export const Sandbox: React.FC = () => {
         ) : (
           <SimulationView type={activeSimulation} />
         )}
+
+        {/* Guaranteed clearance spacer so fixed bottom bar never overlaps controls */}
+        <div className="h-16 shrink-0 pointer-events-none" aria-hidden="true" />
       </div>
     </div>
   );

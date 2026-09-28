@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react'
 import { useOkvirStore } from '@/lib/store';
 import { computeVoronoiPolygons, type Vec2 } from '@/lib/canvas/VoronoiClipping';
 import { TimelinePlaybackBar } from '@/components/simulation/TimelinePlaybackBar';
-import { MultiTierDisclosure, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
+import { PreCanvasBriefing, PostCanvasConsolidation, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 import { audio } from '@/lib/audio';
 
 const CLUSTER_COLORS = ['#38bdf8', '#f59e0b', '#10b981', '#ec4899', '#8b5cf6'];
@@ -561,6 +561,9 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = () => {
 
   return (
     <div className="flex flex-col gap-4 select-none">
+      {/* Pre-Canvas Intuitive Briefing & Mental Model */}
+      <PreCanvasBriefing content={KMEANS_TIER_CONTENT} />
+
       {/* Top Toolbar: Cluster Count K & Presets */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
         {/* Preset Selector */}
@@ -671,8 +674,8 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = () => {
         onStepChange={(step) => setCurrentStepIdx(step)}
       />
 
-      {/* 4-Tier Cognitive Disclosure */}
-      <MultiTierDisclosure content={KMEANS_TIER_CONTENT} />
+      {/* Post-Canvas Mathematical & Code Consolidation */}
+      <PostCanvasConsolidation content={KMEANS_TIER_CONTENT} />
     </div>
   );
 };

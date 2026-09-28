@@ -1,6 +1,7 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
+import { ChevronDown, Keyboard } from 'lucide-react';
 
 export const RaycastActionBar: React.FC = () => {
   const {
@@ -13,6 +14,8 @@ export const RaycastActionBar: React.FC = () => {
     lessons,
     updateLessonBeat,
   } = useOkvirStore();
+
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleNextBeat = useCallback(() => {
     if (currentView === 'lesson') {
@@ -43,6 +46,9 @@ export const RaycastActionBar: React.FC = () => {
       } else if (e.code === 'Space' && currentView === 'lesson') {
         e.preventDefault();
         handleNextBeat();
+      } else if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+        e.preventDefault();
+        setIsCollapsed((prev) => !prev);
       }
     };
 
@@ -60,7 +66,6 @@ export const RaycastActionBar: React.FC = () => {
       label: tr('run', language),
       key: '⌘↵',
       onClick: () => {
-        // Trigger run on code editor if in lesson beat 3
         const runBtn = document.querySelector('button[title*="Run"], button:has(kbd)') as HTMLButtonElement;
         if (runBtn) runBtn.click();
       },
@@ -84,9 +89,22 @@ export const RaycastActionBar: React.FC = () => {
     },
   ];
 
+  if (isCollapsed) {
+    return (
+      <button
+        onClick={() => setIsCollapsed(false)}
+        className="fixed bottom-3 end-5 z-40 flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--bg-surface)]/90 hover:bg-[var(--bg-surface-hover)] shadow-2xl backdrop-blur-xl specular text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all select-none group"
+        title={language === 'ar' ? 'إظهار شريط الاختصارات [?]' : 'Expand Shortcuts [?]'}
+      >
+        <Keyboard size={13} className="text-[var(--math-gradient)] group-hover:scale-110 transition-transform" />
+        <span className="text-[11px] font-semibold">⌘K</span>
+      </button>
+    );
+  }
+
   return (
     <div
-      className="fixed bottom-4 end-6 z-40 flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--bg-surface)]/90 shadow-2xl backdrop-blur-xl specular select-none"
+      className="fixed bottom-3 end-5 z-40 flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--bg-surface)]/90 shadow-2xl backdrop-blur-xl specular select-none slide-up"
       style={{ backdropFilter: 'blur(24px)' }}
     >
       {actions.map((action, i) => (
@@ -104,14 +122,15 @@ export const RaycastActionBar: React.FC = () => {
         </React.Fragment>
       ))}
 
-      {currentView === 'lesson' && (
-        <>
-          <span className="w-px h-3 bg-[var(--border-subtle)]" />
-          <span className="text-[10px] text-[var(--math-gradient)] font-mono px-1">
-            4-Beat Mode
-          </span>
-        </>
-      )}
+      {/* Minimize Button */}
+      <span className="w-px h-3 bg-[var(--border-subtle)]" />
+      <button
+        onClick={() => setIsCollapsed(true)}
+        className="p-1 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] transition-colors"
+        title={language === 'ar' ? 'تصغير الشريط [?]' : 'Minimize shortcuts bar [?]'}
+      >
+        <ChevronDown size={13} />
+      </button>
     </div>
   );
 };

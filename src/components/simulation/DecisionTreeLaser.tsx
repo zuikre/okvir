@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useOkvirStore } from '@/lib/store';
-import { MultiTierDisclosure, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
+import { PreCanvasBriefing, PostCanvasConsolidation, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 import { audio } from '@/lib/audio';
 import { RotateCcw, Sparkles, Split } from 'lucide-react';
 
@@ -360,6 +360,9 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = () => {
 
   return (
     <div className="flex flex-col gap-4 select-none">
+      {/* Pre-Canvas Intuitive Briefing & Mental Model */}
+      <PreCanvasBriefing content={TREE_TIER_CONTENT} />
+
       {/* Top Action Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
         {/* Class Selector for adding points */}
@@ -515,8 +518,8 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = () => {
         </div>
       </div>
 
-      {/* 4-Tier Cognitive Disclosure */}
-      <MultiTierDisclosure content={TREE_TIER_CONTENT} />
+      {/* Post-Canvas Mathematical & Code Consolidation */}
+      <PostCanvasConsolidation content={TREE_TIER_CONTENT} />
     </div>
   );
 };

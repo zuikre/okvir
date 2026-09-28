@@ -124,7 +124,7 @@ export const SettingsView: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+    <div className="flex-1 overflow-y-auto p-6 lg:p-8 pb-6">
       <div className="max-w-3xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col gap-1 border-b border-[var(--border-subtle)] pb-4">
@@ -467,6 +467,9 @@ export const SettingsView: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Guaranteed clearance spacer so fixed bottom bar never overlaps controls */}
+        <div className="h-16 shrink-0 pointer-events-none" aria-hidden="true" />
       </div>
     </div>
   );

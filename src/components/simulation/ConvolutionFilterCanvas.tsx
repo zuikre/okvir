@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
 import { Play, Pause, SkipForward, SkipBack, RotateCcw } from 'lucide-react';
-import { MultiTierDisclosure, TierContent } from '@/components/pedagogy/MultiTierDisclosure';
+import { PreCanvasBriefing, PostCanvasConsolidation, TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 
 type KernelType = 'edge' | 'sobel_x' | 'sobel_y' | 'sharpen' | 'box_blur' | 'ridge' | 'gaussian';
 
@@ -320,6 +320,9 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = () => {
 
   return (
     <div className="flex flex-col gap-5 p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
+      {/* Pre-Canvas Intuitive Briefing & Mental Model */}
+      <PreCanvasBriefing content={CONV_PEDAGOGY} />
+
       {/* Header and Kernel Switcher */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-4">
         <div>
@@ -538,8 +541,8 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = () => {
         </div>
       </div>
 
-      {/* 4-Tier Cognitive Disclosure */}
-      <MultiTierDisclosure content={CONV_PEDAGOGY} />
+      {/* Post-Canvas Mathematical & Code Consolidation */}
+      <PostCanvasConsolidation content={CONV_PEDAGOGY} />
     </div>
   );
 };

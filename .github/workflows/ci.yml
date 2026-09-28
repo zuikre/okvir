@@ -24,5 +24,11 @@ jobs:
       - name: Typecheck TypeScript Sources
         run: npm run typecheck
 
+      - name: Lint Codebase & React Rules
+        run: npm run lint
+
+      - name: Test Curriculum DSL & AST Validation
+        run: npm test
+
       - name: Build Production Assets
         run: npm run build

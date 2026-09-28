@@ -255,7 +255,7 @@ export const LessonPlayer: React.FC = () => {
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="max-w-4xl mx-auto p-6 lg:p-8 space-y-6">
+      <div className="max-w-4xl mx-auto p-6 lg:p-8 pb-6 space-y-6">
         {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
           <div>
@@ -717,6 +717,9 @@ export const LessonPlayer: React.FC = () => {
             </div>
           );
         })()}
+
+        {/* Guaranteed clearance spacer so fixed bottom bar never overlaps controls */}
+        <div className="h-16 shrink-0 pointer-events-none" aria-hidden="true" />
       </div>
     </div>
   );

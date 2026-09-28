@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
-import { MultiTierDisclosure, TierContent } from '@/components/pedagogy/MultiTierDisclosure';
+import { PreCanvasBriefing, PostCanvasConsolidation, TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 
 const TOKENS = ['The', 'animal', "didn't", 'cross', 'the', 'street', 'because', 'it', 'was', 'too', 'tired'];
 
@@ -169,6 +169,9 @@ export const AttentionHeatmapCanvas: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-5 p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
+      {/* Pre-Canvas Intuitive Briefing & Mental Model */}
+      <PreCanvasBriefing content={ATTENTION_PEDAGOGY} />
+
       {/* Header and Controls */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-4">
         <div>
@@ -357,8 +360,8 @@ export const AttentionHeatmapCanvas: React.FC = () => {
         </div>
       </div>
 
-      {/* 4-Tier Cognitive Disclosure */}
-      <MultiTierDisclosure content={ATTENTION_PEDAGOGY} />
+      {/* Post-Canvas Mathematical & Code Consolidation */}
+      <PostCanvasConsolidation content={ATTENTION_PEDAGOGY} />
     </div>
   );
 };

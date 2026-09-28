@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import {
   CanvasCoordinateTransformer,
@@ -8,7 +8,7 @@ import {
   type DataPoint,
   type OLSSummary,
 } from '@/lib/canvas/CanvasMath';
-import { MultiTierDisclosure, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
+import { PreCanvasBriefing, PostCanvasConsolidation, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 import { audio } from '@/lib/audio';
 import { Sparkles, RotateCcw, Plus, Square, Shield } from 'lucide-react';
 
@@ -80,6 +80,12 @@ def analytical_ols_with_bands(X: np.ndarray, y: np.ndarray):
   },
 };
 
+const CANONICAL_OUTLIERS: DataPoint[] = [
+  { x: 18.5, y: 1.8, id: 'outlier-high-leverage' }, // Severe negative leverage (far right, bottom)
+  { x: 9.5, y: 15.2, id: 'outlier-vertical-residual' }, // Extreme vertical residual error (center, top)
+  { x: 1.8, y: 14.5, id: 'outlier-steep-slope' }, // Severe positive leverage (far left, top)
+];
+
 export const LinearRegressionResiduals: React.FC<{
   compact?: boolean;
   highlightedElement?: 'slope' | 'intercept' | 'residuals' | null;
@@ -120,24 +126,31 @@ export const LinearRegressionResiduals: React.FC<{
   const tss = points.reduce((acc, p) => acc + Math.pow(p.y - yMean, 2), 0);
   const currentR2 = tss > 1e-9 ? Math.max(-9.99, 1 - currentLoss / tss) : 0;
 
-  // Counterfactual Leave-One-Out ghost line parameters
-  const ghostOLS =
-    draggedIdx !== null && showGhostLine
-      ? computeLeaveOneOutOLS(points, draggedIdx)
+  // Active injected outliers count
+  const activeOutlierCount = points.filter((p) => p.id?.startsWith('outlier')).length;
+
+  // Baseline clean OLS (calculated on points without any injected outliers)
+  const cleanPoints = points.filter((p) => !p.id?.startsWith('outlier'));
+  const baselineOLS =
+    activeOutlierCount > 0 && cleanPoints.length >= 3
+      ? computeFullOLS(cleanPoints)
       : null;
 
-  // Spring optimization snap animation at 60 FPS
-  const handleSnapToOptimal = () => {
-    if (!olsSummary || isOptimizing) return;
-    setIsOptimizing(true);
-    if (config.soundEnabled) audio.playSuccess();
+  // Counterfactual Leave-One-Out or Baseline Ghost Line
+  const ghostOLS = useMemo(() => {
+    return draggedIdx !== null && showGhostLine
+      ? computeLeaveOneOutOLS(points, draggedIdx)
+      : baselineOLS && showGhostLine
+      ? { slope: baselineOLS.slope, intercept: baselineOLS.intercept }
+      : null;
+  }, [draggedIdx, showGhostLine, points, baselineOLS]);
 
+  // Spring animation helper
+  const animateTo = useCallback((targetSlope: number, targetIntercept: number) => {
     let step = 0;
-    const totalSteps = 45;
+    const totalSteps = 35;
     const startSlope = slope;
     const startIntercept = intercept;
-    const targetSlope = Number(olsSummary.slope.toFixed(3));
-    const targetIntercept = Number(olsSummary.intercept.toFixed(3));
 
     const animate = () => {
       step++;
@@ -148,11 +161,18 @@ export const LinearRegressionResiduals: React.FC<{
 
       if (step < totalSteps) {
         requestAnimationFrame(animate);
-      } else {
-        setIsOptimizing(false);
       }
     };
     requestAnimationFrame(animate);
+  }, [slope, intercept, setSlope, setIntercept]);
+
+  // Spring optimization snap animation at 60 FPS
+  const handleSnapToOptimal = () => {
+    if (!olsSummary || isOptimizing) return;
+    setIsOptimizing(true);
+    if (config.soundEnabled) audio.playSuccess();
+    animateTo(Number(olsSummary.slope.toFixed(3)), Number(olsSummary.intercept.toFixed(3)));
+    setTimeout(() => setIsOptimizing(false), 600);
   };
 
   const handleSelectPreset = (key: keyof typeof OLS_PRESETS) => {
@@ -175,11 +195,29 @@ export const LinearRegressionResiduals: React.FC<{
     if (config.soundEnabled) audio.playClick();
   };
 
-  const handleAddOutlier = () => {
-    setPoints((prev) => [
-      ...prev,
-      { x: 18.5, y: 2.5 }, // High leverage influential outlier
-    ]);
+  const handleToggleOutlier = () => {
+    if (activeOutlierCount >= 3) {
+      // If 3 outliers already injected, reset all injected outliers
+      const nextPoints = points.filter((p) => !p.id?.startsWith('outlier'));
+      setPoints(nextPoints);
+      const cleanOLS = computeFullOLS(nextPoints);
+      if (cleanOLS) {
+        animateTo(Number(cleanOLS.slope.toFixed(3)), Number(cleanOLS.intercept.toFixed(3)));
+      }
+      if (config.soundEnabled) audio.playSuccess();
+      return;
+    }
+
+    // Add next canonical outlier
+    const nextOutlier = CANONICAL_OUTLIERS[activeOutlierCount];
+    const nextPoints = [...points, nextOutlier];
+    setPoints(nextPoints);
+
+    // Smoothly animate the regression line to demonstrate the pull of the outlier!
+    const updatedOLS = computeFullOLS(nextPoints);
+    if (updatedOLS) {
+      animateTo(Number(updatedOLS.slope.toFixed(3)), Number(updatedOLS.intercept.toFixed(3)));
+    }
     if (config.soundEnabled) audio.playWarning();
   };
 
@@ -314,7 +352,7 @@ export const LinearRegressionResiduals: React.FC<{
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // 5. Counterfactual Leave-One-Out Ghost Line (When Dragging)
+    // 5. Counterfactual Ghost Line (When Dragging OR when Outliers are Injected)
     if (ghostOLS) {
       const p1 = transformer.dataToScreen(0, ghostOLS.intercept, width, height);
       const p2 = transformer.dataToScreen(20, ghostOLS.slope * 20 + ghostOLS.intercept, width, height);
@@ -323,14 +361,17 @@ export const LinearRegressionResiduals: React.FC<{
       ctx.setLineDash([6, 4]);
       ctx.moveTo(p1.px, p1.py);
       ctx.lineTo(p2.px, p2.py);
-      ctx.strokeStyle = 'rgba(245, 158, 11, 0.8)';
-      ctx.lineWidth = 1.8;
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.85)';
+      ctx.lineWidth = 2.0;
       ctx.stroke();
       ctx.setLineDash([]);
 
       ctx.fillStyle = '#f59e0b';
-      ctx.font = '10px monospace';
-      ctx.fillText('Without Point: LOO Ghost Line', p2.px - 160, p2.py - 8);
+      ctx.font = 'bold 10px monospace';
+      const ghostLabel = draggedIdx !== null
+        ? 'Without Point: LOO Ghost Line'
+        : 'Baseline OLS (without outlier)';
+      ctx.fillText(ghostLabel, Math.max(10, p2.px - 180), Math.max(20, p2.py - 8));
     }
 
     // 6. Active Regression Line: y_hat = mx + b
@@ -385,23 +426,40 @@ export const LinearRegressionResiduals: React.FC<{
       const diag = olsSummary?.diagnostics[idx];
       const isDragged = idx === draggedIdx;
       const isHovered = idx === hoveredIdx;
+      const isExplicitOutlier = Boolean(p.id?.startsWith('outlier') || p.id === 'outlier');
 
       // Influential outlier warning halo
-      if (diag?.isInfluential || diag?.isHighLeverage) {
+      if (isExplicitOutlier || diag?.isInfluential || diag?.isHighLeverage) {
         ctx.beginPath();
-        const haloRadius = 7 + Math.min(12, (diag.cooksDistance || 0) * 10);
+        const haloRadius = isExplicitOutlier ? 12 : 7 + Math.min(12, (diag?.cooksDistance || 0) * 10);
         ctx.arc(px, py, haloRadius, 0, Math.PI * 2);
-        ctx.fillStyle = diag.isInfluential ? 'rgba(239, 68, 68, 0.22)' : 'rgba(245, 158, 11, 0.22)';
+        ctx.fillStyle = isExplicitOutlier || diag?.isInfluential ? 'rgba(239, 68, 68, 0.35)' : 'rgba(245, 158, 11, 0.25)';
         ctx.fill();
-        ctx.strokeStyle = diag.isInfluential ? 'rgba(239, 68, 68, 0.7)' : 'rgba(245, 158, 11, 0.7)';
-        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = isExplicitOutlier || diag?.isInfluential ? 'rgba(239, 68, 68, 0.9)' : 'rgba(245, 158, 11, 0.8)';
+        ctx.lineWidth = 1.6;
         ctx.stroke();
+
+        // Draw prominent outlier tag on canvas
+        if (isExplicitOutlier || (diag && diag.isInfluential)) {
+          ctx.font = 'bold 9px monospace';
+          const tag = `⚠ Outlier (h=${diag?.leverage.toFixed(2) || '?'}, D=${diag?.cooksDistance.toFixed(2) || '?'})`;
+          const tagWidth = ctx.measureText(tag).width;
+          const tagX = Math.max(10, Math.min(width - tagWidth - 10, px - tagWidth / 2));
+          const tagY = py < 45 ? py + 22 : py - 12;
+
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.9)';
+          ctx.fillRect(tagX - 4, tagY - 9, tagWidth + 8, 13);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(tag, tagX, tagY + 1);
+        }
       }
 
       // Point core
       ctx.beginPath();
-      ctx.arc(px, py, isDragged ? 6.5 : isHovered ? 5.5 : 4.5, 0, Math.PI * 2);
-      ctx.fillStyle = isDragged
+      ctx.arc(px, py, isExplicitOutlier ? 7 : isDragged ? 6.5 : isHovered ? 5.5 : 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = isExplicitOutlier
+        ? '#ef4444'
+        : isDragged
         ? '#f59e0b'
         : p.cluster !== undefined
         ? ['#38bdf8', '#10b981', '#f59e0b'][p.cluster % 3]
@@ -410,12 +468,14 @@ export const LinearRegressionResiduals: React.FC<{
         : '#09090b';
       ctx.fill();
 
-      ctx.strokeStyle = isDragged
+      ctx.strokeStyle = isExplicitOutlier
+        ? '#ffffff'
+        : isDragged
         ? '#ffffff'
         : theme === 'dark'
         ? '#38bdf8'
         : '#0284c7';
-      ctx.lineWidth = isDragged ? 2.5 : 1.8;
+      ctx.lineWidth = isExplicitOutlier ? 2.5 : isDragged ? 2.5 : 1.8;
       ctx.stroke();
     });
   }, [
@@ -536,6 +596,9 @@ export const LinearRegressionResiduals: React.FC<{
 
   return (
     <div className="flex flex-col gap-4 select-none">
+      {/* Pre-Canvas Intuitive Briefing & Mental Model */}
+      {!compact && <PreCanvasBriefing content={OLS_TIER_CONTENT} />}
+
       {/* Scenario Presets & Action Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
         {/* Presets */}
@@ -591,14 +654,30 @@ export const LinearRegressionResiduals: React.FC<{
             <span>95% CI</span>
           </button>
 
-          {/* Add Outlier */}
+          {/* Add / Cycle Outlier */}
           <button
-            onClick={handleAddOutlier}
-            className="flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border border-[var(--border-subtle)] hover:border-amber-400 text-[var(--text-secondary)]"
-            title="Inject an outlier to observe leverage"
+            onClick={handleToggleOutlier}
+            className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              activeOutlierCount > 0
+                ? 'border-rose-500 bg-rose-500/15 text-rose-300 font-bold shadow-sm'
+                : 'border-[var(--border-subtle)] hover:border-amber-400 text-[var(--text-secondary)]'
+            }`}
+            title="Inject influential outliers to observe leverage, residuals, and Cook's distance"
           >
-            <Plus size={12} className="text-amber-400" />
-            <span>{language === 'ar' ? 'شاذة' : 'Outlier'}</span>
+            <Plus size={12} className={activeOutlierCount > 0 ? 'text-rose-400' : 'text-amber-400'} />
+            <span>
+              {language === 'ar'
+                ? activeOutlierCount === 0
+                  ? '+ نقطة شاذة'
+                  : activeOutlierCount < 3
+                  ? `شاذة (${activeOutlierCount}/3)`
+                  : 'إعادة ضبط الشواذ'
+                : activeOutlierCount === 0
+                ? '+ Outlier'
+                : activeOutlierCount < 3
+                ? `Outlier (${activeOutlierCount}/3)`
+                : 'Reset Outliers'}
+            </span>
           </button>
 
           {/* Reset */}
@@ -762,8 +841,8 @@ export const LinearRegressionResiduals: React.FC<{
         </div>
       </div>
 
-      {/* 4-Tier Cognitive Disclosure */}
-      {!compact && <MultiTierDisclosure content={OLS_TIER_CONTENT} />}
+      {/* Post-Canvas Mathematical & Code Consolidation */}
+      {!compact && <PostCanvasConsolidation content={OLS_TIER_CONTENT} />}
     </div>
   );
 };

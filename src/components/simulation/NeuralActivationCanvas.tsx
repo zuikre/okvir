@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
-import { MultiTierDisclosure, TierContent } from '@/components/pedagogy/MultiTierDisclosure';
+import { PreCanvasBriefing, PostCanvasConsolidation, TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 
 type ActivationType = 'relu' | 'sigmoid' | 'tanh' | 'leaky_relu' | 'gelu';
 type NeuralPreset = 'dead_relu' | 'active_relu' | 'sigmoid_saturation' | 'gelu_dip';
@@ -354,6 +354,9 @@ export const NeuralActivationCanvas: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-5">
+      {/* Pre-Canvas Intuitive Briefing & Mental Model */}
+      <PreCanvasBriefing content={NEURAL_PEDAGOGY} />
+
       {/* Preset Scenarios Strip */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <span className="text-[11px] font-mono text-[var(--text-tertiary)] uppercase tracking-wider">
@@ -519,8 +522,8 @@ export const NeuralActivationCanvas: React.FC = () => {
         </div>
       </div>
 
-      {/* 4-Tier Cognitive Disclosure */}
-      <MultiTierDisclosure content={NEURAL_PEDAGOGY} />
+      {/* Post-Canvas Mathematical & Code Consolidation */}
+      <PostCanvasConsolidation content={NEURAL_PEDAGOGY} />
     </div>
   );
 };

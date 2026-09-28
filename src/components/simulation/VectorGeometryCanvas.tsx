@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
-import { MultiTierDisclosure, TierContent } from '@/components/pedagogy/MultiTierDisclosure';
+import { PreCanvasBriefing, PostCanvasConsolidation, TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 import { Layers, Shapes } from 'lucide-react';
 
 interface VectorPoint {
@@ -404,6 +404,9 @@ export const VectorGeometryCanvas: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-5 select-none">
+      {/* Pre-Canvas Intuitive Briefing & Mental Model */}
+      <PreCanvasBriefing content={VECTOR_PEDAGOGY} />
+
       {/* Top Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
         {/* Preset Scenarios Strip */}
@@ -550,8 +553,8 @@ export const VectorGeometryCanvas: React.FC = () => {
         </div>
       </div>
 
-      {/* 4-Tier Cognitive Disclosure */}
-      <MultiTierDisclosure content={VECTOR_PEDAGOGY} />
+      {/* Post-Canvas Mathematical & Code Consolidation */}
+      <PostCanvasConsolidation content={VECTOR_PEDAGOGY} />
     </div>
   );
 };

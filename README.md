@@ -196,6 +196,23 @@ OKVIR DESKTOP CLIENT
 
 ---
 
+## 🛠️ Framework CLI (`okvir-cli`)
+
+Okvir ships with a dedicated developer CLI for authoring, linting, and compiling community curriculum modules:
+
+```bash
+# Scaffold a new interactive course repository
+npm run cli -- init my-course
+
+# Validate all .okvir.md lesson schemas and AST directives
+npm run cli -- test curriculum
+
+# Compile lessons into seekable .okvir archive with Ed25519 signature
+npm run cli -- pack curriculum dist/course.okvir
+```
+
+---
+
 ## 📜 Licensing Strategy
 
 * **Application Engine (Rust, Tauri, React, Simulators):** Dual-licensed under [MIT](LICENSE-MIT) OR [Apache-2.0](LICENSE-APACHE).
