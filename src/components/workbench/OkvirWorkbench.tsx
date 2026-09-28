@@ -401,6 +401,7 @@ export const OkvirWorkbench: React.FC = () => {
     completeLesson,
     certifyLessonMastery,
     setCurrentView,
+    startLesson,
     addXp,
     slope,
     intercept,
@@ -526,7 +527,7 @@ export const OkvirWorkbench: React.FC = () => {
     }
   };
 
-  // Keyboard navigation (ESC to Constellation, M to toggle mute)
+  // Keyboard navigation & Vim controls (j/k to switch lesson, H for hint, Ctrl+Enter to run code, ESC to Constellation, M to toggle mute)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -540,12 +541,48 @@ export const OkvirWorkbench: React.FC = () => {
         const nextSound = !config.soundEnabled;
         useOkvirStore.setState({ config: { ...config, soundEnabled: nextSound } });
         if (nextSound) audio.playClick();
+      } else if ((e.key === 'j' || e.key === 'J') && !e.ctrlKey && !e.metaKey) {
+        // Vim 'j': navigate to next lesson in curriculum
+        e.preventDefault();
+        const curIdx = curriculum.findIndex((m) => m.id === mod.id);
+        if (curIdx < curriculum.length - 1) {
+          const nextMod = curriculum[curIdx + 1];
+          startLesson(nextMod.id);
+          if (config.soundEnabled) audio.playClick();
+        }
+      } else if ((e.key === 'k' || e.key === 'K') && !e.ctrlKey && !e.metaKey) {
+        // Vim 'k': navigate to previous lesson in curriculum
+        e.preventDefault();
+        const curIdx = curriculum.findIndex((m) => m.id === mod.id);
+        if (curIdx > 0) {
+          const prevMod = curriculum[curIdx - 1];
+          startLesson(prevMod.id);
+          if (config.soundEnabled) audio.playClick();
+        }
+      } else if ((e.key === 'h' || e.key === 'H') && !e.ctrlKey && !e.metaKey) {
+        // 'h': scroll to Socratic hint ladder
+        e.preventDefault();
+        scrollToSection('section-hints');
+        if (config.soundEnabled) audio.playClick();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        // Ctrl+Enter / Cmd+Enter: run code challenge
+        e.preventDefault();
+        const runBtn = document.querySelector('button[title*="Run"], button:has(kbd)') as HTMLButtonElement;
+        if (runBtn) runBtn.click();
       }
     };
 
+    const handleCustomToggleHint = () => {
+      scrollToSection('section-hints');
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [config.soundEnabled, setCurrentView]);
+    window.addEventListener('okvir:toggle-hint', handleCustomToggleHint);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('okvir:toggle-hint', handleCustomToggleHint);
+    };
+  }, [config.soundEnabled, setCurrentView, mod.id, startLesson]);
 
   // Determine active simulation type
   const simType: SimulationType = useMemo(() => {
@@ -1008,11 +1045,13 @@ export const OkvirWorkbench: React.FC = () => {
 
           {/* Progressive Socratic Hint Ladder */}
           {beat2.hints && (
-            <SocraticHintLadder
-              hints={beat2.hints}
-              isAr={isAr}
-              soundEnabled={config.soundEnabled}
-            />
+            <div id="section-hints" className="scroll-mt-6">
+              <SocraticHintLadder
+                hints={beat2.hints}
+                isAr={isAr}
+                soundEnabled={config.soundEnabled}
+              />
+            </div>
           )}
         </section>
 

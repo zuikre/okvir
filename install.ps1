@@ -44,11 +44,11 @@ $DownloadSuccess = $false
 try {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Invoke-WebRequest -Uri $ReleaseUrl -OutFile $InstallerTmp -UseBasicParsing -TimeoutSec 30
+    Write-Host "==> Running silent currentUser installation..." -ForegroundColor Gray
+    Start-Process -FilePath $InstallerTmp -ArgumentList "/S", "/currentuser" -Wait
     $DownloadSuccess = $true
 } catch {
     Write-Host "! Desktop installer exe packaging in progress on GitHub CI." -ForegroundColor Yellow
-}
-
 }
 
 if (-not $DownloadSuccess) {

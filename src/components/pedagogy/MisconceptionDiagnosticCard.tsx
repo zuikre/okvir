@@ -89,7 +89,7 @@ export const MisconceptionDiagnosticCard: React.FC<MisconceptionDiagnosticCardPr
         {question.options.map((opt, idx) => {
           const isSelected = selectedIdx === idx;
           let borderStyle = 'border-[var(--border-subtle)] hover:border-[var(--border-strong)]';
-          let bgStyle = 'bg-[var(--bg-app)] text-[var(--text-secondary)]';
+          const bgStyle = 'bg-[var(--bg-app)] text-[var(--text-secondary)]';
 
           if (isSubmitted) {
             if (opt.correct) {

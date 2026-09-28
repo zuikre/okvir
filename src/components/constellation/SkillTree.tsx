@@ -174,17 +174,38 @@ export const SkillTree: React.FC = () => {
     return curriculum[0];
   }, [lessons]);
 
-  // Global keyboard shortcut for quick-start: Space key starts the next recommended module
+  // Global keyboard shortcuts for quick-start & Vim navigation (j/k to select, Enter/Space to start)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       if (target && target.matches('input, textarea, select')) return;
+
       if (e.code === 'Space' && !selectedModule) {
         const activeMod = nextRecommendedModule;
         if (activeMod && lessons[activeMod.id]?.status !== 'locked') {
           e.preventDefault();
           if (config.soundEnabled) audio.playSuccessChime();
           startLesson(activeMod.id);
+        }
+      } else if ((e.key === 'j' || e.key === 'J' || e.key === 'ArrowDown') && !e.ctrlKey && !e.metaKey) {
+        // Vim 'j': cycle to next module in DAG
+        e.preventDefault();
+        const currentIdx = selectedModule ? curriculum.findIndex((m) => m.id === selectedModule.id) : -1;
+        const nextIdx = currentIdx < curriculum.length - 1 ? currentIdx + 1 : 0;
+        setSelectedModule(curriculum[nextIdx]);
+        if (config.soundEnabled) audio.playClick();
+      } else if ((e.key === 'k' || e.key === 'K' || e.key === 'ArrowUp') && !e.ctrlKey && !e.metaKey) {
+        // Vim 'k': cycle to previous module in DAG
+        e.preventDefault();
+        const currentIdx = selectedModule ? curriculum.findIndex((m) => m.id === selectedModule.id) : 0;
+        const prevIdx = currentIdx > 0 ? currentIdx - 1 : curriculum.length - 1;
+        setSelectedModule(curriculum[prevIdx]);
+        if (config.soundEnabled) audio.playClick();
+      } else if (e.key === 'Enter' && selectedModule) {
+        if (lessons[selectedModule.id]?.status !== 'locked') {
+          e.preventDefault();
+          if (config.soundEnabled) audio.playSuccessChime();
+          startLesson(selectedModule.id);
         }
       }
     };

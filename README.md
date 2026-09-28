@@ -261,19 +261,48 @@ For exhaustive technical blueprints, read our [System Architecture Guide](ARCHIT
 
 ---
 
+## ⌨️ Instrument-Grade Keyboard Navigation & Vim Bindings
+
+Okvir features a keyboard-first ergonomics system inspired by Linear, Raycast, and Zed:
+
+| Shortcut | Action | Scope / Context |
+| :--- | :--- | :--- |
+| `⌘K` / `Ctrl+K` | Open Universal Command Palette | Global |
+| `j` / `↓` | Cycle next module in Constellation / Navigate next lesson in Workbench | Constellation / Workbench |
+| `k` / `↑` | Cycle previous module in Constellation / Navigate previous lesson in Workbench | Constellation / Workbench |
+| `↵` (Enter) | Launch selected module | Constellation DAG |
+| `Space` | Quick-start recommended lesson or advance to next beat | Constellation / Workbench |
+| `H` / `h` | Reveal & advance Progressive Socratic Hint Ladder | Workbench |
+| `⌘↵` / `Ctrl+↵` | Execute Python / SQL code challenge kernel | Workbench Code Lab |
+| `D` | Jump to Daily Calibration Drill (FSRS v5 Spaced Repetition) | Global |
+| `M` | Toggle procedural Web Audio synthesis | Workbench / Global |
+| `Esc` | Return to Knowledge Constellation | Workbench / Sandbox / Review |
+| `?` | Toggle Raycast Floating Action Bar | Global |
+
+---
+
 ## 🛠️ Framework CLI (`okvir-cli`)
 
-Okvir ships with a dedicated developer CLI for authoring, linting, and compiling community curriculum modules:
+Okvir ships with a dedicated developer CLI (`bin/okvir.js`) implementing PRD Section 15 for authoring, linting, testing, and compiling community curriculum modules:
 
 ```bash
-# Scaffold a new interactive course repository
-node ./bin/okvir.js init my-course
+# 1. Scaffold a new interactive curriculum repository
+okvir init my-course
 
-# Validate all .okvir.md lesson schemas and AST directives
-npm test
+# 2. Launch live-reload interactive lesson previewer
+okvir dev
 
-# Compile lessons into a seekable .okvir archive with Ed25519 signature
-node ./bin/okvir.js pack ./curriculum ./dist/course.okvir
+# 3. Validate all .okvir.md lesson schemas and AST directives
+okvir test ./curriculum
+
+# 4. Compile lesson assets into seekable .okvir archive with Ed25519 Minisign signature
+okvir pack ./curriculum ./dist/course.okvir
+
+# 5. Cryptographically inspect and verify .okvir binary package integrity
+okvir verify ./dist/course.okvir
+
+# 6. Explore decentralized community curriculum packs
+okvir registry [query]
 ```
 
 For authoring guidelines, see our [Curriculum Authoring Specification](CURRICULUM_SPEC.md).

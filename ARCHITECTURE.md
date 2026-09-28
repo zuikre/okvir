@@ -246,4 +246,34 @@ For modular curriculum distribution, Okvir compiles courses into binary archives
 
 ---
 
+## 9. Framework CLI & Decentralized Community Registry
+
+Per PRD Section 15, Okvir features a decentralized registry and authoring CLI (`bin/okvir.js`):
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       COMMUNITY ECOSYSTEM ARCHITECTURE                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  1. FRAMEWORK CLI (okvir-cli):                                              │
+│     • `okvir init my-course`      Scaffold curriculum repository            │
+│     • `okvir dev`                 Live-reload interactive lesson previewer  │
+│     • `okvir test [dir]`          Execute unit tests & Zod lint checks      │
+│     • `okvir pack [dir] [out]`    Compile seekable .okvir archive & minisig │
+│     • `okvir verify <file.okvir>` Cryptographic integrity & trailer check   │
+│     • `okvir registry [query]`    Decentralized community pack explorer     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  2. DECENTRALIZED GITHUB SPARSE REGISTRY (okvir-registry):                  │
+│     • Community packs are submitted via Pull Request to `okvir/registry`.   │
+│     • Zero database backend: Registry is a flat git repository of JSONs.    │
+│     • Assets are hosted directly on the author's personal GitHub Releases.  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  3. SECURITY & SANDBOXING GUARANTEES:                                       │
+│     • Interactive widgets execute in an isolated Web Worker / opaque sandbox│
+│     • Zero access to host Node.js / Rust filesystem APIs.                   │
+│     • Python code executes strictly inside the Pyodide WebAssembly sandbox. │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 *Okvir is designed from first principles to provide lifelong, zero-friction, sovereign machine learning mastery.*
