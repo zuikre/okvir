@@ -20,6 +20,16 @@ export const LessonPlayer: React.FC = () => {
     completeLesson,
     startLesson,
     setCurrentView,
+    slope,
+    intercept,
+    setSlope,
+    setIntercept,
+    knnK,
+    setKnnK,
+    learningRate,
+    setLearningRate,
+    momentum,
+    setMomentum,
   } = useOkvirStore();
 
   const mod = curriculum.find((m) => m.id === activeLessonId) || curriculum[0];
@@ -439,50 +449,154 @@ export const LessonPlayer: React.FC = () => {
                 <KaTeXMath math={beat2?.formula || '\\hat{\\beta} = (X^T X)^{-1} X^T y'} block />
               </div>
 
-              {/* Interactive Scrubbers if OLS */}
-              {mod.id === 'ols-residual-geometry' && (
-                <div className="flex flex-wrap gap-2 pt-1">
-                  <span className="text-xs font-mono text-[var(--text-tertiary)] self-center me-1">
-                    {language === 'ar' ? 'المتغيرات التفاعلية:' : 'Interactive Scrubbers:'}
-                  </span>
+              {/* Interactive Scrubbers Section (PRD Section 13.4) */}
+              <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[var(--border-subtle)]">
+                <span className="text-xs font-mono text-[var(--text-tertiary)] me-1 flex items-center gap-1">
+                  <Sparkles size={11} className="text-[var(--math-gradient)]" />
+                  {language === 'ar' ? 'المتغيرات التفاعلية:' : 'Interactive Scrubbers:'}
+                </span>
 
-                  <button
-                    onMouseEnter={() => setHighlightedScrubber('residuals')}
-                    onMouseLeave={() => setHighlightedScrubber(null)}
-                    className={`px-2.5 py-1 text-xs font-mono rounded-md border transition-all ${
-                      highlightedScrubber === 'residuals'
-                        ? 'border-rose-500 bg-rose-500/20 text-rose-300'
-                        : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-rose-500/50'
-                    }`}
-                  >
-                    (yᵢ - ŷᵢ)² : {language === 'ar' ? 'مساحة المربع' : 'Residual Square Area'}
-                  </button>
+                {mod.id === 'ols-residual-geometry' && (
+                  <>
+                    <button
+                      onMouseEnter={() => setHighlightedScrubber('residuals')}
+                      onMouseLeave={() => setHighlightedScrubber(null)}
+                      className={`px-2.5 py-1 text-xs font-mono rounded-md border transition-all ${
+                        highlightedScrubber === 'residuals'
+                          ? 'border-rose-500 bg-rose-500/20 text-rose-300'
+                          : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-rose-500/50'
+                      }`}
+                    >
+                      (yᵢ - ŷᵢ)² : {language === 'ar' ? 'مساحة المربع' : 'Residual Square Area'}
+                    </button>
 
-                  <button
-                    onMouseEnter={() => setHighlightedScrubber('slope')}
-                    onMouseLeave={() => setHighlightedScrubber(null)}
-                    className={`px-2.5 py-1 text-xs font-mono rounded-md border transition-all ${
-                      highlightedScrubber === 'slope'
-                        ? 'border-amber-500 bg-amber-500/20 text-amber-300'
-                        : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-amber-500/50'
-                    }`}
-                  >
-                    m : {language === 'ar' ? 'ميل الخط المستقيم' : 'Line Slope Parameter'}
-                  </button>
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+                      <span className="text-xs font-mono text-amber-400 font-semibold">m =</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={slope}
+                        onChange={(e) => {
+                          setSlope(parseFloat(e.target.value));
+                          if (config.soundEnabled) audio.playClick();
+                        }}
+                        className="w-20 accent-amber-500 h-1.5 cursor-ew-resize"
+                      />
+                      <span className="text-xs font-mono text-[var(--text-primary)] w-8 tabular-nums">{slope.toFixed(2)}</span>
+                    </div>
 
-                  <button
-                    onMouseEnter={() => setHighlightedScrubber('intercept')}
-                    onMouseLeave={() => setHighlightedScrubber(null)}
-                    className={`px-2.5 py-1 text-xs font-mono rounded-md border transition-all ${
-                      highlightedScrubber === 'intercept'
-                        ? 'border-amber-500 bg-amber-500/20 text-amber-300'
-                        : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-amber-500/50'
-                    }`}
-                  >
-                    b : {language === 'ar' ? 'نقطة التقاطع' : 'Intercept Parameter'}
-                  </button>
-                </div>
-              )}
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+                      <span className="text-xs font-mono text-sky-400 font-semibold">b =</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="8"
+                        step="0.5"
+                        value={intercept}
+                        onChange={(e) => {
+                          setIntercept(parseFloat(e.target.value));
+                          if (config.soundEnabled) audio.playClick();
+                        }}
+                        className="w-20 accent-sky-500 h-1.5 cursor-ew-resize"
+                      />
+                      <span className="text-xs font-mono text-[var(--text-primary)] w-8 tabular-nums">{intercept.toFixed(1)}</span>
+                    </div>
+                  </>
+                )}
+
+                {mod.id === 'knn-classification' && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono text-[var(--text-secondary)]">K Neighbors:</span>
+                    {[1, 3, 5, 7, 9, 15].map((k) => (
+                      <button
+                        key={k}
+                        onClick={() => {
+                          setKnnK(k);
+                          if (config.soundEnabled) audio.playClick();
+                        }}
+                        className={`px-2 py-0.5 text-xs font-mono rounded border transition-all ${
+                          knnK === k
+                            ? 'border-[var(--math-prediction)] bg-[var(--math-prediction)]/20 text-purple-200 font-bold'
+                            : 'border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
+                        }`}
+                      >
+                        {k}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {(mod.id === 'gradient-vector' || mod.id === 'gradient-descent') && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+                      <span className="text-xs font-mono text-emerald-400 font-semibold">η (LR) =</span>
+                      {[0.01, 0.05, 0.1, 0.25].map((lr) => (
+                        <button
+                          key={lr}
+                          onClick={() => {
+                            setLearningRate(lr);
+                            if (config.soundEnabled) audio.playClick();
+                          }}
+                          className={`px-1.5 py-0.5 text-[10px] font-mono rounded border transition-all ${
+                            learningRate === lr
+                              ? 'border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold'
+                              : 'border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          {lr}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+                      <span className="text-xs font-mono text-purple-400 font-semibold">β (Momentum) =</span>
+                      {[0.0, 0.5, 0.8, 0.95].map((mom) => (
+                        <button
+                          key={mom}
+                          onClick={() => {
+                            setMomentum(mom);
+                            if (config.soundEnabled) audio.playClick();
+                          }}
+                          className={`px-1.5 py-0.5 text-[10px] font-mono rounded border transition-all ${
+                            momentum === mom
+                              ? 'border-purple-500 bg-purple-500/20 text-purple-300 font-bold'
+                              : 'border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          {mom}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {mod.id === 'linear-algebra-vectors' && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono text-[var(--text-secondary)]">
+                      {language === 'ar' ? 'تعديل زاوية المتجه:' : 'Sample Vector Dimension:'}
+                    </span>
+                    <span className="px-2 py-0.5 text-xs font-mono rounded bg-sky-500/10 border border-sky-500/30 text-sky-300 font-semibold">
+                      v = [3.0, 4.0]ᵀ ⟹ ‖v‖ = 5.0
+                    </span>
+                  </div>
+                )}
+
+                {mod.id === 'ridge-lasso' && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono text-[var(--text-secondary)]">λ Penalty:</span>
+                    {[0.0, 0.2, 0.5, 1.0, 2.0].map((l) => (
+                      <span
+                        key={l}
+                        className="px-2 py-0.5 text-xs font-mono rounded bg-amber-500/10 border border-amber-500/20 text-amber-300"
+                      >
+                        λ = {l}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Narrative */}
               <div className="text-sm text-[var(--text-secondary)] leading-relaxed space-y-3 pt-2">

@@ -237,6 +237,7 @@ OKVIR DESKTOP CLIENT
 │   └── 60 FPS Visual Canvas: HTML5 2D Canvas + WebGL
 └── In-App Execution Sandbox (Dedicated Web Worker)
     ├── WebAssembly CPython 3.12 (Pyodide v0.26+)
+    ├── 5-Second Infinite Loop Hard Watchdog & Linear Memory Recycling
     ├── Non-destructive interrupt buffer (SharedArrayBuffer)
     ├── Offline wheels: NumPy, Pandas, Scikit-learn, SciPy
     └── Origin Private File System (OPFS) / MEMFS mounts
@@ -246,8 +247,9 @@ OKVIR DESKTOP CLIENT
 * **Base Installer Size:** `< 28 MB` (vs. 160MB+ for Electron apps)
 * **Cold Startup Time:** `< 480 ms`
 * **Idle RAM Footprint:** `< 50 MB`
-* **Active Simulation RAM:** `< 250 MB` (with Pyodide + NumPy loaded)
+* **Active Simulation RAM:** `< 250 MB` (with Pyodide + NumPy loaded; safe under 350MB ceiling)
 * **Idle CPU Utilization:** `0.0%` (demand-driven animation loops)
+* **Live In-App Telemetry HUD:** Real-time FPS & frame budget (<0.3ms execution) counter with linear memory recycling
 
 For exhaustive technical blueprints, read our [System Architecture Guide](ARCHITECTURE.md).
 

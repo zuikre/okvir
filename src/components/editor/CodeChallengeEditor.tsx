@@ -79,14 +79,12 @@ export const CodeChallengeEditor: React.FC<{
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lineCount = code.split('\n').length;
   const workerRef = useRef<Worker | null>(null);
+  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    setCode(challenge?.starterCode || DEFAULT_STARTER);
-    setOutput({ lines: [], passed: null });
-  }, [challenge?.id, challenge?.starterCode]);
-
-  useEffect(() => {
-    // Instantiate Pyodide Kernel Web Worker
+  const initWorker = () => {
+    if (workerRef.current) {
+      workerRef.current.terminate();
+    }
     try {
       workerRef.current = new Worker(
         new URL('../../workers/PyodideKernelWorker.ts', import.meta.url),
@@ -95,8 +93,19 @@ export const CodeChallengeEditor: React.FC<{
     } catch {
       workerRef.current = null;
     }
+  };
+
+  useEffect(() => {
+    setCode(challenge?.starterCode || DEFAULT_STARTER);
+    setOutput({ lines: [], passed: null });
+  }, [challenge?.id, challenge?.starterCode]);
+
+  useEffect(() => {
+    // Instantiate Pyodide Kernel Web Worker
+    initWorker();
 
     return () => {
+      if (watchdogRef.current) clearTimeout(watchdogRef.current);
       workerRef.current?.terminate();
       workerRef.current = null;
     };
@@ -123,6 +132,8 @@ export const CodeChallengeEditor: React.FC<{
 
   const runTests = () => {
     if (isRunning) return;
+    if (watchdogRef.current) clearTimeout(watchdogRef.current);
+
     setIsRunning(true);
     setOutput({
       lines: [
@@ -136,10 +147,30 @@ export const CodeChallengeEditor: React.FC<{
 
     const executionId = `exec-${Date.now()}`;
 
+    // PRD Section 3.1 & 16.2: 5-Second Infinite Loop Hard Watchdog
+    const timeoutDuration = config.pythonTimeoutMs || 5000;
+    watchdogRef.current = setTimeout(() => {
+      initWorker(); // Kill worker and restore clean linear memory
+      setIsRunning(false);
+      setOutput({
+        lines: [
+          isSql ? '> DuckDB Query Execution Timed Out' : '> Python 3.12 WebAssembly Kernel Interrupt',
+          `✖ [Watchdog Timeout Alert]: Execution exceeded ${timeoutDuration}ms hard ceiling.`,
+          '✖ WebAssembly worker terminated to prevent UI lockup and preserve RAM budget (<350MB).',
+          '✖ Diagnostic: Possible infinite loop (`while True`) or unvectorized high-order complexity O(N³).',
+          '--------------------------------------------------',
+          '💡 Socratic Tip: Replace manual iterative loops with vectorized NumPy/SIMD operations.',
+        ],
+        passed: false,
+      });
+      if (config.soundEnabled) audio.playErrorTick();
+    }, timeoutDuration);
+
     // If Web Worker is available, dispatch to worker thread
     if (workerRef.current) {
       const handleWorkerMessage = (e: MessageEvent<WorkerMessageResponse>) => {
         if (e.data.id === executionId) {
+          if (watchdogRef.current) clearTimeout(watchdogRef.current);
           workerRef.current?.removeEventListener('message', handleWorkerMessage);
           setIsRunning(false);
           setOutput({
@@ -169,6 +200,7 @@ export const CodeChallengeEditor: React.FC<{
     } else {
       // In-process fallback evaluator
       setTimeout(() => {
+        if (watchdogRef.current) clearTimeout(watchdogRef.current);
         const hasForLoop = /\bfor\b\s+.*\s+in\s+/.test(code);
         const testCases = challenge?.testCases || [
           { input: 'v = [3, 4]', expected: '5.0' },

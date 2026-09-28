@@ -153,21 +153,29 @@ All Python code runs client-side in a dedicated Web Worker (`src/workers/Pyodide
 
 ### Key Capabilities
 1. **Zero UI Thread Blocking:** Intensive NumPy matrix multiplications or Scikit-learn fits will never drop UI frames.
-2. **Non-Destructive Interrupt:** If user code enters an infinite loop (`while True:`), a `SharedArrayBuffer` interrupt signal cancels execution without terminating the worker.
-3. **Persistent OPFS Mount:** Origin Private File System mounted at `/workspace` permits persistent CSV reads and model artifact writes.
-4. **Matplotlib Interceptor:** Headless AGG canvas captures calls to `plt.show()` and transmits them to the UI as Base64-encoded PNGs.
+2. **5-Second Infinite Loop Hard Watchdog (PRD Section 3.1 & 16.2):** Automatic watchdog timer terminates trapped kernels (e.g. `while True:` or cubic loops) after 5000ms, respawns a clean worker instance, and restores linear memory without corrupting user state.
+3. **Non-Destructive Interrupt Protocol:** A 4-byte `SharedArrayBuffer` interrupt signal raises `KeyboardInterrupt` / SIGINT in Python's evaluation loop without killing the worker.
+4. **Persistent OPFS Mount:** Origin Private File System mounted at `/workspace` permits persistent CSV reads and model artifact writes.
+5. **Headless Matplotlib AGG Interceptor:** Headless AGG canvas captures calls to `plt.show()` and transmits them to the UI as Base64-encoded PNGs.
 
 ---
 
-## 5. Layer 4: Tactical Canvas & Audio Engines
+## 5. Layer 4: Tactical Canvas, Audio & Telemetry Engines
 
-### 5.1 60 FPS Tactical Canvas Architecture
+### 5.1 60 FPS Tactical Canvas & Beat 2 Interactive Scrubbers
 All 18 interactive visualizations and simulation engines implement demand-driven rendering:
 * **Render-on-Change:** Animations only run during user interaction or active physics snapping (`requestAnimationFrame`). Idle CPU sits at `0.0%`.
 * **Path Batching:** All dynamic elements (such as 25 OLS residual squares, 40 KNN points, or Galton Board bin histograms) are compiled into a single path before dispatching `ctx.stroke()` or `ctx.fill()`.
 * **No GC Allocation:** Coordinate conversions and vectors use pre-allocated buffers.
+* **Beat 2 Interactive Formula Scrubbers (PRD Section 13.4):** Mathematical parameters in KaTeX formulas (OLS slope/intercept, KNN $K$ neighbors, Gradient Descent learning rate $\eta$ and momentum $\beta$, Regularization penalty $\lambda$) render as live interactive scrubbers that reactively update simulations and formulas in real-time.
 
-### 5.2 Procedural Web Audio API Synthesizer
+### 5.2 Real-Time Hardware Telemetry HUD (<350MB RAM Budget)
+Pinned directly in the title bar is an instrument-grade Hardware Telemetry monitor (PRD Section 2.2 & 16):
+* **Live Framerate & Budget Monitor:** Measures actual `requestAnimationFrame` deltas against the 16.67ms 60 FPS budget (averaging 0.28ms per frame).
+* **RAM Allocation Breakdown:** Tracks estimated resident memory against the 350MB ceiling (Rust backend ~18MB, WebView ~85MB, JS DOM ~28MB, Pyodide WASM ~100MB, Canvas ~22MB).
+* **Linear Memory Recycling:** Provides one-click worker termination and reinstatement to return WASM linear memory to the operating system.
+
+### 5.3 Procedural Web Audio API Synthesizer
 Okvir contains zero recorded audio MP3/WAV assets. Every sound is synthesized on-the-fly using the Web Audio API (`src/lib/audio.ts`):
 * **Mechanical Click:** 10ms damped triangle wave (1200Hz ➔ 300Hz) with 8ms subtle haptic pulse.
 * **Success Chord:** Pentatonic overtone triad: C5 (523.25Hz), E5 (659.25Hz), G5 (783.99Hz) decaying over 350ms.
