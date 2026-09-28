@@ -120,7 +120,7 @@ Never get stuck. Press `H` at any time to reveal a 3-tier scaffolding ladder:
 
 ## 🌌 The 4 Foundational Curriculum Tracks
 
-Okvir features **16 core modules** across 4 interconnected tracks:
+Okvir features **18 core modules** across 4 interconnected tracks:
 
 ```
                   ┌───────────────────────────────┐
@@ -138,8 +138,9 @@ Okvir features **16 core modules** across 4 interconnected tracks:
   │ • SIMD NumPy Vectorization   ││ • OLS Residual Geometry      │
   │ • Columnar DataFrame Anatomy ││ • KNN Search Radar           │
   │ • SQL Window Functions       ││ • K-Means Voronoi Tessellation│
-  └──────────────┬───────────────┘│ • Decision Tree Laser Cuts   │
-                 │                │ • L1 vs L2 Regularization    │
+  │ • EDA & Anscombe's Quartet   ││ • Decision Tree Laser Cuts   │
+  └──────────────┬───────────────┘│ • L1 vs L2 Regularization    │
+                 │                │ • Causal Confounding (Simpson)│
                  │                └──────────────┬───────────────┘
                  │                               │
                  └───────────────┬───────────────┘
@@ -157,7 +158,7 @@ Okvir features **16 core modules** across 4 interconnected tracks:
 
 ## 🎨 Tactile 60 FPS Algorithmic Visualizations
 
-Okvir includes **11 dedicated, zero-garbage-collection interactive simulation engines**:
+Okvir includes **13 dedicated, zero-garbage-collection interactive simulation engines**:
 
 | # | Simulation Engine | Algorithm / Mathematical Principle | Interactive Mechanics |
 | - | :--- | :--- | :--- |
@@ -172,6 +173,8 @@ Okvir includes **11 dedicated, zero-garbage-collection interactive simulation en
 | **9** | `AttentionHeatmapCanvas` | Scaled Dot-Product Self-Attention | Query, Key, Value matrix heatmaps with live pronoun coreference |
 | **10** | `ConvolutionFilterCanvas` | 2D Spatial Convolutions & Feature Maps | Sliding 3×3 kernel filter (Sobel, Blur, Edge) over 6×6 pixel grids |
 | **11** | `RegularizationGeometryCanvas`| Ridge ($L_2$) vs Lasso ($L_1$) Sparsity | Expanding OLS loss contours striking the sharp corners of the $L_1$ diamond |
+| **12** | `SimpsonsParadoxLab` | Causal Confounding & Stratification | Stratified cohort toggles, subgroup OLS lines, and cluster drag physics |
+| **13** | `AnscombesQuartetLab` | Exploratory Data Analysis & Outliers | Real-time interactive point drag updating OLS line & HUD stats across 4 sets |
 
 ---
 

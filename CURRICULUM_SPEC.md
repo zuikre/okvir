@@ -141,6 +141,8 @@ Binds an interactive 60 FPS HTML5 Canvas or WebGL engine into the lesson:
 * `AttentionHeatmapCanvas`: Query-Key-Value matrix attention map
 * `ConvolutionFilterCanvas`: 3×3 spatial convolution sliding window
 * `RegularizationGeometryCanvas`: OLS loss contours striking L1 diamond / L2 circle
+* `SimpsonsParadoxLab`: Cohort stratification vs pooled regression and omitted variable bias
+* `AnscombesQuartetLab`: Francis Anscombe's 4 identical summary statistics datasets with real-time point dragging
 
 ### 4.2 Python Challenge (`:::python-challenge`)
 Executes self-grading unit tests in the Pyodide WebAssembly worker:

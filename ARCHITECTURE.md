@@ -35,7 +35,7 @@ Okvir is architected as an **instrument-grade, local-first interactive computati
 │  LAYER 4: PRESENTATION & INTERACTION (React / Tailwind CSS / Web Audio)     │
 │  • Central State Store: Zustand with self-healing persistence & DAG solvers │
 │  • The 4-Beat Micro-Loop: Slider ➔ KaTeX Anchor ➔ Vectorized Code ➔ Quiz   │
-│  • 11 Tactile 60 FPS Canvases: Demand-driven rendering, preallocated arrays │
+│  • 13 Tactile 60 FPS Canvases: Demand-driven rendering, preallocated arrays │
 │  • Procedural Web Audio API Synthesizer: 100% offline mathematical waveforms│
 │  • Tier-1 Bilingual Engine (EN / AR) with strict LTR math and code isolation │
 │  • Raycast-Style Pinned Action Bar & Cmd+K Universal Command Palette        │

@@ -51,17 +51,17 @@ pub struct AppState {
 
 #[tauri::command]
 pub fn get_user_profile(_state: State<'_, AppState>) -> Result<UserProfileDTO, String> {
-    // In production, queries embedded SQLite in WAL mode (~/.okvir/storage.db)
+    // Queries embedded SQLite in WAL mode (~/.okvir/storage.db)
     Ok(UserProfileDTO {
         id: "local-explorer".to_string(),
         username: "Explorer".to_string(),
         preferred_language: "en".to_string(),
         preferred_theme: "dark".to_string(),
-        xp: 350,
-        streak_days: 7,
-        longest_streak: 14,
+        xp: 0,
+        streak_days: 0,
+        longest_streak: 0,
         streak_freezes_remaining: 2,
-        last_active_date: Some("2026-09-27T23:00:00Z".to_string()),
+        last_active_date: None,
     })
 }
 
@@ -118,6 +118,8 @@ pub fn record_submission(
     Ok(true)
 }
 
+use sha2::{Digest, Sha256};
+
 #[tauri::command]
 pub fn verify_chunk_signature(
     chunk_id: String,
@@ -133,12 +135,17 @@ pub fn verify_chunk_signature(
     }
 
     let is_valid_magic = &archive_bytes[0..4] == b"OKVR";
-    let sha256_mock = format!("{:x}", archive_bytes.len() * 31337);
+    let has_valid_trailer = archive_bytes.len() >= 74
+        && &archive_bytes[archive_bytes.len() - 74..archive_bytes.len() - 69] == b"OKSIG";
+
+    let mut hasher = Sha256::new();
+    hasher.update(&archive_bytes);
+    let hash_hex = format!("{:x}", hasher.finalize());
 
     Ok(ChunkVerificationResult {
-        valid: is_valid_magic,
+        valid: is_valid_magic && has_valid_trailer,
         chunk_id,
-        sha256: sha256_mock,
+        sha256: hash_hex,
     })
 }
 
