@@ -17,7 +17,7 @@ export const KaTeXMath: React.FC<KaTeXMathProps> = ({
   className = '',
   onHoverVariable,
 }) => {
-  const containerRef = useRef<HTMLDivElement | HTMLSpanElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
   const isDisplay = block && !inline;
 
   const html = useMemo(() => {
@@ -26,6 +26,7 @@ export const KaTeXMath: React.FC<KaTeXMathProps> = ({
         displayMode: isDisplay,
         throwOnError: false,
         trust: true,
+        strict: 'warn',
       });
     } catch {
       return math;
@@ -60,10 +61,10 @@ export const KaTeXMath: React.FC<KaTeXMathProps> = ({
 
   if (!isDisplay) {
     return (
-      <span
-        ref={containerRef as React.RefObject<HTMLSpanElement>}
+      <bdi
+        ref={containerRef as React.RefObject<HTMLElement>}
         dir="ltr"
-        className={`inline-block align-middle text-left font-mono select-all ${className}`}
+        className={`inline-katex-isolate select-all ${className}`}
         dangerouslySetInnerHTML={{ __html: html }}
       />
     );
@@ -73,7 +74,7 @@ export const KaTeXMath: React.FC<KaTeXMathProps> = ({
     <div
       ref={containerRef as React.RefObject<HTMLDivElement>}
       dir="ltr"
-      className={`text-left font-mono select-all my-2 ${className}`}
+      className={`block-katex-isolate select-all my-3 ${className}`}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

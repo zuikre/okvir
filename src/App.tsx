@@ -4,7 +4,7 @@ import { DesktopTitlebar } from '@/components/shell/DesktopTitlebar';
 import { CommandPalette } from '@/components/shell/CommandPalette';
 import { RaycastActionBar } from '@/components/shell/RaycastActionBar';
 import { SkillTree } from '@/components/constellation/SkillTree';
-import { LessonPlayer } from '@/components/lesson/LessonPlayer';
+import { OkvirWorkbench } from '@/components/workbench/OkvirWorkbench';
 import { DailyCalibration } from '@/components/review/DailyCalibration';
 import { Sandbox } from '@/components/sandbox/Sandbox';
 import { SettingsView } from '@/components/settings/SettingsView';
@@ -84,7 +84,7 @@ function App() {
         {/* Main content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {currentView === 'constellation' && <SkillTree />}
-          {currentView === 'lesson' && <LessonPlayer />}
+          {currentView === 'lesson' && <OkvirWorkbench />}
           {currentView === 'sandbox' && <Sandbox />}
           {currentView === 'review' && <DailyCalibration />}
           {currentView === 'settings' && <SettingsView />}

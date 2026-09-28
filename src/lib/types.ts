@@ -132,3 +132,137 @@ export interface CommandAction {
   action: () => void;
   category: 'navigation' | 'simulation' | 'settings';
 }
+
+// ============================================================================
+// OKVIR 7-STAGE MASTERCLASS EXPANDED TYPES
+// ============================================================================
+
+export type StagePhase =
+  | 'hook'          // Stage 1: Cognitive Hook & Hypothesis Commitment (Controls locked)
+  | 'experiment'    // Stage 2: Targeted Goal-Directed Micro-Experiments
+  | 'geometry'      // Stage 3: Spatial & Physical Invariant Grounding (60 FPS)
+  | 'formal'        // Stage 4: Reactive Mathematical De-formalization (Scrubbers & Anchors)
+  | 'scaffold_code' // Stage 5: Faded Worked-Example & Vectorized Kernel (Parsons ➔ Skeleton ➔ Lab)
+  | 'stress_test'   // Stage 6: Adversarial Boundary Exploration (Breaking the Model)
+  | 'transfer';     // Stage 7: Diagnostic Misconception Transfer Ladder (Playable Proofs)
+
+export type MisconceptionId =
+  | 'ols_zero_sum_implies_perfect_fit'
+  | 'ols_l2_ignores_outliers'
+  | 'gradient_magnitude_is_distance'
+  | 'learning_rate_too_high_always_converges'
+  | 'knn_k1_has_zero_test_error'
+  | 'kmeans_guarantees_global_optimum'
+  | 'tree_depth_infinite_is_optimal'
+  | 'r2_implies_causality'
+  | 'collinearity_biases_coefficients'
+  | 'l1_sparsity_due_to_truncation'
+  | 'attention_weights_are_causal_importance'
+  | 'bayes_prior_overwhelms_likelihood'
+  | 'broadcasting_silent_expansion'
+  | 'autograd_inplace_graph_corruption';
+
+export interface MisconceptionProfile {
+  id: MisconceptionId;
+  label: { en: string; ar: string };
+  description: { en: string; ar: string };
+  refutationText: { en: string; ar: string };
+  suggestedAction: { en: string; ar: string };
+}
+
+export interface PredictiveHookPrompt {
+  id: string;
+  scenario: { en: string; ar: string };
+  prompt: { en: string; ar: string };
+  predictionChoices: {
+    id: string;
+    text: { en: string; ar: string };
+    misconceptionId?: MisconceptionId;
+  }[];
+  revealExplanation: { en: string; ar: string };
+}
+
+export interface TargetedMicroGoal {
+  id: string;
+  title: { en: string; ar: string };
+  instructions: { en: string; ar: string };
+  targetMetric: string;
+  targetValue: number;
+  tolerance: number;
+  hintLadder: SocraticHints;
+  successCelebration: { en: string; ar: string };
+}
+
+export interface ReactiveFormulaToken {
+  symbol: string;
+  role: 'parameter' | 'observation' | 'loss' | 'hyperparameter';
+  boundStateKey: string;
+  min?: number;
+  max?: number;
+  step?: number;
+  tooltip: { en: string; ar: string };
+  geometricMeaning: { en: string; ar: string };
+}
+
+export interface FadedCodeStep {
+  tier: 'parsons' | 'skeleton_fill' | 'autonomous';
+  instructions: { en: string; ar: string };
+  parsonsBlocks?: { id: string; code: string; correctOrderIndex: number }[];
+  skeletonTemplate?: string;
+  solutionHoles?: Record<string, string>;
+  autonomousStarter: string;
+  testCases: TestCase[];
+}
+
+export interface AdversarialStressScenario {
+  id: string;
+  title: { en: string; ar: string };
+  description: { en: string; ar: string };
+  toolAction: 'inject_high_leverage_outlier' | 'induce_perfect_collinearity' | 'add_extreme_noise' | 'non_convex_trap';
+  expectedObservation: { en: string; ar: string };
+  reflectionQuestion: DiagnosticQuestion;
+}
+
+export interface DiagnosticOption {
+  text: { en: string; ar: string };
+  correct: boolean;
+  misconceptionId?: MisconceptionId;
+  diagnosticFeedback: { en: string; ar: string };
+}
+
+export interface DiagnosticQuestion {
+  id: string;
+  depthTier: 1 | 2 | 3;
+  prompt: { en: string; ar: string };
+  latexAnchor?: string;
+  options: DiagnosticOption[];
+}
+
+export interface MasterclassStage {
+  stageNumber: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  phase: StagePhase;
+  title: { en: string; ar: string };
+  estimatedMinutes: number;
+  narrative: { en: string; ar: string };
+  hookPrompt?: PredictiveHookPrompt;
+  microGoal?: TargetedMicroGoal;
+  reactiveTokens?: ReactiveFormulaToken[];
+  fadedCode?: FadedCodeStep;
+  stressTest?: AdversarialStressScenario;
+  diagnosticLadder?: DiagnosticQuestion[];
+  simulationType?: SimulationType;
+  simulationPreset?: string;
+  requiredStateInvariant?: {
+    storeKey: string;
+    targetValue: number;
+    tolerance: number;
+  };
+}
+
+export interface MasterclassModule extends CurriculumModule {
+  pedagogicalVersion: '2.0.0-masterclass';
+  totalEstimatedMinutes: number;
+  stages: MasterclassStage[];
+  misconceptionCatalog: MisconceptionProfile[];
+}
+
