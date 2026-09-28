@@ -19,395 +19,15 @@ import { KaTeXMath } from '@/components/common/KaTeXMath';
 import { audio } from '@/lib/audio';
 import { tauriBridge } from '@/lib/tauri-bridge';
 import type { FSRSState, Rating } from '@/lib/fsrs';
-
-export type DrillFormat = 'flashcard' | 'mcq' | 'boolean' | 'formula_fill';
-
-export interface DrillOption {
-  text: string;
-  textAr?: string;
-  formula?: string;
-  correct: boolean;
-  explanation: string;
-  explanationAr: string;
-}
-
-export interface CalibrationDrillItem {
-  id: string;
-  format: DrillFormat;
-  trackId: 'math' | 'data' | 'econometrics' | 'deep-learning';
-  concept: string;
-  conceptAr: string;
-  prompt: string;
-  promptAr: string;
-
-  // Flashcard specific
-  solutionFormula?: string;
-  solution?: string;
-  solutionAr?: string;
-
-  // MCQ & Formula Fill specific
-  options?: DrillOption[];
-  blankDisplayFormula?: string;
-  filledDisplayFormula?: string;
-
-  // Boolean specific (True/False or Yes/No)
-  booleanAnswer?: boolean;
-  booleanLabels?: {
-    trueText: { en: string; ar: string };
-    falseText: { en: string; ar: string };
-  };
-  booleanFormula?: string;
-  booleanExplanation?: {
-    en: string;
-    ar: string;
-  };
-}
-
-const FOUNDATIONAL_DRILL_ITEMS: CalibrationDrillItem[] = [
-  // 1. Flashcard: Gauss-Markov BLUE Theorem
-  {
-    id: 'drill-gauss-markov',
-    format: 'flashcard',
-    trackId: 'econometrics',
-    concept: 'Gauss-Markov Theorem (BLUE)',
-    conceptAr: 'مبرهنة غاوس-ماركوف (BLUE)',
-    prompt: 'Under what conditions is the OLS estimator the Best Linear Unbiased Estimator (BLUE)?',
-    promptAr: 'تحت أي شروط يكون مقدر المربعات الصغرى (OLS) هو أفضل مقدر خطي غير متحيّز (BLUE)؟',
-    solutionFormula: 'E[\\epsilon|X] = 0, \\quad \\text{Var}(\\epsilon|X) = \\sigma^2 I',
-    solution: 'Strict exogeneity (zero conditional mean of errors), spherical error covariance (homoscedasticity + no autocorrelation), and full column rank of regressor matrix X.',
-    solutionAr: 'التجانس الخارجي التام (المتوسط الشرطي الصفري للبواقي)، مصفوفة تباين كروية (ثبات تباين الأخطاء وغياب الارتباط الذاتي)، ورتبة عمودية كاملة لمصفوفة المتغيرات المستقلة X.',
-  },
-
-  // 2. Boolean (Yes/No): Multicollinearity vs Unbiasedness
-  {
-    id: 'drill-multicollinearity-bias',
-    format: 'boolean',
-    trackId: 'econometrics',
-    concept: 'Multicollinearity & Estimator Bias',
-    conceptAr: 'التعدد الخطي وانحياز المقدر',
-    prompt: 'Does severe multicollinearity between predictors cause the OLS coefficient estimator β̂ to become biased?',
-    promptAr: 'هل يتسبب التعدد الخطي الشديد بين المتغيرات في جعل مقدر معاملات OLS (β̂) غير متحيّز (Biased)؟',
-    booleanAnswer: false,
-    booleanLabels: {
-      trueText: { en: 'Yes — It introduces systematic bias', ar: 'نعم — يسبب انحيازاً منتظماً' },
-      falseText: { en: 'No — OLS remains unbiased, but variance inflates', ar: 'لا — يبقى المقدر غير متحيّز ولكن تباينه يتضخم' },
-    },
-    booleanFormula: 'E[\\hat{\\beta}] = \\beta, \\quad \\text{Var}(\\hat{\\beta}_j) = \\frac{\\sigma^2}{\\sum(x_{ij}-\\bar{x}_j)^2 (1 - R_j^2)}',
-    booleanExplanation: {
-      en: 'Multicollinearity does NOT violate E[ε|X]=0, so OLS remains strictly unbiased. However, (1 - Rⱼ²) approaches zero, causing the variance (and standard errors) to explode to infinity.',
-      ar: 'التعدد الخطي لا ينتهك فرضية E[ε|X]=0، وبالتالي يظل مقدر OLS غير متحيّز تماماً. لكن المشكلة تكمن في اقتراب (1 - Rⱼ²) من الصفر، مما يؤدي إلى تضخم التباين والأخطاء المعيارية بشكل انفجاري.',
-    },
-  },
-
-  // 3. Formula Fill: Normal Equations Matrix Solution
-  {
-    id: 'drill-normal-equations-fill',
-    format: 'formula_fill',
-    trackId: 'econometrics',
-    concept: 'Normal Equations Projection Token',
-    conceptAr: 'معادلات الإسقاط الطبيعية',
-    prompt: 'Complete the analytical closed-form OLS estimator for vector β̂:',
-    promptAr: 'أكمل الصيغة التحليلية المغلقة لمقدر المربعات الصغرى OLS لمتجه المعاملات β̂:',
-    blankDisplayFormula: '\\hat{\\beta} = \\; [\\;?\\;] \\; X^T y',
-    filledDisplayFormula: '\\hat{\\beta} = (X^T X)^{-1} X^T y',
-    options: [
-      {
-        text: '(XᵀX)⁻¹',
-        formula: '(X^T X)^{-1}',
-        correct: true,
-        explanation: 'Setting the gradient ∂SSR/∂β = -2Xᵀ(y - Xβ) = 0 yields (XᵀX)β̂ = Xᵀy. Inverting gives β̂ = (XᵀX)⁻¹Xᵀy.',
-        explanationAr: 'بمساواة التدرج بالصفر نحصل على (XᵀX)β̂ = Xᵀy، وبضرب الطرفين بالمعكوس نحصل على (XᵀX)⁻¹Xᵀy.',
-      },
-      {
-        text: '(XXᵀ)⁻¹',
-        formula: '(X X^T)^{-1}',
-        correct: false,
-        explanation: 'XXᵀ has dimension N × N (observations) and is typically rank-deficient when N > p.',
-        explanationAr: 'المصفوفة XXᵀ ذات بُعد N × N وتكون غير قابلة للعكس عادة عندما يكون عدد المشاهدات أكبر من المتغيرات.',
-      },
-      {
-        text: 'Xᵀ (XᵀX)⁻¹',
-        formula: 'X^T (X^T X)^{-1}',
-        correct: false,
-        explanation: 'Dimension mismatch: multiplying Xᵀ on the left produces incompatible matrix dimensions for β̂.',
-        explanationAr: 'عدم تطابق في الأبعاد المصفوفية: ضرب Xᵀ من اليسار ينتج أبعاداً غير متوافقة مع متجه β̂.',
-      },
-      {
-        text: '(XᵀX)',
-        formula: '(X^T X)',
-        correct: false,
-        explanation: 'Missing the matrix inverse operation needed to solve the linear system.',
-        explanationAr: 'تفتقر إلى عملية قَلْب المصفوفة (المعكوس) اللازمة لحل النظام الخطي.',
-      },
-    ],
-  },
-
-  // 4. MCQ: L1 Lasso vs L2 Ridge Sparsity Geometry
-  {
-    id: 'drill-l1-sparsity-mcq',
-    format: 'mcq',
-    trackId: 'econometrics',
-    concept: 'L1 vs L2 Regularization Geometry',
-    conceptAr: 'هندسة الانتظام: L1 مقابل L2',
-    prompt: 'Why does L1 Lasso regularization induce exact zero coefficients (feature sparsity) while L2 Ridge only shrinks coefficients toward zero?',
-    promptAr: 'لماذا تنتج طريقة L1 (Lasso) معاملات تساوي صفراً تماماً (تناثر الخصائص) بينما تكتفي طريقة L2 (Ridge) بتقليص المعاملات دون تصفيرها؟',
-    options: [
-      {
-        text: 'L1 norm diamond contour has non-differentiable vertices aligned with coordinate axes.',
-        textAr: 'محدد كرة معيار L1 له رؤوس مدببة غير قابلة للاشتقاق تقع مباشرة على محاور الإحداثيات.',
-        correct: true,
-        explanation: 'The elliptical loss contours first touch the L1 diamond constraint at its sharp corners where wᵢ=0. L2 is smooth and spherical, touching tangentially almost never exactly on an axis.',
-        explanationAr: 'خطوط كنتور الخسارة الإهليلجية تلامس أولاً قمم معيار L1 الحادة الواقعة على محاور الإحداثيات (wᵢ=0). أما كرة L2 فهي ملساء وتتلامس مع الكنتور عند نقاط مماسية لا تقع على الصفر.',
-      },
-      {
-        text: 'L1 loss eliminates the intercept parameter completely.',
-        textAr: 'دالة خسارة L1 تلغي معامل التقاطع تماماً.',
-        correct: false,
-        explanation: 'The intercept is generally unpenalized in both Ridge and Lasso.',
-        explanationAr: 'معامل التقاطع عادة لا يخضع للعقوبة في كلتا الطريقتين.',
-      },
-      {
-        text: 'L2 Ridge uses stochastic gradient descent which cannot reach zero.',
-        textAr: 'طريقة L2 تستخدم الانحدار العشوائي الذي يعجز عن بلوغ الصفر.',
-        correct: false,
-        explanation: 'Ridge has an analytical closed-form solution (XᵀX + λI)⁻¹Xᵀy that is non-zero.',
-        explanationAr: 'طريقة ريدج لها حل تحليلي مغلق ومباشر ولا علاقة لذلك بطريقة التحسين.',
-      },
-      {
-        text: 'L1 penalty penalizes large weights less severely than small weights.',
-        textAr: 'عقوبة L1 تعاقب الأوزان الكبيرة بدرجة أقل من الأوزان الصغيرة.',
-        correct: false,
-        explanation: 'L1 applies a constant rate of penalty |w|, unlike L2 which applies a quadratic penalty w².',
-        explanationAr: 'تطبق L1 عقوبة خطية ثابتة بمعدل ثابت على عكس L2 التي تعاقب بشكل تربيعي.',
-      },
-    ],
-  },
-
-  // 5. Flashcard: FSRS v5 Power Law Retention Formula
-  {
-    id: 'drill-fsrs-retrievability',
-    format: 'flashcard',
-    trackId: 'math',
-    concept: 'FSRS v5 Retention Formula',
-    conceptAr: 'معادلة التذكر FSRS v5',
-    prompt: 'How does FSRS v5 model probability of recall R(t, S) as a function of elapsed time t and stability S?',
-    promptAr: 'كيف تحسب خوارزمية FSRS v5 احتمالية الاسترجاع R(t, S) بدلالة الوقت المنقضي t وثبات الذاكرة S؟',
-    solutionFormula: 'R(t, S) = \\left(1 + \\frac{19}{81} \\cdot \\frac{t}{S}\\right)^{-0.5}',
-    solution: 'A power-law forgetting curve where memory stability S represents the exact interval in days when retrievability drops to 90% (R = 0.90).',
-    solutionAr: 'منحنى نسيان وفق قانون القوة حيث يمثل ثبات الذاكرة S عدد الأيام الدقيق الذي تنخفض فيه احتمالية التذكر إلى 90%.',
-  },
-
-  // 6. MCQ: Curse of Dimensionality in Metric Spaces
-  {
-    id: 'drill-curse-dimensionality-mcq',
-    format: 'mcq',
-    trackId: 'data',
-    concept: 'Curse of Dimensionality in KNN',
-    conceptAr: 'معضلة الأبعاد في الفضاءات المترية',
-    prompt: 'In high-dimensional metric spaces (D → ∞), what happens to the ratio between the distance to the furthest neighbor and the nearest neighbor?',
-    promptAr: 'في الفضاءات المترية عالية الأبعاد (D → ∞)، ماذا يحدث للنسبة بين المسافة إلى أبعد جار والمسافة إلى أقرب جار؟',
-    options: [
-      {
-        text: 'The contrast vanishes: (dist_max - dist_min) / dist_min → 0, making all points equidistant.',
-        textAr: 'يتلاشى التباين وتؤول النسبة إلى الصفر، مما يجعل جميع النقاط متساوية البعد تقريباً.',
-        correct: true,
-        explanation: 'Beyer et al. (1999) proved that under mild assumptions in high dimensions, the variance of pairwise distances grows much slower than the mean, destroying distance metric discrimination.',
-        explanationAr: 'أثبتت دراسات الفضاء المتري أنه مع زيادة الأبعاد، يقترب الفرق النسبي بين أبعد نقطة وأقرب نقطة من الصفر، مما يفقد مقاييس المسافة قدرتها على التمييز.',
-      },
-      {
-        text: 'The nearest neighbor distance converges strictly to 0.',
-        textAr: 'تقترب مسافة أقرب جار من الصفر المطلق.',
-        correct: false,
-        explanation: 'Distances actually grow with dimension: ||x|| ∝ √D.',
-        explanationAr: 'المسافات تتسع في الواقع مع زيادة الأبعاد بمعدل يتناسب مع الجذر التربيعي للأبعاد.',
-      },
-      {
-        text: 'Euclidean distance becomes equivalent to Cosine similarity.',
-        textAr: 'تصبح المسافة الإقليدية مطابقة تماماً لتشابه جيب التمام.',
-        correct: false,
-        explanation: 'Cosine similarity measures angles; Euclidean measures magnitude as well.',
-        explanationAr: 'تشابه جيب التمام يقيس الزوايا بينما تقيس المسافة الإقليدية المقادير أيضاً.',
-      },
-    ],
-  },
-
-  // 7. Boolean (True/False): Gradient Descent Step Size Stability
-  {
-    id: 'drill-gradient-step-bound',
-    format: 'boolean',
-    trackId: 'math',
-    concept: 'Gradient Descent Stability Bound',
-    conceptAr: 'حد الاستقرار لخوارزمية الانحدار التدرجي',
-    prompt: 'For an L-Lipschitz smooth loss function, if learning rate η exceeds 2/L, is gradient descent mathematically guaranteed to diverge or oscillate uncontrollably on quadratic manifolds?',
-    promptAr: 'لدالة خسارة ملساء بمحدد L-Lipschitz، إذا تجاوز معدل التعلم η القيمة 2/L، هل تتباعد خطوات الانحدار التدرجي أو تتذبذب بشكل متفجر حتماً؟',
-    booleanAnswer: true,
-    booleanLabels: {
-      trueText: { en: 'True — Step size exceeds the contraction radius', ar: 'صحيح — يتجاوز حجم الخطوة نصف قطر الانكماش' },
-      falseText: { en: 'False — Momentum can always stabilize it', ar: 'خطأ — يمكن للزخم تثبيته دائماً' },
-    },
-    booleanFormula: '\\eta < \\frac{2}{L} \\iff |1 - \\eta L| < 1',
-    booleanExplanation: {
-      en: 'The iteration matrix eigenvalue is (1 - ηλ). When η > 2/L, |1 - ηL| > 1, so the spectral radius exceeds unity, causing geometric amplification and exponential divergence.',
-      ar: 'القيمة الذاتية لمصفوفة التكرار هي (1 - ηλ). عندما يتجاوز η القيمة 2/L تصبح القيمة المطلقة أكبر من 1، مما يضخم الأخطاء أسياً في كل خطوة.',
-    },
-  },
-
-  // 8. Formula Fill / MCQ: Transformer Scaled Dot-Product Attention Divisor
-  {
-    id: 'drill-attention-scaling',
-    format: 'formula_fill',
-    trackId: 'deep-learning',
-    concept: 'Scaled Dot-Product Attention Divisor',
-    conceptAr: 'معامل تحجيم الانتباه في المحولات',
-    prompt: 'Identify the scaling factor in Vaswani et al. (2017) Scaled Dot-Product Attention:',
-    promptAr: 'حدد معامل التحجيم الرياضي في خوارزمية الانتباه لشبكات المحولات (Transformers):',
-    blankDisplayFormula: '\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{Q K^T}{[\\;?\\;]}\\right) V',
-    filledDisplayFormula: '\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{Q K^T}{\\sqrt{d_k}}\\right) V',
-    options: [
-      {
-        text: '√d_k',
-        formula: '\\sqrt{d_k}',
-        correct: true,
-        explanation: 'For independent zero-mean unit-variance components, the dot-product has mean 0 and variance d_k. Dividing by √d_k restores unit variance, preventing softmax from saturating with vanishing gradients.',
-        explanationAr: 'حاصل الضرب النقطي لمتجهات ذات تباين 1 له تباين يساوي d_k. القسمة على √d_k تعيد التباين إلى 1، مما يمنع تشبع دالة softmax وتلاشي التدرجات.',
-      },
-      {
-        text: 'd_k',
-        formula: 'd_k',
-        correct: false,
-        explanation: 'Dividing by d_k over-compresses the logits, causing softmax distribution to become excessively uniform.',
-        explanationAr: 'القسمة على d_k تضغط القيم بشدة وتجعل توزيع softmax موزعاً بانتظام شديد ويفقد التركيز.',
-      },
-      {
-        text: '2^d_k',
-        formula: '2^{d_k}',
-        correct: false,
-        explanation: 'Exponential scaling is mathematically improper and diminishes logits completely.',
-        explanationAr: 'التحجيم الأسي غير صحيح رياضياً ويقضي على الفروق بين القيم.',
-      },
-      {
-        text: 'N (Sequence length)',
-        formula: 'N',
-        correct: false,
-        explanation: 'The scaling factor must depend on the projection dimension d_k, not the variable context sequence length N.',
-        explanationAr: 'معامل التحجيم يعتمد على بعد فضاء الإسقاط d_k وليس على طول النص المتغير N.',
-      },
-    ],
-  },
-
-  // 9. Boolean (Yes/No): Monotonicity of Training R²
-  {
-    id: 'drill-r2-monotonicity',
-    format: 'boolean',
-    trackId: 'econometrics',
-    concept: 'Monotonicity of Training R²',
-    conceptAr: 'رتابة معامل التحديد R² في بيانات التدريب',
-    prompt: 'Can adding an additional feature to an OLS regression model ever cause the training R² to decrease?',
-    promptAr: 'هل يمكن لإضافة متغير تفسيري جديد إلى نموذج انحدار OLS أن يؤدي إلى انخفاض معامل التحديد R² على بيانات التدريب؟',
-    booleanAnswer: false,
-    booleanLabels: {
-      trueText: { en: 'Yes — If the feature is pure random noise', ar: 'نعم — إذا كان المتغير مجرد ضجيج عشوائي' },
-      falseText: { en: 'No — Training R² is weakly monotonically increasing', ar: 'لا — معامل R² على التدريب غير متناقص رتيباً' },
-    },
-    booleanFormula: 'R^2(X_1, X_2) \\ge R^2(X_1), \\quad \\text{since } \\min_{w_1, w_2} \\text{SSR} \\le \\min_{w_1} \\text{SSR}',
-    booleanExplanation: {
-      en: 'OLS minimizes SSR over a larger subspace Col([X₁ X₂]) ⊇ Col(X₁). Setting the new coefficient to zero always achieves at least the previous SSR, so training R² cannot decrease.',
-      ar: 'يقوم OLS بالتقليل على فضاء أعمدة أوسع يشمل الفضاء القديم. ضبط المعامل الجديد على الصفر يحقق على الأقل نفس الخطأ السابق، لذا لا يمكن لـ R² أن ينخفض على بيانات التدريب أبداً.',
-    },
-  },
-
-  // 10. Boolean (True/False): K-Means Global vs Local Optimum
-  {
-    id: 'drill-kmeans-local-min',
-    format: 'boolean',
-    trackId: 'data',
-    concept: 'K-Means Convergence Optimality',
-    conceptAr: 'طبيعة تقارب خوارزمية K-Means',
-    prompt: 'Does standard Lloyd’s K-Means algorithm mathematically guarantee convergence to the global minimum of the inertia objective?',
-    promptAr: 'هل تضمن خوارزمية K-Means التقليدية (Lloyd) التقارب حتماً إلى الحل الأمثل العالمي (Global Minimum) لدالة القصور الذاتي؟',
-    booleanAnswer: false,
-    booleanLabels: {
-      trueText: { en: 'Yes — It always reaches the global optimum', ar: 'نعم — تصل دائماً إلى الحل الأمثل العالمي' },
-      falseText: { en: 'No — It converges to a local minimum or saddle point', ar: 'لا — تتقارب إلى حد أدنى محلي أو نقطة سرج' },
-    },
-    booleanFormula: '\\min_{C, \\mu} \\sum_{k=1}^K \\sum_{x_i \\in C_k} ||x_i - \\mu_k||^2 \\quad \\text{(NP-hard non-convex)}',
-    booleanExplanation: {
-      en: 'K-Means solves an NP-hard non-convex optimization via block coordinate descent. It is guaranteed to converge in a finite number of steps, but frequently gets trapped in poor local minima, which is why K-Means++ initialization is used.',
-      ar: 'تحل خوارزمية K-Means مسألة غير محدبة عبر النزول الإحداثي المجزأ. تضمن الخوارزمية التوقف في عدد منتهٍ من الخطوات، لكنها غالباً ما تعلق في قيعان محلية رديئة، ولهذا تستخدم تقنية K-Means++ للتهيئة الذكية.',
-    },
-  },
-
-  // 11. MCQ: Decision Trees & Jensen's Inequality
-  {
-    id: 'drill-tree-jensen-mcq',
-    format: 'mcq',
-    trackId: 'deep-learning',
-    concept: 'Decision Tree Impurity Reduction',
-    conceptAr: 'انخفاض الشوائب في أشجار القرار ومتباينة جينسن',
-    prompt: 'Why is the Information Gain ΔI in a Decision Tree mathematically guaranteed to be non-negative (ΔI ≥ 0) for the optimal split?',
-    promptAr: 'لماذا يكون كسب المعلومات (Information Gain) في شجرة القرار موجباً بالضرورة (ΔI ≥ 0) للانقسام الأمثل؟',
-    options: [
-      {
-        text: 'The impurity functions (Entropy & Gini) are strictly concave, guaranteeing ΔI ≥ 0 via Jensen’s inequality.',
-        textAr: 'دوال الشوائب (الإنتروبيا وجيني) دوال مقعرة تماماً، مما يضمن ΔI ≥ 0 استناداً إلى متباينة جينسن.',
-        correct: true,
-        explanation: 'Because H(p) is concave, E[H(p)] ≤ H(E[p]). The expected impurity after a split is always less than or equal to the parent node impurity.',
-        explanationAr: 'نظراً لأن دوال الشوائب مقعرة، فإن القيمة المتوقعة للشوائب بعد الانقسام تكون دائماً أقل من أو تساوي شوائب العقدة الأصلية وفق متباينة جينسن.',
-      },
-      {
-        text: 'Decision trees only allow orthogonal axis-aligned cuts.',
-        textAr: 'أشجار القرار تسمح فقط بالقطوع المتعامدة على المحاور.',
-        correct: false,
-        explanation: 'Axis-alignment is a computational constraint, not the mathematical reason for impurity monotonicity.',
-        explanationAr: 'التعامد على المحاور هو قيد حسابي وليس العلة الرياضية لعدم سلبية كسب المعلومات.',
-      },
-      {
-        text: 'Because leaves with zero samples are immediately pruned.',
-        textAr: 'لأنه يتم تشذيب الأوراق التي لا تحتوي على عينات فوراً.',
-        correct: false,
-        explanation: 'Pruning occurs post-hoc to prevent overfitting, unrelated to the theoretical split gain.',
-        explanationAr: 'التشذيب يتم لاحقاً لمنع الإفراط في التخصيص ولا علاقة له بإثبات كسب المعلومات النظري.',
-      },
-    ],
-  },
-
-  // 12. MCQ: Central Limit Theorem Prerequisites
-  {
-    id: 'drill-clt-variance-mcq',
-    format: 'mcq',
-    trackId: 'math',
-    concept: 'Central Limit Theorem Variance Condition',
-    conceptAr: 'شروط مبرهنة النهاية المركزية (CLT)',
-    prompt: 'What condition on the underlying independent and identically distributed (i.i.d.) random variables is strictly required for the classical Central Limit Theorem to hold?',
-    promptAr: 'ما هو الشرط الضروري على المتغيرات العشوائية المستقلة والمتطابقة التوزيع لتطبيق مبرهنة النهاية المركزية الكلاسيكية؟',
-    options: [
-      {
-        text: 'Finite variance (σ² < ∞). For heavy-tailed distributions like Cauchy, sample means do not converge to Normal.',
-        textAr: 'ثبات ومحدودية التباين (σ² < ∞). للتوزيعات ذات الذيول الثقيلة مثل كوشي، لا يقترب متوسط العينات من التوزيع الطبيعي.',
-        correct: true,
-        explanation: 'If σ² = ∞ (as in the Cauchy distribution), the Lindeberg condition fails and the sample mean distribution does not converge to a Gaussian.',
-        explanationAr: 'إذا كان التباين غير محدود (كما في توزيع كوشي)، يفشل شرط ليندبرغ ويبقى توزيع المتوسط متطابقاً مع التوزيع الأصلي دون أي تقارب نحو التوزيع الطبيعي.',
-      },
-      {
-        text: 'The distribution must be symmetric around its mean.',
-        textAr: 'يجب أن يكون التوزيع الأصلي متماثلاً تماماً حول المتوسط.',
-        correct: false,
-        explanation: 'The CLT applies to highly skewed distributions (e.g. Exponential) as sample size N grows.',
-        explanationAr: 'تنطبق المبرهنة على التوزيعات الملتوية وغير المتماثلة (مثل التوزيع الأسي) مع زيادة حجم العينة N.',
-      },
-      {
-        text: 'The support of the random variable must be bounded in [a, b].',
-        textAr: 'يجب أن يكون نطاق المتغير العشوائي محصوراً ومحدوداً في فترة [a, b].',
-        correct: false,
-        explanation: 'Support can be unbounded (-∞, +∞) as long as E[X²] < ∞ (finite variance).',
-        explanationAr: 'يمكن للمجال أن يمتد إلى ما لا نهاية بشرط أن يكون عزم الرتبة الثانية (التباين) محدوداً.',
-      },
-    ],
-  },
-];
+import {
+  ALL_CALIBRATION_DRILLS,
+  type CalibrationDrillItem,
+  type DrillFormat,
+  type DrillOption,
+} from '@/lib/drill-registry';
 
 export const DailyCalibration: React.FC = () => {
-  const { language, addXp, streakDays } = useOkvirStore();
+  const { language, addXp, streakDays, lessons, setActiveLessonId, setCurrentView } = useOkvirStore();
 
   const [cards, setCards] = useState<Record<string, FSRSState>>({});
   const [selectedFormatFilter, setSelectedFormatFilter] = useState<'all' | DrillFormat>('all');
@@ -451,11 +71,18 @@ export const DailyCalibration: React.FC = () => {
     xpEarned: 0,
   });
 
-  // Filtered Drills
+  // Strictly filter drills to only those whose corresponding module is mastered
+  const qualifiedDrills = useMemo(() => {
+    return ALL_CALIBRATION_DRILLS.filter(
+      (drill) => lessons[drill.moduleId]?.status === 'mastered'
+    );
+  }, [lessons]);
+
+  // Filtered Drills by format
   const activeDrills = useMemo(() => {
-    if (selectedFormatFilter === 'all') return FOUNDATIONAL_DRILL_ITEMS;
-    return FOUNDATIONAL_DRILL_ITEMS.filter((item) => item.format === selectedFormatFilter);
-  }, [selectedFormatFilter]);
+    if (selectedFormatFilter === 'all') return qualifiedDrills;
+    return qualifiedDrills.filter((item) => item.format === selectedFormatFilter);
+  }, [qualifiedDrills, selectedFormatFilter]);
 
   const currentItem = activeDrills[currentIndex];
   const isComplete = currentIndex >= activeDrills.length;
@@ -656,8 +283,41 @@ export const DailyCalibration: React.FC = () => {
           </div>
         </div>
 
-        {/* Complete State */}
-        {isComplete ? (
+        {/* Empty State for Beginners (0 mastered lessons) */}
+        {qualifiedDrills.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center space-y-5 fade-in rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 specular">
+            <div className="w-16 h-16 rounded-2xl bg-[var(--math-prediction)]/10 border border-[var(--math-prediction)]/20 flex items-center justify-center text-[var(--math-prediction)]">
+              <Brain size={32} />
+            </div>
+            <div className="space-y-2 max-w-md">
+              <h2 className="text-lg font-bold text-[var(--text-primary)]">
+                {language === 'ar' ? 'منصة المعايرة بانتظار إنجازك الأول!' : 'Your Calibration Deck is Waiting!'}
+              </h2>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                {language === 'ar'
+                  ? 'تعتمد المعايرة اليومية على خوارزمية التكرار المتباعد FSRS لجدولة مراجعة المفاهيم التي أتقنتها فعلياً، لضمان عدم إرهاقك بمفاهيم لم تدرسها بعد. أنجز درسك الأول واجتز اختباره لتفعيل بطاقاتك!'
+                  : 'Daily Calibration uses the FSRS spaced repetition engine to schedule memory reviews strictly for concepts you have mastered, preventing cognitive overload on unlearned material. Master your first lesson to activate your deck!'}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+              <button
+                onClick={() => {
+                  setActiveLessonId('linear-algebra-vectors');
+                  setCurrentView('lesson');
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--math-prediction)] text-black font-semibold text-xs transition-transform active:scale-95 shadow-md shadow-[var(--math-prediction)]/20"
+              >
+                <span>{language === 'ar' ? 'ابدأ الدرس 1: المتجهات كهندسة' : 'Start Lesson 1: Vectors as Geometry'}</span>
+              </button>
+              <button
+                onClick={() => setCurrentView('constellation')}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] transition-colors"
+              >
+                <span>{language === 'ar' ? 'استكشف كوكبة المعرفة' : 'Explore Constellation'}</span>
+              </button>
+            </div>
+          </div>
+        ) : isComplete ? (
           <div className="flex flex-col items-center justify-center py-16 text-center space-y-4 fade-in rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 specular">
             <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
               <Sparkles size={26} />

@@ -38,6 +38,8 @@ import { KaTeXMath } from '@/components/common/KaTeXMath';
 import { MathText } from '@/components/common/MathText';
 import { TactileSlider } from '@/components/common/TactileSlider';
 import { MisconceptionDiagnosticCard } from '@/components/pedagogy/MisconceptionDiagnosticCard';
+import { QuizBatteryComponent } from '@/components/quiz/QuizBatteryComponent';
+import { getQuizBatteryForModule } from '@/lib/curriculum-quizzes';
 import { audio } from '@/lib/audio';
 import type { BeatNumber, SimulationType, DiagnosticQuestion } from '@/lib/types';
 
@@ -396,6 +398,7 @@ export const OkvirWorkbench: React.FC = () => {
     lessons,
     config,
     completeLesson,
+    certifyLessonMastery,
     setCurrentView,
     addXp,
     slope,
@@ -435,6 +438,31 @@ export const OkvirWorkbench: React.FC = () => {
   const beat4 = mod.beats.find((b) => b.number === 4) || mod.beats[3] || beat1;
 
   // Diagnostic question mapping
+  const quizQuestions = useMemo(() => {
+    return getQuizBatteryForModule(mod.id, mod.title, mod.titleAr);
+  }, [mod.id, mod.title, mod.titleAr]);
+
+  const [masteryCertified, setMasteryCertified] = useState(() => {
+    return lessons[activeLessonId]?.status === 'mastered';
+  });
+  const [certifiedScore, setCertifiedScore] = useState<number>(() => {
+    return lessons[activeLessonId]?.masteryScore || 0;
+  });
+
+  useEffect(() => {
+    setMasteryCertified(lessons[activeLessonId]?.status === 'mastered');
+    setCertifiedScore(lessons[activeLessonId]?.masteryScore || 0);
+  }, [activeLessonId, lessons]);
+
+  const handleMasteryCertified = (scorePct: number, passed: boolean) => {
+    setCertifiedScore(scorePct);
+    setMasteryCertified(passed);
+    if (passed) {
+      certifyLessonMastery(mod.id, scorePct);
+      setIsDiagnosticSolved(true);
+    }
+  };
+
   const diagnosticQuestion: DiagnosticQuestion | null = useMemo(() => {
     if (!beat4.question) return null;
     return {
@@ -1038,54 +1066,78 @@ export const OkvirWorkbench: React.FC = () => {
             <MathText text={isAr ? beat4.narrative.ar : beat4.narrative.en} />
           </div>
 
-          {/* Misconception Diagnostic Assessment Card */}
-          {diagnosticQuestion && (
-            <MisconceptionDiagnosticCard
-              question={diagnosticQuestion}
-              onAnswerSelected={(isCorrect) => {
-                setIsDiagnosticSolved(isCorrect);
-              }}
-            />
-          )}
+          {/* Multi-Question Diagnostic Assessment Battery with Passing Score Gate */}
+          <QuizBatteryComponent
+            questions={quizQuestions}
+            onMasteryCertified={handleMasteryCertified}
+            passingScorePct={75}
+            lessonId={mod.id}
+            moduleTitle={mod.title}
+            moduleTitleAr={mod.titleAr}
+          />
         </section>
 
         {/* ======================================================================= */}
         {/* SECTION 7: COMPLETION CELEBRATION & XP CLAIM                            */}
         {/* ======================================================================= */}
         <section id="section-complete" className="pt-10 pb-16 border-t border-[var(--border-subtle)]">
-          <div className="p-8 md:p-12 rounded-3xl border border-emerald-500/30 bg-emerald-950/20 text-center space-y-6 shadow-2xl">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
-              <CheckCircle2 className="w-8 h-8" />
-            </div>
+          {masteryCertified ? (
+            <div className="p-8 md:p-12 rounded-3xl border border-emerald-500/30 bg-emerald-950/20 text-center space-y-6 shadow-2xl">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
+                <CheckCircle2 className="w-8 h-8" />
+              </div>
 
-            <div className="space-y-2">
-              <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold block">
-                {isAr ? 'تهانينا! لقد أتممت الدرس بنجاح' : 'MASTERCLASS COMPLETE!'}
-              </span>
-              <h3 className="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)]">
-                {isAr ? mod.titleAr : mod.title}
-              </h3>
-              <p className="text-sm text-[var(--text-secondary)] max-w-lg mx-auto leading-relaxed">
-                {isAr
-                  ? 'تم تحديث جدول التكرار المتباعد (FSRS) وحفظ تقدمك محلياً في قاعدة البيانات.'
-                  : 'Your spaced repetition stability has been updated and persisted locally in your embedded database.'}
-              </p>
-            </div>
+              <div className="space-y-2">
+                <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold block">
+                  {isAr ? 'تهانينا! لقد أتقنت الدرس معتمداً' : 'MASTERY CERTIFIED & VERIFIED!'}
+                </span>
+                <h3 className="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)]">
+                  {isAr ? mod.titleAr : mod.title}
+                </h3>
+                <p className="text-sm text-[var(--text-secondary)] max-w-lg mx-auto leading-relaxed">
+                  {isAr
+                    ? `حققت نسبة استيعاب ${certifiedScore}% في الاختبار التشخيصي. تم تسجيل إتقانك واعتماده في قاعدة البيانات وتفعيل أسئلة المفهوم في المعايرة اليومية!`
+                    : `Achieved ${certifiedScore}% diagnostic mastery score. Your mastery is certified and persisted in the local database, unlocking concepts for Daily Calibration!`}
+                </p>
+              </div>
 
-            {/* Complete Button */}
-            <button
-              onClick={() => {
-                completeLesson(mod.id);
-                addXp(100);
-                if (config.soundEnabled) audio.playVictoryHarmonics();
-                setCurrentView('constellation');
-              }}
-              className="px-8 py-4 rounded-2xl text-base font-bold bg-emerald-500 hover:bg-emerald-400 text-black shadow-xl shadow-emerald-500/20 transition-all transform hover:scale-105 cursor-pointer inline-flex items-center gap-3"
-            >
-              <span>{isAr ? 'حصد +100 XP والعودة إلى خريطة المعرفة' : 'Claim +100 XP & Return to Roadmap'}</span>
-              <ArrowRight className="w-5 h-5 rtl-flip" />
-            </button>
-          </div>
+              {/* Complete Button */}
+              <button
+                onClick={() => {
+                  completeLesson(mod.id);
+                  if (config.soundEnabled) audio.playVictoryHarmonics();
+                  setCurrentView('constellation');
+                }}
+                className="px-8 py-4 rounded-2xl text-base font-bold bg-emerald-500 hover:bg-emerald-400 text-black shadow-xl shadow-emerald-500/20 transition-all transform hover:scale-105 cursor-pointer inline-flex items-center gap-3"
+              >
+                <span>{isAr ? 'العودة إلى خريطة المعرفة' : 'Return to Knowledge Constellation'}</span>
+                <ArrowRight className="w-5 h-5 rtl-flip" />
+              </button>
+            </div>
+          ) : (
+            <div className="p-8 md:p-12 rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-center space-y-5 shadow-lg">
+              <div className="w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+                <Lock className="w-7 h-7" />
+              </div>
+              <div className="space-y-2 max-w-md mx-auto">
+                <h3 className="text-xl font-bold text-[var(--text-primary)]">
+                  {isAr ? 'بوابة الاعتماد مغلقة — اجتز الاختبار أولاً' : 'Mastery Certification Locked'}
+                </h3>
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  {isAr
+                    ? 'لمنع التقدم غير المستحق، تتطلب المعايير الأكاديمية الصارمة تحقيق درجة 75% أو أعلى في الاختبار التشخيصي أعلاه لفتح شهادة الإتقان وحصد +100 XP.'
+                    : 'To ensure genuine learning transfer, Okvir requires a passing score of at least 75% on the diagnostic battery above to certify mastery and award +100 XP.'}
+                </p>
+              </div>
+              <button
+                onClick={() => scrollToSection('section-quiz')}
+                className="px-6 py-3 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-app)] hover:border-amber-500/50 text-xs font-mono text-[var(--text-secondary)] hover:text-amber-400 transition-colors inline-flex items-center gap-2 cursor-pointer"
+              >
+                <Award className="w-4 h-4 text-amber-400" />
+                <span>{isAr ? 'الانتقال إلى الاختبار التشخيصي' : 'Take Diagnostic Battery (Section 05)'}</span>
+              </button>
+            </div>
+          )}
         </section>
 
       </div>

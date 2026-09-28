@@ -81,6 +81,7 @@ export interface OkvirState {
   lessons: Record<string, LessonProgress>;
   updateLessonBeat: (lessonId: string, beat: BeatNumber) => void;
   completeLesson: (lessonId: string) => void;
+  certifyLessonMastery: (lessonId: string, scorePct: number) => { success: boolean; xpAwarded: number };
   startLesson: (lessonId: string) => void;
   syncWithTauriProfile: () => Promise<void>;
 }
@@ -319,33 +320,59 @@ export const useOkvirStore = create<OkvirState>()(
             },
           };
         }),
-      completeLesson: (lessonId) =>
-        set((state) => {
-          state.recordActivityToday();
-          const lesson = state.lessons[lessonId];
-          if (!lesson) return {};
-          
-          const updatedLessons: Record<string, LessonProgress> = {
-            ...state.lessons,
-            [lessonId]: {
-              ...lesson,
-              status: 'mastered',
-              currentBeat: 4 as BeatNumber,
-              completedBeats: [1, 2, 3, 4] as BeatNumber[],
+      completeLesson: (lessonId) => {
+        get().certifyLessonMastery(lessonId, 100);
+      },
+      certifyLessonMastery: (lessonId, scorePct) => {
+        const state = get();
+        const lesson = state.lessons[lessonId];
+        if (!lesson) return { success: false, xpAwarded: 0 };
+
+        // Strict Mastery Threshold: Must be >= 75%
+        if (scorePct < 75) {
+          set({
+            lessons: {
+              ...state.lessons,
+              [lessonId]: {
+                ...lesson,
+                attemptCount: (lesson.attemptCount || 0) + 1,
+              },
             },
-          };
+          });
+          return { success: false, xpAwarded: 0 };
+        }
 
-          // Re-evaluate the entire DAG: unlock the next lessons whose prerequisites are now satisfied!
-          const dynamicallyUnlocked = recalculateLessonStatuses(updatedLessons);
+        state.recordActivityToday();
+        const xpAwarded = 100;
+        const nowIso = new Date().toISOString();
 
-          // Persist to native SQLite via Tauri bridge (PRD Section 17.2 & Section 2)
-          tauriBridge.completeLesson(lessonId, 360).catch(console.error);
+        const updatedLessons: Record<string, LessonProgress> = {
+          ...state.lessons,
+          [lessonId]: {
+            ...lesson,
+            status: 'mastered',
+            currentBeat: 4 as BeatNumber,
+            completedBeats: [1, 2, 3, 4] as BeatNumber[],
+            masteryScore: Math.round(scorePct),
+            attemptCount: (lesson.attemptCount || 0) + 1,
+            certifiedAt: nowIso,
+            stability: Math.max(lesson.stability || 1, 3.5),
+          },
+        };
 
-          return {
-            xp: state.xp + 50,
-            lessons: dynamicallyUnlocked,
-          };
-        }),
+        // Re-evaluate the entire DAG: unlock the next lessons whose prerequisites are now satisfied!
+        const dynamicallyUnlocked = recalculateLessonStatuses(updatedLessons);
+
+        // Persist to native SQLite via Tauri bridge (PRD Section 17.2 & Section 2)
+        tauriBridge.completeLesson(lessonId, 360).catch(console.error);
+
+        set({
+          xp: state.xp + xpAwarded,
+          lessons: dynamicallyUnlocked,
+        });
+
+        return { success: true, xpAwarded };
+      },
       startLesson: (lessonId) =>
         set((state) => {
           const mod = curriculum.find((m) => m.id === lessonId);

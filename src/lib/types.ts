@@ -55,6 +55,9 @@ export interface LessonProgress {
   difficulty: number;
   lastReviewed: string | null;
   completedBeats: BeatNumber[];
+  masteryScore?: number;
+  attemptCount?: number;
+  certifiedAt?: string;
 }
 
 export interface Beat {
