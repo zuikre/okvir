@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
 import { PreCanvasBriefing, PostCanvasConsolidation, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
-import { Type, Play, RotateCcw, FastForward, CheckCircle2, Hash } from 'lucide-react';
+import { Type, Play, RotateCcw, FastForward, CheckCircle2 } from 'lucide-react';
 
 const PRESET_CORPUS: { id: string; name: { en: string; ar: string }; text: string }[] = [
   {

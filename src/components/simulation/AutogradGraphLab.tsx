@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
 import { PreCanvasBriefing, PostCanvasConsolidation, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
-import { Network, Play, RotateCcw, ArrowRight, Zap, GitCommit, Sliders } from 'lucide-react';
+import { Network, RotateCcw, ArrowRight, Zap } from 'lucide-react';
 
 type ActivationFunc = 'relu' | 'sigmoid' | 'tanh';
 
@@ -113,8 +113,6 @@ export const AutogradGraphLab: React.FC<{ compact?: boolean }> = ({ compact }) =
   const [activation, setActivation] = useState<ActivationFunc>('relu');
   const [learningRate] = useState(0.1);
 
-  // Backprop step animation index
-  const [activeStep, setActiveStep] = useState<number>(0);
 
   // Forward Pass Computations
   const graph = useMemo(() => {
@@ -170,10 +168,11 @@ export const AutogradGraphLab: React.FC<{ compact?: boolean }> = ({ compact }) =
   };
 
   const resetWeights = () => {
+    setX1(1.5);
+    setX2(-0.5);
     setW1(0.8);
     setW2(-1.2);
     setB(0.2);
-    setActiveStep(0);
     if (config.soundEnabled) audio.playClick();
   };
 
@@ -310,11 +309,43 @@ export const AutogradGraphLab: React.FC<{ compact?: boolean }> = ({ compact }) =
         </div>
 
         {/* Parameter Sliders */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-[var(--border-subtle)]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2 border-t border-[var(--border-subtle)]">
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-[var(--text-secondary)]">Input x₁:</span>
+              <strong className="text-sky-400 tabular-nums">{x1.toFixed(2)}</strong>
+            </div>
+            <input
+              type="range"
+              min="-3"
+              max="3"
+              step="0.1"
+              value={x1}
+              onChange={(e) => setX1(parseFloat(e.target.value))}
+              className="w-full accent-sky-400 cursor-pointer"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-[var(--text-secondary)]">Input x₂:</span>
+              <strong className="text-sky-400 tabular-nums">{x2.toFixed(2)}</strong>
+            </div>
+            <input
+              type="range"
+              min="-3"
+              max="3"
+              step="0.1"
+              value={x2}
+              onChange={(e) => setX2(parseFloat(e.target.value))}
+              className="w-full accent-sky-400 cursor-pointer"
+            />
+          </div>
+
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="text-[var(--text-secondary)]">Weight w₁:</span>
-              <strong className="text-[var(--text-primary)] tabular-nums">{w1.toFixed(2)}</strong>
+              <strong className="text-amber-400 tabular-nums">{w1.toFixed(2)}</strong>
             </div>
             <input
               type="range"
@@ -330,7 +361,7 @@ export const AutogradGraphLab: React.FC<{ compact?: boolean }> = ({ compact }) =
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="text-[var(--text-secondary)]">Weight w₂:</span>
-              <strong className="text-[var(--text-primary)] tabular-nums">{w2.toFixed(2)}</strong>
+              <strong className="text-amber-400 tabular-nums">{w2.toFixed(2)}</strong>
             </div>
             <input
               type="range"
@@ -346,7 +377,7 @@ export const AutogradGraphLab: React.FC<{ compact?: boolean }> = ({ compact }) =
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="text-[var(--text-secondary)]">Target y*:</span>
-              <strong className="text-[var(--text-primary)] tabular-nums">{yTarget.toFixed(2)}</strong>
+              <strong className="text-purple-400 tabular-nums">{yTarget.toFixed(2)}</strong>
             </div>
             <input
               type="range"

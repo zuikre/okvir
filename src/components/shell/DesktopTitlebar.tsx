@@ -32,7 +32,7 @@ export const DesktopTitlebar: React.FC = () => {
             OKVIR <span className="text-[var(--text-secondary)] font-sans font-normal">(إطار)</span>
           </span>
           <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-[var(--text-secondary)] border border-[var(--border-strong)]">
-            v0.1.0-alpha
+            v1.0.0
           </span>
         </div>
       </div>

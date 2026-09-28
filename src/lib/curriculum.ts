@@ -448,7 +448,7 @@ def gradient(f, x, h=1e-5):
       {
         number: 1,
         type: 'intuition',
-        simulation: 'ols',
+        simulation: 'vectors',
         narrative: {
           en: 'Python loops interpret each iteration. NumPy pushes the loop to C, processing entire arrays in one call.',
           ar: 'حلقات Python تفسر كل تكرار. NumPy يدفع الحلقة إلى C، ويعالج المصفوفات كاملة في استدعاء واحد.',
@@ -544,7 +544,7 @@ def scale_array(arr: np.ndarray, factor: float) -> np.ndarray:
       {
         number: 1,
         type: 'intuition',
-        simulation: 'kmeans',
+        simulation: 'simpson',
         narrative: {
           en: 'A DataFrame is a collection of Series (columns) sharing an Index (row labels). Think of it as a spreadsheet with superpowers.',
           ar: 'إطار البيانات هو مجموعة سلاسل (أعمدة) تتشارك فهرس (تسميات الصفوف). فكر فيه كجدول بقدرات خارقة.',
@@ -640,7 +640,7 @@ def create_dataframe(data: dict) -> pd.DataFrame:
       {
         number: 1,
         type: 'intuition',
-        simulation: 'tree',
+        simulation: 'simpson',
         narrative: {
           en: 'Window functions compute values across rows related to the current row — like a sliding analytical lens over your data.',
           ar: 'دوال النوافذ تحسب قيم عبر الصفوف المرتبطة بالصف الحالي — مثل عدسة تحليلية منزلقة على بياناتك.',

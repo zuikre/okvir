@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
 import { PreCanvasBriefing, PostCanvasConsolidation, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
-import { Network, AlertCircle, CheckCircle2, TrendingUp, Sliders, ArrowRight } from 'lucide-react';
+import { Network, AlertCircle, CheckCircle2, Sliders, ArrowRight } from 'lucide-react';
 
 interface SimDataPoint {
   z: number;

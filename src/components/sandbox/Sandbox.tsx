@@ -58,10 +58,14 @@ export const Sandbox: React.FC = () => {
     setCurrentView,
   } = useOkvirStore();
 
+  const [unlockedPlaygroundSims, setUnlockedPlaygroundSims] = React.useState<Set<string>>(new Set());
+
   const activeModuleId = SIMULATION_MODULE_MAP[activeSimulation];
   const activeModule = curriculum.find((m) => m.id === activeModuleId);
   const activeLessonProgress = lessons[activeModuleId];
-  const isSimulationLocked = activeLessonProgress ? activeLessonProgress.status === 'locked' : false;
+  const isSimulationLocked =
+    (activeLessonProgress ? activeLessonProgress.status === 'locked' : false) &&
+    !unlockedPlaygroundSims.has(activeSimulation);
 
   // Find uncompleted prerequisites
   const uncompletedPrereqs = (activeModule?.prerequisites || [])
@@ -161,7 +165,14 @@ export const Sandbox: React.FC = () => {
               </div>
             )}
 
-            <div className="pt-2 flex justify-center gap-3">
+            <div className="pt-2 flex flex-wrap justify-center gap-3">
+              <button
+                onClick={() => setUnlockedPlaygroundSims((prev) => new Set([...prev, activeSimulation]))}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-mono font-semibold text-amber-400 transition-all active:scale-95"
+              >
+                <FlaskConical size={14} />
+                <span>{language === 'ar' ? 'تشغيل في وضع التجربة الحرة' : 'Launch Playground (Sandbox Override)'}</span>
+              </button>
               <button
                 onClick={() => setCurrentView('constellation')}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--border-subtle)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"

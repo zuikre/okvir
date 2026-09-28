@@ -87,6 +87,9 @@ print(f"Theory:    Mean={n_pegs*p:.2f}, Var={n_pegs*p*(1-p):.2f}")`,
   },
 };
 
+// Particle color palette
+const PARTICLE_COLORS = ['#38bdf8', '#10b981', '#f59e0b', '#a855f7'];
+
 export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) => {
   const { language, config } = useOkvirStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -103,9 +106,6 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
   const binsRef = useRef<number[]>(new Array(numBins).fill(0));
   binsRef.current = bins;
 
-  // Particle color palette
-  const colors = ['#38bdf8', '#10b981', '#f59e0b', '#a855f7'];
-
   // Spawn new particles
   const spawnParticles = useCallback((count = 1) => {
     const newParticles: Particle[] = [];
@@ -118,13 +118,13 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
         row: 0,
         col: 0,
         settled: false,
-        color: colors[Math.floor(Math.random() * colors.length)],
+        color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
       });
     }
     particlesRef.current.push(...newParticles);
     setTotalDropped((prev) => prev + count);
     if (config.soundEnabled && count <= 5) audio.playClick();
-  }, [config.soundEnabled, colors]);
+  }, [config.soundEnabled]);
 
   const resetBoard = () => {
     particlesRef.current = [];

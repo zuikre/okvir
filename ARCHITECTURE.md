@@ -126,12 +126,12 @@ Tauri v2 provides a secure, minimal Rust wrapper around the system's native Webv
 * **macOS:** WKWebView with NSVisualEffectView vibrancy.
 * **Linux:** WebKitGTK 4.1 with Wayland fractional scaling.
 
-### Typed IPC Commands (`src-tauri/src/lib.rs` & `src/lib/tauri-bridge.ts`)
-* `get_user_profile()`: Returns user profile, XP, and streak.
-* `complete_lesson(lesson_id, time_spent)`: Atomically updates lesson state and records completion.
-* `get_due_fsrs_cards()`: Fetches cards due for daily spaced review.
-* `record_submission(payload)`: Saves code verification attempts.
-* `verify_chunk_signature(chunk_id, archive_bytes)`: Cryptographically checks Ed25519 Minisign signatures.
+### Typed IPC Commands (`src-tauri/src/commands.rs` & `src/lib/tauri-bridge.ts`)
+* `get_user_profile()`: Queries embedded SQLite in WAL mode (`~/.okvir/okvir.db`) returning user profile, XP, and streak.
+* `complete_lesson(lesson_id, time_spent)`: Atomically updates `lesson_progress` state, awards XP, and records completion timestamp.
+* `get_due_fsrs_cards()`: Fetches cards due for daily spaced review according to FSRS v5 schedules.
+* `record_submission(payload)`: Saves code verification attempts and runtime metrics to `code_submissions`.
+* `verify_chunk_signature(chunk_id, archive_bytes)`: Cryptographically checks Ed25519 Minisign signatures over seekable `.okvir` frames.
 
 ---
 

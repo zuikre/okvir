@@ -213,7 +213,7 @@ Inspired by **Raycast and Linear.app**, every core action in Okvir is accessible
 
 | Shortcut | Action | Description |
 | :--- | :--- | :--- |
-| `⌘K` / `Ctrl+K` | **Universal Command Palette** | Fuzzy search across all 16 modules, settings, and simulations |
+| `⌘K` / `Ctrl+K` | **Universal Command Palette** | Fuzzy search across all 23 modules, settings, and simulations |
 | `⌘↵` / `Ctrl+Enter` | **Run Code** | Execute Python challenge in Pyodide WASM worker |
 | `H` | **Socratic Hint** | Cycle through Tier 1 ➔ Tier 2 ➔ Tier 3 hints |
 | `Space` | **Next Beat** | Advance to next beat in the 4-Beat Micro-Loop |
