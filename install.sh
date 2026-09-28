@@ -143,7 +143,20 @@ else
 # Okvir launcher script
 APP_WEB="${HOME}/.okvir/web"
 
-if [ -d "${APP_WEB}" ] && command -v python3 >/dev/null 2>&1; then
+# Handle CLI Subcommands: init, test, pack, dev, version, help
+if [ "$#" -gt 0 ] && [ "$1" != "start" ]; then
+  if [ -f "$(pwd)/bin/okvir.js" ]; then
+    exec node "$(pwd)/bin/okvir.js" "$@"
+  elif [ -f "${HOME}/okvir/bin/okvir.js" ]; then
+    exec node "${HOME}/okvir/bin/okvir.js" "$@"
+  fi
+fi
+
+# Launch interactive web application
+if [ -f "$(pwd)/package.json" ] && [ -f "$(pwd)/bin/okvir.js" ]; then
+  echo "🚀 Launching Okvir interactive learning engine..."
+  exec npm run dev
+elif [ -d "${APP_WEB}" ] && command -v python3 >/dev/null 2>&1; then
   echo "Starting Okvir local engine on http://localhost:5173..."
   (cd "${APP_WEB}" && python3 -m http.server 5173 >/dev/null 2>&1) &
   SERVER_PID=$!
@@ -156,8 +169,6 @@ if [ -d "${APP_WEB}" ] && command -v python3 >/dev/null 2>&1; then
   echo "Okvir is running at http://localhost:5173 (Press Ctrl+C to stop)"
   trap "kill $SERVER_PID 2>/dev/null" EXIT INT TERM
   wait $SERVER_PID
-elif command -v npm >/dev/null 2>&1; then
-  exec npx --yes okvir "$@"
 else
   echo "Please install Node.js 18+ or Python 3 to launch Okvir, or visit https://github.com/zuikre/okvir/releases"
   exit 1
