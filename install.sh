@@ -88,129 +88,76 @@ mkdir -p "${APP_DIR}/cache"
 
 echo "${BOLD}==> Preparing Target Directory:${RESET} ${INSTALL_DIR}"
 
-# 4. Resolve Target Binary
+# 4. Download and Install Native Desktop Application
+echo "${BOLD}==> Fetching Okvir Native Desktop Application (${OKVIR_VERSION})...${RESET}"
+
+INSTALLED=false
+
 if [ "${PLATFORM}" = "linux" ]; then
-  ASSET_NAME="okvir-linux-${TARGET_ARCH}.AppImage"
-  TARGET_PATH="${INSTALL_DIR}/okvir"
-  DESKTOP_ENTRY_DIR="${HOME}/.local/share/applications"
+  TAR_ASSET="okvir-linux-${TARGET_ARCH}.tar.gz"
+  BIN_ASSET="okvir-linux-${TARGET_ARCH}"
+  APPIMAGE_ASSET="okvir-linux-${TARGET_ARCH}.AppImage"
+
+  TMP_DIR="$(mktemp -d)"
+
+  echo "Downloading Linux desktop bundle (${TAR_ASSET})..."
+  if download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/${TAR_ASSET}" "${TMP_DIR}/${TAR_ASSET}" 2>/dev/null || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/download/v1.0.0/${TAR_ASSET}" "${TMP_DIR}/${TAR_ASSET}" 2>/dev/null; then
+    tar -xzf "${TMP_DIR}/${TAR_ASSET}" -C "${TMP_DIR}"
+    chmod +x "${TMP_DIR}/okvir"
+    mv "${TMP_DIR}/okvir" "${INSTALL_DIR}/okvir"
+
+    # Install FreeDesktop Application Shortcut & Icons
+    mkdir -p "${HOME}/.local/share/applications"
+    mkdir -p "${HOME}/.local/share/icons/hicolor/scalable/apps"
+    mkdir -p "${HOME}/.local/share/pixmaps"
+
+    [ -f "${TMP_DIR}/okvir.svg" ] && cp -f "${TMP_DIR}/okvir.svg" "${HOME}/.local/share/icons/hicolor/scalable/apps/okvir.svg"
+    [ -f "${TMP_DIR}/okvir.png" ] && cp -f "${TMP_DIR}/okvir.png" "${HOME}/.local/share/pixmaps/okvir.png"
+    [ -f "${TMP_DIR}/okvir.desktop" ] && cp -f "${TMP_DIR}/okvir.desktop" "${HOME}/.local/share/applications/okvir.desktop"
+
+    update-desktop-database "${HOME}/.local/share/applications" >/dev/null 2>&1 || true
+    rm -rf "${TMP_DIR}"
+    INSTALLED=true
+    echo "${GREEN}✔ Installed Native Desktop Executable to ${INSTALL_DIR}/okvir${RESET}"
+    echo "${GREEN}✔ Created Desktop Application Menu launcher (OKVIR)${RESET}"
+
+  elif download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/${BIN_ASSET}" "${INSTALL_DIR}/okvir" 2>/dev/null || \
+       download_file "https://github.com/${OKVIR_REPO}/releases/download/v1.0.0/${BIN_ASSET}" "${INSTALL_DIR}/okvir" 2>/dev/null; then
+    chmod +x "${INSTALL_DIR}/okvir"
+    INSTALLED=true
+    echo "${GREEN}✔ Installed Native Desktop Executable to ${INSTALL_DIR}/okvir${RESET}"
+
+  elif download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/${APPIMAGE_ASSET}" "${INSTALL_DIR}/okvir" 2>/dev/null || \
+       download_file "https://github.com/${OKVIR_REPO}/releases/download/v1.0.0/${APPIMAGE_ASSET}" "${INSTALL_DIR}/okvir" 2>/dev/null; then
+    chmod +x "${INSTALL_DIR}/okvir"
+    INSTALLED=true
+    echo "${GREEN}✔ Installed Native Desktop AppImage to ${INSTALL_DIR}/okvir${RESET}"
+  fi
+
 elif [ "${PLATFORM}" = "macos" ]; then
-  ASSET_NAME="Okvir-macOS-${TARGET_ARCH}.dmg"
-  TARGET_PATH="/Applications/Okvir.app"
-fi
+  DMG_ASSET="Okvir-macOS-${TARGET_ARCH}.dmg"
+  DMG_TMP="$(mktemp -d)/okvir.dmg"
 
-echo "${BOLD}==> Fetching Okvir ${OKVIR_VERSION} (${ASSET_NAME})...${RESET}"
-
-RELEASE_URL="https://github.com/${OKVIR_REPO}/releases/latest/download/${ASSET_NAME}"
-
-TMP_DEST="$(mktemp -d)/${ASSET_NAME}"
-
-# Attempt download with graceful local fallback if offline or release not yet tagged
-if download_file "${RELEASE_URL}" "${TMP_DEST}" 2>/dev/null; then
-  if [ "${PLATFORM}" = "linux" ]; then
-    chmod +x "${TMP_DEST}"
-    mv "${TMP_DEST}" "${TARGET_PATH}"
-    echo "${GREEN}✔ Installed Okvir AppImage to ${TARGET_PATH}${RESET}"
-  elif [ "${PLATFORM}" = "macos" ]; then
-    hdiutil attach -nobrowse "${TMP_DEST}" -mountpoint /Volumes/OkvirInstall >/dev/null 2>&1
+  echo "Downloading macOS desktop disk image (${DMG_ASSET})..."
+  if download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/${DMG_ASSET}" "${DMG_TMP}" 2>/dev/null || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/download/v1.0.0/${DMG_ASSET}" "${DMG_TMP}" 2>/dev/null; then
+    hdiutil attach -nobrowse "${DMG_TMP}" -mountpoint /Volumes/OkvirInstall >/dev/null 2>&1
     cp -R "/Volumes/OkvirInstall/Okvir.app" /Applications/
     hdiutil detach /Volumes/OkvirInstall >/dev/null 2>&1
+    ln -sf "/Applications/Okvir.app/Contents/MacOS/okvir" "${INSTALL_DIR}/okvir"
+    rm -rf "$(dirname "${DMG_TMP}")"
+    INSTALLED=true
     echo "${GREEN}✔ Installed Okvir.app to /Applications/Okvir.app${RESET}"
-  fi
-else
-  echo "${YELLOW}! Desktop binary packaging in progress on GitHub CI.${RESET}"
-  echo "${BOLD}==> Fetching Okvir standalone distribution (${OKVIR_VERSION})...${RESET}"
-
-  WEB_ZIP_URL="https://github.com/${OKVIR_REPO}/releases/download/v1.0.0/okvir-web-v1.0.0.zip"
-  TMP_WEB_DIR="$(mktemp -d)"
-  TMP_WEB_ZIP="${TMP_WEB_DIR}/web.zip"
-
-  if download_file "${WEB_ZIP_URL}" "${TMP_WEB_ZIP}" 2>/dev/null; then
-    mkdir -p "${APP_DIR}/web"
-    if command -v unzip >/dev/null 2>&1; then
-      unzip -q -o "${TMP_WEB_ZIP}" -d "${APP_DIR}/web"
-      echo "${GREEN}✔ Installed Okvir standalone web engine to ${APP_DIR}/web${RESET}"
-    elif command -v python3 >/dev/null 2>&1; then
-      python3 -c "import zipfile; zipfile.ZipFile('${TMP_WEB_ZIP}').extractall('${APP_DIR}/web')"
-      echo "${GREEN}✔ Installed Okvir standalone web engine to ${APP_DIR}/web${RESET}"
-    fi
-    rm -rf "${TMP_WEB_DIR}"
-  fi
-
-  mkdir -p "${APP_DIR}/bin"
-  download_file "https://raw.githubusercontent.com/${OKVIR_REPO}/main/bin/okvir.js" "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
-  chmod +x "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
-
-  echo "${YELLOW}! Creating portable launcher script at ${INSTALL_DIR}/okvir...${RESET}"
-
-  cat << 'LAUNCHER' > "${INSTALL_DIR}/okvir"
-#!/usr/bin/env bash
-# Okvir launcher script
-APP_DIR="${HOME}/.okvir"
-APP_WEB="${APP_DIR}/web"
-APP_BIN="${APP_DIR}/bin/okvir.js"
-
-# Handle CLI Subcommands: init, test, pack, dev, version, help
-if [ "$#" -gt 0 ] && [ "$1" != "start" ]; then
-  if [ -f "$(pwd)/bin/okvir.js" ]; then
-    exec node "$(pwd)/bin/okvir.js" "$@"
-  elif [ -f "${APP_BIN}" ]; then
-    exec node "${APP_BIN}" "$@"
-  elif [ -f "${HOME}/okvir/bin/okvir.js" ]; then
-    exec node "${HOME}/okvir/bin/okvir.js" "$@"
+    echo "${GREEN}✔ Created symlink at ${INSTALL_DIR}/okvir${RESET}"
   fi
 fi
 
-# Launch interactive web application
-if [ -f "$(pwd)/package.json" ] && [ -f "$(pwd)/bin/okvir.js" ]; then
-  echo "🚀 Launching Okvir interactive learning engine..."
-  exec npm run dev
-elif [ -d "${APP_WEB}" ]; then
-  if command -v python3 >/dev/null 2>&1; then
-    echo "Starting Okvir local engine on http://localhost:5173..."
-    (cd "${APP_WEB}" && python3 -m http.server 5173 >/dev/null 2>&1) &
-    SERVER_PID=$!
-    sleep 0.8
-    if command -v xdg-open >/dev/null 2>&1; then
-      xdg-open "http://localhost:5173" >/dev/null 2>&1 || true
-    elif command -v open >/dev/null 2>&1; then
-      open "http://localhost:5173" >/dev/null 2>&1 || true
-    fi
-    echo "Okvir is running at http://localhost:5173 (Press Ctrl+C to stop)"
-    trap "kill $SERVER_PID 2>/dev/null" EXIT INT TERM
-    wait $SERVER_PID
-  elif command -v node >/dev/null 2>&1; then
-    echo "Starting Okvir local engine via Node on http://localhost:5173..."
-    node -e "
-      const http = require('http');
-      const fs = require('fs');
-      const path = require('path');
-      const root = process.env.HOME + '/.okvir/web';
-      const mimes = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json', '.wasm': 'application/wasm' };
-      http.createServer((req, res) => {
-        let f = path.join(root, req.url === '/' ? 'index.html' : req.url);
-        if (!fs.existsSync(f)) f = path.join(root, 'index.html');
-        res.writeHead(200, { 'Content-Type': mimes[path.extname(f)] || 'application/octet-stream' });
-        fs.createReadStream(f).pipe(res);
-      }).listen(5173, () => {});
-    " &
-    SERVER_PID=$!
-    sleep 0.8
-    if command -v xdg-open >/dev/null 2>&1; then
-      xdg-open "http://localhost:5173" >/dev/null 2>&1 || true
-    elif command -v open >/dev/null 2>&1; then
-      open "http://localhost:5173" >/dev/null 2>&1 || true
-    fi
-    echo "Okvir is running at http://localhost:5173 (Press Ctrl+C to stop)"
-    trap "kill $SERVER_PID 2>/dev/null" EXIT INT TERM
-    wait $SERVER_PID
-  fi
-else
-  echo "Please install Node.js 18+ or Python 3 to launch Okvir, or visit https://github.com/zuikre/okvir/releases"
+if [ "${INSTALLED}" != "true" ]; then
+  echo "${RED}Error: Could not download native desktop release for ${PLATFORM} (${TARGET_ARCH}).${RESET}"
+  echo "Please download the desktop installer manually from:"
+  echo "  https://github.com/${OKVIR_REPO}/releases"
   exit 1
-fi
-LAUNCHER
-  chmod +x "${INSTALL_DIR}/okvir"
-  echo "${GREEN}✔ Created launcher stub at ${INSTALL_DIR}/okvir${RESET}"
 fi
 
 # 5. Verify PATH Configuration

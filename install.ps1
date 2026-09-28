@@ -49,73 +49,30 @@ try {
     Write-Host "! Desktop installer exe packaging in progress on GitHub CI." -ForegroundColor Yellow
 }
 
-if ($DownloadSuccess -and (Test-Path $InstallerTmp)) {
-    Write-Host "==> Executing silent current-user installer..." -ForegroundColor Gray
-    Start-Process -FilePath $InstallerTmp -ArgumentList "/S", "/currentuser" -Wait
-    Write-Host "✔ Okvir installed successfully!" -ForegroundColor Green
-} else {
-    Write-Host "==> Fetching Okvir standalone distribution ($Version)..." -ForegroundColor Gray
-    $WebZipUrl = "https://github.com/$Repo/releases/download/v1.0.0/okvir-web-v1.0.0.zip"
-    $WebZipTmp = "$env:TEMP\okvir-web.zip"
-    $WebDest = "$env:USERPROFILE\.okvir\web"
+}
+
+if (-not $DownloadSuccess) {
+    # Check for standalone native zip package
+    $ZipAssetName = "okvir-windows-x64.zip"
+    $ZipReleaseUrl = "https://github.com/$Repo/releases/latest/download/$ZipAssetName"
+    $ZipTmp = "$env:TEMP\$ZipAssetName"
 
     try {
-        Invoke-WebRequest -Uri $WebZipUrl -OutFile $WebZipTmp -UseBasicParsing -TimeoutSec 30
-        Expand-Archive -Path $WebZipTmp -DestinationPath $WebDest -Force
-        Write-Host "✔ Installed Okvir standalone web engine to $WebDest" -ForegroundColor Green
+        Write-Host "==> Trying standalone desktop package ($ZipAssetName)..." -ForegroundColor Gray
+        Invoke-WebRequest -Uri $ZipReleaseUrl -OutFile $ZipTmp -UseBasicParsing -TimeoutSec 30
+        Expand-Archive -Path $ZipTmp -DestinationPath $InstallDir -Force
+        $DownloadSuccess = $true
+        Write-Host "✔ Okvir native desktop package installed to $InstallDir!" -ForegroundColor Green
     } catch {
-        Write-Host "! Web archive fallback skipped." -ForegroundColor Gray
+        Write-Host "! Standalone desktop package not found." -ForegroundColor Gray
     }
+}
 
-    # Download portable CLI script
-    $CliDestDir = "$env:USERPROFILE\.okvir\bin"
-    New-Item -ItemType Directory -Path $CliDestDir -Force | Out-Null
-    $CliScriptUrl = "https://raw.githubusercontent.com/$Repo/main/bin/okvir.js"
-    try {
-        Invoke-WebRequest -Uri $CliScriptUrl -OutFile "$CliDestDir\okvir.js" -UseBasicParsing -TimeoutSec 15
-    } catch {
-        Write-Host "! CLI script download skipped." -ForegroundColor Gray
-    }
-
-    Write-Host "! Generating lightweight Okvir CMD launcher stub..." -ForegroundColor Yellow
-    $CmdStub = @"
-@echo off
-set APP_DIR=%USERPROFILE%\.okvir
-if not "%~1"=="" (
-  if exist "%CD%\bin\okvir.js" (
-    node "%CD%\bin\okvir.js" %*
-    exit /b %ERRORLEVEL%
-  )
-  if exist "%APP_DIR%\bin\okvir.js" (
-    node "%APP_DIR%\bin\okvir.js" %*
-    exit /b %ERRORLEVEL%
-  )
-)
-if exist "%CD%\package.json" (
-  npm run dev
-  exit /b %ERRORLEVEL%
-)
-if exist "%APP_DIR%\web\index.html" (
-  where python >nul 2>nul
-  if %ERRORLEVEL% EQU 0 (
-    echo Starting Okvir local engine on http://localhost:5173...
-    start http://localhost:5173
-    cd /d "%APP_DIR%\web" && python -m http.server 5173
-    exit /b 0
-  )
-  where node >nul 2>nul
-  if %ERRORLEVEL% EQU 0 (
-    echo Starting Okvir local engine on http://localhost:5173...
-    start http://localhost:5173
-    node -e "const http=require('http'),fs=require('fs'),path=require('path'),root=process.env.USERPROFILE+'/.okvir/web',m={'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json','.wasm':'application/wasm'};http.createServer((q,s)=>{let f=path.join(root,q.url==='/'?'index.html':q.url);if(!fs.existsSync(f))f=path.join(root,'index.html');s.writeHead(200,{'Content-Type':m[path.extname(f)]||'application/octet-stream'});fs.createReadStream(f).pipe(s);}).listen(5173);"
-    exit /b 0
-  )
-)
-echo Please install Node.js 18+ or Python 3 to launch Okvir.
-exit /b 1
-"@
-    Set-Content -Path "$BinDir\okvir.cmd" -Value $CmdStub
-    Write-Host "✔ Created launcher stub at $BinDir\okvir.cmd" -ForegroundColor Green
+if (-not $DownloadSuccess) {
+    Write-Host "`nError: Native desktop package could not be downloaded for Windows ($Arch)." -ForegroundColor Red
+    Write-Host "Please download the Windows desktop installer manually from:"
+    Write-Host "  https://github.com/$Repo/releases`n"
+    exit 1
 }
 
 # 4. Ensure BinDir is in User PATH
