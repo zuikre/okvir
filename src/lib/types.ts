@@ -15,7 +15,8 @@ export type SimulationType =
   | 'attention'
   | 'conv'
   | 'regularization'
-  | 'simpson';
+  | 'simpson'
+  | 'anscombe';
 
 export type LessonStatus = 'locked' | 'available' | 'in_progress' | 'mastered' | 'decaying';
 

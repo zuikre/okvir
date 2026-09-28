@@ -12,6 +12,7 @@ import { AttentionHeatmapCanvas } from './AttentionHeatmapCanvas';
 import { ConvolutionFilterCanvas } from './ConvolutionFilterCanvas';
 import { RegularizationGeometryCanvas } from './RegularizationGeometryCanvas';
 import { SimpsonsParadoxLab } from './SimpsonsParadoxLab';
+import { AnscombesQuartetLab } from './AnscombesQuartetLab';
 
 interface Props {
   type: SimulationType;
@@ -45,6 +46,8 @@ export const SimulationView: React.FC<Props> = ({ type, compact, highlightedElem
       return <RegularizationGeometryCanvas compact={compact} />;
     case 'simpson':
       return <SimpsonsParadoxLab />;
+    case 'anscombe':
+      return <AnscombesQuartetLab compact={compact} />;
     default:
       return <LinearRegressionResiduals compact={compact} highlightedElement={highlightedElement} />;
   }

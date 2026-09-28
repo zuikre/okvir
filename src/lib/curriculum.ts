@@ -17,7 +17,7 @@ export const tracks: Track[] = [
     color: '#10b981',
     colorAr: '#10b981',
     icon: 'Code2',
-    modules: ['numpy-vectorization', 'pandas-dataframe', 'sql-window-functions'],
+    modules: ['numpy-vectorization', 'pandas-dataframe', 'sql-window-functions', 'eda-anscombe'],
   },
   {
     id: 'econometrics',
@@ -26,7 +26,7 @@ export const tracks: Track[] = [
     color: '#f59e0b',
     colorAr: '#f59e0b',
     icon: 'TrendingUp',
-    modules: ['ols-residual-geometry', 'knn-classification', 'kmeans-clustering', 'decision-trees', 'ridge-lasso'],
+    modules: ['ols-residual-geometry', 'knn-classification', 'kmeans-clustering', 'decision-trees', 'ridge-lasso', 'causal-inference-confounding'],
   },
   {
     id: 'deeplearning',
@@ -724,6 +724,112 @@ FROM employees;`,
       },
     ],
   },
+  {
+    id: 'eda-anscombe',
+    title: "EDA & Anscombe's Quartet",
+    titleAr: 'استكشاف البيانات ورباعية أنسكوم',
+    trackId: 'programming',
+    estimatedMinutes: 6,
+    description: {
+      en: 'Why summary statistics lie: identical mean and variance with radically different distributions.',
+      ar: 'لماذا تضلل الإحصاءات الموجزة: متوسطات وتباينات متطابقة مع توزيعات متباينة تماماً.',
+    },
+    prerequisites: ['pandas-dataframe'],
+    x: 340,
+    y: 500,
+    beats: [
+      {
+        number: 1,
+        type: 'intuition',
+        simulation: 'anscombe',
+        narrative: {
+          en: 'All 4 datasets share the exact same mean (9.0, 7.5) and regression line (y = 3.0 + 0.5x). Drag points to see the statistics react!',
+          ar: 'المجموعات الأربع تشترك في نفس المتوسط تماماً (9.0، 7.5) ونفس خط الانحدار (y = 3.0 + 0.5x). اسحب النقاط لترى تفاعل الإحصاءات!',
+        },
+      },
+      {
+        number: 2,
+        type: 'formal',
+        formula: '\\bar{x} = 9.0 \\quad \\bar{y} = 7.5 \\quad \\hat{y} = 3.0 + 0.5x \\quad R^2 = 0.67',
+        formulaNote: {
+          en: 'Numerical summaries compress high-dimensional geometry into scalar projections, hiding non-linear structure.',
+          ar: 'الملخصات العددية تضغط الهندسة عالية الأبعاد في مساقط سلمية، وتخفي البنية غير الخطية والقيم الشاذة.',
+        },
+        narrative: {
+          en: 'Summary statistics alone are never sufficient to characterize distributions — visual inspection is mandatory in EDA.',
+          ar: 'الإحصاءات الموجزة وحدها لا تكفي أبداً لتوصيف التوزيعات — الفحص البصري إلزامي في تحليل البيانات الاستكشافي.',
+        },
+      },
+      {
+        number: 3,
+        type: 'code',
+        code: {
+          id: 'py-anscombe-summary',
+          starterCode: `import numpy as np
+
+def verify_anscombe_invariants(x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
+    # TODO: Compute sample means of X and Y
+    mx = float(np.mean(x))
+    my = float(np.round(np.mean(y), 2))
+    return (mx, my)`,
+          testCases: [
+            { input: 'x=[10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5], y=[8.04, 6.95, 7.58, 8.81, 8.33, 9.96, 7.24, 4.26, 10.84, 4.82, 5.68]', expected: '(9.0, 7.5)' },
+          ],
+          expectedOutput: '(9.0, 7.5)',
+        },
+        narrative: {
+          en: 'Implement the invariant mean calculation in NumPy.',
+          ar: 'طبّق حساب المتوسطات الثابتة باستخدام NumPy.',
+        },
+      },
+      {
+        number: 4,
+        type: 'transfer',
+        question: {
+          prompt: {
+            en: 'Why do all four Anscombe datasets yield the identical OLS regression line y = 3.0 + 0.5x?',
+            ar: 'لماذا تنتج مجموعات أنسكوم الأربع نفس خط انحدار OLS تماماً: y = 3.0 + 0.5x؟',
+          },
+          options: [
+            {
+              text: {
+                en: 'OLS slope and intercept depend exclusively on first and second moments (means, variances, covariance) which happen to match.',
+                ar: 'معاملات OLS تعتمد حصرياً على العزوم الأولى والثانية (المتوسطات، التباينات، التباين المشترك) والتي تتطابق صدفة في هذه المجموعات.',
+              },
+              correct: true,
+              explanation: {
+                en: 'Correct! The normal equation beta = (X^T X)^(-1) X^T y compresses data into sample moments, remaining blind to outliers and non-linear curvature.',
+                ar: 'صحيح! معادلات OLS تختزل البيانات في عينات التباين والمتوسط فقط، ولا تستشعر الانحناء غير الخطي أو القيم الشاذة بمفردها.',
+              },
+            },
+            {
+              text: {
+                en: 'Because Anscombe generated the points using a uniform random distribution.',
+                ar: 'لأن أنسكوم ولّد النقاط باستخدام توزيع عشوائي منتظم.',
+              },
+              correct: false,
+              explanation: {
+                en: 'Anscombe specifically hand-crafted the exact coordinates to deceive summary statistics.',
+                ar: 'أنسكوم قام بتصميم الإحداثيات يدوياً وبدقة فائقة لخداع المقاييس الإحصائية.',
+              },
+            },
+            {
+              text: {
+                en: 'Because R² is equal to 1.0 for all four datasets.',
+                ar: 'لأن R² يساوي 1.0 لجميع المجموعات الأربع.',
+              },
+              correct: false,
+              explanation: {
+                en: 'R² is 0.67, not 1.0, reflecting moderate variance explanation.',
+                ar: 'قيمة R² هي 0.67 وليست 1.0.',
+              },
+            },
+          ],
+        },
+        narrative: { en: '', ar: '' },
+      },
+    ],
+  },
 
   // Track 3: Econometrics & ML
   {
@@ -1211,6 +1317,112 @@ def ridge_loss(y, y_hat, weights, lam):
               explanation: {
                 en: 'The data/features ratio is not the deciding factor — it is about expected sparsity.',
                 ar: 'نسبة البيانات/الميزات ليست العامل الحاسم — بل التوقعات حول التناثر.',
+              },
+            },
+          ],
+        },
+        narrative: { en: '', ar: '' },
+      },
+    ],
+  },
+  {
+    id: 'causal-inference-confounding',
+    title: 'Causal Inference & Confounding',
+    titleAr: 'الاستدلال السببي والخلط',
+    trackId: 'econometrics',
+    estimatedMinutes: 8,
+    description: {
+      en: "Simpson's paradox: how omitted confounders reverse regression slopes, and how stratification uncovers truth.",
+      ar: 'مفارقة سيمبسون: كيف تقلب المتغيرات المربكة ميل الانحدار، وكيف يكشف التقسيم الطبقي الحقيقة.',
+    },
+    prerequisites: ['ols-residual-geometry'],
+    x: 560,
+    y: 780,
+    beats: [
+      {
+        number: 1,
+        type: 'intuition',
+        simulation: 'simpson',
+        narrative: {
+          en: 'Toggle between Pooled and Stratified regression. Notice how older cohorts exercise more but have higher baseline risk, flipping the apparent slope!',
+          ar: 'بدّل بين الانحدار المجمّع والانحدار الطبقي. لاحظ كيف تمارس الفئات الأكبر سناً رياضة أكثر ولكن لديها مخاطر أساسية أعلى، مما يقلب الميل الظاهري!',
+        },
+      },
+      {
+        number: 2,
+        type: 'formal',
+        formula: '\\hat{\\beta}_{\\text{naive}} = \\beta_{\\text{true}} + \\gamma \\cdot \\frac{\\text{Cov}(X, Z)}{\\text{Var}(X)}',
+        formulaNote: {
+          en: 'Omitted Variable Bias (OVB): Naive regression absorbs the indirect path through the confounder.',
+          ar: 'انحياز المتغير المحذوف (OVB): الانحدار البسيط يمتص المسار غير المباشر عبر المتغير المربك.',
+        },
+        narrative: {
+          en: 'In observational data, correlation can have the exact opposite sign of the true causal effect due to confounder bias.',
+          ar: 'في البيانات الرصدية، يمكن أن يحمل الارتباط إشارة معاكسة تماماً للتأثير السببي الحقيقي بسبب انحياز المتغيرات المربكة.',
+        },
+      },
+      {
+        number: 3,
+        type: 'code',
+        code: {
+          id: 'py-omitted-variable-bias',
+          starterCode: `import numpy as np
+
+def compute_naive_beta(beta_true: float, gamma: float, cov_xz: float, var_x: float) -> float:
+    # TODO: Compute naive beta under omitted variable bias
+    bias = gamma * (cov_xz / var_x)
+    return float(beta_true + bias)`,
+          testCases: [
+            { input: 'beta_true=2.0, gamma=-3.0, cov_xz=2.0, var_x=4.0', expected: '0.5' },
+            { input: 'beta_true=1.0, gamma=0.0, cov_xz=5.0, var_x=2.0', expected: '1.0' },
+          ],
+          expectedOutput: '0.5',
+        },
+        narrative: {
+          en: 'Implement the Omitted Variable Bias equation in Python.',
+          ar: 'طبّق معادلة انحياز المتغير المحذوف بلغة بايثون.',
+        },
+      },
+      {
+        number: 4,
+        type: 'transfer',
+        question: {
+          prompt: {
+            en: 'In an observational study where treatment X correlates with confounder Z, when does naive OLS yield an unbiased causal estimate?',
+            ar: 'في دراسة رصدية يرتبط فيها العلاج X بالمتغير المربك Z، متى يعطي OLS البسيط تقديراً سببية غير متحيّز؟',
+          },
+          options: [
+            {
+              text: {
+                en: 'Only when gamma = 0 (confounder Z has no effect on outcome Y) OR Cov(X, Z) = 0.',
+                ar: 'فقط عندما يكون gamma = 0 (المربك Z ليس له تأثير على النتيجة Y) أو Cov(X, Z) = 0.',
+              },
+              correct: true,
+              explanation: {
+                en: 'Correct! The bias term is gamma * Cov(X, Z) / Var(X). If either gamma=0 or Cov(X,Z)=0, the bias vanishes.',
+                ar: 'صحيح! حد الانحياز هو gamma * Cov(X, Z) / Var(X). إذا كان أحدهما صفراً، يتلاشى الانحياز تماماً.',
+              },
+            },
+            {
+              text: {
+                en: 'Whenever the sample size N exceeds 100,000 observations.',
+                ar: 'كلما زاد حجم العينة N عن 100,000 مشاهدة.',
+              },
+              correct: false,
+              explanation: {
+                en: 'Omitted Variable Bias is asymptotic — increasing sample size only makes you precisely wrong with narrower confidence intervals!',
+                ar: 'انحياز المتغير المحذوف هو انحياز تقاربي — زيادة حجم العينة تجعلك واثقاً بدقة من إجابة خاطئة!',
+              },
+            },
+            {
+              text: {
+                en: 'When the outcome Y is normalized to zero mean and unit variance.',
+                ar: 'عندما يتم تطبيع النتيجة Y ليكون متوسطها صفراً وتباينها واحداً.',
+              },
+              correct: false,
+              explanation: {
+                en: 'Standardizing variables rescales coefficients but does not eliminate confounding paths.',
+                ar: 'المعايرة تغير مقياس المعاملات فقط لكنها لا تلغي مسارات الخلط السببي.',
               },
             },
           ],

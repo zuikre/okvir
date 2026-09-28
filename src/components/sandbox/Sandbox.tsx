@@ -18,7 +18,8 @@ const SIMULATION_MODULE_MAP: Record<SimulationType, string> = {
   neural: 'perceptron-activation',
   conv: 'cnn-convolution',
   attention: 'transformer-attention',
-  simpson: 'ols-residual-geometry',
+  simpson: 'causal-inference-confounding',
+  anscombe: 'eda-anscombe',
 };
 
 const SIM_TABS: { type: SimulationType; label: { en: string; ar: string } }[] = [
@@ -34,6 +35,7 @@ const SIM_TABS: { type: SimulationType; label: { en: string; ar: string } }[] = 
   { type: 'conv', label: { en: '2D Convolution', ar: 'الالتفاف المكاني 2D' } },
   { type: 'regularization', label: { en: 'L1 vs L2 Geometry', ar: 'هندسة الانتظام L1/L2' } },
   { type: 'simpson', label: { en: "Simpson's Paradox", ar: 'مفارقة سيمبسون' } },
+  { type: 'anscombe', label: { en: "Anscombe's Quartet", ar: 'رباعية أنسكوم' } },
 ];
 
 export const Sandbox: React.FC = () => {
