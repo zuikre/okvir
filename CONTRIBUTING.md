@@ -1,4 +1,4 @@
-# Contributing to OKVIR (إطار)
+# Contributing to OKVIR
 
 Thank you for your interest in contributing to **Okvir**! Okvir is an open-source, interactive desktop framework for learning Data Science, Econometrics, and AI from first principles.
 

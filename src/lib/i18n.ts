@@ -2,7 +2,7 @@ import type { Language } from './types';
 
 export const t = {
   // Shell
-  appName: { en: 'OKVIR', ar: 'إطار' },
+  appName: { en: 'OKVIR', ar: 'OKVIR' },
   searchPlaceholder: { en: 'Quick Search or Jump to Concept...', ar: 'ابحث عن مفهوم أو درس...' },
   close: { en: 'Close', ar: 'إغلاق' },
   minimize: { en: 'Minimize', ar: 'تصغير' },

@@ -69,7 +69,7 @@ export const MILESTONE_BADGES: MilestoneBadge[] = [
   {
     id: 'badge-okvir-fellow',
     name: 'Okvir Fellow: Master of AI Foundations',
-    nameAr: 'زميل إطار: خبير أسس الذكاء الاصطناعي',
+    nameAr: 'زميل Okvir: خبير أسس الذكاء الاصطناعي',
     description: 'Completed the entire 23-module foundational curriculum from first principles with full zero-shot transfer verification.',
     descriptionAr: 'إتمام كامل المنهج التأسيسي المكون من 23 وحدة من المبادئ الأولى مع التحقق التطبيقي التام.',
     criteria: 'Master all 23 curriculum modules across all 4 foundational tracks',
@@ -112,7 +112,7 @@ export function generateVerifiableCredential(badge: MilestoneBadge, username: st
     issuer: {
       id: 'did:okvir:local-desktop-engine',
       type: 'Profile',
-      name: 'OKVIR (إطار) Desktop Learning Framework',
+      name: 'OKVIR Desktop Learning Framework',
       url: 'https://github.com/zuikre/okvir',
     },
     validFrom: issuedDate,

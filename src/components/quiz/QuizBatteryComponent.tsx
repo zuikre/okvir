@@ -196,7 +196,7 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
                   ? 'أظهرت استيعاباً رصيناً للمفاهيم الرياضية والهندسية، وخلو مسارك الفكري من الشراك والمفاهيم الخاطئة. تم فتح زر حصد الـ 100 XP واعتماد الدرس في خريطة المعرفة.'
                   : 'You demonstrated robust mastery of mathematical boundaries and avoided theoretical traps. The Claim Mastery button below is now unlocked.'
                 : isAr
-                ? 'يشترط إطار إحراز نسبة ٧٥٪ على الأقل لاعتماد الدرس ومنع التقدم الوهمي غير المستحق. راجع المفاهيم التي تعثرت فيها وأعد التحدي.'
+                ? 'يشترط Okvir إحراز نسبة ٧٥٪ على الأقل لاعتماد الدرس ومنع التقدم الوهمي غير المستحق. راجع المفاهيم التي تعثرت فيها وأعد التحدي.'
                 : 'Okvir enforces strict mastery gating (≥ 75%) to prevent unearned progress. Review the diagnostics below and retry to unlock your certification.'}
             </p>
           </div>

@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 const VERSION = '1.0.0';
 
 const HELP_TEXT = `
-  OKVIR (إطار) CLI v${VERSION}
+  OKVIR CLI v${VERSION}
   The Open-Source Desktop Framework for Learning Data Science & AI
 
   USAGE:
@@ -40,7 +40,7 @@ const HELP_TEXT = `
 function logBanner() {
   console.log(`\x1b[36m
   ╔══════════════════════════════════════════════════════╗
-  ║   OKVIR (إطار) - Interactive AI Curriculum Engine    ║
+  ║       OKVIR - Interactive AI Curriculum Engine       ║
   ╚══════════════════════════════════════════════════════╝\x1b[0m`);
 }
 

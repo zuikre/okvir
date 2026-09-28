@@ -720,7 +720,7 @@ export const SkillTree: React.FC = () => {
 
               <div>
                 <h3 className="text-lg font-bold text-[var(--text-primary)]">
-                  {language === 'ar' ? 'وسام زميل إطار: خبير أسس الذكاء الاصطناعي' : 'Okvir Fellow: Sovereign AI Mastery'}
+                  {language === 'ar' ? 'وسام زميل Okvir: خبير أسس الذكاء الاصطناعي' : 'Okvir Fellow: Sovereign AI Mastery'}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-1">
                   {language === 'ar'

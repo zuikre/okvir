@@ -1,10 +1,10 @@
 <div align="center">
 
-# OKVIR (إطار)
+# OKVIR
 ### The Open-Source, Interactive Desktop Framework for Learning Data Science, Econometrics & AI from the Ground Up
 
 [![CI / CD Status](https://img.shields.io/badge/CI%2FCD-Passing-10b981.svg?style=flat-square&logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
-[![Release](https://img.shields.io/badge/release-v1.0.0-emerald.svg?style=flat-square)](https://github.com/zuikre/okvir/releases)
+[![Release](https://img.shields.io/badge/release-v1.0.1-emerald.svg?style=flat-square)](https://github.com/zuikre/okvir/releases)
 [![License: MIT or Apache-2.0](https://img.shields.io/badge/Engine-MIT%20%7C%20Apache--2.0-3b82f6.svg?style=flat-square)](LICENSE-MIT)
 [![Curriculum: CC-BY-SA 4.0](https://img.shields.io/badge/Curriculum-CC--BY--SA%204.0-f59e0b.svg?style=flat-square)](https://creativecommons.org/licenses/by-sa/4.0/)
 [![Platforms](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-8b5cf6.svg?style=flat-square)](#-download--installation)
@@ -31,7 +31,7 @@ They quit because on **Day 1**, they spend 4 hours wrestling with Anaconda envir
 
 And when they finally get Python running? They are met with passive 45-minute video lectures and blackboard proofs that treat linear algebra like an abstract memorization drill instead of geometric intuition.
 
-**Okvir (إطار)** eliminates the DevOps tax on learning forever.
+**Okvir** eliminates the DevOps tax on learning forever.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -83,7 +83,7 @@ npm run tauri dev
 
 ## 🔬 Comparison Matrix: Why Okvir Wins
 
-| Feature / Dimension | Brilliant.org | Duolingo | Jupyter / Colab | Coursera / Udemy | **OKVIR (إطار)** |
+| Feature / Dimension | Brilliant.org | Duolingo | Jupyter / Colab | Coursera / Udemy | **OKVIR** |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Pricing** | $150+/year paywall | Freemium (Ads) | Free | $49–$79/month | **100% Free & Open-Source** |
 | **Setup Friction** | Zero (Web) | Zero (Mobile) | Severe (Local envs) | Moderate | **Zero (One-click desktop)** |

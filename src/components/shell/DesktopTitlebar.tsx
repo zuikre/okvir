@@ -72,10 +72,10 @@ export const DesktopTitlebar: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold tracking-wider font-mono text-[var(--text-primary)]">
-              OKVIR <span className="text-[var(--text-secondary)] font-sans font-normal">(إطار)</span>
+              OKVIR
             </span>
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-[var(--text-secondary)] border border-[var(--border-strong)]">
-              v1.0.0
+              v1.0.1
             </span>
           </div>
         </div>

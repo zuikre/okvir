@@ -1,4 +1,4 @@
-# OKVIR (إطار): System Architecture & Technical Specifications
+# OKVIR: System Architecture & Technical Specifications
 
 > **System Topology:** Embedded SQLite (WAL Mode) ➔ Tauri v2 (Rust 1.80+) ➔ Pyodide WASM Worker ➔ React 18/19 + Tailwind CSS  
 > **Author & Architect:** **Zakarya Roubhi (روبحي زكرياء)** — Data Scientist, MSc Data Science (ESE Oran), Co-Founder & CTO of Podacium  

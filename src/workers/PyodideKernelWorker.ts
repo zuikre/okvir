@@ -1,5 +1,5 @@
 /**
- * OKVIR (إطار) - Pyodide WASM Python & DuckDB SQL Kernel Worker
+ * OKVIR - Pyodide WASM Python & DuckDB SQL Kernel Worker
  * Executes Python code challenges, runs AST validation, captures headless stdout/stderr,
  * and handles interrupt signals via SharedArrayBuffer.
  * Implements PRD Section 3 (Zero-Setup WASM Engine) & Section 10 (SQL & Analytical Kernels).

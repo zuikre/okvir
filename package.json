@@ -2,7 +2,7 @@
   "name": "okvir",
   "private": true,
   "version": "1.0.1",
-  "description": "OKVIR (إطار): The Open-Source Desktop Framework for Learning Data Science, Econometrics & AI",
+  "description": "OKVIR: The Open-Source Desktop Framework for Learning Data Science, Econometrics & AI",
   "author": "Zakarya Roubhi <contact@okvir.dev>",
   "license": "MIT OR Apache-2.0",
   "type": "module",

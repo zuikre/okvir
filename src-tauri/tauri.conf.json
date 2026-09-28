@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "OKVIR (إطار) — The Frame for AI",
+        "title": "OKVIR — The Frame for AI",
         "width": 1280,
         "height": 840,
         "minWidth": 960,

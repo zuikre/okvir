@@ -1,5 +1,5 @@
 -- ============================================================================
--- OKVIR (إطار): Embedded SQLite Schema (WAL Mode)
+-- OKVIR: Embedded SQLite Schema (WAL Mode)
 -- High-Performance Local-First Persistence for Technical Education
 -- ============================================================================
 

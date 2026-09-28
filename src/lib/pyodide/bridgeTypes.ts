@@ -1,5 +1,5 @@
 /**
- * OKVIR (إطار) - Reactive WASM Code-to-Canvas Bridge Protocol
+ * OKVIR - Reactive WASM Code-to-Canvas Bridge Protocol
  * Types for zero-copy Transferable ArrayBuffers, Variable Inspector, and Pyodide Worker
  */
 

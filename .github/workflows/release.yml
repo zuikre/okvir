@@ -30,7 +30,7 @@ jobs:
               repo: context.repo.repo,
               tag_name: context.ref.replace('refs/tags/', ''),
               name: `Okvir ${context.ref.replace('refs/tags/', '')}`,
-              body: 'OKVIR (إطار): The Open-Source Desktop Framework for Learning Data Science, Econometrics & AI.',
+              body: 'OKVIR: The Open-Source Desktop Framework for Learning Data Science, Econometrics & AI.',
               draft: true,
               prerelease: false
             });

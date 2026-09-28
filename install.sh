@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# OKVIR (إطار) - Official Installer Script for Linux and macOS
+# OKVIR - Official Installer Script for Linux and macOS
 # The Open-Source Desktop Framework for Learning Data Science, Econometrics & AI
 # Repository: https://github.com/zuikre/okvir
 # ==============================================================================
@@ -23,7 +23,7 @@ RED="$(tput setaf 1 2>/dev/null || echo '')"
 echo "${CYAN}"
 cat << 'EOF'
   ╔══════════════════════════════════════════════════════╗
-  ║    OKVIR (إطار) - The Framework for AI Education     ║
+  ║        OKVIR - The Framework for AI Education        ║
   ║       Zero Setup • Pure Intuition • 100% Local       ║
   ╚══════════════════════════════════════════════════════╝
 EOF

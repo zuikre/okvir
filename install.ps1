@@ -1,5 +1,5 @@
 # ==============================================================================
-# OKVIR (إطار) - Official PowerShell Installer for Windows 10/11
+# OKVIR - Official PowerShell Installer for Windows 10/11
 # Current-User mode: Zero Administrator / UAC Prompts required
 # Repository: https://github.com/zuikre/okvir
 # ==============================================================================
@@ -13,7 +13,7 @@ $ErrorActionPreference = "Stop"
 
 Write-Host "
   ╔══════════════════════════════════════════════════════╗
-  ║    OKVIR (إطار) - The Framework for AI Education     ║
+  ║        OKVIR - The Framework for AI Education        ║
   ║       Zero Setup • Pure Intuition • 100% Local       ║
   ╚══════════════════════════════════════════════════════╝
 " -ForegroundColor Cyan

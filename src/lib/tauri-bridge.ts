@@ -1,5 +1,5 @@
 /**
- * OKVIR (إطار) - Native Rust Engine (Tauri v2) Typed IPC Bridge
+ * OKVIR - Native Rust Engine (Tauri v2) Typed IPC Bridge
  * Provides typed wrappers for desktop window vibrancy, SQLite WAL queries,
  * chunk signature verification, and battery-aware power governor.
  */

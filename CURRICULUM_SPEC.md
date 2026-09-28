@@ -1,4 +1,4 @@
-# OKVIR (إطار): Curriculum DSL & Authoring Specification
+# OKVIR: Curriculum DSL & Authoring Specification
 
 > **Specification Version:** `1.0.0-DSL`  
 > **Format Extension:** `.okvir.md`  
