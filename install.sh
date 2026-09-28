@@ -94,18 +94,23 @@ echo "${BOLD}==> Fetching Okvir Native Desktop Application (${OKVIR_VERSION})...
 INSTALLED=false
 
 if [ "${PLATFORM}" = "linux" ]; then
-  TAR_ASSET="okvir-linux-${TARGET_ARCH}.tar.gz"
-  BIN_ASSET="okvir-linux-${TARGET_ARCH}"
-  APPIMAGE_ASSET="okvir-linux-${TARGET_ARCH}.AppImage"
+  ARCH_SUFFIX="amd64"
+  [ "${TARGET_ARCH}" = "aarch64" ] && ARCH_SUFFIX="arm64"
 
   TMP_DIR="$(mktemp -d)"
 
-  echo "Downloading Linux desktop bundle (${TAR_ASSET})..."
-  if download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/${TAR_ASSET}" "${TMP_DIR}/${TAR_ASSET}" 2>/dev/null || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/download/v1.0.0/${TAR_ASSET}" "${TMP_DIR}/${TAR_ASSET}" 2>/dev/null; then
-    tar -xzf "${TMP_DIR}/${TAR_ASSET}" -C "${TMP_DIR}"
-    chmod +x "${TMP_DIR}/okvir"
-    mv "${TMP_DIR}/okvir" "${INSTALL_DIR}/okvir"
+  echo "Downloading Linux desktop application..."
+  if download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_1.0.1_${ARCH_SUFFIX}.AppImage" "${INSTALL_DIR}/okvir" 2>/dev/null || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/download/v1.0.1/OKVIR_1.0.1_${ARCH_SUFFIX}.AppImage" "${INSTALL_DIR}/okvir" 2>/dev/null || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" 2>/dev/null || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/download/v1.0.0/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" 2>/dev/null; then
+
+    if [ -f "${TMP_DIR}/okvir.tar.gz" ]; then
+      tar -xzf "${TMP_DIR}/okvir.tar.gz" -C "${TMP_DIR}"
+      chmod +x "${TMP_DIR}/okvir"
+      mv "${TMP_DIR}/okvir" "${INSTALL_DIR}/okvir"
+    fi
+    chmod +x "${INSTALL_DIR}/okvir"
 
     # Install FreeDesktop Application Shortcut & Icons
     mkdir -p "${HOME}/.local/share/applications"
@@ -120,28 +125,16 @@ if [ "${PLATFORM}" = "linux" ]; then
     rm -rf "${TMP_DIR}"
     INSTALLED=true
     echo "${GREEN}✔ Installed Native Desktop Executable to ${INSTALL_DIR}/okvir${RESET}"
-    echo "${GREEN}✔ Created Desktop Application Menu launcher (OKVIR)${RESET}"
-
-  elif download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/${BIN_ASSET}" "${INSTALL_DIR}/okvir" 2>/dev/null || \
-       download_file "https://github.com/${OKVIR_REPO}/releases/download/v1.0.0/${BIN_ASSET}" "${INSTALL_DIR}/okvir" 2>/dev/null; then
-    chmod +x "${INSTALL_DIR}/okvir"
-    INSTALLED=true
-    echo "${GREEN}✔ Installed Native Desktop Executable to ${INSTALL_DIR}/okvir${RESET}"
-
-  elif download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/${APPIMAGE_ASSET}" "${INSTALL_DIR}/okvir" 2>/dev/null || \
-       download_file "https://github.com/${OKVIR_REPO}/releases/download/v1.0.0/${APPIMAGE_ASSET}" "${INSTALL_DIR}/okvir" 2>/dev/null; then
-    chmod +x "${INSTALL_DIR}/okvir"
-    INSTALLED=true
-    echo "${GREEN}✔ Installed Native Desktop AppImage to ${INSTALL_DIR}/okvir${RESET}"
   fi
 
 elif [ "${PLATFORM}" = "macos" ]; then
-  DMG_ASSET="Okvir-macOS-${TARGET_ARCH}.dmg"
   DMG_TMP="$(mktemp -d)/okvir.dmg"
 
-  echo "Downloading macOS desktop disk image (${DMG_ASSET})..."
-  if download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/${DMG_ASSET}" "${DMG_TMP}" 2>/dev/null || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/download/v1.0.0/${DMG_ASSET}" "${DMG_TMP}" 2>/dev/null; then
+  echo "Downloading macOS desktop disk image..."
+  if download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_1.0.1_universal.dmg" "${DMG_TMP}" 2>/dev/null || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/download/v1.0.1/OKVIR_1.0.1_universal.dmg" "${DMG_TMP}" 2>/dev/null || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/Okvir-macOS-${TARGET_ARCH}.dmg" "${DMG_TMP}" 2>/dev/null || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/download/v1.0.0/Okvir-macOS-${TARGET_ARCH}.dmg" "${DMG_TMP}" 2>/dev/null; then
     hdiutil attach -nobrowse "${DMG_TMP}" -mountpoint /Volumes/OkvirInstall >/dev/null 2>&1
     cp -R "/Volumes/OkvirInstall/Okvir.app" /Applications/
     hdiutil detach /Volumes/OkvirInstall >/dev/null 2>&1
