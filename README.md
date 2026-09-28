@@ -118,9 +118,9 @@ Never get stuck. Press `H` at any time to reveal a 3-tier scaffolding ladder:
 
 ---
 
-## 🌌 The 4 Foundational Curriculum Tracks
+## 🌌 The 4 Foundational Curriculum Tracks & Knowledge Constellation
 
-Okvir features **23 core modules** across 4 interconnected tracks:
+Okvir features **23 core modules** across 4 interconnected tracks, visualized through an interactive **3-mode pedagogical roadmap system**:
 
 ```
                   ┌───────────────────────────────┐
@@ -158,6 +158,12 @@ Okvir features **23 core modules** across 4 interconnected tracks:
                   │ • Byte-Pair Encoding (BPE)    │
                   └───────────────────────────────┘
 ```
+
+### 🗺️ Tri-Modal Knowledge Navigation
+1. **Duolingo / Brilliant Serpentine Roadmap (`Roadmap`):** An analytical continuous Bézier spline connecting modular checkpoints with tactile 3D pedestals, flowing energy particle dashes (`river-flow`), beacon ping animations for current active lessons, and unit milestone credential gateways.
+2. **Interactive 2D Prerequisite DAG (`Constellation DAG`):** A cosmic 2D star-map spanning 6 depth layers with 22 directed prerequisite splines, reactive dependency highlights upon node hover/selection, and topological prerequisite resolution.
+3. **Track Matrix Architecture (`Matrix`):** A side-by-side columnar view visualizing parallel track progression, mastery percentages, and curriculum completion.
+4. **Hero Progression HUD:** Quick-launch next lesson via `Space`, live mastery percentages, streak counters, and W3C Open Badges 3.0 / Verifiable Credential claims.
 
 ---
 
