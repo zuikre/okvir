@@ -45,41 +45,38 @@ interface DagNodePos {
 }
 
 // 2D Cosmic Topological Coordinates for the Constellation DAG Star-Map
+// Systematically partitioned into 4 disciplinary columns with strictly downward-flowing topological depth
 const DAG_COORDINATES: Record<string, DagNodePos> = {
-  // Layer 0: Root Foundations
-  'linear-algebra-vectors': { x: 180, y: 80 },
-  'bayes-theorem': { x: 420, y: 80 },
-  'sql-window-functions': { x: 680, y: 80 },
-  'bpe-tokenization': { x: 920, y: 80 },
+  // Column 1: Mathematical Foundations (Track center: x = 175)
+  'linear-algebra-vectors': { x: 175, y: 70 },
+  'dot-product-geometry': { x: 175, y: 190 },
+  'gradient-vector': { x: 60, y: 330 },
+  'bayes-theorem': { x: 175, y: 330 },
+  'eigenvalues-eigenvectors': { x: 290, y: 330 },
+  'central-limit-theorem': { x: 175, y: 470 },
 
-  // Layer 1
-  'eigenvalues-eigenvectors': { x: 80, y: 220 },
-  'dot-product-geometry': { x: 220, y: 220 },
-  'numpy-vectorization': { x: 500, y: 220 },
-  'central-limit-theorem': { x: 380, y: 220 },
+  // Column 2: Programming & Data Systems (Track center: x = 470)
+  'numpy-vectorization': { x: 470, y: 70 },
+  'pandas-dataframe': { x: 470, y: 190 },
+  'sql-window-functions': { x: 410, y: 330 },
+  'eda-anscombe': { x: 530, y: 330 },
 
-  // Layer 2
-  'gradient-vector': { x: 100, y: 360 },
-  'kmeans-clustering': { x: 220, y: 360 },
-  'perceptron-activation': { x: 340, y: 360 },
-  'pandas-dataframe': { x: 480, y: 360 },
-  'knn-classification': { x: 620, y: 360 },
-  'decision-trees': { x: 760, y: 360 },
-  'cnn-convolution': { x: 900, y: 360 },
+  // Column 3: Econometrics & Classical ML (Track center: x = 790)
+  'ols-residual-geometry': { x: 790, y: 70 },
+  'knn-classification': { x: 675, y: 190 },
+  'ridge-lasso': { x: 790, y: 190 },
+  'causal-inference-confounding': { x: 905, y: 190 },
+  'kmeans-clustering': { x: 675, y: 330 },
+  'instrumental-variables-2sls': { x: 850, y: 330 },
+  'decision-trees': { x: 675, y: 470 },
 
-  // Layer 3
-  'ols-residual-geometry': { x: 160, y: 500 },
-  'transformer-attention': { x: 340, y: 500 },
-  'gradient-descent': { x: 500, y: 500 },
-  'eda-anscombe': { x: 680, y: 500 },
-
-  // Layer 4
-  'ridge-lasso': { x: 100, y: 640 },
-  'causal-inference-confounding': { x: 240, y: 640 },
-  'autograd-computational-graph': { x: 500, y: 640 },
-
-  // Layer 5
-  'instrumental-variables-2sls': { x: 240, y: 780 },
+  // Column 4: Deep Learning & Modern AI (Track center: x = 1110)
+  'perceptron-activation': { x: 1110, y: 70 },
+  'gradient-descent': { x: 1110, y: 190 },
+  'cnn-convolution': { x: 1045, y: 330 },
+  'autograd-computational-graph': { x: 1175, y: 330 },
+  'transformer-attention': { x: 1045, y: 470 },
+  'bpe-tokenization': { x: 1045, y: 610 },
 };
 
 export const SkillTree: React.FC = () => {
@@ -388,16 +385,16 @@ export const SkillTree: React.FC = () => {
             const milestoneBadge = MILESTONE_BADGES.find((b) => b.id === unit.badgeId);
 
             // Container dimensions for analytical SVG mapping
-            const ROW_HEIGHT = 150;
-            const CONTAINER_WIDTH = 500;
-            const TOTAL_HEIGHT = unit.modules.length * ROW_HEIGHT + 40;
+            const ROW_HEIGHT = 140;
+            const CONTAINER_WIDTH = 440;
+            const TOTAL_HEIGHT = unit.modules.length * ROW_HEIGHT + 50;
 
             // Pre-calculate exact (X, Y) center coordinates for each node
             const nodeCoords = unit.modules.map((_, i) => {
-              const xOffset = Math.sin((i + 0.3) * 1.35) * 115 * (language === 'ar' ? -1 : 1);
+              const xOffset = Math.sin((i + 0.3) * 1.35) * 95 * (language === 'ar' ? -1 : 1);
               return {
                 x: CONTAINER_WIDTH / 2 + xOffset,
-                y: 60 + i * ROW_HEIGHT,
+                y: 70 + i * ROW_HEIGHT,
               };
             });
 
@@ -472,12 +469,13 @@ export const SkillTree: React.FC = () => {
 
                 {/* 2. Unified Serpentine Winding Canvas with Exact Mathematical Links */}
                 <div
-                  className="relative w-full max-w-[500px] mx-auto select-none"
+                  className="relative w-full max-w-[440px] mx-auto select-none"
                   style={{ height: `${TOTAL_HEIGHT}px` }}
                 >
                   {/* Single Unified Full-Unit SVG Overlay connecting all nodes */}
                   <svg
                     viewBox={`0 0 ${CONTAINER_WIDTH} ${TOTAL_HEIGHT}`}
+                    preserveAspectRatio="none"
                     className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"
                   >
                     <defs>
@@ -502,16 +500,11 @@ export const SkillTree: React.FC = () => {
                       const isNextMastered = lessons[nextMod.id]?.status === 'mastered';
                       const isNextActive = lessons[nextMod.id]?.status === 'available' || lessons[nextMod.id]?.status === 'in_progress';
 
-                      // Anchors: from bottom of node i (y + 36) to top of node i+1 (y - 36)
-                      const startX = curr.x;
-                      const startY = curr.y + 36;
-                      const endX = next.x;
-                      const endY = next.y - 36;
-                      const deltaY = endY - startY;
-
-                      const ctrlY1 = startY + deltaY * 0.45;
-                      const ctrlY2 = startY + deltaY * 0.55;
-                      const pathD = `M ${startX} ${startY} C ${startX} ${ctrlY1}, ${endX} ${ctrlY2}, ${endX} ${endY}`;
+                      // Connect center to center: node pedestal sits firmly on top of the pipe
+                      const deltaY = next.y - curr.y;
+                      const ctrlY1 = curr.y + deltaY * 0.5;
+                      const ctrlY2 = curr.y + deltaY * 0.5;
+                      const pathD = `M ${curr.x} ${curr.y} C ${curr.x} ${ctrlY1}, ${next.x} ${ctrlY2}, ${next.x} ${next.y}`;
 
                       const isBothMastered = isCurrentMastered && isNextMastered;
                       const isFlowing = isCurrentMastered && isNextActive;
@@ -523,7 +516,7 @@ export const SkillTree: React.FC = () => {
                             d={pathD}
                             fill="none"
                             stroke="rgba(0,0,0,0.6)"
-                            strokeWidth="10"
+                            strokeWidth="16"
                             strokeLinecap="round"
                           />
 
@@ -531,8 +524,8 @@ export const SkillTree: React.FC = () => {
                           <path
                             d={pathD}
                             fill="none"
-                            stroke="var(--border-subtle)"
-                            strokeWidth="6"
+                            stroke="var(--border-strong)"
+                            strokeWidth="11"
                             strokeLinecap="round"
                           />
 
@@ -543,30 +536,38 @@ export const SkillTree: React.FC = () => {
                             stroke={
                               isBothMastered
                                 ? '#10b981'
-                                : isFlowing
-                                ? unit.color
-                                : isCurrentMastered
+                                : isFlowing || isCurrentMastered
                                 ? unit.color
                                 : 'var(--border-subtle)'
                             }
-                            strokeWidth={isBothMastered || isFlowing ? '4' : '2.5'}
-                            strokeDasharray={isBothMastered ? 'none' : isFlowing ? '8 8' : '4 4'}
-                            className={isFlowing ? 'river-flow' : ''}
+                            strokeWidth="7"
                             strokeLinecap="round"
-                            opacity={isBothMastered || isFlowing ? 1.0 : 0.4}
+                            opacity={isBothMastered || isFlowing ? 1.0 : 0.45}
                           />
 
-                          {/* Inner radiant energy glow for active flowing paths */}
+                          {/* Inner radiant energy glow and animated streaming dashes for active learning path */}
                           {isFlowing && (
-                            <path
-                              d={pathD}
-                              fill="none"
-                              stroke={unit.color}
-                              strokeWidth="8"
-                              opacity="0.3"
-                              filter={`url(#glow-${unit.id})`}
-                              strokeLinecap="round"
-                            />
+                            <>
+                              <path
+                                d={pathD}
+                                fill="none"
+                                stroke={unit.color}
+                                strokeWidth="14"
+                                opacity="0.35"
+                                filter={`url(#glow-${unit.id})`}
+                                strokeLinecap="round"
+                              />
+                              <path
+                                d={pathD}
+                                fill="none"
+                                stroke="#ffffff"
+                                strokeWidth="2.5"
+                                strokeDasharray="6 6"
+                                className="river-flow"
+                                strokeLinecap="round"
+                                opacity="0.85"
+                              />
+                            </>
                           )}
                         </g>
                       );
@@ -584,14 +585,12 @@ export const SkillTree: React.FC = () => {
                     const isLocked = status === 'locked';
                     const isDecaying = status === 'decaying';
 
-                    const leftPercent = (coord.x / CONTAINER_WIDTH) * 100;
-
                     return (
                       <div
                         key={mod.id}
                         className="absolute z-10 flex flex-col items-center"
                         style={{
-                          left: `${leftPercent}%`,
+                          left: `${(coord.x / CONTAINER_WIDTH) * 100}%`,
                           top: `${coord.y}px`,
                           transform: 'translate(-50%, -50%)',
                         }}
@@ -606,7 +605,7 @@ export const SkillTree: React.FC = () => {
                         )}
 
                         {/* 3D Round Node Pedestal */}
-                        <div className="relative group">
+                        <div className="relative group w-20 h-20">
                           {isAvailable && (
                             <div className="absolute inset-0 rounded-full beacon-ping bg-sky-400/40 pointer-events-none" />
                           )}
@@ -615,7 +614,7 @@ export const SkillTree: React.FC = () => {
                             onClick={() => handleNodeClick(mod)}
                             onMouseEnter={() => setHoveredModuleId(mod.id)}
                             onMouseLeave={() => setHoveredModuleId(null)}
-                            className={`relative w-18 h-18 sm:w-20 sm:h-20 rounded-full flex flex-col items-center justify-center font-mono select-none pedestal-3d cursor-pointer ${
+                            className={`relative w-20 h-20 rounded-full flex flex-col items-center justify-center font-mono select-none pedestal-3d cursor-pointer ${
                               isMastered
                                 ? 'bg-gradient-to-b from-emerald-400 to-emerald-600 shadow-[0_6px_0_#065f46,0_12px_24px_rgba(16,185,129,0.35)] text-white'
                                 : isInProgress
@@ -653,8 +652,8 @@ export const SkillTree: React.FC = () => {
                           </button>
                         </div>
 
-                        {/* Node Label Below */}
-                        <div className="mt-2 text-center max-w-[140px]">
+                        {/* Node Label Below inside floating glassmorphic pill */}
+                        <div className="mt-2.5 px-3 py-1 rounded-xl bg-[var(--bg-app)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-center max-w-[150px] shadow-sm">
                           <div className="text-xs font-bold text-[var(--text-primary)] leading-tight truncate">
                             {language === 'ar' ? mod.titleAr : mod.title}
                           </div>
@@ -804,44 +803,97 @@ export const SkillTree: React.FC = () => {
           VIEW MODE 2: INTERACTIVE 2D COSMIC PREREQUISITE STAR-MAP (DAG GRAPH)
          ========================================================================= */}
       {viewMode === 'dag' && (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 space-y-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 space-y-4">
           <div className="flex items-center justify-between text-xs font-mono text-[var(--text-secondary)] border-b border-[var(--border-subtle)] pb-2">
-            <span>
-              {language === 'ar'
-                ? 'مخطط العلاقات السببية والمتطلبات المعرفية (23 عقدة • 22 رابطاً توجيهياً)'
-                : 'Directed Acyclic Graph (DAG) Prerequisite Topology (23 Modules • 22 Directed Edges)'}
+            <span className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
+              <span>
+                {language === 'ar'
+                  ? 'مخطط العلاقات السببية والمتطلبات المعرفية (23 عقدة • 22 رابطاً توجيهياً موثوقاً)'
+                  : 'Directed Acyclic Graph (DAG) Prerequisite Topology (23 Modules • 22 Directed Edges)'}
+              </span>
             </span>
-            <span className="text-[10px] text-[var(--text-tertiary)]">
+            <span className="text-[10px] text-[var(--text-tertiary)] hidden sm:inline">
               {language === 'ar' ? 'مرر الفأرة فوق أي عقدة لإضاءة مسار متطلباتها' : 'Hover any node to highlight dependency lineage'}
             </span>
           </div>
 
           <div className="relative w-full overflow-x-auto rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-2xl">
-            <div className="relative min-w-[1000px] h-[860px]">
-              {/* SVG Edges Layer */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none">
+            <div className="relative min-w-[1260px] h-[720px] select-none">
+              {/* Disciplinary Track Column Headers */}
+              <div className="absolute top-0 left-0 right-0 h-10 flex pointer-events-none z-10 border-b border-[var(--border-subtle)]/40">
+                <div className="absolute left-[175px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-mono font-bold">
+                  <span>📐</span>
+                  <span>{language === 'ar' ? 'الأسس الرياضية' : 'Mathematical Foundations'}</span>
+                </div>
+                <div className="absolute left-[470px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold">
+                  <span>💻</span>
+                  <span>{language === 'ar' ? 'البرمجة والبيانات' : 'Programming & Data'}</span>
+                </div>
+                <div className="absolute left-[790px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold">
+                  <span>📈</span>
+                  <span>{language === 'ar' ? 'الاقتصاد القياسي والتعلم' : 'Econometrics & ML'}</span>
+                </div>
+                <div className="absolute left-[1110px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-bold">
+                  <span>🧠</span>
+                  <span>{language === 'ar' ? 'التعلم العميق والذكاء الاصطناعي' : 'Deep Learning & AI'}</span>
+                </div>
+              </div>
+
+              {/* SVG Edges Layer with UserSpaceOnUse Arrowheads to prevent flashing */}
+              <svg
+                viewBox="0 0 1260 720"
+                className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"
+              >
                 <defs>
+                  {/* Stable Arrowhead Markers: strictly userSpaceOnUse so strokeWidth changes never teleport/flash markers */}
                   <marker
                     id="dag-arrow"
+                    markerUnits="userSpaceOnUse"
                     viewBox="0 0 10 10"
-                    refX="22"
-                    refY="5"
-                    markerWidth="6"
-                    markerHeight="6"
-                    orient="auto-start-reverse"
-                  >
-                    <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--border-strong)" />
-                  </marker>
-                  <marker
-                    id="dag-arrow-active"
-                    viewBox="0 0 10 10"
-                    refX="22"
+                    refX="8"
                     refY="5"
                     markerWidth="7"
                     markerHeight="7"
-                    orient="auto-start-reverse"
+                    orient="auto"
                   >
-                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
+                    <path d="M 1 2 L 8 5 L 1 8 z" fill="#52525b" />
+                  </marker>
+                  <marker
+                    id="dag-arrow-active"
+                    markerUnits="userSpaceOnUse"
+                    viewBox="0 0 10 10"
+                    refX="8"
+                    refY="5"
+                    markerWidth="8"
+                    markerHeight="8"
+                    orient="auto"
+                  >
+                    <path d="M 1 2 L 8 5 L 1 8 z" fill="#38bdf8" />
+                  </marker>
+                  <marker
+                    id="dag-arrow-prereq"
+                    markerUnits="userSpaceOnUse"
+                    viewBox="0 0 10 10"
+                    refX="8"
+                    refY="5"
+                    markerWidth="8"
+                    markerHeight="8"
+                    orient="auto"
+                  >
+                    <path d="M 1 2 L 8 5 L 1 8 z" fill="#f59e0b" />
+                  </marker>
+                  <marker
+                    id="dag-arrow-mastered"
+                    markerUnits="userSpaceOnUse"
+                    viewBox="0 0 10 10"
+                    refX="8"
+                    refY="5"
+                    markerWidth="8"
+                    markerHeight="8"
+                    orient="auto"
+                  >
+                    <path d="M 1 2 L 8 5 L 1 8 z" fill="#10b981" />
                   </marker>
                 </defs>
 
@@ -850,47 +902,78 @@ export const SkillTree: React.FC = () => {
                   const pTo = DAG_COORDINATES[toId];
                   if (!pFrom || !pTo) return null;
 
-                  const isHighlighted =
-                    hoveredModuleId === fromId ||
-                    hoveredModuleId === toId ||
-                    selectedModule?.id === fromId ||
-                    selectedModule?.id === toId;
+                  const isSourceHovered = hoveredModuleId === fromId || selectedModule?.id === fromId;
+                  const isTargetHovered = hoveredModuleId === toId || selectedModule?.id === toId;
+                  const isHighlighted = isSourceHovered || isTargetHovered;
 
                   const isOriginMastered = lessons[fromId]?.status === 'mastered';
+                  const isDestMastered = lessons[toId]?.status === 'mastered';
                   const isDestAvailable = lessons[toId]?.status === 'available' || lessons[toId]?.status === 'in_progress';
                   const isEdgeFlowing = isOriginMastered && isDestAvailable;
 
-                  const deltaY = pTo.y - pFrom.y;
-                  const cY1 = pFrom.y + deltaY * 0.45;
-                  const cY2 = pFrom.y + deltaY * 0.55;
-                  const pathD = `M ${pFrom.x} ${pFrom.y} C ${pFrom.x} ${cY1}, ${pTo.x} ${cY2}, ${pTo.x} ${pTo.y}`;
+                  // Dock precisely at bottom center of origin card (y + 27) and top center of dest card (y - 27)
+                  const startX = pFrom.x;
+                  const startY = pFrom.y + 27;
+                  const endX = pTo.x;
+                  const endY = pTo.y - 27;
+                  const deltaY = endY - startY;
+
+                  // Arc offset for the linear-algebra-vectors -> bayes-theorem transitive shortcut
+                  const isShortcut = fromId === 'linear-algebra-vectors' && toId === 'bayes-theorem';
+                  const arcX = isShortcut ? -60 : 0;
+
+                  const cY1 = startY + deltaY * 0.45;
+                  const cY2 = startY + deltaY * 0.55;
+                  const pathD = `M ${startX} ${startY} C ${startX + arcX} ${cY1}, ${endX + arcX} ${cY2}, ${endX} ${endY}`;
 
                   return (
                     <g key={`dag-edge-${idx}`}>
+                      {/* Drop-shadow background casing to prevent edge crossing artifacts */}
+                      <path
+                        d={pathD}
+                        fill="none"
+                        stroke="var(--bg-surface)"
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                      />
+
+                      {/* Foreground edge spline */}
                       <path
                         d={pathD}
                         fill="none"
                         stroke={
                           isHighlighted
-                            ? '#38bdf8'
+                            ? isSourceHovered
+                              ? '#38bdf8'
+                              : '#f59e0b'
+                            : isOriginMastered && isDestMastered
+                            ? '#10b981'
                             : isEdgeFlowing
                             ? '#10b981'
                             : isOriginMastered
-                            ? 'rgba(16, 185, 129, 0.4)'
+                            ? 'rgba(16, 185, 129, 0.45)'
                             : 'var(--border-subtle)'
                         }
-                        strokeWidth={isHighlighted ? 3 : isEdgeFlowing ? 2.5 : 1.5}
-                        strokeDasharray={isEdgeFlowing ? '6 6' : isOriginMastered ? 'none' : '3 3'}
+                        strokeWidth={isHighlighted ? 2.5 : isEdgeFlowing ? 2 : 1.5}
+                        strokeDasharray={isEdgeFlowing || isHighlighted ? '6 6' : isOriginMastered ? 'none' : '3 3'}
                         className={isEdgeFlowing || isHighlighted ? 'river-flow' : ''}
-                        markerEnd={isHighlighted || isEdgeFlowing ? 'url(#dag-arrow-active)' : 'url(#dag-arrow)'}
-                        opacity={isHighlighted ? 1.0 : isOriginMastered ? 0.7 : 0.3}
+                        markerEnd={
+                          isHighlighted
+                            ? isSourceHovered
+                              ? 'url(#dag-arrow-active)'
+                              : 'url(#dag-arrow-prereq)'
+                            : isOriginMastered && (isDestMastered || isEdgeFlowing)
+                            ? 'url(#dag-arrow-mastered)'
+                            : 'url(#dag-arrow)'
+                        }
+                        opacity={isHighlighted ? 1.0 : isOriginMastered ? 0.75 : 0.35}
                       />
                     </g>
                   );
                 })}
               </svg>
 
-              {/* Render DAG Nodes */}
+              {/* Render DAG Node Cards: self-contained 110x54px tactile cards */}
               {curriculum.map((mod) => {
                 const pos = DAG_COORDINATES[mod.id] || { x: 500, y: 400 };
                 const progress = lessons[mod.id];
@@ -901,58 +984,87 @@ export const SkillTree: React.FC = () => {
                 const isLocked = status === 'locked';
 
                 const isHovered = hoveredModuleId === mod.id;
+                const isSelected = selectedModule?.id === mod.id;
                 const track = tracks.find((t) => t.id === mod.trackId);
 
                 return (
                   <div
                     key={mod.id}
-                    className="absolute flex flex-col items-center"
+                    className="absolute z-10"
                     style={{
                       left: `${pos.x}px`,
                       top: `${pos.y}px`,
                       transform: 'translate(-50%, -50%)',
+                      width: '110px',
+                      height: '54px',
                     }}
                   >
                     <button
                       onClick={() => handleNodeClick(mod)}
                       onMouseEnter={() => setHoveredModuleId(mod.id)}
                       onMouseLeave={() => setHoveredModuleId(null)}
-                      className={`relative w-12 h-12 rounded-xl flex items-center justify-center font-mono shadow-md transition-all cursor-pointer ${
+                      className={`w-full h-full rounded-xl px-2.5 py-1.5 flex flex-col justify-between text-start border transition-all duration-150 cursor-pointer ${
                         isMastered
-                          ? 'bg-emerald-500/20 border-2 border-emerald-400 text-emerald-300 hover:scale-110 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+                          ? 'bg-[var(--bg-surface)] border-emerald-500/70 shadow-[0_2px_8px_rgba(16,185,129,0.25)] hover:border-emerald-400 hover:scale-105'
                           : isInProgress
-                          ? 'bg-amber-500/20 border-2 border-amber-400 text-amber-300 hover:scale-110 shadow-[0_0_12px_rgba(245,158,11,0.3)]'
+                          ? 'bg-[var(--bg-surface)] border-amber-500/80 shadow-[0_2px_8px_rgba(245,158,11,0.25)] hover:border-amber-400 hover:scale-105'
                           : isAvailable
-                          ? 'bg-sky-500/20 border-2 border-sky-400 text-sky-300 hover:scale-110 shadow-[0_0_12px_rgba(56,189,248,0.3)] pulse-ring'
-                          : 'bg-[var(--bg-app)] border border-[var(--border-subtle)] text-zinc-600 hover:text-zinc-400'
-                      }`}
+                          ? 'bg-[var(--bg-surface)] border-sky-500 shadow-[0_2px_10px_rgba(56,189,248,0.3)] hover:border-sky-400 hover:scale-105 ring-2 ring-sky-500/30 animate-pulse'
+                          : 'bg-[var(--bg-surface)]/70 border-[var(--border-subtle)] text-[var(--text-tertiary)] opacity-60 hover:opacity-90 hover:border-[var(--border-strong)]'
+                      } ${isHovered || isSelected ? 'ring-2 ring-[var(--text-primary)] scale-105 shadow-xl' : ''}`}
                     >
-                      {isMastered && <Award size={18} className="text-emerald-400" />}
-                      {isInProgress && <Play size={16} fill="currentColor" className="text-amber-400" />}
-                      {isAvailable && <Play size={16} fill="currentColor" className="text-sky-400" />}
-                      {isLocked && <Lock size={15} />}
-                    </button>
+                      {/* Card Header: Track dot + Est. Time + Status Icon */}
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className="w-2 h-2 rounded-full shrink-0"
+                            style={{ backgroundColor: track?.color || '#38bdf8' }}
+                          />
+                          <span className="text-[9px] font-mono font-bold text-[var(--text-tertiary)]">
+                            {mod.estimatedMinutes}m
+                          </span>
+                        </div>
 
-                    <div className="mt-1 text-center max-w-[110px]">
-                      <div className="text-[11px] font-semibold text-[var(--text-primary)] truncate">
+                        <div className="shrink-0">
+                          {isMastered && <Check size={12} className="text-emerald-400 stroke-[3]" />}
+                          {isInProgress && <Play size={10} fill="currentColor" className="text-amber-400" />}
+                          {isAvailable && <Play size={11} fill="currentColor" className="text-sky-400" />}
+                          {isLocked && <Lock size={10} className="text-[var(--text-tertiary)]" />}
+                        </div>
+                      </div>
+
+                      {/* Card Body: Localized Title */}
+                      <div className="text-[10px] font-bold text-[var(--text-primary)] leading-tight line-clamp-2 truncate">
                         {language === 'ar' ? mod.titleAr : mod.title}
                       </div>
-                      <div className="text-[9px] font-mono text-[var(--text-tertiary)]">
-                        {track?.title.split(' ')[0]}
-                      </div>
-                    </div>
+                    </button>
 
+                    {/* Popover Card on Hover */}
                     {isHovered && (
-                      <div className="absolute bottom-full mb-2 w-56 p-2.5 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] shadow-2xl backdrop-blur-xl z-30 text-start slide-up pointer-events-none">
-                        <div className="text-[10px] font-mono font-bold text-sky-400 mb-0.5">
+                      <div className="absolute bottom-full mb-2 w-60 p-3 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] shadow-2xl backdrop-blur-xl z-30 text-start slide-up pointer-events-none left-1/2 -translate-x-1/2">
+                        <div className="flex items-center justify-between gap-2 border-b border-[var(--border-subtle)] pb-1 mb-1.5">
+                          <span
+                            className="text-[10px] font-mono font-bold uppercase tracking-wider"
+                            style={{ color: track?.color || '#38bdf8' }}
+                          >
+                            {track?.title}
+                          </span>
+                          <span className="text-[9px] font-mono text-[var(--text-tertiary)]">
+                            ~{mod.estimatedMinutes} mins
+                          </span>
+                        </div>
+                        <div className="text-xs font-bold text-[var(--text-primary)] mb-1">
                           {language === 'ar' ? mod.titleAr : mod.title}
                         </div>
-                        <div className="text-[10px] text-[var(--text-secondary)] line-clamp-2">
+                        <div className="text-[10px] text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
                           {language === 'ar' ? mod.description.ar : mod.description.en}
                         </div>
                         {mod.prerequisites.length > 0 && (
-                          <div className="mt-1.5 pt-1 border-t border-[var(--border-subtle)] text-[9px] font-mono text-amber-400">
-                            Prereqs: {mod.prerequisites.join(', ')}
+                          <div className="mt-1.5 pt-1 border-t border-[var(--border-subtle)] text-[9px] font-mono text-amber-400 flex items-center gap-1">
+                            <span className="text-[var(--text-tertiary)]">
+                              {language === 'ar' ? 'المتطلبات:' : 'Prereqs:'}
+                            </span>
+                            <span className="truncate">{mod.prerequisites.join(', ')}</span>
                           </div>
                         )}
                       </div>
