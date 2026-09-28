@@ -61,7 +61,7 @@ When contributing to Okvir, keep our core principles in mind:
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/okvir-org/okvir.git
+git clone https://github.com/zuikre/okvir.git
 cd okvir
 npm install
 ```

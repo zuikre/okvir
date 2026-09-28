@@ -113,7 +113,7 @@ export function generateVerifiableCredential(badge: MilestoneBadge, username: st
       id: 'did:okvir:local-desktop-engine',
       type: 'Profile',
       name: 'OKVIR (إطار) Desktop Learning Framework',
-      url: 'https://github.com/okvir-org/okvir',
+      url: 'https://github.com/zuikre/okvir',
     },
     validFrom: issuedDate,
     credentialSubject: {

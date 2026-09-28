@@ -101,7 +101,7 @@ export class OkvirChunkEngine {
    */
   static async resolveChunkMirrorUrl(chunkId: string, version = '1.0.0'): Promise<string[]> {
     return [
-      `https://github.com/okvir-org/okvir/releases/download/v${version}/chunk-${chunkId}.okvir`,
+      `https://github.com/zuikre/okvir/releases/download/v${version}/chunk-${chunkId}.okvir`,
       `https://assets.okvir.dev/chunks/v${version}/${chunkId}.okvir`,
       `http://localhost:41820/cache/chunk-${chunkId}.okvir`,
     ];

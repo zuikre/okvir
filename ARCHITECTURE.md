@@ -2,7 +2,7 @@
 
 > **System Topology:** Embedded SQLite (WAL Mode) ➔ Tauri v2 (Rust 1.80+) ➔ Pyodide WASM Worker ➔ React 18/19 + Tailwind CSS  
 > **Author & Architect:** **Zakarya Roubhi (روبحي زكرياء)** — Data Scientist, MSc Data Science (ESE Oran), Co-Founder & CTO of Podacium  
-> **Repository:** [https://github.com/okvir-org/okvir](https://github.com/okvir-org/okvir)  
+> **Repository:** [https://github.com/zuikre/okvir](https://github.com/zuikre/okvir)  
 
 ---
 

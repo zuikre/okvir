@@ -4,7 +4,7 @@
 ### The Open-Source, Interactive Desktop Framework for Learning Data Science, Econometrics & AI from the Ground Up
 
 [![CI / CD Status](https://img.shields.io/badge/CI%2FCD-Passing-10b981.svg?style=flat-square&logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
-[![Release](https://img.shields.io/badge/release-v1.0.0-emerald.svg?style=flat-square)](https://github.com/okvir-org/okvir/releases)
+[![Release](https://img.shields.io/badge/release-v1.0.0-emerald.svg?style=flat-square)](https://github.com/zuikre/okvir/releases)
 [![License: MIT or Apache-2.0](https://img.shields.io/badge/Engine-MIT%20%7C%20Apache--2.0-3b82f6.svg?style=flat-square)](LICENSE-MIT)
 [![Curriculum: CC-BY-SA 4.0](https://img.shields.io/badge/Curriculum-CC--BY--SA%204.0-f59e0b.svg?style=flat-square)](https://creativecommons.org/licenses/by-sa/4.0/)
 [![Platforms](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-8b5cf6.svg?style=flat-square)](#-download--installation)
@@ -17,7 +17,7 @@
   <strong>Zero DevOps Setup. 100% Local-First. 60 FPS Visual Physics. Procedural Web Audio. Bilingual EN/AR. Under 28MB.</strong>
 </p>
 
-[**Download Desktop App**](https://github.com/okvir-org/okvir/releases) • [**Architecture Specs**](ARCHITECTURE.md) • [**Curriculum Guide**](CURRICULUM_SPEC.md) • [**Contributing**](CONTRIBUTING.md)
+[**Download Desktop App**](https://github.com/zuikre/okvir/releases) • [**Architecture Specs**](ARCHITECTURE.md) • [**Curriculum Guide**](CURRICULUM_SPEC.md) • [**Contributing**](CONTRIBUTING.md)
 
 </div>
 
@@ -66,7 +66,7 @@ irm https://okvir.dev/install.ps1 | iex
 ### Local Development from Source
 ```bash
 # 1. Clone the repository
-git clone https://github.com/okvir-org/okvir.git
+git clone https://github.com/zuikre/okvir.git
 cd okvir
 
 # 2. Install dependencies
