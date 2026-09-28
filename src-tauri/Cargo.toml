@@ -1,6 +1,6 @@
 [package]
 name = "okvir-desktop"
-version = "1.0.0"
+version = "1.0.1"
 description = "OKVIR (إطار): The Open-Source Desktop Framework for Learning Data Science, Econometrics & AI"
 authors = ["Zakarya Roubhi <contact@okvir.dev>"]
 edition = "2021"

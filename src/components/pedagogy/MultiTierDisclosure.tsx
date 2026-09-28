@@ -100,7 +100,7 @@ export const PreCanvasBriefing: React.FC<{
               </p>
             </div>
 
-            <div className="flex items-start gap-2 text-xs text-[var(--text-secondary)] font-mono px-1">
+            <div className="flex items-start gap-2 text-xs text-[var(--text-secondary)] px-1">
               <ChevronRight size={14} className="text-emerald-400 shrink-0 mt-0.5" />
               <span>
                 <strong className="text-[var(--text-primary)]">
@@ -115,7 +115,7 @@ export const PreCanvasBriefing: React.FC<{
         {activeTier === 2 && (
           <div className="space-y-3 slide-up">
             <div className="p-3.5 rounded-lg border border-sky-500/25 bg-sky-500/5 space-y-2">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-sky-400 font-semibold flex items-center gap-1.5">
+              <div className="text-[11px] uppercase tracking-wider text-sky-400 font-semibold flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
                 {language === 'ar' ? 'الآلية الفضائية والقيود الهندسية' : 'Spatial Mechanics & Geometric Constraints'}
               </div>
@@ -124,7 +124,7 @@ export const PreCanvasBriefing: React.FC<{
               </p>
             </div>
 
-            <div className="flex items-center gap-2 p-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] text-xs font-mono text-[var(--text-secondary)]">
+            <div className="flex items-center gap-2 p-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] text-xs text-[var(--text-secondary)]">
               <span className="text-sky-400 font-semibold shrink-0">
                 {language === 'ar' ? 'الثابت المحفوظ:' : 'Conserved Invariant:'}
               </span>
@@ -246,7 +246,7 @@ export const PostCanvasConsolidation: React.FC<{
               </div>
             </div>
 
-            <p className="text-xs text-[var(--text-secondary)] font-mono leading-relaxed px-1">
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed px-1">
               {content.code.explanation[language]}
             </p>
           </div>
@@ -318,7 +318,7 @@ export const MultiTierDisclosure: React.FC<MultiTierDisclosureProps> = ({
             </p>
           </div>
 
-          <div className="flex items-start gap-2 text-xs text-[var(--text-secondary)] font-mono">
+          <div className="flex items-start gap-2 text-xs text-[var(--text-secondary)]">
             <ChevronRight size={14} className="text-emerald-400 shrink-0 mt-0.5" />
             <span>
               <strong className="text-[var(--text-primary)]">{language === 'ar' ? 'المغزى الجوهري: ' : 'Key Takeaway: '}</strong>
@@ -332,7 +332,7 @@ export const MultiTierDisclosure: React.FC<MultiTierDisclosureProps> = ({
       {activeTier === 2 && (
         <div className="space-y-3 slide-up">
           <div className="p-3.5 rounded-lg border border-sky-500/20 bg-sky-500/5 space-y-2">
-            <div className="text-[11px] font-mono uppercase tracking-wider text-sky-400 font-semibold">
+            <div className="text-[11px] uppercase tracking-wider text-sky-400 font-semibold">
               {language === 'ar' ? 'الآلية الهندسية وتوزيع الفضاء' : 'Spatial Mechanics & Geometric Constraints'}
             </div>
             <p className="text-xs text-[var(--text-primary)] leading-relaxed">
@@ -340,7 +340,7 @@ export const MultiTierDisclosure: React.FC<MultiTierDisclosureProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-2 p-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] text-xs font-mono text-[var(--text-secondary)]">
+          <div className="flex items-center gap-2 p-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] text-xs text-[var(--text-secondary)]">
             <span className="text-sky-400 font-semibold">{language === 'ar' ? 'المقدار المحفوظ:' : 'Conserved Quantity:'}</span>
             <span className="text-[var(--text-primary)]">{content.geometry.conservedQuantity[language]}</span>
           </div>
@@ -397,7 +397,7 @@ export const MultiTierDisclosure: React.FC<MultiTierDisclosureProps> = ({
             </div>
           </div>
 
-          <p className="text-xs text-[var(--text-secondary)] font-mono leading-relaxed">
+          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             {content.code.explanation[language]}
           </p>
         </div>

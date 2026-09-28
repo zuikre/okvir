@@ -100,11 +100,11 @@ export const TactileSlider: React.FC<TactileSliderProps> = ({
   return (
     <div className={`space-y-1.5 select-none ${className}`} onWheel={handleWheel}>
       {/* Header: Label & Numerical Readout */}
-      <div className="flex items-center justify-between text-xs font-mono">
+      <div className="flex items-center justify-between text-xs">
         {label && <span className="text-[var(--text-secondary)] font-medium text-[11px]">{label}</span>}
         <div
           onDoubleClick={handleDoubleClick}
-          className="px-1.5 py-0.5 rounded bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-bold text-[10px] tabular-nums cursor-pointer hover:border-[var(--border-strong)]"
+          className="px-1.5 py-0.5 rounded bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-mono font-bold text-[10px] tabular-nums cursor-pointer hover:border-[var(--border-strong)]"
           title="Double-click to reset to default"
         >
           {value.toFixed(decimals)}

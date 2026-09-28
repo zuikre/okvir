@@ -30,6 +30,26 @@ export class ProceduralAudioEngine {
 
   private isMuted = false;
   private lastTickTime = 0;
+  private isUnlocked = false;
+
+  public unlock(): void {
+    if (typeof window === 'undefined') return;
+    const ctx = this.init();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+    if (!this.isUnlocked) {
+      try {
+        const buffer = ctx.createBuffer(1, 1, 22050);
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(ctx.destination);
+        source.start(0);
+        this.isUnlocked = true;
+      } catch {}
+    }
+  }
 
   private init(): AudioContext | null {
     if (typeof window === 'undefined') return null;
@@ -53,6 +73,16 @@ export class ProceduralAudioEngine {
       this.masterGain = this.ctx.createGain();
       this.masterGain.gain.setValueAtTime(0.85, this.ctx.currentTime);
       this.masterGain.connect(this.limiter);
+
+      // Global User Gesture Unlocker for WebKitGTK / Safari
+      const unlockEvents = ['pointerdown', 'keydown', 'click', 'touchstart'];
+      const onFirstGesture = () => {
+        this.unlock();
+        if (this.ctx && this.ctx.state === 'running') {
+          unlockEvents.forEach((evt) => window.removeEventListener(evt, onFirstGesture));
+        }
+      };
+      unlockEvents.forEach((evt) => window.addEventListener(evt, onFirstGesture, { passive: true }));
     }
 
     if (this.ctx.state === 'suspended') {
@@ -61,126 +91,132 @@ export class ProceduralAudioEngine {
     return this.ctx;
   }
 
+  private ensureRunning(callback: (ctx: AudioContext) => void) {
+    if (this.isMuted) return;
+    const ctx = this.init();
+    if (!ctx || !this.masterGain) return;
+
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(() => {
+        if (ctx.state === 'running') callback(ctx);
+      }).catch(() => {});
+      return;
+    }
+    callback(ctx);
+  }
+
   // 1. TACTILE MICRO-SWITCH CLICK (Buttons, Toggles)
   // Transient Dirac pulse approximation: 10ms downward sweep
   public playClick(pitchMultiplier = 1.0) {
-    if (this.isMuted) return;
-    const ctx = this.init();
-    if (!ctx || !this.masterGain) return;
-
-    try {
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = 'triangle';
-      const startFreq = 1600 * pitchMultiplier;
-      const endFreq = 320 * pitchMultiplier;
-
-      osc.frequency.setValueAtTime(startFreq, now);
-      osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.012);
-
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
-
-      osc.connect(gain);
-      gain.connect(this.masterGain);
-
-      osc.start(now);
-      osc.stop(now + 0.012);
-      this.triggerHaptic(8);
-    } catch {
-      // Audio autoplay policy fallback
-    }
-  }
-
-  // 2. PHYSICAL DIAL SCRUB TICK (Rotary Encoders, Sliders, Timeline Scrubbing)
-  // Velocity-damped 6ms pulse with anti-chattering threshold
-  public playScrubTick(velocity = 1.0) {
-    if (this.isMuted) return;
-    const ctx = this.init();
-    if (!ctx || !this.masterGain) return;
-
-    const now = ctx.currentTime;
-    // Chattering prevention: minimum 18ms between scrub ticks
-    if (now - this.lastTickTime < 0.018) return;
-    this.lastTickTime = now;
-
-    try {
-      const osc = ctx.createOscillator();
-      const filter = ctx.createBiquadFilter();
-      const gain = ctx.createGain();
-
-      // Pitch dynamically scales with scrub velocity (800Hz to 2200Hz)
-      const clampedVel = Math.max(0.5, Math.min(3.0, velocity));
-      const centerFreq = 1100 * clampedVel;
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(centerFreq, now);
-      osc.frequency.exponentialRampToValueAtTime(centerFreq * 0.4, now + 0.007);
-
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(centerFreq, now);
-      filter.Q.setValueAtTime(3.0, now);
-
-      gain.gain.setValueAtTime(0.12 * Math.min(clampedVel, 1.4), now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.007);
-
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(this.masterGain);
-
-      osc.start(now);
-      osc.stop(now + 0.007);
-      this.triggerHaptic(4);
-    } catch {}
-  }
-
-  // 3. ERROR DISSONANCE (Constraint Violation, Divergence, Out of Bounds)
-  // Tritone clash (diminished 5th) + metallic ring modulation + low thud
-  public playErrorDissonance() {
-    if (this.isMuted) return;
-    const ctx = this.init();
-    if (!ctx || !this.masterGain) return;
-
-    try {
-      const now = ctx.currentTime;
-      // Dissonant Cluster: F#3 (185 Hz), G3 (196 Hz), C4 (261.63 Hz)
-      const freqs = [185.0, 196.0, 261.63];
-
-      freqs.forEach((freq) => {
+    this.ensureRunning((ctx) => {
+      try {
+        const now = Math.max(ctx.currentTime, 0.001);
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
 
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(freq, now);
-        osc.frequency.exponentialRampToValueAtTime(freq * 0.85, now + 0.28);
+        osc.type = 'triangle';
+        const startFreq = 1600 * pitchMultiplier;
+        const endFreq = 320 * pitchMultiplier;
 
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+        osc.frequency.setValueAtTime(startFreq, now);
+        osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.012);
+
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
 
         osc.connect(gain);
         gain.connect(this.masterGain!);
 
         osc.start(now);
-        osc.stop(now + 0.28);
-      });
+        osc.stop(now + 0.012);
+        this.triggerHaptic(8);
+      } catch {}
+    });
+  }
 
-      // Low frequency sub-thud (boundary impact)
-      const subOsc = ctx.createOscillator();
-      const subGain = ctx.createGain();
-      subOsc.type = 'sine';
-      subOsc.frequency.setValueAtTime(90, now);
-      subOsc.frequency.exponentialRampToValueAtTime(35, now + 0.15);
-      subGain.gain.setValueAtTime(0.2, now);
-      subGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
-      subOsc.connect(subGain);
-      subGain.connect(this.masterGain);
-      subOsc.start(now);
-      subOsc.stop(now + 0.15);
+  // 2. PHYSICAL DIAL SCRUB TICK (Rotary Encoders, Sliders, Timeline Scrubbing)
+  // Velocity-damped 6ms pulse with anti-chattering threshold
+  public playScrubTick(velocity = 1.0) {
+    this.ensureRunning((ctx) => {
+      const now = Math.max(ctx.currentTime, 0.001);
+      // Chattering prevention: minimum 18ms between scrub ticks
+      if (now - this.lastTickTime < 0.018) return;
+      this.lastTickTime = now;
 
-      this.triggerHaptic([25, 40, 30]);
-    } catch {}
+      try {
+        const osc = ctx.createOscillator();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        // Pitch dynamically scales with scrub velocity (800Hz to 2200Hz)
+        const clampedVel = Math.max(0.5, Math.min(3.0, velocity));
+        const centerFreq = 1100 * clampedVel;
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(centerFreq, now);
+        osc.frequency.exponentialRampToValueAtTime(centerFreq * 0.4, now + 0.007);
+
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(centerFreq, now);
+        filter.Q.setValueAtTime(3.0, now);
+
+        gain.gain.setValueAtTime(0.12 * Math.min(clampedVel, 1.4), now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.007);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterGain!);
+
+        osc.start(now);
+        osc.stop(now + 0.007);
+        this.triggerHaptic(4);
+      } catch {}
+    });
+  }
+
+  // 3. ERROR DISSONANCE (Constraint Violation, Divergence, Out of Bounds)
+  // Tritone clash (diminished 5th) + metallic ring modulation + low thud
+  public playErrorDissonance() {
+    this.ensureRunning((ctx) => {
+      try {
+        const now = Math.max(ctx.currentTime, 0.001);
+        // Dissonant Cluster: F#3 (185 Hz), G3 (196 Hz), C4 (261.63 Hz)
+        const freqs = [185.0, 196.0, 261.63];
+
+        freqs.forEach((freq) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, now);
+          osc.frequency.exponentialRampToValueAtTime(freq * 0.85, now + 0.28);
+
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+
+          osc.connect(gain);
+          gain.connect(this.masterGain!);
+
+          osc.start(now);
+          osc.stop(now + 0.28);
+        });
+
+        // Low frequency sub-thud (boundary impact)
+        const subOsc = ctx.createOscillator();
+        const subGain = ctx.createGain();
+        subOsc.type = 'sine';
+        subOsc.frequency.setValueAtTime(90, now);
+        subOsc.frequency.exponentialRampToValueAtTime(35, now + 0.15);
+        subGain.gain.setValueAtTime(0.2, now);
+        subGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+        subOsc.connect(subGain);
+        subGain.connect(this.masterGain!);
+        subOsc.start(now);
+        subOsc.stop(now + 0.15);
+
+        this.triggerHaptic([25, 40, 30]);
+      } catch {}
+    });
   }
 
   // Subtle error tick for backwards compatibility
@@ -250,52 +286,50 @@ export class ProceduralAudioEngine {
   // 5. VICTORY HARMONICS & FM CHIME (Concept Mastered, Tests Passed)
   // Chowning FM bell synthesis: inharmonic carrier/modulator ratio + Major 9th shimmer
   public playVictoryHarmonics() {
-    if (this.isMuted) return;
-    const ctx = this.init();
-    if (!ctx || !this.masterGain) return;
+    this.ensureRunning((ctx) => {
+      try {
+        const now = Math.max(ctx.currentTime, 0.001);
+        // Radiant Lydian/Major 9th Chord: C5 (523.25), E5 (659.25), G5 (783.99), B5 (987.77), D6 (1174.66)
+        const chord = [523.25, 659.25, 783.99, 987.77, 1174.66];
 
-    try {
-      const now = ctx.currentTime;
-      // Radiant Lydian/Major 9th Chord: C5 (523.25), E5 (659.25), G5 (783.99), B5 (987.77), D6 (1174.66)
-      const chord = [523.25, 659.25, 783.99, 987.77, 1174.66];
+        chord.forEach((freq, idx) => {
+          const start = now + idx * 0.055;
 
-      chord.forEach((freq, idx) => {
-        const start = now + idx * 0.055;
+          // Carrier
+          const carrier = ctx.createOscillator();
+          carrier.type = 'sine';
+          carrier.frequency.setValueAtTime(freq, start);
 
-        // Carrier
-        const carrier = ctx.createOscillator();
-        carrier.type = 'sine';
-        carrier.frequency.setValueAtTime(freq, start);
+          // Modulator (FM synthesis for metallic crystal chime)
+          const modulator = ctx.createOscillator();
+          const modGain = ctx.createGain();
+          modulator.type = 'sine';
+          // Inharmonic bell ratio 1 : 2.756
+          modulator.frequency.setValueAtTime(freq * 2.756, start);
+          modGain.gain.setValueAtTime(freq * 0.8, start);
+          modGain.gain.exponentialRampToValueAtTime(0.01, start + 0.35);
 
-        // Modulator (FM synthesis for metallic crystal chime)
-        const modulator = ctx.createOscillator();
-        const modGain = ctx.createGain();
-        modulator.type = 'sine';
-        // Inharmonic bell ratio 1 : 2.756
-        modulator.frequency.setValueAtTime(freq * 2.756, start);
-        modGain.gain.setValueAtTime(freq * 0.8, start);
-        modGain.gain.exponentialRampToValueAtTime(0.01, start + 0.35);
+          modulator.connect(modGain);
+          modGain.connect(carrier.frequency);
 
-        modulator.connect(modGain);
-        modGain.connect(carrier.frequency);
+          // Note Envelope
+          const noteGain = ctx.createGain();
+          noteGain.gain.setValueAtTime(0.0001, start);
+          noteGain.gain.linearRampToValueAtTime(0.14 / (idx * 0.3 + 1), start + 0.01);
+          noteGain.gain.exponentialRampToValueAtTime(0.0001, start + 0.65);
 
-        // Note Envelope
-        const noteGain = ctx.createGain();
-        noteGain.gain.setValueAtTime(0.0001, start);
-        noteGain.gain.linearRampToValueAtTime(0.14 / (idx * 0.3 + 1), start + 0.01);
-        noteGain.gain.exponentialRampToValueAtTime(0.0001, start + 0.65);
+          carrier.connect(noteGain);
+          noteGain.connect(this.masterGain!);
 
-        carrier.connect(noteGain);
-        noteGain.connect(this.masterGain!);
+          modulator.start(start);
+          carrier.start(start);
+          modulator.stop(start + 0.65);
+          carrier.stop(start + 0.65);
+        });
 
-        modulator.start(start);
-        carrier.start(start);
-        modulator.stop(start + 0.65);
-        carrier.stop(start + 0.65);
-      });
-
-      this.triggerHaptic([15, 30, 20, 45, 60]);
-    } catch {}
+        this.triggerHaptic([15, 30, 20, 45, 60]);
+      } catch {}
+    });
   }
 
   // Rosewood marimba chord / beat completion harmonic chime

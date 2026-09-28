@@ -93,6 +93,24 @@ def vector_magnitude(v: np.ndarray) -> float:
             { input: 'v = [1, 1]', expected: '1.414...' },
           ],
           expectedOutput: '5.0',
+          variants: {
+            python: {
+              starterCode: `import numpy as np\n\ndef vector_magnitude(v: np.ndarray) -> float:\n    # Vectorized Euclidean norm: sqrt(sum(v_i^2))\n    return float(np.sqrt(np.sum(v ** 2)))\n\nprint(vector_magnitude(np.array([3.0, 4.0])))`,
+              expectedOutput: '5.0',
+            },
+            javascript: {
+              starterCode: `// Euclidean vector magnitude in modern JavaScript (ES2024)\nfunction vectorMagnitude(v) {\n  return Math.hypot(...v);\n}\n\nconsole.log(vectorMagnitude([3, 4]));`,
+              expectedOutput: '5',
+            },
+            c: {
+              starterCode: `#include <stdio.h>\n#include <math.h>\n\ndouble vector_magnitude(double x, double y) {\n    return sqrt(x * x + y * y);\n}\n\nint main() {\n    printf("%.1f\\n", vector_magnitude(3.0, 4.0));\n    return 0;\n}`,
+              expectedOutput: '5.0',
+            },
+            rust: {
+              starterCode: `fn vector_magnitude(v: &[f64]) -> f64 {\n    v.iter().map(|&x| x * x).sum::<f64>().sqrt()\n}\n\nfn main() {\n    let v = [3.0, 4.0];\n    println!("{:.1}", vector_magnitude(&v));\n}`,
+              expectedOutput: '5.0',
+            },
+          },
         },
         narrative: {
           en: 'Implement the magnitude formula using NumPy vectorized operations.',
@@ -189,6 +207,24 @@ def dot_product(u: np.ndarray, v: np.ndarray) -> float:
             { input: 'u=[1,0], v=[0,1]', expected: '0.0' },
           ],
           expectedOutput: '1.0',
+          variants: {
+            python: {
+              starterCode: `import numpy as np\n\ndef dot_product(u: np.ndarray, v: np.ndarray) -> float:\n    # Vectorized algebraic dot product: u . v = sum(u_i * v_i)\n    return float(np.dot(u, v))\n\nprint(dot_product(np.array([1.0, 0.0]), np.array([1.0, 0.0])))`,
+              expectedOutput: '1.0',
+            },
+            javascript: {
+              starterCode: `// Dot product in JavaScript\nfunction dotProduct(u, v) {\n  return u.reduce((sum, u_i, i) => sum + u_i * v[i], 0);\n}\n\nconsole.log(dotProduct([1, 0], [1, 0]));`,
+              expectedOutput: '1',
+            },
+            c: {
+              starterCode: `#include <stdio.h>\n\ndouble dot_product(const double u[], const double v[], int n) {\n    double sum = 0.0;\n    for (int i = 0; i < n; i++) sum += u[i] * v[i];\n    return sum;\n}\n\nint main() {\n    double u[2] = {1.0, 0.0};\n    double v[2] = {1.0, 0.0};\n    printf("%.1f\\n", dot_product(u, v, 2));\n    return 0;\n}`,
+              expectedOutput: '1.0',
+            },
+            rust: {
+              starterCode: `fn dot_product(u: &[f64], v: &[f64]) -> f64 {\n    u.iter().zip(v.iter()).map(|(a, b)| a * b).sum()\n}\n\nfn main() {\n    let u = [1.0, 0.0];\n    let v = [1.0, 0.0];\n    println!("{:.1}", dot_product(&u, &v));\n}`,
+              expectedOutput: '1.0',
+            },
+          },
         },
         narrative: {
           en: 'Implement the dot product using np.dot.',

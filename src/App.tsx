@@ -13,19 +13,22 @@ function App() {
   const {
     theme,
     language,
+    config,
     currentView,
     isCommandPaletteOpen,
     setCommandPaletteOpen,
     setCurrentView,
   } = useOkvirStore();
 
-  // Initialize theme + language attributes on mount and sync SQLite profile
+  // Initialize theme + language + typography attributes on mount and sync SQLite profile
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.setAttribute('dir', language === 'ar' ? 'rtl' : 'ltr');
     document.documentElement.setAttribute('lang', language);
+    const activeFont = config.arabicFont || 'noto';
+    document.documentElement.setAttribute('data-arabic-font', activeFont);
     useOkvirStore.getState().syncWithTauriProfile?.();
-  }, [theme, language]);
+  }, [theme, language, config?.arabicFont]);
 
   // Global keyboard shortcuts
   useEffect(() => {

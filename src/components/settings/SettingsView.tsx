@@ -19,6 +19,7 @@ import {
   Brain,
   Lock,
   FileCheck2,
+  Type,
 } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import {
@@ -28,6 +29,7 @@ import {
   type MilestoneBadge,
 } from '@/lib/badges';
 import { tracks, curriculum } from '@/lib/curriculum';
+import type { ArabicFontFamily } from '@/lib/types';
 
 export const SettingsView: React.FC = () => {
   const {
@@ -39,6 +41,7 @@ export const SettingsView: React.FC = () => {
     setUsername,
     setDailyXpGoal,
     setPowerGovernor,
+    setArabicFont,
     exportLocalData,
     importLocalData,
     resetAllData,
@@ -203,6 +206,103 @@ export const SettingsView: React.FC = () => {
               </button>
             </div>
           </form>
+        </div>
+
+        {/* Arabic Typography & Font Selection */}
+        <div className="p-6 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+              <Type size={14} className="text-[var(--math-vector)]" />
+              <span>{language === 'ar' ? 'الخط العربي ونظام الطباعة' : 'Arabic Typography & Font Engine'}</span>
+            </div>
+            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+              {config.arabicFont === 'kufi' ? 'Noto Kufi' : config.arabicFont === 'sans' ? 'Noto Sans' : config.arabicFont === 'ibm' ? 'IBM Plex Sans' : 'Noto Sans UI (Active)'}
+            </span>
+          </div>
+
+          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+            {language === 'ar'
+              ? 'اختر نوع الخط العربي المعتمد في الواجهات والنصوص الرياضية والأكاديمية. الخط الافتراضي هو Noto Sans Arabic UI (الخط المستخدم في بطاقات شقوق أشجار القرار).'
+              : 'Configure the Arabic typography system used across all panels, interactive lessons, and mathematical proofs. Default is Noto Sans Arabic UI.'}
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[
+              {
+                id: 'noto' as ArabicFontFamily,
+                name: 'Noto Sans Arabic UI',
+                nameAr: 'الخط الأصلي (شقوق أشجار القرار)',
+                tag: 'UI Modern (Recommended)',
+                desc: 'Clean, proportional Arabic sans-serif optimized for UI headers and mathematical cards.',
+                descAr: 'الخط الدقيق المعتمد في بطاقات المسارات ومفاهيم شقوق أشجار القرار.',
+                preview: 'أُوكْفِير: بيئة تفاعلية للذكاء الاصطناعي',
+                fontFamily: "'Noto Sans Arabic UI', sans-serif",
+              },
+              {
+                id: 'kufi' as ArabicFontFamily,
+                name: 'Noto Kufi Arabic',
+                nameAr: 'كوفي هندسي حديث',
+                tag: 'Geometric Kufic',
+                desc: 'Geometric modern Kufic design with architectural horizontal baselines.',
+                descAr: 'خط كوفي هندسي متناسق للملصقات والعناوين الهندسية الصارمة.',
+                preview: 'أُوكْفِير: بيئة تفاعلية للذكاء الاصطناعي',
+                fontFamily: "'Noto Kufi Arabic', sans-serif",
+              },
+              {
+                id: 'sans' as ArabicFontFamily,
+                name: 'Noto Sans Arabic',
+                nameAr: 'نسخي تقني معاصر',
+                tag: 'Clean Proportional',
+                desc: 'Balanced, highly legible Arabic sans suitable for long explanatory texts.',
+                descAr: 'خط عربي حديث مخصص للنصوص الطويلة والشروحات الفكرية المستفيضة.',
+                preview: 'أُوكْفِير: بيئة تفاعلية للذكاء الاصطناعي',
+                fontFamily: "'Noto Sans Arabic', sans-serif",
+              },
+              {
+                id: 'ibm' as ArabicFontFamily,
+                name: 'IBM Plex Sans Arabic',
+                nameAr: 'آي بي إم بلكس',
+                tag: 'Mechanical / Grotesque',
+                desc: 'Engineered mechanical grotesque typeface with technical proportions.',
+                descAr: 'طابع ميكانيكي هندسي للأنظمة التقنية الكلاسيكية.',
+                preview: 'أُوكْفِير: بيئة تفاعلية للذكاء الاصطناعي',
+                fontFamily: "'IBM Plex Sans Arabic', 'Noto Sans Arabic UI', sans-serif",
+              },
+            ].map((f) => {
+              const active = (config.arabicFont || 'noto') === f.id;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setArabicFont(f.id)}
+                  className={`text-start p-3.5 rounded-lg border transition-all relative ${
+                    active
+                      ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/10 shadow-sm'
+                      : 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface-hover)]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
+                      <span>{language === 'ar' ? f.nameAr : f.name}</span>
+                    </span>
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[var(--bg-surface)] text-[var(--text-tertiary)] border border-[var(--border-subtle)]">
+                      {f.tag}
+                    </span>
+                  </div>
+                  <div
+                    className="text-sm font-semibold text-[var(--text-primary)] my-2 line-clamp-1"
+                    style={{ fontFamily: f.fontFamily }}
+                    dir="rtl"
+                  >
+                    {f.preview}
+                  </div>
+                  <p className="text-[11px] text-[var(--text-tertiary)] line-clamp-2 leading-relaxed">
+                    {language === 'ar' ? f.descAr : f.desc}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* 2. Local Database & Disk Footprint */}

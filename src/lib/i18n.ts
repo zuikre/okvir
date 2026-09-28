@@ -99,6 +99,31 @@ export const t = {
   xp: { en: 'XP', ar: 'نقطة' },
   days: { en: 'Days', ar: 'يوم' },
   streak: { en: 'Streak', ar: 'السلسلة' },
+
+  // Multi-Language & Compiler Toolchain
+  compare: { en: 'Compare', ar: 'مقارنة' },
+  syncOn: { en: 'Sync: ON', ar: 'المزامنة: مفعّلة' },
+  syncOff: { en: 'Sync: OFF', ar: 'المزامنة: معطّلة' },
+  synthesized: { en: 'Synthesized', ar: 'مُوَلَّد' },
+  testCases: { en: 'Test Cases', ar: 'حالات الاختبار' },
+  consoleLogs: { en: 'Console Logs', ar: 'سجلات وحدة التحكم' },
+  case: { en: 'Case', ar: 'حالة' },
+  input: { en: 'Input', ar: 'المدخلات' },
+  expected: { en: 'Expected', ar: 'المتوقع' },
+  ready: { en: 'Ready', ar: 'جاهز' },
+  rescan: { en: 'Rescan Compilers', ar: 'إعادة فحص المترجمات' },
+  applyFix: { en: 'Apply Fix (1-Click)', ar: 'تطبيق الإصلاح (بنقرة)' },
+  whatHappened: { en: '1. What Happened', ar: '1. ماذا حدث' },
+  where: { en: '2. Where', ar: '2. أين حدث' },
+  why: { en: '3. Why (Mental Model)', ar: '3. لماذا (النموذج الذهني)' },
+  howToFix: { en: '4. How to Fix', ar: '4. كيفية الإصلاح' },
+  rawTraceback: { en: 'Raw Compiler Traceback', ar: 'تتبع المترجم الأصلي' },
+  selectCompiler: { en: 'Select Compiler or Runtime Environment', ar: 'اختر المترجم أو بيئة التشغيل' },
+  detectedNative: { en: 'Detected Native Compilers (Local OS)', ar: 'المترجمات المحلية المكتشفة' },
+  embeddedWasm: { en: 'Zero-Setup Embedded Sandboxes (In-App)', ar: 'بيئات التشغيل المضمنة (بدون تثبيت)' },
+  sandboxedExecution: { en: 'Sandboxed Local Execution (5s Watchdog Cap)', ar: 'تشغيل محلي معزول (حارس أمني 5 ثوانٍ)' },
+  pressEscToDismiss: { en: 'Press Esc to dismiss', ar: 'اضغط Esc للإغلاق' },
+  copyCode: { en: 'Copy Code', ar: 'نسخ الكود' },
 } as const;
 
 export function tr(key: keyof typeof t, lang: Language): string {

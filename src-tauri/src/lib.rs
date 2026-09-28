@@ -17,6 +17,8 @@ pub fn run() {
             commands::get_due_fsrs_cards,
             commands::record_submission,
             commands::verify_chunk_signature,
+            commands::detect_toolchains,
+            commands::execute_native_code,
         ])
         .run(tauri::generate_context!())
         .expect("error while running okvir tauri application");

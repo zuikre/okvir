@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Theme, Language, ViewName, SimulationType, BeatNumber, LessonProgress, LocalConfig } from './types';
+import type { Theme, Language, ViewName, SimulationType, BeatNumber, LessonProgress, LocalConfig, ArabicFontFamily, SupportedCodeLanguage } from './types';
 import { initialLessons, curriculum } from './curriculum';
 import { tauriBridge } from './tauri-bridge';
 
@@ -61,6 +61,7 @@ export interface OkvirState {
   setUsername: (name: string) => void;
   setDailyXpGoal: (goal: number) => void;
   setPowerGovernor: (enabled: boolean) => void;
+  setArabicFont: (font: ArabicFontFamily) => void;
   exportLocalData: () => string;
   importLocalData: (jsonData: string) => boolean;
   resetAllData: () => void;
@@ -76,6 +77,16 @@ export interface OkvirState {
   setKnnK: (k: number) => void;
   setLearningRate: (lr: number) => void;
   setMomentum: (b: number) => void;
+
+  // Multi-Language & Compiler Toolchain State
+  preferredCodeLanguage: SupportedCodeLanguage;
+  isLanguageSyncEnabled: boolean;
+  activeToolchainId: string;
+  compareCodeLanguage: SupportedCodeLanguage | null;
+  setPreferredCodeLanguage: (lang: SupportedCodeLanguage) => void;
+  setLanguageSync: (enabled: boolean) => void;
+  setActiveToolchain: (id: string) => void;
+  setCompareCodeLanguage: (lang: SupportedCodeLanguage | null) => void;
 
   // Curriculum progress
   lessons: Record<string, LessonProgress>;
@@ -151,6 +162,16 @@ export const useOkvirStore = create<OkvirState>()(
       setActiveSimulation: (activeSimulation) => set({ activeSimulation }),
       setCommandPaletteOpen: (isCommandPaletteOpen) => set({ isCommandPaletteOpen }),
 
+      // Multi-Language & Compiler Toolchain State
+      preferredCodeLanguage: 'python',
+      isLanguageSyncEnabled: true,
+      activeToolchainId: 'python',
+      compareCodeLanguage: null,
+      setPreferredCodeLanguage: (preferredCodeLanguage) => set({ preferredCodeLanguage }),
+      setLanguageSync: (isLanguageSyncEnabled) => set({ isLanguageSyncEnabled }),
+      setActiveToolchain: (activeToolchainId) => set({ activeToolchainId }),
+      setCompareCodeLanguage: (compareCodeLanguage) => set({ compareCodeLanguage }),
+
       // 100% Authentic Local Data — Start at 0 until user does activities
       xp: 0,
       streakDays: 0,
@@ -163,6 +184,7 @@ export const useOkvirStore = create<OkvirState>()(
         powerGovernorEnabled: true,
         pythonTimeoutMs: 5000,
         soundEnabled: true,
+        arabicFont: 'noto',
       },
 
       recordActivityToday: () => {
@@ -235,6 +257,13 @@ export const useOkvirStore = create<OkvirState>()(
 
       setPowerGovernor: (powerGovernorEnabled) =>
         set((state) => ({ config: { ...state.config, powerGovernorEnabled } })),
+
+      setArabicFont: (arabicFont) => {
+        if (typeof document !== 'undefined') {
+          document.documentElement.setAttribute('data-arabic-font', arabicFont);
+        }
+        set((state) => ({ config: { ...state.config, arabicFont } }));
+      },
 
       exportLocalData: () => {
         const state = get();

@@ -33,6 +33,8 @@ export interface SocraticHints {
   tier3: { en: string; ar: string };
 }
 
+export type ArabicFontFamily = 'noto' | 'kufi' | 'sans' | 'ibm';
+
 export interface LocalConfig {
   username: string;
   dailyXpGoal: number;
@@ -42,6 +44,7 @@ export interface LocalConfig {
   powerGovernorEnabled: boolean;
   pythonTimeoutMs: number;
   soundEnabled: boolean;
+  arabicFont?: ArabicFontFamily;
 }
 
 export interface LessonProgress {
@@ -72,16 +75,65 @@ export interface Beat {
   narrative: { en: string; ar: string };
 }
 
+export type SupportedCodeLanguage = 'python' | 'javascript' | 'c' | 'rust' | 'java' | 'r';
+
+export interface CodeLanguageVariant {
+  starterCode: string;
+  expectedOutput?: string;
+  testCases?: TestCase[];
+  solution?: string;
+  languageName?: string;
+}
+
 export interface CodeChallenge {
   id: string;
   starterCode: string;
   testCases: TestCase[];
   expectedOutput: string;
+  variants?: Partial<Record<SupportedCodeLanguage, CodeLanguageVariant>>;
 }
 
 export interface TestCase {
   input: string;
   expected: string;
+}
+
+export interface ToolchainInfo {
+  id: string;
+  language: SupportedCodeLanguage | 'sql';
+  name: string;
+  binary: string;
+  path?: string;
+  version?: string;
+  isAvailable: boolean;
+  tier: 'native' | 'embedded';
+  status: 'ready' | 'running' | 'warning' | 'missing';
+}
+
+export interface DiagnosticLocation {
+  line: number;
+  column?: number;
+  snippet?: string;
+}
+
+export interface DiagnosticError {
+  title: string;
+  what: string;
+  where: DiagnosticLocation;
+  why: string;
+  how: string;
+  suggestedFix?: string;
+  rawTraceback?: string;
+}
+
+export interface ExecutionResult {
+  success: boolean;
+  stdout: string[];
+  stderr: string[];
+  executionTimeMs: number;
+  memoryUsedBytes?: number;
+  diagnostics?: DiagnosticError | null;
+  runtimeUsed?: string;
 }
 
 export interface QuizQuestion {

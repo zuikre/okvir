@@ -204,7 +204,7 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
 
         {/* Detailed Question Review Pill List */}
         <div className="space-y-3 pt-2">
-          <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-tertiary)] font-bold block">
+          <span className="text-xs text-[var(--text-tertiary)] font-bold block">
             {isAr ? 'تفاصيل الإجابات حسب المستويات الإدراكية:' : 'Diagnostic Breakdown by Cognitive Tier:'}
           </span>
 
@@ -212,7 +212,7 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
             {calculatedResults.details.map((item, idx) => (
               <div
                 key={item.questionId}
-                className={`p-3.5 rounded-2xl border flex items-center justify-between text-xs font-mono ${
+                className={`p-3.5 rounded-2xl border flex items-center justify-between text-xs ${
                   item.isCorrect
                     ? 'border-emerald-500/30 bg-emerald-500/5 text-emerald-300'
                     : 'border-rose-500/30 bg-rose-500/5 text-rose-300'
@@ -396,7 +396,7 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
       {/* Immediate Diagnostic Rationale Drawer */}
       {isCurrentSubmitted && currentSelectedIdx !== null && (
         <div className="p-5 rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-app)] space-y-3 animate-fade-in">
-          <div className="flex items-center gap-2 text-xs font-mono font-bold">
+          <div className="flex items-center gap-2 text-xs font-bold">
             {currentOptions[currentSelectedIdx]?.correct ? (
               <span className="text-emerald-400 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4" />
@@ -410,7 +410,7 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
             )}
           </div>
 
-          <p className="text-xs md:text-sm text-[var(--text-secondary)] leading-relaxed font-mono">
+          <p className="text-xs md:text-sm text-[var(--text-secondary)] leading-relaxed font-normal">
             {isAr
               ? currentOptions[currentSelectedIdx]?.diagnosticFeedback.ar
               : currentOptions[currentSelectedIdx]?.diagnosticFeedback.en}

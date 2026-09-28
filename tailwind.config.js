@@ -4,10 +4,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        arabic: ['IBM Plex Sans Arabic', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-arabic)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        arabic: ['var(--font-arabic)', 'Noto Sans Arabic UI', 'Noto Sans Arabic', 'sans-serif'],
         amiri: ['Amiri', 'serif'],
-        mono: ['JetBrains Mono', 'Courier New', 'monospace'],
+        mono: ['JetBrains Mono', 'var(--font-arabic)', 'Courier New', 'monospace'],
       },
     },
   },

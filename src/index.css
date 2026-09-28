@@ -6,6 +6,86 @@
 @tailwind utilities;
 
 /* ==========================================================================
+   BUNDLED LOCAL ARABIC HIGH-PRECISION TYPEFACES (100% Offline, Zero Latency)
+   ========================================================================== */
+@font-face {
+  font-family: 'Noto Sans Arabic UI';
+  src: url('/fonts/NotoSansArabicUI-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Sans Arabic UI';
+  src: url('/fonts/NotoSansArabicUI-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Kufi Arabic';
+  src: url('/fonts/NotoKufiArabic-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Kufi Arabic';
+  src: url('/fonts/NotoKufiArabic-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Sans Arabic';
+  src: url('/fonts/NotoSansArabic-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Sans Arabic';
+  src: url('/fonts/NotoSansArabic-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-arabic: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+html[dir='rtl'],
+[dir='rtl'] {
+  --font-arabic: 'Noto Sans Arabic UI', 'Noto Sans Arabic', system-ui, sans-serif;
+}
+
+html[dir='rtl'][data-arabic-font="noto"],
+[data-arabic-font="noto"] {
+  --font-arabic: 'Noto Sans Arabic UI', 'Noto Sans Arabic', system-ui, sans-serif;
+}
+
+html[dir='rtl'][data-arabic-font="kufi"],
+[data-arabic-font="kufi"] {
+  --font-arabic: 'Noto Kufi Arabic', 'Noto Sans Arabic UI', system-ui, sans-serif;
+}
+
+html[dir='rtl'][data-arabic-font="sans"],
+[data-arabic-font="sans"] {
+  --font-arabic: 'Noto Sans Arabic', 'Noto Sans Arabic UI', system-ui, sans-serif;
+}
+
+html[dir='rtl'][data-arabic-font="ibm"],
+[data-arabic-font="ibm"] {
+  --font-arabic: 'IBM Plex Sans Arabic', 'Noto Sans Arabic UI', 'Noto Sans Arabic', system-ui, sans-serif;
+}
+
+/* ==========================================================================
    DARK THEME: "OLED Charcoal" (Default Studio Mode)
    Calibrated for WCAG AAA Compliance (Contrast >= 7.0:1)
    ========================================================================== */
@@ -84,11 +164,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Global RTL font application covering body, portals, and dialogs */
 html[dir='rtl'],
 html[dir='rtl'] body,
 [dir='rtl'] {
-  font-family: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
+  font-family: var(--font-arabic), system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+[dir='rtl'] {
+  letter-spacing: normal;
 }
 
 /* Classical Scholarly Arabic Anchor for Theorems & Intuitions */
@@ -100,9 +184,15 @@ html[dir='rtl'] body,
   line-height: 1.85;
 }
 
+/* Monospace typography: JetBrains Mono for code/numbers, Arabic sans fallback for Arabic */
 .font-mono {
   font-family: 'JetBrains Mono', 'Courier New', monospace;
   font-feature-settings: 'zero' on, 'calt' on;
+}
+
+[dir='rtl'] .font-mono,
+html[dir='rtl'] .font-mono {
+  font-family: 'JetBrains Mono', var(--font-arabic), monospace;
 }
 
 .tabular-nums {
