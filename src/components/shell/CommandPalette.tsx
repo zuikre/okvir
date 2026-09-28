@@ -163,6 +163,56 @@ export const CommandPalette: React.FC = () => {
         action: () => { setActiveSimulation('tree'); setCurrentView('sandbox'); setCommandPaletteOpen(false); },
         category: 'simulation',
       },
+      {
+        id: 'sim-eigen',
+        label: {
+          en: 'Jump to: EigenHunter (Invariant Directions Av = λv)',
+          ar: 'انتقال مباشر: صائد المتجهات الذاتية (Av = λv)',
+        },
+        icon: 'Compass',
+        action: () => { setActiveSimulation('eigen'); setCurrentView('sandbox'); setCommandPaletteOpen(false); },
+        category: 'simulation',
+      },
+      {
+        id: 'sim-clt',
+        label: {
+          en: 'Jump to: Galton Board & Central Limit Theorem Simulator',
+          ar: 'انتقال مباشر: لوحة غالتون ومبرهنة النهاية المركزية',
+        },
+        icon: 'Activity',
+        action: () => { setActiveSimulation('clt'); setCurrentView('sandbox'); setCommandPaletteOpen(false); },
+        category: 'simulation',
+      },
+      {
+        id: 'sim-iv',
+        label: {
+          en: 'Jump to: 2-Stage Least Squares (2SLS) & Instrumental Causal DAG',
+          ar: 'انتقال مباشر: المربعات الصغرى ذات المرحلتين (2SLS) ومخطط السببية',
+        },
+        icon: 'Network',
+        action: () => { setActiveSimulation('iv'); setCurrentView('sandbox'); setCommandPaletteOpen(false); },
+        category: 'simulation',
+      },
+      {
+        id: 'sim-autograd',
+        label: {
+          en: 'Jump to: OkvirGrad Computational Graph & Reverse Backpropagation',
+          ar: 'انتقال مباشر: مخطط الحساب والتفاضل التلقائي العكسي',
+        },
+        icon: 'GitCommit',
+        action: () => { setActiveSimulation('autograd'); setCurrentView('sandbox'); setCommandPaletteOpen(false); },
+        category: 'simulation',
+      },
+      {
+        id: 'sim-bpe',
+        label: {
+          en: 'Jump to: Byte-Pair Encoding (BPE) Subword Tokenizer Lab',
+          ar: 'انتقال مباشر: مختبر ترميز BPE للمحولات والنماذج اللغوية',
+        },
+        icon: 'Type',
+        action: () => { setActiveSimulation('bpe'); setCurrentView('sandbox'); setCommandPaletteOpen(false); },
+        category: 'simulation',
+      },
     ];
 
     // Micro-lessons across all 4 tracks

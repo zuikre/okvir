@@ -20,22 +20,32 @@ const SIMULATION_MODULE_MAP: Record<SimulationType, string> = {
   attention: 'transformer-attention',
   simpson: 'causal-inference-confounding',
   anscombe: 'eda-anscombe',
+  eigen: 'eigenvalues-eigenvectors',
+  clt: 'central-limit-theorem',
+  iv: 'instrumental-variables-2sls',
+  autograd: 'autograd-computational-graph',
+  bpe: 'bpe-tokenization',
 };
 
 const SIM_TABS: { type: SimulationType; label: { en: string; ar: string } }[] = [
   { type: 'ols', label: { en: 'OLS Regression', ar: 'انحدار OLS' } },
   { type: 'vectors', label: { en: 'Vector Geometry', ar: 'هندسة المتجهات' } },
+  { type: 'eigen', label: { en: 'EigenHunter', ar: 'صائد المتجهات الذاتية' } },
   { type: 'bayes', label: { en: 'Bayes Frequency', ar: 'شجرة بايز' } },
+  { type: 'clt', label: { en: 'Galton Board (CLT)', ar: 'لوحة غالتون (CLT)' } },
   { type: 'knn', label: { en: 'KNN Radar', ar: 'رادار KNN' } },
   { type: 'gradient', label: { en: 'Gradient Descent', ar: 'الانحدار التدرجي' } },
   { type: 'kmeans', label: { en: 'K-Means Voronoi', ar: 'فورونوي K-Means' } },
   { type: 'tree', label: { en: 'Decision Tree', ar: 'شجرة القرار' } },
-  { type: 'neural', label: { en: 'Neural Activation', ar: 'تفعيل الخلية العصبية' } },
-  { type: 'attention', label: { en: 'Self-Attention', ar: 'الانتباه الذاتي' } },
-  { type: 'conv', label: { en: '2D Convolution', ar: 'الالتفاف المكاني 2D' } },
   { type: 'regularization', label: { en: 'L1 vs L2 Geometry', ar: 'هندسة الانتظام L1/L2' } },
   { type: 'simpson', label: { en: "Simpson's Paradox", ar: 'مفارقة سيمبسون' } },
+  { type: 'iv', label: { en: '2SLS Instrumental IV', ar: 'المتغيرات الصورية 2SLS' } },
   { type: 'anscombe', label: { en: "Anscombe's Quartet", ar: 'رباعية أنسكوم' } },
+  { type: 'neural', label: { en: 'Neural Activation', ar: 'تفعيل الخلية العصبية' } },
+  { type: 'autograd', label: { en: 'OkvirGrad Autograd', ar: 'تفاضل أوكفير التلقائي' } },
+  { type: 'conv', label: { en: '2D Convolution', ar: 'الالتفاف المكاني 2D' } },
+  { type: 'attention', label: { en: 'Self-Attention', ar: 'الانتباه الذاتي' } },
+  { type: 'bpe', label: { en: 'BPE Tokenizer', ar: 'ترميز BPE للمحولات' } },
 ];
 
 export const Sandbox: React.FC = () => {

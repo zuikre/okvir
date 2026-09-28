@@ -16,7 +16,12 @@ export type SimulationType =
   | 'conv'
   | 'regularization'
   | 'simpson'
-  | 'anscombe';
+  | 'anscombe'
+  | 'eigen'
+  | 'clt'
+  | 'iv'
+  | 'autograd'
+  | 'bpe';
 
 export type LessonStatus = 'locked' | 'available' | 'in_progress' | 'mastered' | 'decaying';
 

@@ -35,7 +35,7 @@ Okvir is architected as an **instrument-grade, local-first interactive computati
 │  LAYER 4: PRESENTATION & INTERACTION (React / Tailwind CSS / Web Audio)     │
 │  • Central State Store: Zustand with self-healing persistence & DAG solvers │
 │  • The 4-Beat Micro-Loop: Slider ➔ KaTeX Anchor ➔ Vectorized Code ➔ Quiz   │
-│  • 13 Tactile 60 FPS Canvases: Demand-driven rendering, preallocated arrays │
+│  • 18 Tactile 60 FPS Canvases & Labs: Demand-driven rendering, prealloc arrays│
 │  • Procedural Web Audio API Synthesizer: 100% offline mathematical waveforms│
 │  • Tier-1 Bilingual Engine (EN / AR) with strict LTR math and code isolation │
 │  • Raycast-Style Pinned Action Bar & Cmd+K Universal Command Palette        │
@@ -162,9 +162,9 @@ All Python code runs client-side in a dedicated Web Worker (`src/workers/Pyodide
 ## 5. Layer 4: Tactical Canvas & Audio Engines
 
 ### 5.1 60 FPS Tactical Canvas Architecture
-All 11 interactive visualizations implement demand-driven rendering:
+All 18 interactive visualizations and simulation engines implement demand-driven rendering:
 * **Render-on-Change:** Animations only run during user interaction or active physics snapping (`requestAnimationFrame`). Idle CPU sits at `0.0%`.
-* **Path Batching:** All dynamic elements (such as 25 OLS residual squares or 40 KNN points) are compiled into a single path before dispatching `ctx.stroke()` or `ctx.fill()`.
+* **Path Batching:** All dynamic elements (such as 25 OLS residual squares, 40 KNN points, or Galton Board bin histograms) are compiled into a single path before dispatching `ctx.stroke()` or `ctx.fill()`.
 * **No GC Allocation:** Coordinate conversions and vectors use pre-allocated buffers.
 
 ### 5.2 Procedural Web Audio API Synthesizer

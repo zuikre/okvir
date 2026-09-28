@@ -8,7 +8,7 @@ export const tracks: Track[] = [
     color: '#38bdf8',
     colorAr: '#38bdf8',
     icon: 'Sigma',
-    modules: ['linear-algebra-vectors', 'dot-product-geometry', 'gradient-vector', 'bayes-theorem'],
+    modules: ['linear-algebra-vectors', 'dot-product-geometry', 'gradient-vector', 'bayes-theorem', 'eigenvalues-eigenvectors', 'central-limit-theorem'],
   },
   {
     id: 'programming',
@@ -26,7 +26,7 @@ export const tracks: Track[] = [
     color: '#f59e0b',
     colorAr: '#f59e0b',
     icon: 'TrendingUp',
-    modules: ['ols-residual-geometry', 'knn-classification', 'kmeans-clustering', 'decision-trees', 'ridge-lasso', 'causal-inference-confounding'],
+    modules: ['ols-residual-geometry', 'knn-classification', 'kmeans-clustering', 'decision-trees', 'ridge-lasso', 'causal-inference-confounding', 'instrumental-variables-2sls'],
   },
   {
     id: 'deeplearning',
@@ -35,7 +35,7 @@ export const tracks: Track[] = [
     color: '#a855f7',
     colorAr: '#a855f7',
     icon: 'Brain',
-    modules: ['perceptron-activation', 'gradient-descent', 'cnn-convolution', 'transformer-attention'],
+    modules: ['perceptron-activation', 'gradient-descent', 'cnn-convolution', 'transformer-attention', 'autograd-computational-graph', 'bpe-tokenization'],
   },
 ];
 
@@ -1821,6 +1821,449 @@ def attention(Q, K, V):
               explanation: {
                 en: 'Normalization is different — scaling specifically addresses the dot-product magnitude.',
                 ar: 'التطبيع مختلف — التحجيم يعالج تحديداً حجم الجداء القياسي.',
+              },
+            },
+          ],
+        },
+        narrative: { en: '', ar: '' },
+      },
+    ],
+  },
+  {
+    id: 'eigenvalues-eigenvectors',
+    title: 'Eigenvalues & Invariant Directions',
+    titleAr: 'القيم والمتجهات الذاتية',
+    trackId: 'math',
+    estimatedMinutes: 8,
+    description: {
+      en: 'Discover invariant lines that do not rotate during linear space transformations: Av = λv.',
+      ar: 'اكتشف خطوط الاتجاه الثابتة التي لا تدور أثناء التحويلات الخطية: Av = λv.',
+    },
+    prerequisites: ['linear-algebra-vectors', 'dot-product-geometry'],
+    x: 260,
+    y: 150,
+    beats: [
+      {
+        number: 1,
+        type: 'intuition',
+        simulation: 'eigen',
+        narrative: {
+          en: 'Most vectors rotate and stretch when multiplied by a matrix. Hunt for special directions where the vector remains strictly on its original line!',
+          ar: 'معظم المتجهات تدور وتتمدد عند ضربها في مصفوفة. ابحث عن الاتجاهات الخاصة حيث يبقى المتجه مستقراً تماماً على خطه الأصلي!',
+        },
+      },
+      {
+        number: 2,
+        type: 'formal',
+        formula: 'A\\mathbf{v} = \\lambda\\mathbf{v} \\iff \\det(A - \\lambda I) = 0',
+        formulaNote: {
+          en: 'The characteristic equation roots give the exact scaling eigenvalues λ.',
+          ar: 'جذور المعادلة المميزة تعطي بدقة القيم الذاتية λ لمعامل التحجيم.',
+        },
+        narrative: {
+          en: 'Setting (A - λI)v = 0 requires a non-trivial nullspace, meaning the determinant must collapse to zero.',
+          ar: 'اشتراط (A - λI)v = 0 يستوجب وجود فضاء صفري غير بديهي، مما يفرض انهيار المحدد إلى الصفر.',
+        },
+      },
+      {
+        number: 3,
+        type: 'code',
+        code: {
+          id: 'py-eigen',
+          starterCode: `import numpy as np
+
+def compute_matrix_spectrum(A: np.ndarray) -> list[float]:
+    # TODO: Compute sorted real eigenvalues of matrix A
+    evals = np.linalg.eigvals(A)
+    return sorted([float(np.real(e)) for e in evals])`,
+          testCases: [
+            { input: 'A = [[2, 0], [0, 3]]', expected: '[2.0, 3.0]' },
+            { input: 'A = [[1, 0], [0, 1]]', expected: '[1.0, 1.0]' },
+          ],
+          expectedOutput: '[2.0, 3.0]',
+        },
+        narrative: {
+          en: 'Compute eigenvalues in Python using numpy.linalg.eigvals.',
+          ar: 'احسب القيم الذاتية في بايثون باستخدام numpy.linalg.eigvals.',
+        },
+      },
+      {
+        number: 4,
+        type: 'transfer',
+        question: {
+          prompt: {
+            en: 'What does a zero eigenvalue (λ = 0) signify about a transformation matrix A?',
+            ar: 'ماذا تعني القيمة الذاتية الصفرية (λ = 0) بالنسبة لمصفوفة التحويل A؟',
+          },
+          options: [
+            {
+              text: { en: 'The matrix is singular and collapses space (det(A) = 0)', ar: 'المصفوفة شاذة وتقلص الفضاء إلى بعد أدنى (det(A) = 0)' },
+              correct: true,
+              explanation: {
+                en: 'det(A) is the product of eigenvalues. If any λ = 0, det(A) = 0 and dimensionality collapses.',
+                ar: 'محدد المصفوفة يساوي حاصل ضرب قيمها الذاتية. إذا كانت أي λ = 0، فإن det(A) = 0 وتنهار الأبعاد.',
+              },
+            },
+            {
+              text: { en: 'The matrix rotates space by 90 degrees', ar: 'المصفوفة تدور الفضاء بزاوية 90 درجة' },
+              correct: false,
+              explanation: {
+                en: 'Rotation matrices have complex eigenvalues with magnitude 1, not zero.',
+                ar: 'مصفوفات الدوران تمتلك قيماً ذاتية مركبة ذات معيار 1، وليست صفراً.',
+              },
+            },
+          ],
+        },
+        narrative: { en: '', ar: '' },
+      },
+    ],
+  },
+  {
+    id: 'central-limit-theorem',
+    title: 'Central Limit Theorem & Distributions',
+    titleAr: 'مبرهنة النهاية المركزية والتوزيعات',
+    trackId: 'math',
+    estimatedMinutes: 7,
+    description: {
+      en: 'Observe how sums of independent random variables invariably converge to the Gaussian normal curve.',
+      ar: 'شاهد كيف تتقارب مجاميع المتغيرات العشوائية المستقلة حتماً نحو المنحنى الغاووسي الطبيعي.',
+    },
+    prerequisites: ['bayes-theorem'],
+    x: 320,
+    y: 220,
+    beats: [
+      {
+        number: 1,
+        type: 'intuition',
+        simulation: 'clt',
+        narrative: {
+          en: 'Drop balls through the Galton peg array. Watch individual chaotic bounces assemble into a pristine normal bell curve at the bottom.',
+          ar: 'أسقط الكرات عبر شبكة أوتاد غالتون. شاهد كيف تتجمع الارتدادات العشوائية الفوضوية لتشكل منحنى جرسياً مثالياً في الأسفل.',
+        },
+      },
+      {
+        number: 2,
+        type: 'formal',
+        formula: 'Z_n = \\frac{\\sum_{i=1}^n X_i - n\\mu}{\\sigma\\sqrt{n}} \\xrightarrow{d} \\mathcal{N}(0, 1)',
+        formulaNote: {
+          en: 'Standardized sum converges asymptotically to the standard normal distribution.',
+          ar: 'المجموع المعياري يتقارب مقاربياً مع التوزيع الطبيعي القياسي.',
+        },
+        narrative: {
+          en: 'Regardless of the shape of individual random variables, their normalized sum always tends to a Gaussian as n grows.',
+          ar: 'بغض النظر عن شكل توزيع المتغيرات الفردية، فإن مجموعها المعياري يميل دائماً إلى التوزيع الغاووسي كلما كبر n.',
+        },
+      },
+      {
+        number: 3,
+        type: 'code',
+        code: {
+          id: 'py-clt',
+          starterCode: `import numpy as np
+
+def compute_clt_mean(samples: np.ndarray) -> float:
+    # TODO: Compute sample mean of random trials
+    return float(np.mean(samples))`,
+          testCases: [
+            { input: 'samples = [2, 4, 6, 8]', expected: '5.0' },
+            { input: 'samples = [10, 20]', expected: '15.0' },
+          ],
+          expectedOutput: '5.0',
+        },
+        narrative: {
+          en: 'Compute empirical sample averages in Python.',
+          ar: 'احسب المتوسطات التجريبية للعينات في بايثون.',
+        },
+      },
+      {
+        number: 4,
+        type: 'transfer',
+        question: {
+          prompt: {
+            en: 'Why is the Central Limit Theorem fundamental to modern machine learning and statistics?',
+            ar: 'لماذا تعد مبرهنة النهاية المركزية ركيزة أساسية في التعلم الآلي والإحصاء؟',
+          },
+          options: [
+            {
+              text: { en: 'It allows assuming asymptotic normality for sample averages and gradients without knowing true population distribution', ar: 'تتيح افتراض التوزيع الطبيعي المقاربي للمتوسطات والتدرجات دون اشتراط معرفة التوزيع السكاني الحقيقي' },
+              correct: true,
+              explanation: {
+                en: 'CLT justifies z-tests, confidence intervals, and stochastic gradient estimators in deep learning.',
+                ar: 'تبرر مبرهنة CLT اختبارات z وفترات الثقة ومقدري التدرج العشوائي في التعلم العميق.',
+              },
+            },
+            {
+              text: { en: 'It guarantees that all dataset features are normally distributed', ar: 'تضمن أن جميع ميزات البيانات تتبع التوزيع الطبيعي' },
+              correct: false,
+              explanation: {
+                en: 'Features themselves are rarely normal; only sums and averages of random variables are.',
+                ar: 'البيانات والميزات نادراً ما تكون طبيعية؛ فقط المجاميع والمتوسطات هي التي تتقارب طبيعياً.',
+              },
+            },
+          ],
+        },
+        narrative: { en: '', ar: '' },
+      },
+    ],
+  },
+  {
+    id: 'instrumental-variables-2sls',
+    title: 'Instrumental Variables & 2SLS',
+    titleAr: 'المتغيرات الصورية والمربعات الصغرى ذات المرحلتين',
+    trackId: 'econometrics',
+    estimatedMinutes: 8,
+    description: {
+      en: 'Purge omitted variable bias and endogeneity using exogenous instrumental variables and Two-Stage Least Squares.',
+      ar: 'طهر تحيز المتغيرات المحذوفة والداخلية باستخدام المتغيرات الصورية الخارجية والمربعات الصغرى ذات المرحلتين.',
+    },
+    prerequisites: ['ols-residual-geometry', 'causal-inference-confounding'],
+    x: 380,
+    y: 280,
+    beats: [
+      {
+        number: 1,
+        type: 'intuition',
+        simulation: 'iv',
+        narrative: {
+          en: 'When treatment is contaminated by unobserved ability (U), naive OLS is biased. An instrument (Z) pushes treatment cleanly without touching U.',
+          ar: 'عندما تتلوث المعالجة بالقدرة غير المرصودة (U)، يصبح OLS متحيزاً. المتغير الصوري (Z) يدفع المعالجة بنقاء دون ملامسة U.',
+        },
+      },
+      {
+        number: 2,
+        type: 'formal',
+        formula: '\\beta_{\\text{IV}} = \\frac{\\text{Cov}(Y, Z)}{\\text{Cov}(D, Z)} = (\\hat{D}^T \\hat{D})^{-1} \\hat{D}^T Y',
+        formulaNote: {
+          en: 'Wald ratio and 2SLS project treatment onto exogenous variation.',
+          ar: 'نسبة فالد و 2SLS تسقط المعالجة على التباين الخارجي النقي.',
+        },
+        narrative: {
+          en: 'Stage 1 regresses D on Z to isolate predicted treatment D_hat. Stage 2 regresses Y on D_hat, recovering the true parameter.',
+          ar: 'المرحلة 1 تنحدر بـ D على Z لعزل المعالجة المتوقعة D_hat. والمرحلة 2 تنحدر بـ Y على D_hat لاستعادة المعامل الحقيقي.',
+        },
+      },
+      {
+        number: 3,
+        type: 'code',
+        code: {
+          id: 'py-iv',
+          starterCode: `def compute_wald_ratio(cov_yz: float, cov_dz: float) -> float:
+    # TODO: Compute the Wald instrumental estimator
+    if abs(cov_dz) < 1e-9:
+        return 0.0
+    return float(cov_yz / cov_dz)`,
+          testCases: [
+            { input: 'cov_yz = 3.0, cov_dz = 2.0', expected: '1.5' },
+            { input: 'cov_yz = 4.0, cov_dz = 1.0', expected: '4.0' },
+          ],
+          expectedOutput: '1.5',
+        },
+        narrative: {
+          en: 'Implement the classical Wald instrumental estimator.',
+          ar: 'طبق مقدر فالد القياسي للمتغير الصوري.',
+        },
+      },
+      {
+        number: 4,
+        type: 'transfer',
+        question: {
+          prompt: {
+            en: 'What happens to the 2SLS estimator if the instrument Z directly affects outcome Y (violating exclusion restriction)?',
+            ar: 'ماذا يحدث لمقدر 2SLS إذا أثر المتغير الصوري Z مباشرة في النتيجة Y (انتهاك قيد الاستبعاد)؟',
+          },
+          options: [
+            {
+              text: { en: 'The IV estimate is severely biased and fails to identify the true causal effect', ar: 'يصبح تقدير IV متحيزاً بشدة ويفشل في التعرف على الأثر السببي الحقيقي' },
+              correct: true,
+              explanation: {
+                en: 'Exclusion restriction is untestable and mandatory: Z must influence Y ONLY through D.',
+                ar: 'قيد الاستبعاد إلزامي لا يقبل المساومة: يجب أن يؤثر Z في Y فقط وحصرياً عبر المعالجة D.',
+              },
+            },
+            {
+              text: { en: 'The standard errors shrink to zero', ar: 'تتقلص الأخطاء المعيارية إلى الصفر' },
+              correct: false,
+              explanation: {
+                en: 'Standard errors do not shrink; rather, the point estimate itself becomes invalid.',
+                ar: 'الأخطاء المعيارية لا تتقلص؛ بل يصبح التقدير النقطي ذاته باطلاً علمياً.',
+              },
+            },
+          ],
+        },
+        narrative: { en: '', ar: '' },
+      },
+    ],
+  },
+  {
+    id: 'autograd-computational-graph',
+    title: 'OkvirGrad: Reverse Autograd',
+    titleAr: 'أوكفير-غراد: التفاضل التلقائي العكسي',
+    trackId: 'deeplearning',
+    estimatedMinutes: 8,
+    description: {
+      en: 'Deconstruct how neural network automatic differentiation engines track DAG dependencies and execute backpropagation.',
+      ar: 'فكك كيفية تتبع محركات التفاضل التلقائي للاعتماديات في الـ DAG وتنفيذ خوارزمية الانتشار العكسي.',
+    },
+    prerequisites: ['perceptron-activation', 'gradient-descent'],
+    x: 440,
+    y: 340,
+    beats: [
+      {
+        number: 1,
+        type: 'intuition',
+        simulation: 'autograd',
+        narrative: {
+          en: 'Watch numbers propagate forward through addition and multiplication nodes, then see the adjoint gradients flow in reverse via the chain rule.',
+          ar: 'شاهد الأرقام تتدفق إلى الأمام عبر عقد الجمع والضرب، ثم راقب تدرجات المشتقات تتدفق نحو الخلف عبر قاعدة السلسلة.',
+        },
+      },
+      {
+        number: 2,
+        type: 'formal',
+        formula: '\\frac{\\partial L}{\\partial w_i} = \\sum_{v \\in \\text{Children}(w_i)} \\frac{\\partial L}{\\partial v} \\cdot \\frac{\\partial v}{\\partial w_i}',
+        formulaNote: {
+          en: 'Reverse-mode accumulation aggregates partial gradients across DAG fan-out.',
+          ar: 'التراكم في النمط العكسي يجمع المشتقات الجزئية عبر تفرعات الـ DAG.',
+        },
+        narrative: {
+          en: 'Topological sorting ensures every child node computes and delivers its adjoint before its parents evaluate their gradient contributions.',
+          ar: 'الفرز الطبولوجي يضمن أن كل عقدة فرعية تحسب وتسلم مشتقتها المرافقة قبل أن تقيم العقد الأبوية تدرجاتها.',
+        },
+      },
+      {
+        number: 3,
+        type: 'code',
+        code: {
+          id: 'py-autograd',
+          starterCode: `def product_backward(x: float, w: float, out_grad: float) -> float:
+    # TODO: Compute dL/dw for p = w * x
+    return float(out_grad * x)`,
+          testCases: [
+            { input: 'x = 2.0, w = 3.0, out_grad = 4.0', expected: '8.0' },
+            { input: 'x = 0.5, w = 4.0, out_grad = 2.0', expected: '1.0' },
+          ],
+          expectedOutput: '8.0',
+        },
+        narrative: {
+          en: 'Implement the scalar product node backward step in Python.',
+          ar: 'طبق الخطوة العكسية لعقدة الضرب القياسي في بايثون.',
+        },
+      },
+      {
+        number: 4,
+        type: 'transfer',
+        question: {
+          prompt: {
+            en: 'Why is reverse-mode autograd (backprop) preferred over forward-mode for neural networks with millions of parameters?',
+            ar: 'لماذا يفضل التفاضل التلقائي العكسي (الانتشار العكسي) على النمط الأمامي في الشبكات العصبية ذات الملايين من المعاملات؟',
+          },
+          options: [
+            {
+              text: { en: 'Reverse-mode computes gradients for all parameters in a single pass from the scalar loss', ar: 'النمط العكسي يحسب التدرجات لجميع المعاملات بدورة واحدة فقط انطلاقاً من دالة الخسارة القياسية' },
+              correct: true,
+              explanation: {
+                en: 'Forward-mode requires one pass per input parameter (millions of passes), whereas reverse-mode requires only one backward pass for scalar loss.',
+                ar: 'النمط الأمامي يتطلب دورة كاملة لكل معامل فردي (ملايين الدورات)، بينما يحتاج النمط العكسي دورة واحدة لدالة الخسارة.',
+              },
+            },
+            {
+              text: { en: 'Forward-mode cannot compute derivatives of non-linear activations', ar: 'النمط الأمامي لا يمكنه حساب مشتقات الدوال غير الخطية' },
+              correct: false,
+              explanation: {
+                en: 'Both modes are mathematically exact; the difference is purely computational efficiency.',
+                ar: 'كلا النمطين متطابقان رياضياً؛ والفرق بينهما يكمن حصرياً في الكفاءة والتعقيد الحسابي.',
+              },
+            },
+          ],
+        },
+        narrative: { en: '', ar: '' },
+      },
+    ],
+  },
+  {
+    id: 'bpe-tokenization',
+    title: 'Byte-Pair Encoding & Tokenizers',
+    titleAr: 'ترميز أزواج البايتات (BPE)',
+    trackId: 'deeplearning',
+    estimatedMinutes: 7,
+    description: {
+      en: 'Inspect how modern Large Language Models compress text into optimal subword vocabularies using BPE merge rules.',
+      ar: 'افحص كيف تضغط النماذج اللغوية الكبيرة النصوص إلى مفردات تحت-كلمية مثالية باستخدام قواعد دمج BPE.',
+    },
+    prerequisites: ['transformer-attention'],
+    x: 500,
+    y: 400,
+    beats: [
+      {
+        number: 1,
+        type: 'intuition',
+        simulation: 'bpe',
+        narrative: {
+          en: 'Observe text split into characters, count adjacent pairs, and merge the highest-frequency pairs step by step into compound tokens.',
+          ar: 'شاهد النص مجزءاً إلى حروف، وعد أزواج الحروف المتجاورة، ثم ادمج الأزواج الأكثر تكراراً خطوة بخطوة إلى رموز مركبة.',
+        },
+      },
+      {
+        number: 2,
+        type: 'formal',
+        formula: '\\mathcal{V}_{k+1} = \\mathcal{V}_k \\cup \\{ (t_i, t_j)^* \\}, \\quad (t_i, t_j)^* = \\arg\\max_{(u, v)} \\text{Freq}(u, v)',
+        formulaNote: {
+          en: 'Greedy frequency iteration expands vocabulary and shrinks sequence length.',
+          ar: 'التكرار الجشع للأكثر تكراراً يوسع المفردات ويقلص طول السلسلة.',
+        },
+        narrative: {
+          en: 'BPE merges frequent character patterns into atomic tokens while preserving character-level fallback for rare or unknown words.',
+          ar: 'يدمج BPE الأنماط الشائعة في رموز ذرية مع الحفاظ على مرونة التفكيك الحرفي للكلمات النادرة أو غير المعروفة.',
+        },
+      },
+      {
+        number: 3,
+        type: 'code',
+        code: {
+          id: 'py-bpe',
+          starterCode: `from collections import Counter
+
+def find_top_bigram(tokens: list[str]) -> tuple[str, str]:
+    # TODO: Find the most frequent adjacent bigram
+    pairs = Counter()
+    for i in range(len(tokens) - 1):
+        pairs[(tokens[i], tokens[i+1])] += 1
+    best_pair, _ = pairs.most_common(1)[0]
+    return (str(best_pair[0]), str(best_pair[1]))`,
+          testCases: [
+            { input: "tokens = ['a', 'b', 'a', 'b', 'c']", expected: "('a', 'b')" },
+            { input: "tokens = ['x', 'y', 'z', 'y', 'z']", expected: "('y', 'z')" },
+          ],
+          expectedOutput: "('a', 'b')",
+        },
+        narrative: {
+          en: 'Find the top adjacent token bigram in Python.',
+          ar: 'ابحث عن الزوج الثنائي الأكثر تكراراً في بايثون.',
+        },
+      },
+      {
+        number: 4,
+        type: 'transfer',
+        question: {
+          prompt: {
+            en: 'Why is subword tokenization (BPE) superior to pure word-level tokenization for multilingual and code models?',
+            ar: 'لماذا يتفوق ترميز الأجزاء الفرعية (BPE) على الترميز الكلمي الكامل في النماذج متعددة اللغات والأكواد البرمجية؟',
+          },
+          options: [
+            {
+              text: { en: 'It keeps vocabulary size bounded while preventing Out-Of-Vocabulary (OOV) errors for compound or unseen words', ar: 'يحافظ على حجم قاموس المفردات محدوداً مع منع أخطاء الكلمات غير المعرفة (OOV) للكلمات المركبة أو غير المرئية مسبقاً' },
+              correct: true,
+              explanation: {
+                en: 'Word-level models need infinite dictionaries and fail on typos or morphology; BPE decomposes novel words cleanly.',
+                ar: 'النماذج الكلمية تتطلب قواميس لا نهائية وتفشل عند الأخطاء الإملائية والاشتقاقات، بينما يفكك BPE الكلمات الجديدة بأمان.',
+              },
+            },
+            {
+              text: { en: 'It eliminates the need for positional embeddings in transformers', ar: 'يلغي الحاجة إلى التضمينات الموضعية في المحولات' },
+              correct: false,
+              explanation: {
+                en: 'Positional encodings are still required to understand word order.',
+                ar: 'التضمينات الموضعية ما تزال ضرورية لفهم ترتيب الرموز في الجملة.',
               },
             },
           ],

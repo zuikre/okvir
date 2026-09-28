@@ -7,6 +7,7 @@ dist/
 build/
 target/
 src-tauri/target/
+src-tauri/gen/
 
 # Environment and secrets
 .env

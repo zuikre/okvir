@@ -13,6 +13,11 @@ import { ConvolutionFilterCanvas } from './ConvolutionFilterCanvas';
 import { RegularizationGeometryCanvas } from './RegularizationGeometryCanvas';
 import { SimpsonsParadoxLab } from './SimpsonsParadoxLab';
 import { AnscombesQuartetLab } from './AnscombesQuartetLab';
+import { EigenHunterCanvas } from './EigenHunterCanvas';
+import { GaltonBoardCltLab } from './GaltonBoardCltLab';
+import { InstrumentalVariablesLab } from './InstrumentalVariablesLab';
+import { AutogradGraphLab } from './AutogradGraphLab';
+import { BpeTokenizerLab } from './BpeTokenizerLab';
 
 interface Props {
   type: SimulationType;
@@ -48,6 +53,16 @@ export const SimulationView: React.FC<Props> = ({ type, compact, highlightedElem
       return <SimpsonsParadoxLab />;
     case 'anscombe':
       return <AnscombesQuartetLab compact={compact} />;
+    case 'eigen':
+      return <EigenHunterCanvas compact={compact} />;
+    case 'clt':
+      return <GaltonBoardCltLab compact={compact} />;
+    case 'iv':
+      return <InstrumentalVariablesLab compact={compact} />;
+    case 'autograd':
+      return <AutogradGraphLab compact={compact} />;
+    case 'bpe':
+      return <BpeTokenizerLab compact={compact} />;
     default:
       return <LinearRegressionResiduals compact={compact} highlightedElement={highlightedElement} />;
   }

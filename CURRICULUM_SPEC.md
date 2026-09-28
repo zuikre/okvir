@@ -143,6 +143,11 @@ Binds an interactive 60 FPS HTML5 Canvas or WebGL engine into the lesson:
 * `RegularizationGeometryCanvas`: OLS loss contours striking L1 diamond / L2 circle
 * `SimpsonsParadoxLab`: Cohort stratification vs pooled regression and omitted variable bias
 * `AnscombesQuartetLab`: Francis Anscombe's 4 identical summary statistics datasets with real-time point dragging
+* `EigenHunterCanvas`: Rotary dial hunting for invariant directions $Av = \lambda v$ and characteristic roots
+* `GaltonBoardCltLab`: Triangular peg quincunx physics drops demonstrating the Central Limit Theorem
+* `InstrumentalVariablesLab`: Causal DAG with endogeneity, 2-Stage Least Squares (2SLS), and Wald estimator
+* `AutogradGraphLab`: OkvirGrad computational graph DAG with forward pass and reverse-mode backpropagation
+* `BpeTokenizerLab`: Byte-Pair Encoding subword tokenizer visualizer with greedy merge rule extraction
 
 ### 4.2 Python Challenge (`:::python-challenge`)
 Executes self-grading unit tests in the Pyodide WebAssembly worker:
