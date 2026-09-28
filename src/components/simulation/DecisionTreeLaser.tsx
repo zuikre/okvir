@@ -84,7 +84,7 @@ def best_split(x: np.ndarray, y: np.ndarray):
   },
 };
 
-export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = () => {
+export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = true }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { theme, language, config } = useOkvirStore();
 
@@ -361,7 +361,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = () => {
   return (
     <div className="flex flex-col gap-4 select-none">
       {/* Pre-Canvas Intuitive Briefing & Mental Model */}
-      <PreCanvasBriefing content={TREE_TIER_CONTENT} />
+      {!compact && <PreCanvasBriefing content={TREE_TIER_CONTENT} />}
 
       {/* Top Action Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
@@ -519,7 +519,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = () => {
       </div>
 
       {/* Post-Canvas Mathematical & Code Consolidation */}
-      <PostCanvasConsolidation content={TREE_TIER_CONTENT} />
+      {!compact && <PostCanvasConsolidation content={TREE_TIER_CONTENT} />}
     </div>
   );
 };

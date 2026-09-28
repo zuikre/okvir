@@ -25,7 +25,7 @@ interface Props {
   highlightedElement?: 'slope' | 'intercept' | 'residuals' | null;
 }
 
-export const SimulationView: React.FC<Props> = ({ type, compact, highlightedElement }) => {
+export const SimulationView: React.FC<Props> = ({ type, compact = true, highlightedElement }) => {
   switch (type) {
     case 'ols':
       return <LinearRegressionResiduals compact={compact} highlightedElement={highlightedElement} />;
@@ -38,13 +38,13 @@ export const SimulationView: React.FC<Props> = ({ type, compact, highlightedElem
     case 'tree':
       return <DecisionTreeLaser compact={compact} />;
     case 'vectors':
-      return <VectorGeometryCanvas />;
+      return <VectorGeometryCanvas compact={compact} />;
     case 'bayes':
-      return <BayesFrequencyTree />;
+      return <BayesFrequencyTree compact={compact} />;
     case 'neural':
-      return <NeuralActivationCanvas />;
+      return <NeuralActivationCanvas compact={compact} />;
     case 'attention':
-      return <AttentionHeatmapCanvas />;
+      return <AttentionHeatmapCanvas compact={compact} />;
     case 'conv':
       return <ConvolutionFilterCanvas compact={compact} />;
     case 'regularization':

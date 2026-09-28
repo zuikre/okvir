@@ -109,7 +109,7 @@ def vector_geometry(u: np.ndarray, v: np.ndarray):
   },
 };
 
-export const VectorGeometryCanvas: React.FC = () => {
+export const VectorGeometryCanvas: React.FC<{ compact?: boolean }> = ({ compact = true }) => {
   const { language, config } = useOkvirStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -405,7 +405,7 @@ export const VectorGeometryCanvas: React.FC = () => {
   return (
     <div className="flex flex-col gap-5 select-none">
       {/* Pre-Canvas Intuitive Briefing & Mental Model */}
-      <PreCanvasBriefing content={VECTOR_PEDAGOGY} />
+      {!compact && <PreCanvasBriefing content={VECTOR_PEDAGOGY} />}
 
       {/* Top Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
@@ -554,7 +554,7 @@ export const VectorGeometryCanvas: React.FC = () => {
       </div>
 
       {/* Post-Canvas Mathematical & Code Consolidation */}
-      <PostCanvasConsolidation content={VECTOR_PEDAGOGY} />
+      {!compact && <PostCanvasConsolidation content={VECTOR_PEDAGOGY} />}
     </div>
   );
 };

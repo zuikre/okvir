@@ -46,7 +46,7 @@ export const curriculum: CurriculumModule[] = [
     title: 'Vectors as Geometry',
     titleAr: 'المتجهات ك هندسة',
     trackId: 'math',
-    estimatedMinutes: 6,
+    estimatedMinutes: 18,
     description: {
       en: 'Understand vectors as directional displacements, not just lists of numbers.',
       ar: 'افهم المتجهات كإزاحات اتجاهية، وليس مجرد قوائم أرقام.',
@@ -60,14 +60,14 @@ export const curriculum: CurriculumModule[] = [
         type: 'intuition',
         simulation: 'vectors',
         narrative: {
-          en: 'A vector is an arrow in space — it has direction and magnitude. Drag the endpoint to see how the vector changes.',
-          ar: 'المتجه هو سهم في الفضاء — له اتجاه وحجم. اسحب النقطة لترى كيف يتغير المتجه.',
+          en: 'A vector is fundamentally a geometric displacement with magnitude and orientation in coordinate-free space. In machine learning, every observation, neural activation, weight column, and optimization update is a vector in high-dimensional space.\n\nManipulate the endpoint in the interactive canvas to observe how Cartesian components (v_x, v_y) transform continuously. Notice that vectors possess length invariant under coordinate translation, forming the primitive building blocks of linear transformations and inner product spaces.',
+          ar: 'المتجه في جوهره هو إزاحة هندسية ذات مقدار واتجاه في فضاء لا إحداثي. في التعلم الآلي، كل مشاهدة وتنشيط عصبي وعمود أوزان وتحديث أمثلية هو متجه في فضاء عالي الأبعاد.\n\nحرّك طرف المتجه في المختبر التفاعلي لملاحظة كيف تتحول المركبات الديكارتية (v_x, v_y) بسلاسة. لاحظ أن المتجهات تمتلك طولاً ثابتاً تحت الإزاحة، مما يجعلها اللبنات الأساسية للتحويلات الخطية وفضاءات الجداء الداخلي.',
         },
       },
       {
         number: 2,
         type: 'formal',
-        formula: 'v = [v₁, v₂]ᵀ    ‖v‖ = √(v₁² + v₂²)',
+        formula: '\\mathbf{v} = \\begin{bmatrix} v_1 \\\\ v_2 \\end{bmatrix} \\in \\mathbb{R}^2, \\quad \\|\\mathbf{v}\\|_2 = \\sqrt{\\mathbf{v}^T \\mathbf{v}} = \\sqrt{\\sum_{i=1}^n v_i^2}',
         formulaNote: {
           en: 'The magnitude is the Euclidean length of the vector.',
           ar: 'الحجم هو الطول الإقليدي للمتجه.',
@@ -143,7 +143,7 @@ def vector_magnitude(v: np.ndarray) -> float:
     title: 'Dot Product & Projection',
     titleAr: 'الجداء القياسي والإسقاط',
     trackId: 'math',
-    estimatedMinutes: 7,
+    estimatedMinutes: 18,
     description: {
       en: 'The dot product as geometric projection: u·v = ‖u‖‖v‖cos(θ).',
       ar: 'الجداء القياسي كإسقاط هندسي: u·v = ‖u‖‖v‖cos(θ).',
@@ -157,14 +157,14 @@ def vector_magnitude(v: np.ndarray) -> float:
         type: 'intuition',
         simulation: 'vectors',
         narrative: {
-          en: 'The dot product measures how much two vectors point in the same direction. When they are perpendicular, it is zero.',
-          ar: 'الجداء القياسي يقيس مدى تطابق اتجاه متجهين. عندما يكونان متعامدين، يكون صفراً.',
+          en: 'The dot product is the geometric projection of one vector onto another, scaled by the length of the reference axis. When two vectors are aligned, their dot product equals the product of their magnitudes; when perpendicular (orthogonal), the projection vanishes completely to zero.\n\nIn modern transformer architectures, attention mechanisms compute similarity through scaled dot products between query and key vectors. Drag both vectors on the canvas to see the radiant projection beam cast onto the 1D subspace, visually confirming the Cauchy-Schwarz inequality |u·v| <= ||u|| ||v||.',
+          ar: 'الجداء القياسي هو الإسقاط الهندسي لمتجه على آخر، مضروباً في طول محور الإسناد. عندما يتطابق اتجاه متجهين، يساوي جداؤهما جداء أطوالهما؛ وعندما يتعامدان، يتلاشى الإسقاط كلياً إلى الصفر.\n\nفي بنى المحولات المعاصرة، تحسب آليات الانتباه التشابه عبر الجداء القياسي المدرج بين متجهات الاستعلام والمفتاح. حرّك كلا المتجهين على اللوحة لرؤية شعاع الإسقاط المسلط على الفضاء الجزئي، مؤكداً متباينة كوشي-شفارتز هندسياً.',
         },
       },
       {
         number: 2,
         type: 'formal',
-        formula: 'u · v = ‖u‖ ‖v‖ cos(θ) = u₁v₁ + u₂v₂',
+        formula: '\\mathbf{u} \\cdot \\mathbf{v} = \\|\\mathbf{u}\\|_2 \\|\\mathbf{v}\\|_2 \\cos(\\theta) = \\sum_{i=1}^n u_i v_i = \\mathbf{u}^T \\mathbf{v}',
         formulaNote: {
           en: 'The algebraic and geometric definitions are equivalent.',
           ar: 'التعريفان الجبري والهندسي متكافئان.',
@@ -239,7 +239,7 @@ def dot_product(u: np.ndarray, v: np.ndarray) -> float:
     title: 'The Gradient Vector',
     titleAr: 'متجه التدرج',
     trackId: 'math',
-    estimatedMinutes: 8,
+    estimatedMinutes: 18,
     description: {
       en: 'The gradient points in the direction of steepest ascent on a surface.',
       ar: 'التدرج يشير إلى اتجاه الصعود الأكثر انحداراً على سطح.',
@@ -253,14 +253,14 @@ def dot_product(u: np.ndarray, v: np.ndarray) -> float:
         type: 'intuition',
         simulation: 'gradient',
         narrative: {
-          en: 'The gradient ∇f points uphill — the steepest way up. Move against it to descend.',
-          ar: 'التدرج ∇f يشير إلى الأعلى — أشد الطرق صعوداً. تحرك عكسه للنزول.',
+          en: 'The gradient vector ∇f collects all partial derivatives of a scalar loss function, pointing in the unique direction of steepest local ascent. The magnitude ||∇f|| quantifies the maximum instantaneous rate of change per unit distance.\n\nBecause ∇f is strictly orthogonal to the level contour curves of the loss surface, moving in the opposite direction -∇f yields the path of maximum local decrease. Observe on the 2D contour canvas how the gradient vectors align perpendicularly to the elliptical ripples of the loss landscape.',
+          ar: 'يجمع متجه التدرج ∇f كافة المشتقات الجزئية لدالة الخسارة القياسية، مشيراً إلى الاتجاه الفريد لأقصى صعود محلي. يحدد المقدار ||∇f|| المعدل اللحظي الأقصى للتغير لكل وحدة مسافة.\n\nنظراً لأن ∇f متعامد تماماً على خطوط الكنتور لدالة الخسارة، فإن التحرك في الاتجاه المعاكس -∇f يوفر مسار أقصى انحدار هبوطي. راقب على لوحة الكنتور كيف تصطف متجهات التدرج عمودياً على المنحنيات البيضاوية لسطح الخسارة.',
         },
       },
       {
         number: 2,
         type: 'formal',
-        formula: '∇f = [∂f/∂x, ∂f/∂y]    ‖∇f‖ = rate of steepest ascent',
+        formula: '\\nabla f(\\mathbf{x}) = \\begin{bmatrix} \\frac{\\partial f}{\\partial x_1} \\\\ \\frac{\\partial f}{\\partial x_2} \\end{bmatrix}, \\quad D_{\\mathbf{u}} f(\\mathbf{x}) = \\nabla f(\\mathbf{x}) \\cdot \\hat{\\mathbf{u}} = \\|\\nabla f(\\mathbf{x})\\| \\cos(\\theta)',
         formulaNote: {
           en: 'Each component is the partial derivative along that axis.',
           ar: 'كل مكون هو المشتقة الجزئية على طول ذلك المحور.',
@@ -340,7 +340,7 @@ def gradient(f, x, h=1e-5):
     title: "Bayes' Theorem",
     titleAr: 'نظرية بايز',
     trackId: 'math',
-    estimatedMinutes: 7,
+    estimatedMinutes: 18,
     description: {
       en: 'Update beliefs with evidence: Prior × Likelihood → Posterior.',
       ar: 'حدّث الاعتقادات بالأدلة: الاحتمال القبلي × الاحتمالية ← الاحتمال البعدي.',
@@ -354,14 +354,14 @@ def gradient(f, x, h=1e-5):
         type: 'intuition',
         simulation: 'bayes',
         narrative: {
-          en: 'Bayes updates your belief after seeing evidence. A positive test does not always mean disease — it depends on the base rate.',
-          ar: 'بايز يحدّث اعتقادك بعد رؤية الأدلة. اختبار إيجابي لا يعني دائماً مرضاً — يعتمد على المعدل الأساسي.',
+          en: 'Bayesian inference formalizes how rational agents must update their subjective prior beliefs upon receiving empirical evidence. When observing data D, the likelihood P(D|θ) modulates the prior P(θ) to yield the posterior distribution P(θ|D).\n\nCrucially, human intuition chronically ignores base rates. If a disease has a 1% base rate and a diagnostic test is 99% accurate, testing positive yields only a ~50% posterior probability of infection because false positives from the large healthy population match the true positives from the small sick population.',
+          ar: 'يصيغ الاستدلال البايزي كيفية قيام النماذج العقلانية بتحديث اعتقاداتها القبلية عند تلقي أدلة تجريبية. عند مشاهدة البيانات D، تقوم دالة الإمكان P(D|θ) بتعديل الاحتمال القبلي P(θ) لإنتاج التوزيع البعدي P(θ|D).\n\nبشكل حاسم، يميل الحدس البشري لتجاهل المعدلات الأساسية. إذا كان مرض ما يصيب 1% من السكان واختبار دقته 99%، فإن النتيجة الإيجابية تعطي احتمالاً بعدياً يقارب 50% فقط، لأن الإيجابيات الكاذبة من الأغلبية السليمة تعادل الإيجابيات الحقيقية من الأقلية المصابة.',
         },
       },
       {
         number: 2,
         type: 'formal',
-        formula: 'P(H|E) = P(E|H) · P(H) / P(E)',
+        formula: 'P(\\theta \\mid \\mathcal{D}) = \\frac{P(\\mathcal{D} \\mid \\theta) P(\\theta)}{P(\\mathcal{D})} = \\frac{P(\\mathcal{D} \\mid \\theta) P(\\theta)}{\\int P(\\mathcal{D} \\mid \\theta\') P(\\theta\') d\\theta\'}',
         formulaNote: {
           en: 'Posterior = Likelihood × Prior / Evidence',
           ar: 'البعدي = الاحتمالية × القبلي / الدليل',
@@ -436,7 +436,7 @@ def gradient(f, x, h=1e-5):
     title: 'NumPy Vectorization',
     titleAr: 'توجيه NumPy',
     trackId: 'programming',
-    estimatedMinutes: 6,
+    estimatedMinutes: 18,
     description: {
       en: 'Why vectorized operations are 100x faster than Python for-loops.',
       ar: 'لماذا العمليات المتجهة أسرع 100 مرة من حلقات Python.',
@@ -532,7 +532,7 @@ def scale_array(arr: np.ndarray, factor: float) -> np.ndarray:
     title: 'The DataFrame Anatomy',
     titleAr: 'تشريح إطار البيانات',
     trackId: 'programming',
-    estimatedMinutes: 7,
+    estimatedMinutes: 18,
     description: {
       en: 'Series, Index, and column-oriented storage in Pandas.',
       ar: 'السلسلة، الفهرس، والتخزين المعمد بالأعمدة في Pandas.',
@@ -628,7 +628,7 @@ def create_dataframe(data: dict) -> pd.DataFrame:
     title: 'SQL Window Functions',
     titleAr: 'دوال النوافذ SQL',
     trackId: 'programming',
-    estimatedMinutes: 8,
+    estimatedMinutes: 18,
     description: {
       en: 'ROW_NUMBER, RANK, LAG, LEAD and partitioned aggregates.',
       ar: 'ROW_NUMBER، RANK، LAG، LEAD والتجميعات المقسمة.',
@@ -729,7 +729,7 @@ FROM employees;`,
     title: "EDA & Anscombe's Quartet",
     titleAr: 'استكشاف البيانات ورباعية أنسكوم',
     trackId: 'programming',
-    estimatedMinutes: 6,
+    estimatedMinutes: 18,
     description: {
       en: 'Why summary statistics lie: identical mean and variance with radically different distributions.',
       ar: 'لماذا تضلل الإحصاءات الموجزة: متوسطات وتباينات متطابقة مع توزيعات متباينة تماماً.',
@@ -837,7 +837,7 @@ def verify_anscombe_invariants(x: np.ndarray, y: np.ndarray) -> tuple[float, flo
     title: 'The Geometry of Squared Residuals',
     titleAr: 'هندسة البواقي المربعة',
     trackId: 'econometrics',
-    estimatedMinutes: 6,
+    estimatedMinutes: 18,
     description: {
       en: 'See how OLS minimizes the sum of squared residuals geometrically.',
       ar: 'شاهد كيف يقلل OLS مجموع البواقي المربعة هندسياً.',
@@ -934,7 +934,7 @@ def compute_squared_loss(y: np.ndarray, y_hat: np.ndarray) -> float:
     title: 'K-Nearest Neighbors',
     titleAr: 'أقرب الجيران',
     trackId: 'econometrics',
-    estimatedMinutes: 7,
+    estimatedMinutes: 18,
     description: {
       en: 'Classify points by voting among their k nearest neighbors.',
       ar: 'صنّف النقاط بالتصويت بين أقرب k جيران.',
@@ -1034,7 +1034,7 @@ def knn_predict(X_train, y_train, query, k=3):
     title: 'K-Means Clustering',
     titleAr: 'تجميع K-Means',
     trackId: 'econometrics',
-    estimatedMinutes: 7,
+    estimatedMinutes: 18,
     description: {
       en: 'Watch centroids glide to cluster means as Voronoi cells morph.',
       ar: 'شاهد المراكز تنزلق إلى وسائل العناقيد بينما تتشكل خلايا فورونوي.',
@@ -1134,7 +1134,7 @@ def kmeans_step(X, centroids):
     title: 'Decision Trees & Impurity',
     titleAr: 'أشجار القرار والشوائب',
     trackId: 'econometrics',
-    estimatedMinutes: 8,
+    estimatedMinutes: 18,
     description: {
       en: 'Recursive binary splitting with entropy and Gini impurity.',
       ar: 'الانقسام الثنائي التراكبي مع الإنتروبيا وشوائب جيني.',
@@ -1232,7 +1232,7 @@ def gini_impurity(y: np.ndarray) -> float:
     title: 'Ridge & Lasso Regularization',
     titleAr: 'تنظيم ريدج ولاسو',
     trackId: 'econometrics',
-    estimatedMinutes: 8,
+    estimatedMinutes: 18,
     description: {
       en: 'L2 shrinks weights smoothly; L1 produces exact sparsity.',
       ar: 'L2 يقلل الأوزان بسلاسة؛ L1 ينتج تناثراً دقيقاً.',
@@ -1330,7 +1330,7 @@ def ridge_loss(y, y_hat, weights, lam):
     title: 'Causal Inference & Confounding',
     titleAr: 'الاستدلال السببي والخلط',
     trackId: 'econometrics',
-    estimatedMinutes: 8,
+    estimatedMinutes: 18,
     description: {
       en: "Simpson's paradox: how omitted confounders reverse regression slopes, and how stratification uncovers truth.",
       ar: 'مفارقة سيمبسون: كيف تقلب المتغيرات المربكة ميل الانحدار، وكيف يكشف التقسيم الطبقي الحقيقة.',
@@ -1438,7 +1438,7 @@ def compute_naive_beta(beta_true: float, gamma: float, cov_xz: float, var_x: flo
     title: 'The Perceptron & Activations',
     titleAr: 'الخلايا العصبية ودوال التنشيط',
     trackId: 'deeplearning',
-    estimatedMinutes: 7,
+    estimatedMinutes: 18,
     description: {
       en: 'Weighted sums, bias, and non-linear activation functions.',
       ar: 'المجاميع المرجحة، الانحراف، ودوال التنشيط غير الخطية.',
@@ -1534,7 +1534,7 @@ def relu(x: np.ndarray) -> np.ndarray:
     title: 'Gradient Descent Dynamics',
     titleAr: 'ديناميكية الانحدار التدرجي',
     trackId: 'deeplearning',
-    estimatedMinutes: 8,
+    estimatedMinutes: 18,
     description: {
       en: 'Watch a particle roll down a loss surface with momentum and learning rate.',
       ar: 'شاهد جسيماً يتدحرج على سطح خسارة مع الزخم ومعدل التعلم.',
@@ -1631,7 +1631,7 @@ def gradient_step(w, grad, v, lr=0.01, momentum=0.9):
     title: 'CNN & Convolution Kernels',
     titleAr: 'الشبكات الالتفافية والمرشحات',
     trackId: 'deeplearning',
-    estimatedMinutes: 7,
+    estimatedMinutes: 18,
     description: {
       en: 'Kernels slide over images, detecting edges and patterns.',
       ar: 'المرشحات تنزلق على الصور، وتكشف الحواف والأنماط.',
@@ -1732,7 +1732,7 @@ def conv2d(image, kernel):
     title: 'Transformer Attention',
     titleAr: 'انتباه المحوّلات',
     trackId: 'deeplearning',
-    estimatedMinutes: 9,
+    estimatedMinutes: 18,
     description: {
       en: 'Scaled dot-product attention: Q, K, V matrices.',
       ar: 'انتباه الجداء القياسي المحدد: مصفوفات Q، K، V.',
@@ -1834,7 +1834,7 @@ def attention(Q, K, V):
     title: 'Eigenvalues & Invariant Directions',
     titleAr: 'القيم والمتجهات الذاتية',
     trackId: 'math',
-    estimatedMinutes: 8,
+    estimatedMinutes: 18,
     description: {
       en: 'Discover invariant lines that do not rotate during linear space transformations: Av = λv.',
       ar: 'اكتشف خطوط الاتجاه الثابتة التي لا تدور أثناء التحويلات الخطية: Av = λv.',
@@ -1923,7 +1923,7 @@ def compute_matrix_spectrum(A: np.ndarray) -> list[float]:
     title: 'Central Limit Theorem & Distributions',
     titleAr: 'مبرهنة النهاية المركزية والتوزيعات',
     trackId: 'math',
-    estimatedMinutes: 7,
+    estimatedMinutes: 18,
     description: {
       en: 'Observe how sums of independent random variables invariably converge to the Gaussian normal curve.',
       ar: 'شاهد كيف تتقارب مجاميع المتغيرات العشوائية المستقلة حتماً نحو المنحنى الغاووسي الطبيعي.',
@@ -2011,7 +2011,7 @@ def compute_clt_mean(samples: np.ndarray) -> float:
     title: 'Instrumental Variables & 2SLS',
     titleAr: 'المتغيرات الصورية والمربعات الصغرى ذات المرحلتين',
     trackId: 'econometrics',
-    estimatedMinutes: 8,
+    estimatedMinutes: 18,
     description: {
       en: 'Purge omitted variable bias and endogeneity using exogenous instrumental variables and Two-Stage Least Squares.',
       ar: 'طهر تحيز المتغيرات المحذوفة والداخلية باستخدام المتغيرات الصورية الخارجية والمربعات الصغرى ذات المرحلتين.',
@@ -2099,7 +2099,7 @@ def compute_clt_mean(samples: np.ndarray) -> float:
     title: 'OkvirGrad: Reverse Autograd',
     titleAr: 'أوكفير-غراد: التفاضل التلقائي العكسي',
     trackId: 'deeplearning',
-    estimatedMinutes: 8,
+    estimatedMinutes: 18,
     description: {
       en: 'Deconstruct how neural network automatic differentiation engines track DAG dependencies and execute backpropagation.',
       ar: 'فكك كيفية تتبع محركات التفاضل التلقائي للاعتماديات في الـ DAG وتنفيذ خوارزمية الانتشار العكسي.',
@@ -2185,7 +2185,7 @@ def compute_clt_mean(samples: np.ndarray) -> float:
     title: 'Byte-Pair Encoding & Tokenizers',
     titleAr: 'ترميز أزواج البايتات (BPE)',
     trackId: 'deeplearning',
-    estimatedMinutes: 7,
+    estimatedMinutes: 18,
     description: {
       en: 'Inspect how modern Large Language Models compress text into optimal subword vocabularies using BPE merge rules.',
       ar: 'افحص كيف تضغط النماذج اللغوية الكبيرة النصوص إلى مفردات تحت-كلمية مثالية باستخدام قواعد دمج BPE.',

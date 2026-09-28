@@ -120,7 +120,7 @@ def scaled_dot_product_attention(
   },
 };
 
-export const AttentionHeatmapCanvas: React.FC = () => {
+export const AttentionHeatmapCanvas: React.FC<{ compact?: boolean }> = ({ compact = true }) => {
   const { language, config } = useOkvirStore();
 
   const [activeHead, setActiveHead] = useState<1 | 2>(2);
@@ -170,7 +170,7 @@ export const AttentionHeatmapCanvas: React.FC = () => {
   return (
     <div className="flex flex-col gap-5 p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
       {/* Pre-Canvas Intuitive Briefing & Mental Model */}
-      <PreCanvasBriefing content={ATTENTION_PEDAGOGY} />
+      {!compact && <PreCanvasBriefing content={ATTENTION_PEDAGOGY} />}
 
       {/* Header and Controls */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-4">
@@ -361,7 +361,7 @@ export const AttentionHeatmapCanvas: React.FC = () => {
       </div>
 
       {/* Post-Canvas Mathematical & Code Consolidation */}
-      <PostCanvasConsolidation content={ATTENTION_PEDAGOGY} />
+      {!compact && <PostCanvasConsolidation content={ATTENTION_PEDAGOGY} />}
     </div>
   );
 };

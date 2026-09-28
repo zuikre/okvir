@@ -147,7 +147,7 @@ class CustomActivationNeuron(nn.Module):
   },
 };
 
-export const NeuralActivationCanvas: React.FC = () => {
+export const NeuralActivationCanvas: React.FC<{ compact?: boolean }> = ({ compact = true }) => {
   const { language, config } = useOkvirStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -355,7 +355,7 @@ export const NeuralActivationCanvas: React.FC = () => {
   return (
     <div className="flex flex-col gap-5">
       {/* Pre-Canvas Intuitive Briefing & Mental Model */}
-      <PreCanvasBriefing content={NEURAL_PEDAGOGY} />
+      {!compact && <PreCanvasBriefing content={NEURAL_PEDAGOGY} />}
 
       {/* Preset Scenarios Strip */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
@@ -523,7 +523,7 @@ export const NeuralActivationCanvas: React.FC = () => {
       </div>
 
       {/* Post-Canvas Mathematical & Code Consolidation */}
-      <PostCanvasConsolidation content={NEURAL_PEDAGOGY} />
+      {!compact && <PostCanvasConsolidation content={NEURAL_PEDAGOGY} />}
     </div>
   );
 };

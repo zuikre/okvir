@@ -115,7 +115,7 @@ def knn_predict_weighted(X_train: np.ndarray, y_train: np.ndarray, x_query: np.n
   },
 };
 
-export const KNNRadar: React.FC<{ compact?: boolean }> = () => {
+export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = true }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { knnK, setKnnK, theme, language, config } = useOkvirStore();
 
@@ -433,7 +433,7 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = () => {
   return (
     <div className="flex flex-col gap-4 select-none">
       {/* Pre-Canvas Intuitive Briefing & Mental Model */}
-      <PreCanvasBriefing content={KNN_TIER_CONTENT} />
+      {!compact && <PreCanvasBriefing content={KNN_TIER_CONTENT} />}
 
       {/* Scenario Presets Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
@@ -611,7 +611,7 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = () => {
       </div>
 
       {/* Post-Canvas Mathematical & Code Consolidation */}
-      <PostCanvasConsolidation content={KNN_TIER_CONTENT} />
+      {!compact && <PostCanvasConsolidation content={KNN_TIER_CONTENT} />}
     </div>
   );
 };

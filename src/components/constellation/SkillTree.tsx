@@ -25,6 +25,10 @@ import { curriculum, tracks } from '@/lib/curriculum';
 import { audio } from '@/lib/audio';
 import { MILESTONE_BADGES, generateVerifiableCredential } from '@/lib/badges';
 import type { CurriculumModule, LessonStatus } from '@/lib/types';
+import { SkillNodeComponent } from './SkillNodeComponent';
+import { ConstellationConnectors, type ConnectorEdge } from './ConstellationConnectors';
+import { ConstellationCanvas } from './ConstellationCanvas';
+import { generateCurvedEdgePath } from './geometry';
 
 interface UnitDefinition {
   id: string;
@@ -223,6 +227,42 @@ export const SkillTree: React.FC = () => {
     });
     return edges;
   }, []);
+
+  // Compute adaptive, non-flashing cubic Bézier splines for all DAG edges
+  const dagEdges: ConnectorEdge[] = useMemo(() => {
+    const list: ConnectorEdge[] = [];
+    allPrereqEdges.forEach(({ fromId, toId }, idx) => {
+      const pFrom = DAG_COORDINATES[fromId];
+      const pTo = DAG_COORDINATES[toId];
+      if (!pFrom || !pTo) return;
+
+      const fromBox = { cx: pFrom.x, cy: pFrom.y, width: 110, height: 54 };
+      const toBox = { cx: pTo.x, cy: pTo.y, width: 110, height: 54 };
+      const { pathD } = generateCurvedEdgePath(fromBox, toBox, true);
+
+      const isSourceHovered = hoveredModuleId === fromId || selectedModule?.id === fromId;
+      const isTargetHovered = hoveredModuleId === toId || selectedModule?.id === toId;
+      const isHighlighted = isSourceHovered || isTargetHovered;
+
+      const isOriginMastered = lessons[fromId]?.status === 'mastered';
+      const isDestMastered = lessons[toId]?.status === 'mastered';
+      const isDestAvailable =
+        lessons[toId]?.status === 'available' || lessons[toId]?.status === 'in_progress';
+
+      list.push({
+        id: `edge-${idx}-${fromId}-${toId}`,
+        fromId,
+        toId,
+        pathD,
+        isHighlighted,
+        isOriginMastered,
+        isDestMastered,
+        isDestAvailable,
+        isSourceHovered,
+      });
+    });
+    return list;
+  }, [allPrereqEdges, hoveredModuleId, selectedModule, lessons]);
 
   return (
     <div className="flex-1 overflow-y-auto grid-bg pb-12 select-none">
@@ -469,13 +509,12 @@ export const SkillTree: React.FC = () => {
 
                 {/* 2. Unified Serpentine Winding Canvas with Exact Mathematical Links */}
                 <div
-                  className="relative w-full max-w-[440px] mx-auto select-none"
+                  className="relative w-[440px] max-w-full mx-auto select-none overflow-visible"
                   style={{ height: `${TOTAL_HEIGHT}px` }}
                 >
                   {/* Single Unified Full-Unit SVG Overlay connecting all nodes */}
                   <svg
                     viewBox={`0 0 ${CONTAINER_WIDTH} ${TOTAL_HEIGHT}`}
-                    preserveAspectRatio="none"
                     className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"
                   >
                     <defs>
@@ -574,126 +613,37 @@ export const SkillTree: React.FC = () => {
                     })}
                   </svg>
 
-                  {/* Render Node Pedestals at exact analytical percentage coordinates */}
+                  {/* Render Node Pedestals at exact analytical pixel coordinates */}
                   {unit.modules.map((mod, modIdx) => {
                     const coord = nodeCoords[modIdx];
                     const progress = lessons[mod.id];
-                    const status: LessonStatus = progress?.status || (modIdx === 0 && unit.unitNumber === 1 ? 'available' : 'locked');
-                    const isMastered = status === 'mastered';
-                    const isInProgress = status === 'in_progress';
-                    const isAvailable = status === 'available';
-                    const isLocked = status === 'locked';
-                    const isDecaying = status === 'decaying';
+                    const status: LessonStatus =
+                      progress?.status ||
+                      (modIdx === 0 && unit.unitNumber === 1 ? 'available' : 'locked');
 
                     return (
                       <div
                         key={mod.id}
                         className="absolute z-10 flex flex-col items-center"
                         style={{
-                          left: `${(coord.x / CONTAINER_WIDTH) * 100}%`,
+                          left: `${coord.x}px`,
                           top: `${coord.y}px`,
                           transform: 'translate(-50%, -50%)',
                         }}
                       >
-                        {/* Floating "START" Badge overhead if Available */}
-                        {isAvailable && (
-                          <div className="absolute -top-7 z-20 bounce-subtle">
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-sky-500 text-white shadow-md border border-white/30 tracking-wider">
-                              {language === 'ar' ? 'ابدأ هنا' : 'START'}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* 3D Round Node Pedestal */}
-                        <div className="relative group w-20 h-20">
-                          {isAvailable && (
-                            <div className="absolute inset-0 rounded-full beacon-ping bg-sky-400/40 pointer-events-none" />
-                          )}
-
-                          <button
-                            onClick={() => handleNodeClick(mod)}
-                            onMouseEnter={() => setHoveredModuleId(mod.id)}
-                            onMouseLeave={() => setHoveredModuleId(null)}
-                            className={`relative w-20 h-20 rounded-full flex flex-col items-center justify-center font-mono select-none pedestal-3d cursor-pointer ${
-                              isMastered
-                                ? 'bg-gradient-to-b from-emerald-400 to-emerald-600 shadow-[0_6px_0_#065f46,0_12px_24px_rgba(16,185,129,0.35)] text-white'
-                                : isInProgress
-                                ? 'bg-gradient-to-b from-amber-400 to-amber-600 shadow-[0_6px_0_#92400e,0_12px_24px_rgba(245,158,11,0.35)] text-white'
-                                : isAvailable
-                                ? 'bg-gradient-to-b from-sky-400 to-blue-600 shadow-[0_6px_0_#1e40af,0_12px_24px_rgba(56,189,248,0.4)] text-white pulse-ring'
-                                : isDecaying
-                                ? 'bg-gradient-to-b from-rose-500 to-rose-700 shadow-[0_6px_0_#881337,0_12px_24px_rgba(244,63,94,0.3)] text-white'
-                                : 'bg-gradient-to-b from-[#18181b] to-[#121215] shadow-[0_5px_0_#27272a] border border-[#27272a] text-zinc-500 opacity-60 hover:opacity-85'
-                            }`}
-                          >
-                            <div className="flex items-center justify-center">
-                              {isMastered && <Award size={24} className="text-yellow-200" />}
-                              {isInProgress && <Play size={22} fill="currentColor" />}
-                              {isAvailable && <Play size={24} fill="currentColor" className="text-white" />}
-                              {isDecaying && <AlertTriangle size={20} />}
-                              {isLocked && <Lock size={20} />}
-                            </div>
-
-                            {/* Mini Beat Progress Stars / Fraction */}
-                            {isMastered && (
-                              <div className="flex items-center gap-0.5 mt-0.5 text-yellow-200">
-                                <Star size={8} fill="currentColor" />
-                                <Star size={8} fill="currentColor" />
-                                <Star size={8} fill="currentColor" />
-                                <Star size={8} fill="currentColor" />
-                              </div>
-                            )}
-
-                            {isInProgress && (
-                              <span className="text-[9px] font-bold text-amber-100 mt-0.5">
-                                {progress?.completedBeats?.length || 1}/4
-                              </span>
-                            )}
-                          </button>
-                        </div>
-
-                        {/* Node Label Below inside floating glassmorphic pill */}
-                        <div className="mt-2.5 px-3 py-1 rounded-xl bg-[var(--bg-app)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-center max-w-[150px] shadow-sm">
-                          <div className="text-xs font-bold text-[var(--text-primary)] leading-tight truncate">
-                            {language === 'ar' ? mod.titleAr : mod.title}
-                          </div>
-                          <div className="text-[10px] font-mono text-[var(--text-tertiary)] flex items-center justify-center gap-1 mt-0.5">
-                            <Clock size={9} />
-                            <span>{mod.estimatedMinutes}m</span>
-                            {isMastered && <span className="text-emerald-400 font-semibold">✓</span>}
-                          </div>
-                        </div>
-
-                        {/* Hover Quick Popover Card */}
-                        {hoveredModuleId === mod.id && (
-                          <div
-                            className="absolute bottom-full mb-3 w-64 p-3 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] shadow-2xl backdrop-blur-xl z-30 text-start slide-up pointer-events-none"
-                            style={{ borderColor: unit.color }}
-                          >
-                            <div className="flex items-center justify-between gap-2 border-b border-[var(--border-subtle)] pb-1.5 mb-1.5">
-                              <span
-                                className="text-[10px] font-mono font-bold uppercase tracking-wider"
-                                style={{ color: unit.color }}
-                              >
-                                {language === 'ar' ? unit.titleAr : unit.title}
-                              </span>
-                              <span className="text-[9px] font-mono text-[var(--text-tertiary)]">
-                                ~{mod.estimatedMinutes} mins
-                              </span>
-                            </div>
-                            <h3 className="text-xs font-bold text-[var(--text-primary)]">
-                              {language === 'ar' ? mod.titleAr : mod.title}
-                            </h3>
-                            <p className="text-[11px] text-[var(--text-secondary)] line-clamp-2 mt-1 leading-relaxed">
-                              {language === 'ar' ? mod.description.ar : mod.description.en}
-                            </p>
-                            {mod.prerequisites.length > 0 && (
-                              <div className="mt-2 pt-1 border-t border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-tertiary)]">
-                                {language === 'ar' ? 'المتطلبات:' : 'Prerequisites:'} {mod.prerequisites.join(', ')}
-                              </div>
-                            )}
-                          </div>
-                        )}
+                        <SkillNodeComponent
+                          module={mod}
+                          status={status}
+                          completedBeatsCount={progress?.completedBeats?.length || 0}
+                          mode="roadmap"
+                          language={language}
+                          accentColor={unit.color}
+                          isHovered={hoveredModuleId === mod.id}
+                          isSelected={selectedModule?.id === mod.id}
+                          onClick={() => handleNodeClick(mod)}
+                          onMouseEnter={() => setHoveredModuleId(mod.id)}
+                          onMouseLeave={() => setHoveredModuleId(null)}
+                        />
                       </div>
                     );
                   })}
@@ -818,262 +768,71 @@ export const SkillTree: React.FC = () => {
             </span>
           </div>
 
-          <div className="relative w-full overflow-x-auto rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-2xl">
-            <div className="relative min-w-[1260px] h-[720px] select-none">
-              {/* Disciplinary Track Column Headers */}
-              <div className="absolute top-0 left-0 right-0 h-10 flex pointer-events-none z-10 border-b border-[var(--border-subtle)]/40">
-                <div className="absolute left-[175px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-mono font-bold">
-                  <span>📐</span>
-                  <span>{language === 'ar' ? 'الأسس الرياضية' : 'Mathematical Foundations'}</span>
+          <ConstellationCanvas contentWidth={1260} contentHeight={720}>
+            {(_lod, _scale) => (
+              <div className="relative w-[1260px] h-[720px] select-none">
+                {/* Disciplinary Track Column Headers */}
+                <div className="absolute top-0 left-0 right-0 h-10 flex pointer-events-none z-10 border-b border-[var(--border-subtle)]/40">
+                  <div className="absolute left-[175px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-mono font-bold">
+                    <span>📐</span>
+                    <span>{language === 'ar' ? 'الأسس الرياضية' : 'Mathematical Foundations'}</span>
+                  </div>
+                  <div className="absolute left-[470px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold">
+                    <span>💻</span>
+                    <span>{language === 'ar' ? 'البرمجة والبيانات' : 'Programming & Data'}</span>
+                  </div>
+                  <div className="absolute left-[790px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold">
+                    <span>📈</span>
+                    <span>{language === 'ar' ? 'الاقتصاد القياسي والتعلم' : 'Econometrics & ML'}</span>
+                  </div>
+                  <div className="absolute left-[1110px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-bold">
+                    <span>🧠</span>
+                    <span>{language === 'ar' ? 'التعلم العميق والذكاء الاصطناعي' : 'Deep Learning & AI'}</span>
+                  </div>
                 </div>
-                <div className="absolute left-[470px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold">
-                  <span>💻</span>
-                  <span>{language === 'ar' ? 'البرمجة والبيانات' : 'Programming & Data'}</span>
-                </div>
-                <div className="absolute left-[790px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold">
-                  <span>📈</span>
-                  <span>{language === 'ar' ? 'الاقتصاد القياسي والتعلم' : 'Econometrics & ML'}</span>
-                </div>
-                <div className="absolute left-[1110px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-bold">
-                  <span>🧠</span>
-                  <span>{language === 'ar' ? 'التعلم العميق والذكاء الاصطناعي' : 'Deep Learning & AI'}</span>
-                </div>
-              </div>
 
-              {/* SVG Edges Layer with UserSpaceOnUse Arrowheads to prevent flashing */}
-              <svg
-                viewBox="0 0 1260 720"
-                className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"
-              >
-                <defs>
-                  {/* Stable Arrowhead Markers: strictly userSpaceOnUse so strokeWidth changes never teleport/flash markers */}
-                  <marker
-                    id="dag-arrow"
-                    markerUnits="userSpaceOnUse"
-                    viewBox="0 0 10 10"
-                    refX="8"
-                    refY="5"
-                    markerWidth="7"
-                    markerHeight="7"
-                    orient="auto"
-                  >
-                    <path d="M 1 2 L 8 5 L 1 8 z" fill="#52525b" />
-                  </marker>
-                  <marker
-                    id="dag-arrow-active"
-                    markerUnits="userSpaceOnUse"
-                    viewBox="0 0 10 10"
-                    refX="8"
-                    refY="5"
-                    markerWidth="8"
-                    markerHeight="8"
-                    orient="auto"
-                  >
-                    <path d="M 1 2 L 8 5 L 1 8 z" fill="#38bdf8" />
-                  </marker>
-                  <marker
-                    id="dag-arrow-prereq"
-                    markerUnits="userSpaceOnUse"
-                    viewBox="0 0 10 10"
-                    refX="8"
-                    refY="5"
-                    markerWidth="8"
-                    markerHeight="8"
-                    orient="auto"
-                  >
-                    <path d="M 1 2 L 8 5 L 1 8 z" fill="#f59e0b" />
-                  </marker>
-                  <marker
-                    id="dag-arrow-mastered"
-                    markerUnits="userSpaceOnUse"
-                    viewBox="0 0 10 10"
-                    refX="8"
-                    refY="5"
-                    markerWidth="8"
-                    markerHeight="8"
-                    orient="auto"
-                  >
-                    <path d="M 1 2 L 8 5 L 1 8 z" fill="#10b981" />
-                  </marker>
-                </defs>
+                {/* SVG Edges Layer: Decoupled stable markers and photon overlay */}
+                <svg
+                  viewBox="0 0 1260 720"
+                  className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"
+                >
+                  <ConstellationConnectors edges={dagEdges} />
+                </svg>
 
-                {allPrereqEdges.map(({ fromId, toId }, idx) => {
-                  const pFrom = DAG_COORDINATES[fromId];
-                  const pTo = DAG_COORDINATES[toId];
-                  if (!pFrom || !pTo) return null;
-
-                  const isSourceHovered = hoveredModuleId === fromId || selectedModule?.id === fromId;
-                  const isTargetHovered = hoveredModuleId === toId || selectedModule?.id === toId;
-                  const isHighlighted = isSourceHovered || isTargetHovered;
-
-                  const isOriginMastered = lessons[fromId]?.status === 'mastered';
-                  const isDestMastered = lessons[toId]?.status === 'mastered';
-                  const isDestAvailable = lessons[toId]?.status === 'available' || lessons[toId]?.status === 'in_progress';
-                  const isEdgeFlowing = isOriginMastered && isDestAvailable;
-
-                  // Dock precisely at bottom center of origin card (y + 27) and top center of dest card (y - 27)
-                  const startX = pFrom.x;
-                  const startY = pFrom.y + 27;
-                  const endX = pTo.x;
-                  const endY = pTo.y - 27;
-                  const deltaY = endY - startY;
-
-                  // Arc offset for the linear-algebra-vectors -> bayes-theorem transitive shortcut
-                  const isShortcut = fromId === 'linear-algebra-vectors' && toId === 'bayes-theorem';
-                  const arcX = isShortcut ? -60 : 0;
-
-                  const cY1 = startY + deltaY * 0.45;
-                  const cY2 = startY + deltaY * 0.55;
-                  const pathD = `M ${startX} ${startY} C ${startX + arcX} ${cY1}, ${endX + arcX} ${cY2}, ${endX} ${endY}`;
+                {/* Render DAG Node Cards: Tactile polymorphic components */}
+                {curriculum.map((mod) => {
+                  const pos = DAG_COORDINATES[mod.id] || { x: 500, y: 400 };
+                  const progress = lessons[mod.id];
+                  const status =
+                    progress?.status || (mod.prerequisites.length === 0 ? 'available' : 'locked');
 
                   return (
-                    <g key={`dag-edge-${idx}`}>
-                      {/* Drop-shadow background casing to prevent edge crossing artifacts */}
-                      <path
-                        d={pathD}
-                        fill="none"
-                        stroke="var(--bg-surface)"
-                        strokeWidth="6"
-                        strokeLinecap="round"
+                    <div
+                      key={mod.id}
+                      className="absolute z-10"
+                      style={{
+                        left: `${pos.x}px`,
+                        top: `${pos.y}px`,
+                        transform: 'translate(-50%, -50%)',
+                      }}
+                    >
+                      <SkillNodeComponent
+                        module={mod}
+                        status={status}
+                        mode="dag"
+                        language={language}
+                        isHovered={hoveredModuleId === mod.id}
+                        isSelected={selectedModule?.id === mod.id}
+                        onClick={() => handleNodeClick(mod)}
+                        onMouseEnter={() => setHoveredModuleId(mod.id)}
+                        onMouseLeave={() => setHoveredModuleId(null)}
                       />
-
-                      {/* Foreground edge spline */}
-                      <path
-                        d={pathD}
-                        fill="none"
-                        stroke={
-                          isHighlighted
-                            ? isSourceHovered
-                              ? '#38bdf8'
-                              : '#f59e0b'
-                            : isOriginMastered && isDestMastered
-                            ? '#10b981'
-                            : isEdgeFlowing
-                            ? '#10b981'
-                            : isOriginMastered
-                            ? 'rgba(16, 185, 129, 0.45)'
-                            : 'var(--border-subtle)'
-                        }
-                        strokeWidth={isHighlighted ? 2.5 : isEdgeFlowing ? 2 : 1.5}
-                        strokeDasharray={isEdgeFlowing || isHighlighted ? '6 6' : isOriginMastered ? 'none' : '3 3'}
-                        className={isEdgeFlowing || isHighlighted ? 'river-flow' : ''}
-                        markerEnd={
-                          isHighlighted
-                            ? isSourceHovered
-                              ? 'url(#dag-arrow-active)'
-                              : 'url(#dag-arrow-prereq)'
-                            : isOriginMastered && (isDestMastered || isEdgeFlowing)
-                            ? 'url(#dag-arrow-mastered)'
-                            : 'url(#dag-arrow)'
-                        }
-                        opacity={isHighlighted ? 1.0 : isOriginMastered ? 0.75 : 0.35}
-                      />
-                    </g>
+                    </div>
                   );
                 })}
-              </svg>
-
-              {/* Render DAG Node Cards: self-contained 110x54px tactile cards */}
-              {curriculum.map((mod) => {
-                const pos = DAG_COORDINATES[mod.id] || { x: 500, y: 400 };
-                const progress = lessons[mod.id];
-                const status = progress?.status || (mod.prerequisites.length === 0 ? 'available' : 'locked');
-                const isMastered = status === 'mastered';
-                const isInProgress = status === 'in_progress';
-                const isAvailable = status === 'available';
-                const isLocked = status === 'locked';
-
-                const isHovered = hoveredModuleId === mod.id;
-                const isSelected = selectedModule?.id === mod.id;
-                const track = tracks.find((t) => t.id === mod.trackId);
-
-                return (
-                  <div
-                    key={mod.id}
-                    className="absolute z-10"
-                    style={{
-                      left: `${pos.x}px`,
-                      top: `${pos.y}px`,
-                      transform: 'translate(-50%, -50%)',
-                      width: '110px',
-                      height: '54px',
-                    }}
-                  >
-                    <button
-                      onClick={() => handleNodeClick(mod)}
-                      onMouseEnter={() => setHoveredModuleId(mod.id)}
-                      onMouseLeave={() => setHoveredModuleId(null)}
-                      className={`w-full h-full rounded-xl px-2.5 py-1.5 flex flex-col justify-between text-start border transition-all duration-150 cursor-pointer ${
-                        isMastered
-                          ? 'bg-[var(--bg-surface)] border-emerald-500/70 shadow-[0_2px_8px_rgba(16,185,129,0.25)] hover:border-emerald-400 hover:scale-105'
-                          : isInProgress
-                          ? 'bg-[var(--bg-surface)] border-amber-500/80 shadow-[0_2px_8px_rgba(245,158,11,0.25)] hover:border-amber-400 hover:scale-105'
-                          : isAvailable
-                          ? 'bg-[var(--bg-surface)] border-sky-500 shadow-[0_2px_10px_rgba(56,189,248,0.3)] hover:border-sky-400 hover:scale-105 ring-2 ring-sky-500/30 animate-pulse'
-                          : 'bg-[var(--bg-surface)]/70 border-[var(--border-subtle)] text-[var(--text-tertiary)] opacity-60 hover:opacity-90 hover:border-[var(--border-strong)]'
-                      } ${isHovered || isSelected ? 'ring-2 ring-[var(--text-primary)] scale-105 shadow-xl' : ''}`}
-                    >
-                      {/* Card Header: Track dot + Est. Time + Status Icon */}
-                      <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-1.5">
-                          <span
-                            className="w-2 h-2 rounded-full shrink-0"
-                            style={{ backgroundColor: track?.color || '#38bdf8' }}
-                          />
-                          <span className="text-[9px] font-mono font-bold text-[var(--text-tertiary)]">
-                            {mod.estimatedMinutes}m
-                          </span>
-                        </div>
-
-                        <div className="shrink-0">
-                          {isMastered && <Check size={12} className="text-emerald-400 stroke-[3]" />}
-                          {isInProgress && <Play size={10} fill="currentColor" className="text-amber-400" />}
-                          {isAvailable && <Play size={11} fill="currentColor" className="text-sky-400" />}
-                          {isLocked && <Lock size={10} className="text-[var(--text-tertiary)]" />}
-                        </div>
-                      </div>
-
-                      {/* Card Body: Localized Title */}
-                      <div className="text-[10px] font-bold text-[var(--text-primary)] leading-tight line-clamp-2 truncate">
-                        {language === 'ar' ? mod.titleAr : mod.title}
-                      </div>
-                    </button>
-
-                    {/* Popover Card on Hover */}
-                    {isHovered && (
-                      <div className="absolute bottom-full mb-2 w-60 p-3 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface)] shadow-2xl backdrop-blur-xl z-30 text-start slide-up pointer-events-none left-1/2 -translate-x-1/2">
-                        <div className="flex items-center justify-between gap-2 border-b border-[var(--border-subtle)] pb-1 mb-1.5">
-                          <span
-                            className="text-[10px] font-mono font-bold uppercase tracking-wider"
-                            style={{ color: track?.color || '#38bdf8' }}
-                          >
-                            {track?.title}
-                          </span>
-                          <span className="text-[9px] font-mono text-[var(--text-tertiary)]">
-                            ~{mod.estimatedMinutes} mins
-                          </span>
-                        </div>
-                        <div className="text-xs font-bold text-[var(--text-primary)] mb-1">
-                          {language === 'ar' ? mod.titleAr : mod.title}
-                        </div>
-                        <div className="text-[10px] text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
-                          {language === 'ar' ? mod.description.ar : mod.description.en}
-                        </div>
-                        {mod.prerequisites.length > 0 && (
-                          <div className="mt-1.5 pt-1 border-t border-[var(--border-subtle)] text-[9px] font-mono text-amber-400 flex items-center gap-1">
-                            <span className="text-[var(--text-tertiary)]">
-                              {language === 'ar' ? 'المتطلبات:' : 'Prereqs:'}
-                            </span>
-                            <span className="truncate">{mod.prerequisites.join(', ')}</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+              </div>
+            )}
+          </ConstellationCanvas>
         </div>
       )}
 

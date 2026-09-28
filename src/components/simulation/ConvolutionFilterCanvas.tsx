@@ -192,7 +192,7 @@ def conv2d_gemm(image: np.ndarray, kernel: np.ndarray):
   },
 };
 
-export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = () => {
+export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compact = true }) => {
   const { language, config } = useOkvirStore();
 
   const [activeKernel, setActiveKernel] = useState<KernelType>('edge');
@@ -321,7 +321,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = () => {
   return (
     <div className="flex flex-col gap-5 p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
       {/* Pre-Canvas Intuitive Briefing & Mental Model */}
-      <PreCanvasBriefing content={CONV_PEDAGOGY} />
+      {!compact && <PreCanvasBriefing content={CONV_PEDAGOGY} />}
 
       {/* Header and Kernel Switcher */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-4">
@@ -542,7 +542,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = () => {
       </div>
 
       {/* Post-Canvas Mathematical & Code Consolidation */}
-      <PostCanvasConsolidation content={CONV_PEDAGOGY} />
+      {!compact && <PostCanvasConsolidation content={CONV_PEDAGOGY} />}
     </div>
   );
 };

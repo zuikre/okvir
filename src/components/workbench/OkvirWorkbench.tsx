@@ -63,6 +63,32 @@ export const OkvirWorkbench: React.FC = () => {
   const [activeDeckTab, setActiveDeckTab] = useState<'canvas' | 'code' | 'inspector' | 'profiler'>('canvas');
   const [isFocusDeck, setIsFocusDeck] = useState(false);
   const [selectedQuizIdx, setSelectedQuizIdx] = useState<number | null>(null);
+  const [splitPercent, setSplitPercent] = useState(42);
+  const isDraggingSplitRef = React.useRef(false);
+
+  const handleSplitPointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    isDraggingSplitRef.current = true;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handleSplitPointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingSplitRef.current) return;
+    const ratio = (e.clientX / window.innerWidth) * 100;
+    const bounded = Math.min(65, Math.max(28, ratio));
+    setSplitPercent(bounded);
+  };
+
+  const handleSplitPointerUp = (e: React.PointerEvent) => {
+    if (isDraggingSplitRef.current) {
+      isDraggingSplitRef.current = false;
+      try {
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+    }
+  };
 
   // Reactive WASM bridge
   const { isReady, isRunning, variables, memory, logs, executionTimeMs, runCode } = useCodeCanvasBridge();
@@ -111,6 +137,11 @@ export const OkvirWorkbench: React.FC = () => {
 
   const setBeat = (b: BeatNumber) => {
     updateLessonBeat(mod.id, b);
+    if (b === 1 || b === 2) {
+      setActiveDeckTab('canvas');
+    } else if (b === 3) {
+      setActiveDeckTab('code');
+    }
     if (config.soundEnabled) audio.playClick();
   };
 
@@ -239,7 +270,10 @@ export const OkvirWorkbench: React.FC = () => {
       <div className="flex-1 flex overflow-hidden">
         {/* Left Pane (45%): Masterclass Console & Narrative */}
         {!isFocusDeck && (
-          <aside className="w-[45%] border-e border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-hidden">
+          <aside
+            style={{ width: `${splitPercent}%` }}
+            className="border-e border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col overflow-hidden shrink-0"
+          >
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {/* Beat Headline */}
               <div className="space-y-1">
@@ -377,6 +411,20 @@ export const OkvirWorkbench: React.FC = () => {
               </button>
             </div>
           </aside>
+        )}
+
+        {/* Draggable Divider Gutter */}
+        {!isFocusDeck && (
+          <div
+            onPointerDown={handleSplitPointerDown}
+            onPointerMove={handleSplitPointerMove}
+            onPointerUp={handleSplitPointerUp}
+            onPointerCancel={handleSplitPointerUp}
+            className="w-1.5 hover:w-2 bg-[var(--border-subtle)] hover:bg-sky-500/80 cursor-col-resize flex items-center justify-center transition-all z-10 group shrink-0"
+            title="Drag to resize panes"
+          >
+            <div className="w-[2px] h-6 rounded-full bg-zinc-600 group-hover:bg-white transition-colors" />
+          </div>
         )}
 
         {/* Right Pane (55% or 100%): Dockable Industrial Instrument Deck */}

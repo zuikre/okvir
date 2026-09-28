@@ -117,7 +117,7 @@ interface TrajectorySnapshot {
   gradNorm: number;
 }
 
-export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = () => {
+export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact = true }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { learningRate, momentum, setLearningRate, setMomentum, theme, language, config } = useOkvirStore();
 
@@ -409,7 +409,7 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = () => {
   return (
     <div className="flex flex-col gap-4 select-none">
       {/* Pre-Canvas Intuitive Briefing & Mental Model */}
-      <PreCanvasBriefing content={GD_TIER_CONTENT} />
+      {!compact && <PreCanvasBriefing content={GD_TIER_CONTENT} />}
 
       {/* Top Toolbar: Surfaces & Optimizers */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
@@ -570,7 +570,7 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = () => {
       </div>
 
       {/* Post-Canvas Mathematical & Code Consolidation */}
-      <PostCanvasConsolidation content={GD_TIER_CONTENT} />
+      {!compact && <PostCanvasConsolidation content={GD_TIER_CONTENT} />}
     </div>
   );
 };

@@ -171,7 +171,7 @@ interface StepSnapshot {
   phase: string;
 }
 
-export const KMeansVoronoi: React.FC<{ compact?: boolean }> = () => {
+export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = true }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { theme, language, config } = useOkvirStore();
 
@@ -562,7 +562,7 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = () => {
   return (
     <div className="flex flex-col gap-4 select-none">
       {/* Pre-Canvas Intuitive Briefing & Mental Model */}
-      <PreCanvasBriefing content={KMEANS_TIER_CONTENT} />
+      {!compact && <PreCanvasBriefing content={KMEANS_TIER_CONTENT} />}
 
       {/* Top Toolbar: Cluster Count K & Presets */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
@@ -675,7 +675,7 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = () => {
       />
 
       {/* Post-Canvas Mathematical & Code Consolidation */}
-      <PostCanvasConsolidation content={KMEANS_TIER_CONTENT} />
+      {!compact && <PostCanvasConsolidation content={KMEANS_TIER_CONTENT} />}
     </div>
   );
 };

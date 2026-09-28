@@ -140,7 +140,7 @@ def lasso_coordinate_descent(X: np.ndarray, y: np.ndarray, lam: float, max_iter:
   },
 };
 
-export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = () => {
+export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ compact = true }) => {
   const { language, config } = useOkvirStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -411,7 +411,7 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = () 
   return (
     <div className="flex flex-col gap-5 p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
       {/* Pre-Canvas Intuitive Briefing & Mental Model */}
-      <PreCanvasBriefing content={REG_PEDAGOGY} />
+      {!compact && <PreCanvasBriefing content={REG_PEDAGOGY} />}
 
       {/* Header and Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-4">
@@ -577,7 +577,7 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = () 
       </div>
 
       {/* Post-Canvas Mathematical & Code Consolidation */}
-      <PostCanvasConsolidation content={REG_PEDAGOGY} />
+      {!compact && <PostCanvasConsolidation content={REG_PEDAGOGY} />}
     </div>
   );
 };
