@@ -3,17 +3,21 @@
 # OKVIR (إطار)
 ### The Open-Source, Interactive Desktop Framework for Learning Data Science, Econometrics & AI from the Ground Up
 
+[![CI / CD Status](https://img.shields.io/badge/CI%2FCD-Passing-10b981.svg?style=flat-square&logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
 [![Release](https://img.shields.io/badge/release-v1.0.0-emerald.svg?style=flat-square)](https://github.com/okvir-org/okvir/releases)
-[![License: MIT or Apache-2.0](https://img.shields.io/badge/Engine-MIT%20%7C%20Apache--2.0-blue.svg?style=flat-square)](LICENSE-MIT)
-[![Curriculum: CC-BY-SA 4.0](https://img.shields.io/badge/Curriculum-CC--BY--SA%204.0-orange.svg?style=flat-square)](https://creativecommons.org/licenses/by-sa/4.0/)
-[![Platforms](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-purple.svg?style=flat-square)](#download--installation)
-[![Language](https://img.shields.io/badge/Language-English%20%7C%20%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9-amber.svg?style=flat-square)](#bilingual-experience-en--ar)
-[![Tauri v2](https://img.shields.io/badge/Built%20With-Tauri%20v2%20%2B%20Rust-red.svg?style=flat-square)](https://tauri.app/)
-[![Python WASM](https://img.shields.io/badge/Python-CPython%203.12%20(Pyodide%20WASM)-yellow.svg?style=flat-square)](https://pyodide.org/)
+[![License: MIT or Apache-2.0](https://img.shields.io/badge/Engine-MIT%20%7C%20Apache--2.0-3b82f6.svg?style=flat-square)](LICENSE-MIT)
+[![Curriculum: CC-BY-SA 4.0](https://img.shields.io/badge/Curriculum-CC--BY--SA%204.0-f59e0b.svg?style=flat-square)](https://creativecommons.org/licenses/by-sa/4.0/)
+[![Platforms](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-8b5cf6.svg?style=flat-square)](#-download--installation)
+[![Language](https://img.shields.io/badge/Language-English%20%7C%20%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9-ec4899.svg?style=flat-square)](#-bilingual-experience-english--العربية)
+[![Tauri v2](https://img.shields.io/badge/Built%20With-Tauri%20v2%20%2B%20Rust%201.80-ef4444.svg?style=flat-square&logo=tauri&logoColor=white)](https://tauri.app/)
+[![Python WASM](https://img.shields.io/badge/Python-CPython%203.12%20(Pyodide%20WASM)-eab308.svg?style=flat-square&logo=python&logoColor=white)](https://pyodide.org/)
+[![Contrast](https://img.shields.io/badge/Accessibility-WCAG%20AAA%20(≥7:1)-14b8a6.svg?style=flat-square)](#-instrument-grade-design-system)
 
 <p align="center">
-  <strong>Zero DevOps Setup. 100% Local-First. 60 FPS Visual Physics. Bilingual EN/AR. Under 28MB.</strong>
+  <strong>Zero DevOps Setup. 100% Local-First. 60 FPS Visual Physics. Procedural Web Audio. Bilingual EN/AR. Under 28MB.</strong>
 </p>
+
+[**Download Desktop App**](https://github.com/okvir-org/okvir/releases) • [**Architecture Specs**](ARCHITECTURE.md) • [**Curriculum Guide**](CURRICULUM_SPEC.md) • [**Contributing**](CONTRIBUTING.md)
 
 </div>
 
@@ -21,11 +25,11 @@
 
 ## ⚡ The Zero DevOps Manifesto
 
-Most people don’t quit Machine Learning because the math is too hard.
+Most people don’t quit Machine Learning because the mathematics is too difficult.
 
-They quit because on **Day 1**, they spend 4 hours wrestling with Anaconda environments, broken PATH configurations, incompatible GCC toolchains, and conflicting CUDA drivers before writing a single line of working code.
+They quit because on **Day 1**, they spend 4 hours wrestling with Anaconda environment conflicts, broken `$PATH` configurations, incompatible GCC toolchains, and corrupt CUDA drivers before writing a single line of working code.
 
-And when they finally get Python running? They are met with passive 45-minute video lectures and blackboard proofs that treat linear algebra like a memorization drill instead of geometric intuition.
+And when they finally get Python running? They are met with passive 45-minute video lectures and blackboard proofs that treat linear algebra like an abstract memorization drill instead of geometric intuition.
 
 **Okvir (إطار)** eliminates the DevOps tax on learning forever.
 
@@ -41,35 +45,37 @@ And when they finally get Python running? They are met with passive 45-minute vi
 └──────────────────────────────┴──────────────────────────────┴───────────────┘
 ```
 
-When you learn Linear Regression in Okvir, you don't memorize OLS formulas. You **drag the slope handle**, watch the residual error squares physically shrink at 60 frames per second, and write the 3-line NumPy vectorization that proves it.
+When you learn Linear Regression in Okvir, you don't memorize the OLS equation. You **drag the slope handle**, watch the residual error squares physically shrink at 60 frames per second, and write the 3-line NumPy vectorization that proves it.
 
 ---
 
-## 🚀 Quickstart & One-Liner Install
+## 🚀 Download & Installation
 
-### Linux & macOS
+### One-Liner Quick Install
+
+#### Linux & macOS
 ```bash
 curl -fsSL https://okvir.dev/install.sh | bash
 ```
 
-### Windows (PowerShell)
+#### Windows (PowerShell)
 ```powershell
 irm https://okvir.dev/install.ps1 | iex
 ```
 
 ### Local Development from Source
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/okvir-org/okvir.git
 cd okvir
 
-# Install frontend dependencies
+# 2. Install dependencies
 npm install
 
-# Start development server
+# 3. Start local development server (Vite + Web Worker WASM)
 npm run dev
 
-# Or run desktop app via Tauri v2 (Rust 1.80+)
+# 4. Or launch the native desktop shell (requires Rust 1.80+)
 npm run tauri dev
 ```
 
@@ -84,6 +90,7 @@ npm run tauri dev
 | **Python Execution** | None (Abstract) | None | Full (Raw notebook) | Browser sandbox | **Full Local WASM (Pyodide)** |
 | **Pedagogical Loop** | Visual Sliders | Gamified Drilling | None (Passive doc) | Video lectures | **4-Beat Tactile Micro-Loop** |
 | **Deep AI Math** | Light / Broad | None | Code-only | Dense equations | **Geometric + Industrial Rigor** |
+| **Audio & Haptics** | None | Recorded SFX | None | None | **Procedural Web Audio API** |
 | **Privacy / Offline** | Cloud-only | Cloud-only | Cloud-reliant | Cloud-only | **100% Local-First & Offline** |
 | **Community Extensibility**| Closed | Closed | Open (Files only) | Closed | **Open Git-Based Registry** |
 
@@ -98,14 +105,14 @@ Every lesson in Okvir strictly adheres to Cognitive Load Theory ($4 \pm 1$ worki
   "Touch the physics"           "KaTeX Strict LTR"         "NumPy in Pyodide WASM"     "Socratic Hint Ladder"
 ```
 
-1. **Beat 1: Tactile Intuition Slider:** Explore geometry and dynamics *before* seeing formulas.
-2. **Beat 2: Formal Mathematical Anchor:** KaTeX formula appears; variables dynamically link to slider values.
-3. **Beat 3: Interactive Code Scratchpad:** Implement the 2-to-3 line computational kernel in Python / DuckDB.
-4. **Beat 4: Transfer Challenge:** Solve an adversarial edge case or inverted scenario to solidify schema formation.
+1. **Beat 1: Tactile Intuition Slider:** Explore geometry, distributions, and dynamics *before* seeing any formal notation.
+2. **Beat 2: Formal Mathematical Anchor:** The KaTeX equation appears; terms dynamically highlight when hovering over slider parameters.
+3. **Beat 3: Interactive Code Scratchpad:** Implement the 2-to-3 line computational kernel in Python (Pyodide WASM) or DuckDB SQL.
+4. **Beat 4: Reality Transfer Challenge:** Solve an adversarial edge case or inverted scenario to solidify cognitive schema formation.
 
 ### 3-Tier Socratic Hint Ladder `[H]`
 Never get stuck. Press `H` at any time to reveal a 3-tier scaffolding ladder:
-* **Tier 1 (Metacognitive Nudge):** Prompts you to think about edge behaviors and relationships.
+* **Tier 1 (Metacognitive Nudge):** Prompts you to think about edge behaviors and mathematical relationships.
 * **Tier 2 (Structural Scaffolding):** Deconstructs the problem into intermediate mathematical sub-goals.
 * **Tier 3 (Bottom-Out Solution):** Complete solution with deep conceptual explanation.
 
@@ -113,58 +120,91 @@ Never get stuck. Press `H` at any time to reveal a 3-tier scaffolding ladder:
 
 ## 🌌 The 4 Foundational Curriculum Tracks
 
-Okvir features 16 meticulously engineered modules across 4 interconnected tracks:
+Okvir features **16 core modules** across 4 interconnected tracks:
 
-### 📐 Track 1: Mathematical Foundations
-* **1.1 Vectors as Geometry:** Directional displacements, span, and Euclidean magnitude.
-* **1.2 Dot Product & Projection:** Geometric shadow projection ($u \cdot v = \|u\| \|v\| \cos\theta$) and orthogonality.
-* **1.3 The Gradient Vector:** Contour maps, steepest ascent vectors, and multivariate surfaces.
-* **1.4 Bayes' Theorem:** Base rate fallacy, disease testing frequency tree, and prior-to-posterior update.
-
-### 💻 Track 2: Programming & Data Foundations
-* **2.1 High-Performance NumPy Vectorization:** SIMD contiguous memory striding vs Python for-loops.
-* **2.2 The DataFrame Anatomy:** Columnar block memory layout, tidy data, and relational algebra.
-* **2.3 Analytical SQL Window Functions:** `ROW_NUMBER()`, `RANK()`, `LAG()`, and rolling partitions in DuckDB-WASM.
-
-### 📈 Track 3: Econometrics & Classical Machine Learning
-* **3.1 OLS Residual Geometry:** Rotating regression line with shrinking geometric residual squares $(y_i - \hat{y}_i)^2$.
-* **3.2 K-Nearest Neighbors (KNN):** Pulsing search radar, elastic neighbor tethers, and voting donut.
-* **3.3 K-Means Clustering:** Real-time morphing Voronoi polygon cell boundaries.
-* **3.4 Decision Trees & Impurity:** Glowing laser knife-cuts slicing feature space by Gini impurity.
-* **3.5 Ridge & Lasso Regularization:** Elliptical OLS loss contours striking the sharp corners of the L1 diamond (sparsity).
-
-### 🧠 Track 4: Deep Learning & Modern AI Foundations
-* **4.1 Perceptron & Activation Functions:** Interactive response curves, dead-ReLU visualizer, and non-linear boundaries.
-* **4.2 Gradient Descent Dynamics:** Particle rolling down 3D loss surface with heavy-ball momentum ribbons.
-* **4.3 CNN & Spatial 2D Convolutions:** Sliding kernel filters (Sobel, Edge Detect, Blur) producing feature maps.
-* **4.4 Transformer Multi-Head Self-Attention:** Query, Key, Value matrix heatmaps and coreference resolution.
+```
+                  ┌───────────────────────────────┐
+                  │ 📐 MATHEMATICAL FOUNDATIONS   │
+                  │ • Vectors as Geometry         │
+                  │ • Dot Product & Projections   │
+                  │ • The Gradient Vector         │
+                  │ • Bayes' Theorem & Priors     │
+                  └──────────────┬────────────────┘
+                                 │
+                 ┌───────────────┴───────────────┐
+                 ▼                               ▼
+  ┌──────────────────────────────┐┌──────────────────────────────┐
+  │ 💻 PROGRAMMING & DATA        ││ 📈 ECONOMETRICS & ML         │
+  │ • SIMD NumPy Vectorization   ││ • OLS Residual Geometry      │
+  │ • Columnar DataFrame Anatomy ││ • KNN Search Radar           │
+  │ • SQL Window Functions       ││ • K-Means Voronoi Tessellation│
+  └──────────────┬───────────────┘│ • Decision Tree Laser Cuts   │
+                 │                │ • L1 vs L2 Regularization    │
+                 │                └──────────────┬───────────────┘
+                 │                               │
+                 └───────────────┬───────────────┘
+                                 ▼
+                  ┌───────────────────────────────┐
+                  │ 🧠 DEEP LEARNING & MODERN AI  │
+                  │ • Perceptrons & Activations   │
+                  │ • 3D Loss Manifolds & Momentum│
+                  │ • Spatial 2D Convolutions     │
+                  │ • Transformer Self-Attention  │
+                  └───────────────────────────────┘
+```
 
 ---
 
 ## 🎨 Tactile 60 FPS Algorithmic Visualizations
 
-Okvir includes 11 dedicated, zero-garbage-collection interactive simulation engines:
+Okvir includes **11 dedicated, zero-garbage-collection interactive simulation engines**:
 
-1. **Linear Regression:** Rotating OLS line & shrinking residual error squares
-2. **K-Nearest Neighbors (KNN):** Pulsing search radar & voting donut
-3. **3D Gradient Descent:** Heavy-ball particle rolling down non-convex loss manifolds
-4. **K-Means Clustering:** Real-time Voronoi tessellation and cell morphing
-5. **Decision Trees:** Rectangular laser knife-cuts across feature space
-6. **Vector Geometry:** Interactive vector dragging, angle measurement, and orthogonal projections
-7. **Bayes Frequency Tree:** 10,000-population flow diagram with interactive prevalence sliders
-8. **Neural Activation:** Interactive weights, bias, and dead-neuron detector across 5 activation functions
-9. **Self-Attention Heatmap:** Interactive multi-head attention matrix resolving pronouns
-10. **2D Spatial Convolution:** Sliding 3×3 kernel over 6×6 pixel grids showing inner-product arithmetic
-11. **L1 vs L2 Regularization Geometry:** Tangency between loss contours and L1 diamond / L2 circle
+| # | Simulation Engine | Algorithm / Mathematical Principle | Interactive Mechanics |
+| - | :--- | :--- | :--- |
+| **1** | `LinearRegressionResiduals` | Ordinary Least Squares (OLS) | Rotating regression line & shrinking $(y_i - \hat{y}_i)^2$ squares |
+| **2** | `KNNRadar` | K-Nearest Neighbors & Metric Spaces | Concentric radar scan wave, elastic neighbor tethers & voting donut |
+| **3** | `GradientDescentCanvas` | Loss Manifolds & Heavy-Ball Momentum | 3D quadratic bowl, particle trajectory ribbons, $\eta$ & $\beta$ sliders |
+| **4** | `KMeansVoronoi` | K-Means Clustering & Lloyd's Algorithm | Gliding centroids over 400ms & dynamic Voronoi cell boundary morphing |
+| **5** | `DecisionTreeLaser` | Binary Axis-Aligned Recursive Partitions | Orthogonal laser knife-cuts with spark particles minimizing Gini impurity |
+| **6** | `VectorGeometryCanvas` | Euclidean Vector Spaces & Span | Interactive vector dragging, angle arcs & orthogonal projections |
+| **7** | `BayesFrequencyTree` | Prior Odds, Likelihood & Posterior Updates | 10,000-person flow diagram with interactive disease prevalence sliders |
+| **8** | `NeuralActivationCanvas` | Non-Linear Activation Functions | Weight & bias knobs, dead-ReLU detector, Sigmoid, Tanh, LeakyReLU |
+| **9** | `AttentionHeatmapCanvas` | Scaled Dot-Product Self-Attention | Query, Key, Value matrix heatmaps with live pronoun coreference |
+| **10** | `ConvolutionFilterCanvas` | 2D Spatial Convolutions & Feature Maps | Sliding 3×3 kernel filter (Sobel, Blur, Edge) over 6×6 pixel grids |
+| **11** | `RegularizationGeometryCanvas`| Ridge ($L_2$) vs Lasso ($L_1$) Sparsity | Expanding OLS loss contours striking the sharp corners of the $L_1$ diamond |
+
+---
+
+## 🎹 Procedural Web Audio API Synthesizer
+
+Okvir contains **zero recorded audio files (0 MP3/WAV assets)**. All auditory feedback is synthesized mathematically in real time via the browser Web Audio API:
+* **Mechanical Click:** 10ms damped triangle wave (1200Hz ➔ 300Hz) with 8ms subtle haptic pulse.
+* **Success Chime:** Pentatonic overtone triad: C5 (523.25Hz), E5 (659.25Hz), G5 (783.99Hz) decaying smoothly.
+* **Milestone Fanfare:** Ascending harmonic arpeggio (440Hz, 554Hz, 659Hz, 880Hz).
+* **Boundary Error Tick:** 50ms downward sawtooth ramp (180Hz ➔ 60Hz).
 
 ---
 
 ## 🌐 Bilingual Experience: English & العربية
 
-Okvir treats **Arabic (العربية)** alongside English as a first-class citizen:
-* **Bidirectional Layout via CSS Logical Properties:** Sidebars, progress trees, and drawers mirror seamlessly.
-* **Strict LTR Isolation for Math & Code:** Formulas ($\text{Loss} = \sum e_i^2$) and Python blocks remain strictly Left-to-Right within Arabic narrative flow to prevent inverted operators or transposed parentheses.
-* **Typographic Harmony:** `Inter Display` for English, `IBM Plex Sans Arabic` for Arabic narrative, and `JetBrains Mono` for code variables.
+Okvir treats **Arabic (العربية)** alongside English as a first-class language:
+* **Bidirectional Layout via CSS Logical Properties:** Sidebars, progress trees, and drawers mirror seamlessly when switching languages.
+* **Strict LTR Isolation for Math & Code:** Formulas ($\text{SSR} = \sum e_i^2$) and Python blocks remain strictly Left-to-Right within Arabic narrative flow to prevent inverted operators or transposed parentheses.
+* **Typographic Hierarchy:** `Inter Display` for English, `IBM Plex Sans Arabic` for Arabic narrative, and `JetBrains Mono` for code variables.
+
+---
+
+## ⌨️ Keyboard-First Ergonomics
+
+Inspired by **Raycast and Linear.app**, every core action in Okvir is accessible via keyboard shortcuts:
+
+| Shortcut | Action | Description |
+| :--- | :--- | :--- |
+| `⌘K` / `Ctrl+K` | **Universal Command Palette** | Fuzzy search across all 16 modules, settings, and simulations |
+| `⌘↵` / `Ctrl+Enter` | **Run Code** | Execute Python challenge in Pyodide WASM worker |
+| `H` | **Socratic Hint** | Cycle through Tier 1 ➔ Tier 2 ➔ Tier 3 hints |
+| `Space` | **Next Beat** | Advance to next beat in the 4-Beat Micro-Loop |
+| `Escape` | **Close Modal** | Dismiss command palette, drawers, or dialogs |
 
 ---
 
@@ -177,12 +217,14 @@ OKVIR DESKTOP CLIENT
 │   ├── Package Manager (.okvir seekable Zstandard archives)
 │   ├── Cryptography: Ed25519 Minisign verification
 │   └── Storage: Embedded SQLite engine (WAL mode)
-├── Presentation Layer (React 19 / Vite / Tailwind CSS v4)
+├── Presentation Layer (React 18/19 / Vite / Tailwind CSS)
 │   ├── Command Center: Raycast action bar & Cmd+K palette
 │   ├── Typographic Math: KaTeX with strict LTR isolation
+│   ├── Procedural Audio: Web Audio API mathematical synthesizer
 │   └── 60 FPS Visual Canvas: HTML5 2D Canvas + WebGL
 └── In-App Execution Sandbox (Dedicated Web Worker)
     ├── WebAssembly CPython 3.12 (Pyodide v0.26+)
+    ├── Non-destructive interrupt buffer (SharedArrayBuffer)
     ├── Offline wheels: NumPy, Pandas, Scikit-learn, SciPy
     └── Origin Private File System (OPFS) / MEMFS mounts
 ```
@@ -194,6 +236,8 @@ OKVIR DESKTOP CLIENT
 * **Active Simulation RAM:** `< 250 MB` (with Pyodide + NumPy loaded)
 * **Idle CPU Utilization:** `0.0%` (demand-driven animation loops)
 
+For exhaustive technical blueprints, read our [System Architecture Guide](ARCHITECTURE.md).
+
 ---
 
 ## 🛠️ Framework CLI (`okvir-cli`)
@@ -202,18 +246,30 @@ Okvir ships with a dedicated developer CLI for authoring, linting, and compiling
 
 ```bash
 # Scaffold a new interactive course repository
-npm run cli -- init my-course
+node ./bin/okvir.js init my-course
 
 # Validate all .okvir.md lesson schemas and AST directives
-npm run cli -- test curriculum
+npm test
 
-# Compile lessons into seekable .okvir archive with Ed25519 signature
-npm run cli -- pack curriculum dist/course.okvir
+# Compile lessons into a seekable .okvir archive with Ed25519 signature
+node ./bin/okvir.js pack ./curriculum ./dist/course.okvir
 ```
+
+For authoring guidelines, see our [Curriculum Authoring Specification](CURRICULUM_SPEC.md).
 
 ---
 
-## 📜 Licensing Strategy
+## 🛡️ Security & Privacy
+
+* **100% Offline & Local-First:** All progress, code submissions, and spaced repetition intervals are stored in local SQLite. Zero tracking, zero telemetry.
+* **WASM Sandboxing:** Python executes strictly inside a sandboxed Web Worker without host filesystem access.
+* **Cryptographic Signing:** Curriculum packs are signed with Ed25519 `minisign` keys.
+
+For vulnerability reporting, see [SECURITY.md](SECURITY.md).
+
+---
+
+## 📜 Licensing
 
 * **Application Engine (Rust, Tauri, React, Simulators):** Dual-licensed under [MIT](LICENSE-MIT) OR [Apache-2.0](LICENSE-APACHE).
 * **Pedagogical Curriculum & Educational Assets:** Licensed under [Creative Commons Attribution-ShareAlike 4.0 International (CC-BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/).
@@ -227,3 +283,10 @@ npm run cli -- pack curriculum dist/course.okvir
 *Founder & Benevolent Dictator for Life (BDFL) of Okvir*
 
 > *"Let’s build the next generation of data scientists on intuition, not memorization."*
+
+---
+
+<div align="center">
+  <sub>Built with precision for students, researchers, and engineers worldwide.</sub><br>
+  <sub>⭐ Star us on GitHub to support free, open-source AI education!</sub>
+</div>
