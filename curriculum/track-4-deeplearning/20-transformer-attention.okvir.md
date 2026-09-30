@@ -44,12 +44,14 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def online_softmax_step(
-    m_prev: np.ndarray,
-    l_prev: np.ndarray,
-    O_prev: np.ndarray,
-    S_block: np.ndarray,
-    V_block: np.ndarray
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]: ...
+import numpy as np
+
+def online_softmax_step(m_prev, l_prev, O_prev, S_block, V_block):
+    """Execute a single FlashAttention online softmax update step."""
+    # TODO: 1. Compute m_new = max(m_prev, max(S_block))
+    # TODO: 2. Compute rescale factor alpha = exp(m_prev - m_new)
+    # TODO: 3. Compute P_block = exp(S_block - m_new)
+    # TODO: 4. Rescale and accumulate l_new and O_new
+    pass
 ```
 :::

@@ -44,10 +44,15 @@ test_cases:
 ---
 ```python
 class ReActAgent:
-    tools: dict[str, callable]
-    max_turns: int
-    def __init__(self, tools: dict[str, callable], max_turns: int = 5) -> None: ...
-    def run(self, query: str, mock_llm: callable) -> dict: ...
-# Returns: {"status": "success" | "cycle_detected" | "max_turns_exceeded", "final_answer": str | None, "turns": int, "history": list[str]}
+    def __init__(self, tools: dict[str, callable], max_turns: int = 5):
+        self.tools = tools
+        self.max_turns = max_turns
+
+    def run(self, query: str, mock_llm: callable) -> dict:
+        """Execute autonomous multi-turn ReAct loop."""
+        # TODO: 1. Maintain history list starting with Question: query
+        # TODO: 2. Loop up to max_turns
+        # TODO: 3. Parse LLM response, detect cycles, and terminate on FINISH
+        pass
 ```
 :::

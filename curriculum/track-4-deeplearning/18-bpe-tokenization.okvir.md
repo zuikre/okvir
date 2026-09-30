@@ -39,11 +39,14 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def kv_cache_decoder_step(
-    x_t: np.ndarray,
-    k_cache: np.ndarray | None,
-    v_cache: np.ndarray | None,
-    W_q: np.ndarray, W_k: np.ndarray, W_v: np.ndarray, W_o: np.ndarray
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]: ...
+import numpy as np
+
+def kv_cache_decoder_step(x_t, k_cache, v_cache, W_q, W_k, W_v, W_o):
+    """Execute single-step token inference with KV caching."""
+    # TODO: 1. Project q_t, k_t, v_t for single token x_t
+    # TODO: 2. Concatenate k_t and v_t with k_cache and v_cache along axis=1
+    # TODO: 3. Compute attention between single query q_t and full key cache
+    # TODO: 4. Project attended context through W_o and return updated state
+    pass
 ```
 :::

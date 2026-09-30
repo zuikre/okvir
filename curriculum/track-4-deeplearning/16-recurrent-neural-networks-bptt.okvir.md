@@ -43,8 +43,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def apply_rotary_emb(x: np.ndarray, base: float = 10000.0) -> np.ndarray: ...
-# x: shape (B, S, D) where D is even
-# Returns: rotated tensor of shape (B, S, D)
+import numpy as np
+
+def apply_rotary_emb(x: np.ndarray, base: float = 10000.0) -> np.ndarray:
+    """Apply 2D Rotary Position Embeddings (RoPE)."""
+    # TODO: 1. Calculate inverse frequency theta for i in [0, D/2 - 1]
+    # TODO: 2. Compute phase angles m * theta for sequence positions m in [0, S - 1]
+    # TODO: 3. Perform 2D rotation on adjacent (even, odd) features
+    pass
 ```
 :::

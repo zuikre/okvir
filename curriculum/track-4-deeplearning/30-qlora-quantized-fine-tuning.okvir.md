@@ -43,11 +43,12 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def ddpm_q_sample(
-    x_0: np.ndarray,
-    t: int,
-    noise: np.ndarray,
-    alpha_bars: np.ndarray
-) -> np.ndarray: ...
+import numpy as np
+
+def ddpm_q_sample(x_0: np.ndarray, t: int, noise: np.ndarray, alpha_bars: np.ndarray) -> np.ndarray:
+    """Sample noisy latent x_t in closed form."""
+    # TODO: Retrieve alpha_bar at timestep t
+    # TODO: Blend x_0 and noise using sqrt(alpha_bar) and sqrt(1 - alpha_bar)
+    pass
 ```
 :::

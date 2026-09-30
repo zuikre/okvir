@@ -39,10 +39,11 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def bpe_encode(
-    text: str,
-    merges: list[tuple[str, str]],
-    vocab: dict[str, int]
-) -> list[int]: ...
+def bpe_encode(text: str, merges: list[tuple[str, str]], vocab: dict[str, int]) -> list[int]:
+    """Encode raw text into token IDs using learned BPE merges."""
+    # TODO: 1. Split text into words and decompose into characters + '</w>'
+    # TODO: 2. Sequentially apply merge rules in priority order
+    # TODO: 3. Map resulting tokens to IDs in vocab (fallback to <unk> if missing)
+    pass
 ```
 :::

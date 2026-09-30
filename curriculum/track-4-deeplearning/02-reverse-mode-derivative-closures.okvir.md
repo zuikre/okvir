@@ -42,12 +42,27 @@ test_cases:
 ---
 ```python
 class Value:
-    data: float
-    grad: float
-    _backward: Callable[[], None]
-    def __init__(self, data: float | int, _children: tuple = (), _op: str = '') -> None: ...
-    def __add__(self, other: 'Value' | float | int) -> 'Value': ...
-    def __mul__(self, other: 'Value' | float | int) -> 'Value': ...
-    def relu(self) -> 'Value': ...
+    def __init__(self, data: float | int, _children: tuple = (), _op: str = ''):
+        self.data = float(data)
+        self.grad = 0.0
+        self._backward = lambda: None
+        self._prev = set(_children)
+        self._op = _op
+
+    def __add__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data + other.data, (self, other), '+')
+        # TODO: Define out._backward closure using +=
+        return out
+
+    def __mul__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data * other.data, (self, other), '*')
+        # TODO: Define out._backward closure using product rule
+        return out
+
+    def relu(self):
+        # TODO: Implement out = Value(max(0, self.data)) and out._backward closure
+        pass
 ```
 :::

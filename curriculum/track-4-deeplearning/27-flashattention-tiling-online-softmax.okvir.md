@@ -43,13 +43,14 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def grpo_compute_advantages_and_loss(
-    rewards: np.ndarray,
-    logp: np.ndarray,
-    old_logp: np.ndarray,
-    ref_logp: np.ndarray,
-    beta_kl: float = 0.04,
-    clip_eps: float = 0.2
-) -> tuple[np.ndarray, float]: ...
+import numpy as np
+
+def grpo_compute_advantages_and_loss(rewards, logp, old_logp, ref_logp, beta_kl=0.04, clip_eps=0.2):
+    """Compute group-relative normalized advantages and GRPO loss."""
+    # TODO: 1. Group-normalize rewards: (r - mean) / (std + eps)
+    # TODO: 2. Compute importance ratio r_i = exp(logp - old_logp)
+    # TODO: 3. Compute clipped surrogate loss
+    # TODO: 4. Add KL penalty and return (advantages, total_loss)
+    pass
 ```
 :::

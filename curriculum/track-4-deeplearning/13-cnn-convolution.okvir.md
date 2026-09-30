@@ -42,13 +42,14 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def scaled_dot_product_attention(
-    Q: np.ndarray,
-    K: np.ndarray,
-    V: np.ndarray,
-    scale: float | None = None
-) -> tuple[np.ndarray, np.ndarray]: ...
-# Q: (..., S_q, d_k), K: (..., S_k, d_k), V: (..., S_k, d_v)
-# Returns: (output: (..., S_q, d_v), weights: (..., S_q, S_k))
+import numpy as np
+
+def scaled_dot_product_attention(Q: np.ndarray, K: np.ndarray, V: np.ndarray, scale: float | None = None) -> tuple[np.ndarray, np.ndarray]:
+    """Compute scaled dot-product attention with stable softmax."""
+    # TODO: 1. Set scale = 1.0 / sqrt(d_k) if scale is None
+    # TODO: 2. Compute Q @ K^T * scale
+    # TODO: 3. Compute row-wise stable softmax
+    # TODO: 4. Compute attention_weights @ V
+    pass
 ```
 :::

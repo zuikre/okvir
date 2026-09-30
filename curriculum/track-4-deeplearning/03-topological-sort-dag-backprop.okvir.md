@@ -42,8 +42,42 @@ test_cases:
 ---
 ```python
 class Value:
-    # Full autograd Value node with backward()
-    def backward(self) -> None: ...
-    # Builds topological order, sets seed grad to 1.0, calls _backward() in reverse
+    def __init__(self, data: float | int, _children: tuple = (), _op: str = ''):
+        self.data = float(data)
+        self.grad = 0.0
+        self._backward = lambda: None
+        self._prev = set(_children)
+        self._op = _op
+
+    def __add__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data + other.data, (self, other), '+')
+        def _backward():
+            self.grad += out.grad
+            other.grad += out.grad
+        out._backward = _backward
+        return out
+
+    def __mul__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data * other.data, (self, other), '*')
+        def _backward():
+            self.grad += other.data * out.grad
+            other.grad += self.data * out.grad
+        out._backward = _backward
+        return out
+
+    def relu(self):
+        out = Value(max(0.0, self.data), (self,), 'relu')
+        def _backward():
+            self.grad += (out.data > 0.0) * out.grad
+        out._backward = _backward
+        return out
+
+    def backward(self):
+        # TODO: 1. Build topological order via DFS post-order traversal
+        # TODO: 2. Set self.grad = 1.0
+        # TODO: 3. Call _backward() on all nodes in reverse topological order
+        pass
 ```
 :::

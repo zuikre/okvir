@@ -41,10 +41,12 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def discretize_zoh(
-    delta: np.ndarray,
-    A: np.ndarray,
-    B: np.ndarray
-) -> tuple[np.ndarray, np.ndarray]: ...
+import numpy as np
+
+def discretize_zoh(delta: np.ndarray, A: np.ndarray, B: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Discretize continuous SSM parameters via Zero-Order Hold."""
+    # TODO: Broadcast delta (B, L, D) and A (D, N) to compute A_bar = exp(delta * A)
+    # TODO: Compute B_bar = delta * B
+    pass
 ```
 :::

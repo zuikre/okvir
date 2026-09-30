@@ -42,14 +42,14 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def layernorm_forward(
-    x: np.ndarray,
-    gamma: np.ndarray,
-    beta: np.ndarray,
-    eps: float = 1e-5
-) -> tuple[np.ndarray, dict]: ...
-# x: shape (..., D)
-# gamma, beta: shape (D,)
-# Returns: (normalized_output: np.ndarray, cache: dict)
+import numpy as np
+
+def layernorm_forward(x: np.ndarray, gamma: np.ndarray, beta: np.ndarray, eps: float = 1e-5) -> tuple[np.ndarray, dict]:
+    """Compute Layer Normalization over the last dimension."""
+    # TODO: Compute mean and variance along axis=-1 with keepdims=True
+    # TODO: Normalize x to zero-mean and unit-variance
+    # TODO: Scale by gamma and shift by beta
+    # TODO: Return normalized array and cache dict
+    pass
 ```
 :::

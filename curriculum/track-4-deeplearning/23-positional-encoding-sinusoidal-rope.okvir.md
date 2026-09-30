@@ -45,14 +45,30 @@ test_cases:
     expected: "0.0"
 ---
 ```python
+import numpy as np
+
 class LoRALinear:
-    W_0: np.ndarray
-    A: np.ndarray
-    B: np.ndarray
-    merged: bool
-    def __init__(self, in_features: int, out_features: int, rank: int = 4, alpha: float = 8.0) -> None: ...
-    def forward(self, x: np.ndarray) -> np.ndarray: ...
-    def merge_weights(self) -> None: ...
-    def unmerge_weights(self) -> None: ...
+    def __init__(self, in_features: int, out_features: int, rank: int = 4, alpha: float = 8.0):
+        self.in_features = in_features
+        self.out_features = out_features
+        self.rank = rank
+        self.alpha = alpha
+        self.scaling = alpha / rank
+        self.W_0 = np.random.randn(out_features, in_features) * 0.02
+        self.A = np.random.randn(rank, in_features) * 0.02
+        self.B = np.zeros((out_features, rank))
+        self.merged = False
+
+    def forward(self, x: np.ndarray) -> np.ndarray:
+        # TODO: Compute base output + scaled LoRA adapter output
+        pass
+
+    def merge_weights(self):
+        # TODO: Fold (B @ A) * scaling into W_0
+        pass
+
+    def unmerge_weights(self):
+        # TODO: Subtract (B @ A) * scaling from W_0
+        pass
 ```
 :::

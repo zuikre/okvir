@@ -42,10 +42,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def selective_scan(
-    A_bar: np.ndarray,
-    B_bar_x: np.ndarray,
-    C: np.ndarray
-) -> np.ndarray: ...
+import numpy as np
+
+def selective_scan(A_bar: np.ndarray, B_bar_x: np.ndarray, C: np.ndarray) -> np.ndarray:
+    """Execute selective scan recurrence over sequence length L."""
+    # TODO: Initialize hidden state h = zeros((D, N))
+    # TODO: Iterate t in 0..L-1: h = A_bar[t] * h + B_bar_x[t]
+    # TODO: Compute y_t = sum(h * C[t], axis=-1)
+    pass
 ```
 :::

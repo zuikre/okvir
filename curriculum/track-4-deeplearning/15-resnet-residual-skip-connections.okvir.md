@@ -39,11 +39,14 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def multi_head_attention_forward(
-    X: np.ndarray,
-    W_q: np.ndarray, W_k: np.ndarray, W_v: np.ndarray, W_o: np.ndarray,
-    num_heads: int,
-    is_causal: bool = False
-) -> np.ndarray: ...
+import numpy as np
+
+def multi_head_attention_forward(X, W_q, W_k, W_v, W_o, num_heads, is_causal=False):
+    """Execute full Multi-Head Attention forward pass."""
+    # TODO: 1. Project Q, K, V
+    # TODO: 2. Reshape and transpose to (B, num_heads, S, d_k)
+    # TODO: 3. Compute batched scaled dot-product attention with optional causal mask
+    # TODO: 4. Concatenate heads back to (B, S, D) and project via W_o
+    pass
 ```
 :::

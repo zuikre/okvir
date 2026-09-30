@@ -41,9 +41,11 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def train_bpe(corpus: list[str], num_merges: int) -> list[tuple[str, str]]: ...
-# corpus: list of string sentences/documents
-# num_merges: number of merge rules to learn
-# Returns: ordered list of learned merge tuples (token_A, token_B)
+def train_bpe(corpus: list[str], num_merges: int) -> list[tuple[str, str]]:
+    """Extract BPE merge rules from corpus."""
+    # TODO: 1. Tokenize corpus words into tuples of characters with '</w>'
+    # TODO: 2. Iteratively count adjacent pair frequencies across all words
+    # TODO: 3. Select most frequent pair, append to merges list, and update word tuples
+    pass
 ```
 :::

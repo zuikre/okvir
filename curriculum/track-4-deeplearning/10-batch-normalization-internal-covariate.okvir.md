@@ -39,11 +39,17 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def gru_cell_forward(
-    x_t: np.ndarray, h_prev: np.ndarray,
-    W_z: np.ndarray, U_z: np.ndarray, b_z: np.ndarray,
-    W_r: np.ndarray, U_r: np.ndarray, b_r: np.ndarray,
-    W_h: np.ndarray, U_h: np.ndarray, b_h: np.ndarray
-) -> np.ndarray: ...
+import numpy as np
+
+def sigmoid(z):
+    return 1.0 / (1.0 + np.exp(-np.clip(z, -30.0, 30.0)))
+
+def gru_cell_forward(x_t, h_prev, W_z, U_z, b_z, W_r, U_r, b_r, W_h, U_h, b_h):
+    """Execute a single GRU step."""
+    # TODO: Compute reset gate r_t
+    # TODO: Compute update gate z_t
+    # TODO: Compute candidate hidden state h_tilde using r_t * h_prev
+    # TODO: Blend previous state and candidate state
+    pass
 ```
 :::

@@ -39,12 +39,12 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def bradley_terry_loss(
-    r_win: np.ndarray,
-    r_loss: np.ndarray
-) -> tuple[float, np.ndarray, np.ndarray]: ...
-# r_win: (N,) scalar rewards for winning responses
-# r_loss: (N,) scalar rewards for losing responses
-# Returns: (loss: float, grad_w: np.ndarray, grad_l: np.ndarray)
+import numpy as np
+
+def bradley_terry_loss(r_win: np.ndarray, r_loss: np.ndarray) -> tuple[float, np.ndarray, np.ndarray]:
+    """Compute Bradley-Terry preference loss and gradients."""
+    # TODO: Compute stable loss using np.logaddexp(0, -(r_win - r_loss))
+    # TODO: Compute analytical gradients w.r.t r_win and r_loss
+    pass
 ```
 :::

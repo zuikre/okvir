@@ -41,10 +41,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def causal_attention(
-    Q: np.ndarray,
-    K: np.ndarray,
-    V: np.ndarray
-) -> tuple[np.ndarray, np.ndarray]: ...
+import numpy as np
+
+def causal_attention(Q: np.ndarray, K: np.ndarray, V: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Compute causal autoregressive attention."""
+    # TODO: Compute scaled dot-product scores
+    # TODO: Create upper-triangular boolean mask (j > i) and fill with -1e9
+    # TODO: Softmax and project with V
+    pass
 ```
 :::

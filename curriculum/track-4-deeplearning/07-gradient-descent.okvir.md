@@ -41,16 +41,14 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def conv2d_im2col(
-    x: np.ndarray,
-    w: np.ndarray,
-    b: np.ndarray | None = None,
-    stride: int = 1,
-    padding: int = 0
-) -> np.ndarray: ...
-# x: (B, C_in, H, W)
-# w: (C_out, C_in, K_h, K_w)
-# b: (C_out,) or None
-# Returns: (B, C_out, out_h, out_w)
+import numpy as np
+
+def conv2d_im2col(x: np.ndarray, w: np.ndarray, b: np.ndarray | None = None, stride: int = 1, padding: int = 0) -> np.ndarray:
+    """Vectorized 2D convolution using im2col and matrix multiplication."""
+    # TODO: 1. Apply zero padding to spatial dimensions (H, W) if padding > 0
+    # TODO: 2. Compute output spatial dimensions out_h and out_w
+    # TODO: 3. Unfold image patches into columns (im2col)
+    # TODO: 4. Perform matrix multiplication with flattened filter weights and reshape
+    pass
 ```
 :::

@@ -42,17 +42,14 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def adamw_step(
-    param: np.ndarray,
-    grad: np.ndarray,
-    m: np.ndarray,
-    v: np.ndarray,
-    t: int,
-    lr: float = 1e-3,
-    beta1: float = 0.9,
-    beta2: float = 0.999,
-    eps: float = 1e-8,
-    weight_decay: float = 1e-2
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]: ...
+import numpy as np
+
+def adamw_step(param, grad, m, v, t, lr=1e-3, beta1=0.9, beta2=0.999, eps=1e-8, weight_decay=1e-2):
+    """Perform one AdamW optimization update step."""
+    # TODO: 1. Apply decoupled weight decay to param
+    # TODO: 2. Update biased first (m) and second (v) moment estimates
+    # TODO: 3. Compute bias-corrected moments m_hat and v_hat using step t
+    # TODO: 4. Apply adaptive update step and return (param_next, m_next, v_next)
+    pass
 ```
 :::

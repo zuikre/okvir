@@ -39,9 +39,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def cross_entropy_loss_lse(logits: np.ndarray, targets: np.ndarray) -> tuple[float, np.ndarray]: ...
-# logits: (N, C) float array of unbounded logits
-# targets: (N,) integer array of ground-truth class labels 0 <= targets[i] < C
-# Returns: (loss: float, grad: np.ndarray of shape (N, C))
+import numpy as np
+
+def cross_entropy_loss_lse(logits: np.ndarray, targets: np.ndarray) -> tuple[float, np.ndarray]:
+    """Numerically stable cross-entropy with log-sum-exp trick."""
+    # TODO: Subtract row-wise max for numerical stability
+    # TODO: Compute log_sum_exp and log-probabilities
+    # TODO: Calculate mean cross-entropy loss and analytical gradient
+    pass
 ```
 :::

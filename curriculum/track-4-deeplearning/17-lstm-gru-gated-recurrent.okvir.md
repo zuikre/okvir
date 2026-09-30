@@ -39,11 +39,14 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def swiglu_forward(
-    x: np.ndarray,
-    W_gate: np.ndarray,
-    W_up: np.ndarray,
-    W_down: np.ndarray
-) -> np.ndarray: ...
+import numpy as np
+
+def swiglu_forward(x: np.ndarray, W_gate: np.ndarray, W_up: np.ndarray, W_down: np.ndarray) -> np.ndarray:
+    """Compute SwiGLU gated feed-forward layer."""
+    # TODO: 1. Project gate = x @ W_gate and compute Swish(gate)
+    # TODO: 2. Project up = x @ W_up
+    # TODO: 3. Bilinear element-wise multiply Swish(gate) * up
+    # TODO: 4. Project through W_down
+    pass
 ```
 :::

@@ -42,9 +42,12 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def repeat_kv(x: np.ndarray, n_rep: int) -> np.ndarray: ...
-# x: (B, n_kv, S, d_k)
-# n_rep: number of times each head is repeated (G = n_q / n_kv)
-# Returns: (B, n_kv * n_rep, S, d_k)
+import numpy as np
+
+def repeat_kv(x: np.ndarray, n_rep: int) -> np.ndarray:
+    """Broadcast KV heads across query head groups."""
+    # TODO: If n_rep == 1, return x directly
+    # TODO: Expand dimension and repeat along head axis
+    pass
 ```
 :::

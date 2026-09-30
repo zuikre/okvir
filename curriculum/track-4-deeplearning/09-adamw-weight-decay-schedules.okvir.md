@@ -41,11 +41,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def rms_norm_forward(
-    x: np.ndarray,
-    gamma: np.ndarray,
-    eps: float = 1e-6,
-    residual: np.ndarray | None = None
-) -> tuple[np.ndarray, np.ndarray]: ...
+import numpy as np
+
+def rms_norm_forward(x: np.ndarray, gamma: np.ndarray, eps: float = 1e-6, residual: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
+    """Compute RMSNorm with optional residual addition."""
+    # TODO: Add residual if provided
+    # TODO: Compute root mean square over last dimension
+    # TODO: Scale by gamma and return (output, active_residual_state)
+    pass
 ```
 :::

@@ -51,50 +51,14 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-import duckdb
+-- Formulate a DuckDB SQL query computing DENSE_RANK() and max salary gap
+-- across departmental partitions.
+-- Schema: employees(emp_id, dept_name, emp_name, salary)
 
-def test_sql_window_rank():
-    con = duckdb.connect(":memory:")
-    con.execute("""
-        CREATE TABLE employees (emp_id INT, dept_name VARCHAR, emp_name VARCHAR, salary DOUBLE);
-        INSERT INTO employees VALUES
-            (1, 'Eng', 'Alice', 100000.0),
-            (2, 'Eng', 'Bob',   100000.0), -- Tie for 1st
-            (3, 'Eng', 'Carol',  80000.0), -- 2nd in DENSE_RANK
-            (4, 'Mkt', 'Dave',   90000.0);
-    """)
-    
-    query = """
-        SELECT
-            emp_id,
-            dept_name,
-            emp_name,
-            salary,
-            DENSE_RANK() OVER (
-                PARTITION BY dept_name 
-                ORDER BY salary DESC
-            ) AS dept_salary_rank,
-            ROUND(
-                MAX(salary) OVER (PARTITION BY dept_name) - salary, 
-                2
-            ) AS salary_gap_to_max
-        FROM employees
-        ORDER BY dept_name ASC, dept_salary_rank ASC, salary DESC, emp_id ASC;
-    """
-    
-    rows = con.execute(query).fetchall()
-    assert len(rows) == 4
-    # Check Eng partition
-    assert rows[0][:5] == (1, 'Eng', 'Alice', 100000.0, 1)
-    assert rows[0][5] == 0.0
-    assert rows[1][:5] == (2, 'Eng', 'Bob', 100000.0, 1)
-    assert rows[1][5] == 0.0
-    assert rows[2][:5] == (3, 'Eng', 'Carol', 80000.0, 2), "DENSE_RANK must assign 2 to Carol, not 3!"
-    assert rows[2][5] == 20000.0
-    
-    print("ALL TESTS PASSED for sql-window-dense-rank")
-
-if __name__ == "__main__":
-    test_sql_window_rank()
+SELECT
+    -- TODO: emp_id, dept_name, emp_name, salary, dept_salary_rank, salary_gap_to_max
+FROM employees
+-- TODO: WINDOW functions and ORDER BY
+;
 ```
 :::

@@ -39,12 +39,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def sft_masked_loss(
-    logits: np.ndarray,
-    labels: np.ndarray,
-    ignore_index: int = -100
-) -> tuple[float, int]: ...
-# logits: (B, S, V), labels: (B, S)
-# Returns: (mean_loss: float, active_token_count: int)
+import numpy as np
+
+def sft_masked_loss(logits: np.ndarray, labels: np.ndarray, ignore_index: int = -100) -> tuple[float, int]:
+    """Compute masked SFT cross-entropy loss."""
+    # TODO: 1. Filter out tokens where labels == ignore_index
+    # TODO: 2. Compute log-sum-exp over active vocabulary logits
+    # TODO: 3. Return mean loss over active tokens and active token count
+    pass
 ```
 :::

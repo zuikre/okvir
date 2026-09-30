@@ -67,15 +67,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Residuals are not orthogonal to regressor columns (`X.T @ residuals != 0`).",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Using an unstable manual matrix inverse `np.linalg.inv(X.T @ X)` on ill-conditioned data or transposing vectors incorrectly.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Use `np.linalg.solve(X.T @ X, X.T @ y)` to obtain numerically stable coefficients, then compute `residuals = y - X @ beta`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -189,15 +189,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Adjusted $R^2$ exceeds unadjusted $R^2$, or returns a value greater than 1.0.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Confusing the total number of columns $K$ (which includes intercept) with the count of explanatory variables $p$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Set residual degrees of freedom strictly to $N - p - 1$, where $p$ is the number of regressors beyond the constant.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -312,15 +312,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Standard errors are negative or `NaN`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Dividing by $N$ instead of degree-of-freedom corrected $N - K$, or non-positive-definite $(X^T X)^{-1}$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Ensure residual sum of squares is divided by `(n - k)` where `k = X.shape[1]`, then take the square root of `np.diag(vcov)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -434,15 +434,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Memory allocation error or slow loop when building the meat matrix.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Creating an explicit $N \\times N$ diagonal matrix via `np.diag(e**2)` consumes $O(N^2)$ memory and scales quadratically.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Use memory-efficient vector broadcasting: `X_scaled = X * e[:, None]; meat = X_scaled.T @ X_scaled`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -557,15 +557,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Matrix multiplication `M @ X` does not evaluate to zero.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Inverting before multiplying by $X$ or transposing $X$ incorrectly in the outer product.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Follow the exact hat matrix formulation: `X @ np.linalg.inv(X.T @ X) @ X.T`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -680,15 +680,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Partial slope `beta_1_fwl` does not match the full regression coefficient `beta_1_full`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Failing to project BOTH the dependent variable $y$ and the primary regressor $X_1$ onto the orthogonal complement of $X_2$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Apply the annihilator matrix $M_{X_2}$ to both $y$ and $X_1$ before running the second-stage regression.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -802,15 +802,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Short regression does not equal long regression plus bias.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Reversing the auxiliary regression (e.g. regressing $X_1$ on $X_2$ instead of $X_2$ on $X_1$).",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "The auxiliary regression must project the *omitted* variables $X_2$ onto the *included* variables $X_1$: `np.linalg.solve(X1.T @ X1, X1.T @ X2)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -924,15 +924,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Division by zero warning or infinite VIF on non-singular matrices.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Omitting the constant intercept in the auxiliary regression, causing uncentered $R^2$ to exceed 1.0.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Always append an intercept column `np.ones((n, 1))` to the auxiliary design matrix `X_other`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1046,15 +1046,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Identity failure: `naive_diff != att + selection_bias`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Evaluating selection bias using observed $Y$ rather than potential baseline control outcome $Y_0$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Selection bias measures baseline counterfactual difference under control: compare `y0[d == 1]` against `y0[d == 0]`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1168,15 +1168,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Extreme variance or `NaN` in estimated treatment effect.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Propensity scores near 0 or 1 produce exploding inverse weights that violate positivity/overlap.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Clip propensity scores within a safe numerical interval: `ps = np.clip(ps, 1e-4, 1.0 - 1e-4)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1291,15 +1291,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Stratum weighting yields incorrect overall effect.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Weighting by the number of treated units in stratum $s$ instead of the total stratum population frequency $P(Z = s)$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "The backdoor adjustment formula weights by the marginal probability $P(Z = s) = \\frac{N_s}{N}$.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1413,15 +1413,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Conditioned slope `b_cond` is zero or positive.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Adding $C$ as an outcome rather than a control regressor, or reversing causal arrows.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "In multiple regression `y = b0 + b1*x + b2*c`, $C$ enters as an explanatory variable alongside $X$.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1536,15 +1536,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Discrepancy between `wald` and `ratio_cov`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Using `np.cov` without setting `bias=True`, leading to mismatched sample normalization $N-1$ vs population $N$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Pass `bias=True` to `np.cov` or manually compute centered inner products `np.mean((y - y_bar) * (z - z_bar))`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1658,15 +1658,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Standard errors are severely underestimated or fail unit tests.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "The classic \"2SLS Second-Stage Trap\": computing residuals using fitted values $\\hat{X}$ (`y - X_hat @ beta`) rather than observed features $X$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Always evaluate structural residuals using original observed data: `residuals = y - X @ beta_2sls`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1780,15 +1780,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Time-invariant regressors cause singular matrix errors in `np.linalg.solve`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "The Within-Transformation completely wipes out time-invariant variables ($x_{it} - \bar{x}_i = 0$), inducing columns of zeros in `X_tilde`.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Only include time-varying regressors in fixed-effects models; time-invariant traits are absorbed into $\u0007lpha_i$.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1902,15 +1902,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Negative Hausman statistic or non-invertible variance matrix.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Inverting in reverse order (`vcov_re - vcov_fe`). Under the null hypothesis, the RE estimator is asymptotically efficient, so $V_{\text{FE}} - V_{\text{RE}}$ must be positive semi-definite.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Subtract $V_{\text{RE}}$ from $V_{\text{FE}}$: `v_diff = vcov_fe - vcov_re`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2025,15 +2025,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Discrepancy between `delta_did` and `beta_interaction`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Omitting main effects (`treat` or `post`) from the interaction regression design matrix.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "The 2x2 DiD regression MUST contain the intercept, the treatment dummy, the post dummy, and their interaction: `[1, treat, post, treat * post]`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2147,15 +2147,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Exact collinearity / singular matrix in event-study regression.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Failing to omit the baseline period $\tau = -1$, causing the dummy variable trap.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Always drop one relative time period (conventionally $\tau = -1$) to serve as the reference benchmark against which all dynamic effects are measured.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2269,15 +2269,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Jump estimate $\tau$ is biased by linear slope leakage.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Using uncentered $x$ instead of centered $\tilde{x} = x - c$, making $\beta_1$ evaluate the jump at $x = 0$ rather than the threshold $c$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Always center the running variable: $\tilde{x} = x - c$ so that the intercept and treatment indicator directly capture the jump at the cutoff.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2391,15 +2391,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Divide by zero in `np.log` calculation.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Empty boundary bins produce zero densities when bin width is too narrow.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Guard against zero division by clamping density values: `max(density, 1e-9)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2514,15 +2514,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Donor weights sum to values other than 1.0 or contain negative numbers.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Running unconstrained OLS regressions which allows negative weights and extrapolation outside the convex hull.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Enforce simplex projection or softmax re-parameterization $\\mathbf{w} = \text{softmax}(\boldsymbol{\theta})$ to guarantee $w_j \\ge 0$ and $\\sum w_j = 1$.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2636,15 +2636,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Permutation p-value is zero or exceeds 1.0.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Excluding the treated unit from the denominator (dividing by $J$ instead of total pool $J+1$).",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "In Fisherian exact permutation testing, the treated unit itself is part of the permutation distribution: $p = \frac{\\sum \\mathbf{1}(R_i \\ge R_{\text{treated}})}{N_{\text{total}}}$.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2759,15 +2759,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Ridge coefficients do not shrink toward zero as $\u0007lpha$ increases.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Penalizing the intercept term or adding $\u0007lpha$ with incorrect matrix dimensions.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Add $\u0007lpha \\mathbf{I}_P$ strictly to the $P \times P$ Gramian matrix $X^T X$.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2881,15 +2881,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Coefficients fluctuate or fail to converge to exact zero.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Computing residuals against full prediction $X\beta$ without adding back the $j$-th feature contribution $X_j \beta_j$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Isolate partial residuals by removing feature $j$: `r_j = y - (X @ beta - X[:, j] * beta[j])`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3004,15 +3004,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Floating-point overflow / `NaN` in probability or loss evaluation.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Large positive or negative linear projections $X\beta$ cause overflow in $\\exp(-z)$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Clamp the linear projection before exponentiation: `np.clip(z_lin, -30.0, 30.0)` and add $\\epsilon = 10^{-12}$ inside `np.log`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3126,15 +3126,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Softmax probabilities produce `NaN` on large positive activations.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Computing $\\exp(Z)$ directly without subtracting row maximums triggers IEEE 754 infinity.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Subtract the maximum of each row: `Z_stable = Z - np.max(Z, axis=1, keepdims=True)` prior to exponentiation.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3249,15 +3249,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Points with correct classification still generate gradients.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Confusing 0-1 misclassification ($m_i < 0$) with margin violation ($m_i < 1$). SVM penalizes correctly classified points that fall within the margin slab $0 < m_i < 1$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "The hinge condition applies whenever the margin is strictly less than 1: `margins < 1.0`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3371,15 +3371,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Split creates empty left or right subsets.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Testing candidate thresholds at the exact values of $x$ rather than the midpoints between consecutive sorted distinct values.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Evaluate midpoints between consecutive elements: `(x[i] + x[i+1]) / 2` and skip identical duplicates.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3494,15 +3494,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Accuracy calculation divides by zero or evaluates in-bag samples.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Assuming all samples appear in all trees, or including in-bag bootstrap training predictions.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Only tally predictions for sample $i$ if $i$ was omitted from tree $b$'s bootstrap draw (`i in pred_dict`).",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3616,15 +3616,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Residuals have wrong sign ($f - y$ instead of $y - f$).",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Confusing the gradient of the loss with the *negative* gradient (pseudo-residual). Gradient boosting descends the loss surface by following the negative gradient.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Set $r = - \frac{\\partial L}{\\partial f} = y - f$ for MSE loss.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3739,15 +3739,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Leaf weights have inverted signs.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Forgetting the leading negative sign in the unconstrained parabolic vertex formula: $\u0007rg\\min_w (G w + \frac{1}{2}(H + \\lambda) w^2) = - \frac{G}{H + \\lambda}$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Multiply by $-1$: `w = - g_sum / (h_sum + lam)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3861,15 +3861,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "First principal component does not align with maximum variance.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Failing to center the columns of $X$ before running SVD, causing the first singular vector to capture the displacement from the coordinate origin rather than true variance.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Always subtract column means: `X_centered = X - np.mean(X, axis=0)` before running SVD.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3984,15 +3984,15 @@ export const econometricsModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Joint probability matrix $P$ does not sum to 1.0 or is asymmetrical.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Forgetting to symmetrize conditional affinities $p_{j|i}$ and divide by total points $2N$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Joint affinities must satisfy $P_{ij} = \frac{p_{j|i} + p_{i|j}}{2N}$, guaranteeing symmetry $P = P^T$ and normalization $\\sum_{ij} P_{ij} = 1.0$.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },

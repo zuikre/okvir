@@ -45,10 +45,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def react_step_parse_and_execute(
-    response_text: str,
-    tools: dict[str, callable]
-) -> tuple[str, str, str, str]: ...
-# Returns: (thought: str, action: str, action_input: str, observation: str)
+import re
+
+def react_step_parse_and_execute(response_text: str, tools: dict[str, callable]) -> tuple[str, str, str, str]:
+    """Parse LLM text and execute tool if action is requested."""
+    # TODO: 1. Extract Thought, Action, Action Input, or Final Answer
+    # TODO: 2. If Final Answer present, return (thought, 'FINISH', '', final_answer)
+    # TODO: 3. Dispatch action to tools dictionary and capture output as observation
+    pass
 ```
 :::

@@ -64,15 +64,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The returned values remain in their original order, or post-swap IDs do not match the inverted pre-swap IDs.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Assigning `a = b` followed by `b = a` overwrites the binding `a` before it can be assigned to `b`, leaving both names pointing to `b`. Python evaluates the entire right-hand side of `a, b = b, a` into an internal temporary tuple before binding to the left-hand targets.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Write `a, b = b, a` in a single line, and compute `id(a)` and `id(b)` before and after this unpack statement.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -186,15 +186,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Looking up a key with value `0` or `False` unexpectedly returns the fallback value.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "In Python, `0 or \"fallback\"` evaluates to `\"fallback\"` because `bool(0)` is `False`. Logical `or` does not distinguish between missing values and intentional zero/empty values.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Use explicit boolean tracking (`found = True`) and verify key containment (`key in current`) rather than relying on boolean coercion.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -308,15 +308,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`UnboundLocalError: cannot access local variable 'current_val' where it is not associated with a value`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Augmented assignment (`+=`) combines read and write. Because `current_val` is assigned to, Python marks it local. When attempting to read it before completing assignment, `UnboundLocalError` fires.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Add `nonlocal current_val` at the very top of `add()` and `reset()`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -430,15 +430,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Test failure reporting `Side effect detected! Input list was mutated`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "In Python, iterating over a list of dictionaries yields references to the original dictionary heap objects. Modifying keys in `r` directly mutates the caller's data structure.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Construct a new dictionary using `{**r, target_key: scaled_val}` instead of mutating `r`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -552,15 +552,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The output value corresponds to $f_1(f_2(x))$ instead of $f_2(f_1(x))$.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Classical mathematical composition $(g \\circ f)(x)$ runs from right to left. Data pipelines require left-to-right forward progression.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Iterate forwards using `for fn in steps_tuple:` or `reduce(lambda val, fn: fn(val), funcs, x)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -674,15 +674,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Calls are rejected even after the window time has elapsed, or memory consumption grows monotonically.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Failing to pop timestamps that fall outside `current_time - window_seconds` causes stale requests to count against the quota permanently.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Use a `collections.deque` and repeatedly `popleft()` while `timestamps[0] <= current_time - window_seconds`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -796,15 +796,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The output list contains single characters `['h', 'e', 'l', 'l', 'o']` instead of the complete string `\"hello\"`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "In Python, `str` and `bytes` implement the `Iterable` protocol. If checked only against `Iterable`, strings are repeatedly unpacked down to individual characters.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Explicitly check `if isinstance(item, (str, bytes)) or not isinstance(item, Iterable):` as the base leaf condition.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -918,15 +918,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The final window has fewer elements than `window_size`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "If the loop allows `start_idx` to exceed `len(seq) - window_size`, Python's slice syntax `seq[start : start + window_size]` does not error; it simply truncates at the end of the sequence.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Ensure the range iterates over `range(0, len(seq) - window_size + 1, step)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1040,15 +1040,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`RecursionError: maximum recursion depth exceeded` when copying circular structures.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "If `memo[node_id] = cloned_container` is placed AFTER child recursion, any circular link back to the parent encounters an empty memo entry, triggering an infinite descent.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Allocate the empty container and register it in `memo[node_id]` immediately before recursing on child nodes.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1162,15 +1162,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "After calling `delete(k1)`, subsequent `get(k2)` returns `None` even though `k2` was never deleted.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Linear probing stops searching as soon as it hits `None`. If an intervening slot is wiped clean, subsequent items that collided and probed past that slot become unreachable.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Replace deleted keys with a unique sentinel object (`_TOMBSTONE = object()`) and instruct `get()` to continue probing when encountering `_TOMBSTONE`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1284,15 +1284,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The browser tab hangs or crashes with an execution timeout on arrays of length 10,000+.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Nested loops perform $\\frac{N^2}{2}$ iterations. For $N = 10,000$, this requires $50,000,000$ operations in WASM, exceeding the 800ms budget.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Build a dictionary mapping `val -> [indices]` in a single forward pass, looking up `target - val` in $\\mathcal{O}(1)$ time.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1406,15 +1406,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The browser test runner aborts with `Execution Timeout (>800ms)`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Testing membership in a standard Python list (`x in list`) iterates linearly through all elements from start to end ($\\mathcal{O}(K)$).",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Maintain a parallel `seen = set()` for $\\mathcal{O}(1)$ lookups, appending to `output` only when `item not in seen`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1528,15 +1528,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Writing `3 * v` raises `TypeError: unsupported operand type(s) for *: 'int' and 'Vector2D'`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Python evaluates binary operations left-to-right. Since `int` does not know how to multiply by `Vector2D`, it looks for the reflected method `__rmul__` on the right-hand operand.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Implement `def __rmul__(self, scalar): return self.__mul__(scalar)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1651,15 +1651,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Passing a generator causes `TypeError: object of type 'generator' has no len()` or infinite loop.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Generators and network streams do not support slicing or length discovery. They can only be consumed sequentially via `iter()` and `next()`.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Store `self._source_iter = iter(iterable)` and accumulate items inside a loop using `try: item = next(self._source_iter) except StopIteration: break`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1773,15 +1773,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The variance of `[1e9+1, 1e9+2, 1e9+3]` computes to `0.0` or a negative number.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Floating point numbers in IEEE 754 have 53 bits of precision (~15-17 decimal digits). When squaring $10^9$ to $10^{18}$, the small differences in low-order bits fall off the mantissa, destroying statistical accuracy.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Update variance via the dual-delta terms: `delta = x - mean`, `mean += delta / count`, `delta2 = x - mean`, `M2 += delta * delta2`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1896,15 +1896,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The code passes correctness tests but fails with `Performance Violation: Pure Python loop detected`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Iterating element-by-element in Python forces the runtime to unbox every float into a PyObject, nullifying the SIMD hardware pipeline.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Use `np.abs(y_true - y_pred)` and pass the boolean condition `errors <= delta` directly into `np.where(condition, quadratic, linear)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2018,15 +2018,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The browser tab runs out of memory (OOM) or returns garbled memory values.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Strides are byte offsets, not element offsets. If you pass `(1, 1)` instead of `(itemsize, itemsize)`, NumPy steps by 1 single byte instead of 8 bytes, reading misaligned binary float fragments.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Retrieve the native element byte stride with `elem_stride = arr.strides[0]` and assign `strides=(elem_stride, elem_stride)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2140,15 +2140,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`ValueError: operands could not be broadcast together with shapes (N, D) (M, D)`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "NumPy aligns dimensions from right to left. Dimension $D$ matches, but $N$ and $M$ conflict unless an explicit dimension of size 1 is introduced.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Expand dimensions using `np.newaxis`: `X[:, np.newaxis, :] - Y[np.newaxis, :, :]`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2262,15 +2262,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Keys present in `series_b` but missing in `series_a` are omitted from the output.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Iterating only over the keys of the first operand creates an inner/left join instead of full outer index alignment.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Take the set union `set(series_a.keys()) | set(series_b.keys())`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2384,15 +2384,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`loc` returns one fewer element than expected (omits the stop label).",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Standard Python slicing `[start:stop]` is half-open, stopping before `stop`. Pandas `loc` is mathematically closed: both endpoints are included.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Slice with `index[start_idx : stop_idx + 1]`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2506,15 +2506,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Missing ID variables in output or unexpected overwrites of row data.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Modifying a shared dictionary in-place causes all emitted rows to reflect the values of the final iteration.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Construct a fresh dictionary for each value variable: `{**base_id_record, var_name: v_col, value_name: row[v_col]}`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2628,15 +2628,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`ZeroDivisionError: division by zero` when a group has 1 record or all values are equal.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Sample variance requires at least 2 observations ($N - 1 = 0$). Identical numbers produce $s = 0$, causing division by zero when calculating $Z$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Check `if n < 2: std = 0.0` and when standardizing: `z = 0.0 if std == 0.0 else (val - mean) / std`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2728,7 +2728,7 @@ export const programmingModules: CurriculumModule[] = [
         "type": "code",
         "code": {
           "id": "py-sql-joins-relational-merges",
-          "starterCode": "import duckdb\n\ndef test_sql_logical_exec():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE orders (\n            order_id INT,\n            region VARCHAR,\n            product_category VARCHAR,\n            status VARCHAR,\n            revenue DOUBLE\n        );\n        INSERT INTO orders VALUES\n            (1, 'North', 'Tech', 'COMPLETED', 300.0),\n            (2, 'North', 'Tech', 'COMPLETED', 250.0), -- Tech North: sum=550, count=2 (PASS)\n            (3, 'North', 'Tech', 'CANCELLED', 1000.0),-- Cancelled: excluded\n            (4, 'South', 'Tech', 'COMPLETED', 600.0), -- Tech South: sum=600, count=1 (FAIL count)\n            (5, 'North', 'Home', 'COMPLETED', 100.0),\n            (6, 'North', 'Home', 'COMPLETED', 200.0); -- Home North: sum=300, count=2 (FAIL sum)\n    \"\"\")\n    \n    query = \"\"\"\n        SELECT\n            region,\n            product_category,\n            ROUND(SUM(revenue), 2) AS total_revenue,\n            COUNT(*) AS order_count\n        FROM orders\n        WHERE status = 'COMPLETED'\n        GROUP BY region, product_category\n        HAVING COUNT(*) >= 2 AND SUM(revenue) >= 500.0\n        ORDER BY total_revenue DESC, region ASC;\n    \"\"\"\n    \n    res = con.execute(query).fetchall()\n    assert len(res) == 1\n    assert res[0] == ('North', 'Tech', 550.0, 2)\n    \n    print(\"ALL TESTS PASSED for sql-logical-exec-order\")\n\nif __name__ == \"__main__\":\n    test_sql_logical_exec()",
+          "starterCode": "-- Write a DuckDB SQL query filtering pre-aggregation in WHERE\n-- and post-aggregation in HAVING.\n-- Schema: orders(order_id, region, product_category, status, revenue)\n\nSELECT\n    -- TODO: Columns and aggregations\nFROM orders\n-- TODO: WHERE, GROUP BY, HAVING, ORDER BY\n;",
           "testCases": [
             {
               "input": "x = np.array([1.0, 2.0])",
@@ -2742,23 +2742,23 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "3.0",
           "variants": {
             "python": {
-              "starterCode": "import duckdb\n\ndef test_sql_logical_exec():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE orders (\n            order_id INT,\n            region VARCHAR,\n            product_category VARCHAR,\n            status VARCHAR,\n            revenue DOUBLE\n        );\n        INSERT INTO orders VALUES\n            (1, 'North', 'Tech', 'COMPLETED', 300.0),\n            (2, 'North', 'Tech', 'COMPLETED', 250.0), -- Tech North: sum=550, count=2 (PASS)\n            (3, 'North', 'Tech', 'CANCELLED', 1000.0),-- Cancelled: excluded\n            (4, 'South', 'Tech', 'COMPLETED', 600.0), -- Tech South: sum=600, count=1 (FAIL count)\n            (5, 'North', 'Home', 'COMPLETED', 100.0),\n            (6, 'North', 'Home', 'COMPLETED', 200.0); -- Home North: sum=300, count=2 (FAIL sum)\n    \"\"\")\n    \n    query = \"\"\"\n        SELECT\n            region,\n            product_category,\n            ROUND(SUM(revenue), 2) AS total_revenue,\n            COUNT(*) AS order_count\n        FROM orders\n        WHERE status = 'COMPLETED'\n        GROUP BY region, product_category\n        HAVING COUNT(*) >= 2 AND SUM(revenue) >= 500.0\n        ORDER BY total_revenue DESC, region ASC;\n    \"\"\"\n    \n    res = con.execute(query).fetchall()\n    assert len(res) == 1\n    assert res[0] == ('North', 'Tech', 550.0, 2)\n    \n    print(\"ALL TESTS PASSED for sql-logical-exec-order\")\n\nif __name__ == \"__main__\":\n    test_sql_logical_exec()",
+              "starterCode": "-- Write a DuckDB SQL query filtering pre-aggregation in WHERE\n-- and post-aggregation in HAVING.\n-- Schema: orders(order_id, region, product_category, status, revenue)\n\nSELECT\n    -- TODO: Columns and aggregations\nFROM orders\n-- TODO: WHERE, GROUP BY, HAVING, ORDER BY\n;",
               "expectedOutput": "3.0"
             }
           },
-          "solution": "import duckdb\n\ndef test_sql_logical_exec():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE orders (\n            order_id INT,\n            region VARCHAR,\n            product_category VARCHAR,\n            status VARCHAR,\n            revenue DOUBLE\n        );\n        INSERT INTO orders VALUES\n            (1, 'North', 'Tech', 'COMPLETED', 300.0),\n            (2, 'North', 'Tech', 'COMPLETED', 250.0), -- Tech North: sum=550, count=2 (PASS)\n            (3, 'North', 'Tech', 'CANCELLED', 1000.0),-- Cancelled: excluded\n            (4, 'South', 'Tech', 'COMPLETED', 600.0), -- Tech South: sum=600, count=1 (FAIL count)\n            (5, 'North', 'Home', 'COMPLETED', 100.0),\n            (6, 'North', 'Home', 'COMPLETED', 200.0); -- Home North: sum=300, count=2 (FAIL sum)\n    \"\"\")\n    \n    query = \"\"\"\n        SELECT\n            region,\n            product_category,\n            ROUND(SUM(revenue), 2) AS total_revenue,\n            COUNT(*) AS order_count\n        FROM orders\n        WHERE status = 'COMPLETED'\n        GROUP BY region, product_category\n        HAVING COUNT(*) >= 2 AND SUM(revenue) >= 500.0\n        ORDER BY total_revenue DESC, region ASC;\n    \"\"\"\n    \n    res = con.execute(query).fetchall()\n    assert len(res) == 1\n    assert res[0] == ('North', 'Tech', 550.0, 2)\n    \n    print(\"ALL TESTS PASSED for sql-logical-exec-order\")\n\nif __name__ == \"__main__\":\n    test_sql_logical_exec()"
+          "solution": "SELECT\n    region,\n    product_category,\n    ROUND(SUM(revenue), 2) AS total_revenue,\n    COUNT(*) AS order_count\nFROM orders\nWHERE status = 'COMPLETED'\nGROUP BY region, product_category\nHAVING COUNT(*) >= 2 AND SUM(revenue) >= 500.0\nORDER BY total_revenue DESC, region ASC;"
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`Binder Error: aggregate function SUM not allowed in WHERE clause`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "`WHERE` is executed before rows are aggregated into groups. At that point in execution, group summaries do not exist.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Move `status = 'COMPLETED'` to `WHERE`, and move `SUM(revenue) >= 500.0` to `HAVING`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2850,7 +2850,7 @@ export const programmingModules: CurriculumModule[] = [
         "type": "code",
         "code": {
           "id": "py-sql-aggregations-group-by",
-          "starterCode": "import duckdb\n\ndef test_sql_join_coalesce():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE customers (customer_id INT, customer_name VARCHAR);\n        CREATE TABLE transactions (txn_id INT, customer_id INT, amount DOUBLE);\n        \n        INSERT INTO customers VALUES\n            (101, 'Alice'),\n            (102, 'Bob'),\n            (103, 'Charlie');\n            \n        INSERT INTO transactions VALUES\n            (1, 101, 50.0),\n            (2, 101, 75.5),\n            (3, 102, 20.0);\n            -- Charlie has 0 transactions\n    \"\"\")\n    \n    query = \"\"\"\n        SELECT\n            c.customer_id,\n            c.customer_name,\n            COALESCE(ROUND(SUM(t.amount), 2), 0.0) AS total_spent,\n            COUNT(t.txn_id) AS transaction_count\n        FROM customers c\n        LEFT JOIN transactions t ON c.customer_id = t.customer_id\n        GROUP BY c.customer_id, c.customer_name\n        ORDER BY total_spent DESC, c.customer_id ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert rows[0] == (101, 'Alice', 125.5, 2)\n    assert rows[1] == (102, 'Bob', 20.0, 1)\n    assert rows[2] == (103, 'Charlie', 0.0, 0), \"Customer with 0 transactions must have count 0, not 1!\"\n    \n    print(\"ALL TESTS PASSED for sql-join-coalesce-null\")\n\nif __name__ == \"__main__\":\n    test_sql_join_coalesce()",
+          "starterCode": "-- Formulate a DuckDB SQL query computing Customer Lifetime Value\n-- handling customers with 0 transactions using LEFT JOIN and COALESCE.\n\nSELECT\n    -- TODO: customer_id, customer_name, total_spent, transaction_count\nFROM customers c\n-- TODO: LEFT JOIN, GROUP BY, ORDER BY\n;",
           "testCases": [
             {
               "input": "x = np.array([1.0, 2.0])",
@@ -2864,23 +2864,23 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "3.0",
           "variants": {
             "python": {
-              "starterCode": "import duckdb\n\ndef test_sql_join_coalesce():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE customers (customer_id INT, customer_name VARCHAR);\n        CREATE TABLE transactions (txn_id INT, customer_id INT, amount DOUBLE);\n        \n        INSERT INTO customers VALUES\n            (101, 'Alice'),\n            (102, 'Bob'),\n            (103, 'Charlie');\n            \n        INSERT INTO transactions VALUES\n            (1, 101, 50.0),\n            (2, 101, 75.5),\n            (3, 102, 20.0);\n            -- Charlie has 0 transactions\n    \"\"\")\n    \n    query = \"\"\"\n        SELECT\n            c.customer_id,\n            c.customer_name,\n            COALESCE(ROUND(SUM(t.amount), 2), 0.0) AS total_spent,\n            COUNT(t.txn_id) AS transaction_count\n        FROM customers c\n        LEFT JOIN transactions t ON c.customer_id = t.customer_id\n        GROUP BY c.customer_id, c.customer_name\n        ORDER BY total_spent DESC, c.customer_id ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert rows[0] == (101, 'Alice', 125.5, 2)\n    assert rows[1] == (102, 'Bob', 20.0, 1)\n    assert rows[2] == (103, 'Charlie', 0.0, 0), \"Customer with 0 transactions must have count 0, not 1!\"\n    \n    print(\"ALL TESTS PASSED for sql-join-coalesce-null\")\n\nif __name__ == \"__main__\":\n    test_sql_join_coalesce()",
+              "starterCode": "-- Formulate a DuckDB SQL query computing Customer Lifetime Value\n-- handling customers with 0 transactions using LEFT JOIN and COALESCE.\n\nSELECT\n    -- TODO: customer_id, customer_name, total_spent, transaction_count\nFROM customers c\n-- TODO: LEFT JOIN, GROUP BY, ORDER BY\n;",
               "expectedOutput": "3.0"
             }
           },
-          "solution": "import duckdb\n\ndef test_sql_join_coalesce():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE customers (customer_id INT, customer_name VARCHAR);\n        CREATE TABLE transactions (txn_id INT, customer_id INT, amount DOUBLE);\n        \n        INSERT INTO customers VALUES\n            (101, 'Alice'),\n            (102, 'Bob'),\n            (103, 'Charlie');\n            \n        INSERT INTO transactions VALUES\n            (1, 101, 50.0),\n            (2, 101, 75.5),\n            (3, 102, 20.0);\n            -- Charlie has 0 transactions\n    \"\"\")\n    \n    query = \"\"\"\n        SELECT\n            c.customer_id,\n            c.customer_name,\n            COALESCE(ROUND(SUM(t.amount), 2), 0.0) AS total_spent,\n            COUNT(t.txn_id) AS transaction_count\n        FROM customers c\n        LEFT JOIN transactions t ON c.customer_id = t.customer_id\n        GROUP BY c.customer_id, c.customer_name\n        ORDER BY total_spent DESC, c.customer_id ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert rows[0] == (101, 'Alice', 125.5, 2)\n    assert rows[1] == (102, 'Bob', 20.0, 1)\n    assert rows[2] == (103, 'Charlie', 0.0, 0), \"Customer with 0 transactions must have count 0, not 1!\"\n    \n    print(\"ALL TESTS PASSED for sql-join-coalesce-null\")\n\nif __name__ == \"__main__\":\n    test_sql_join_coalesce()"
+          "solution": "SELECT\n    c.customer_id,\n    c.customer_name,\n    COALESCE(ROUND(SUM(t.amount), 2), 0.0) AS total_spent,\n    COUNT(t.txn_id) AS transaction_count\nFROM customers c\nLEFT JOIN transactions t ON c.customer_id = t.customer_id\nGROUP BY c.customer_id, c.customer_name\nORDER BY total_spent DESC, c.customer_id ASC;"
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Charlie (who has 0 transactions) is reported as having `transaction_count = 1`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "In a `LEFT JOIN`, an unmatched customer still produces 1 row in the joined relation (with `NULL` for transaction attributes). `COUNT(*)` counts rows regardless of nullity.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Use `COUNT(t.txn_id)`. `COUNT(column)` ignores `NULL` values, properly yielding 0.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2972,7 +2972,7 @@ export const programmingModules: CurriculumModule[] = [
         "type": "code",
         "code": {
           "id": "py-sql-window-functions",
-          "starterCode": "import duckdb\n\ndef test_sql_case_pivot():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE sales (dept_name VARCHAR, sale_date DATE, revenue DOUBLE);\n        INSERT INTO sales VALUES\n            ('Electronics', '2024-01-15', 100.0), -- Q1\n            ('Electronics', '2024-05-10', 200.0), -- Q2\n            ('Electronics', '2024-11-20', 300.0), -- Q4\n            ('Electronics', '2023-11-20', 999.0), -- 2023 (Excluded)\n            ('Furniture',   '2024-02-10', 150.0); -- Q1\n    \"\"\")\n    \n    query = \"\"\"\n        SELECT\n            dept_name,\n            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 1 THEN revenue ELSE 0 END), 2) AS q1_revenue,\n            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 2 THEN revenue ELSE 0 END), 2) AS q2_revenue,\n            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 3 THEN revenue ELSE 0 END), 2) AS q3_revenue,\n            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 4 THEN revenue ELSE 0 END), 2) AS q4_revenue,\n            ROUND(SUM(revenue), 2) AS annual_total\n        FROM sales\n        WHERE EXTRACT(YEAR FROM sale_date) = 2024\n        GROUP BY dept_name\n        ORDER BY annual_total DESC, dept_name ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert len(rows) == 2\n    assert rows[0] == ('Electronics', 100.0, 200.0, 0.0, 300.0, 600.0)\n    assert rows[1] == ('Furniture', 150.0, 0.0, 0.0, 0.0, 150.0)\n    \n    print(\"ALL TESTS PASSED for sql-case-pivot-agg\")\n\nif __name__ == \"__main__\":\n    test_sql_case_pivot()",
+          "starterCode": "-- Formulate a DuckDB SQL query pivoting sales into quarterly columns\n-- using conditional aggregation CASE WHEN expressions.\n\nSELECT\n    -- TODO: dept_name, q1_revenue, q2_revenue, q3_revenue, q4_revenue, annual_total\nFROM sales\n-- TODO: WHERE, GROUP BY, ORDER BY\n;",
           "testCases": [
             {
               "input": "x = np.array([1.0, 2.0])",
@@ -2986,23 +2986,23 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "3.0",
           "variants": {
             "python": {
-              "starterCode": "import duckdb\n\ndef test_sql_case_pivot():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE sales (dept_name VARCHAR, sale_date DATE, revenue DOUBLE);\n        INSERT INTO sales VALUES\n            ('Electronics', '2024-01-15', 100.0), -- Q1\n            ('Electronics', '2024-05-10', 200.0), -- Q2\n            ('Electronics', '2024-11-20', 300.0), -- Q4\n            ('Electronics', '2023-11-20', 999.0), -- 2023 (Excluded)\n            ('Furniture',   '2024-02-10', 150.0); -- Q1\n    \"\"\")\n    \n    query = \"\"\"\n        SELECT\n            dept_name,\n            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 1 THEN revenue ELSE 0 END), 2) AS q1_revenue,\n            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 2 THEN revenue ELSE 0 END), 2) AS q2_revenue,\n            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 3 THEN revenue ELSE 0 END), 2) AS q3_revenue,\n            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 4 THEN revenue ELSE 0 END), 2) AS q4_revenue,\n            ROUND(SUM(revenue), 2) AS annual_total\n        FROM sales\n        WHERE EXTRACT(YEAR FROM sale_date) = 2024\n        GROUP BY dept_name\n        ORDER BY annual_total DESC, dept_name ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert len(rows) == 2\n    assert rows[0] == ('Electronics', 100.0, 200.0, 0.0, 300.0, 600.0)\n    assert rows[1] == ('Furniture', 150.0, 0.0, 0.0, 0.0, 150.0)\n    \n    print(\"ALL TESTS PASSED for sql-case-pivot-agg\")\n\nif __name__ == \"__main__\":\n    test_sql_case_pivot()",
+              "starterCode": "-- Formulate a DuckDB SQL query pivoting sales into quarterly columns\n-- using conditional aggregation CASE WHEN expressions.\n\nSELECT\n    -- TODO: dept_name, q1_revenue, q2_revenue, q3_revenue, q4_revenue, annual_total\nFROM sales\n-- TODO: WHERE, GROUP BY, ORDER BY\n;",
               "expectedOutput": "3.0"
             }
           },
-          "solution": "import duckdb\n\ndef test_sql_case_pivot():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE sales (dept_name VARCHAR, sale_date DATE, revenue DOUBLE);\n        INSERT INTO sales VALUES\n            ('Electronics', '2024-01-15', 100.0), -- Q1\n            ('Electronics', '2024-05-10', 200.0), -- Q2\n            ('Electronics', '2024-11-20', 300.0), -- Q4\n            ('Electronics', '2023-11-20', 999.0), -- 2023 (Excluded)\n            ('Furniture',   '2024-02-10', 150.0); -- Q1\n    \"\"\")\n    \n    query = \"\"\"\n        SELECT\n            dept_name,\n            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 1 THEN revenue ELSE 0 END), 2) AS q1_revenue,\n            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 2 THEN revenue ELSE 0 END), 2) AS q2_revenue,\n            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 3 THEN revenue ELSE 0 END), 2) AS q3_revenue,\n            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 4 THEN revenue ELSE 0 END), 2) AS q4_revenue,\n            ROUND(SUM(revenue), 2) AS annual_total\n        FROM sales\n        WHERE EXTRACT(YEAR FROM sale_date) = 2024\n        GROUP BY dept_name\n        ORDER BY annual_total DESC, dept_name ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert len(rows) == 2\n    assert rows[0] == ('Electronics', 100.0, 200.0, 0.0, 300.0, 600.0)\n    assert rows[1] == ('Furniture', 150.0, 0.0, 0.0, 0.0, 150.0)\n    \n    print(\"ALL TESTS PASSED for sql-case-pivot-agg\")\n\nif __name__ == \"__main__\":\n    test_sql_case_pivot()"
+          "solution": "SELECT\n    dept_name,\n    ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 1 THEN revenue ELSE 0 END), 2) AS q1_revenue,\n    ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 2 THEN revenue ELSE 0 END), 2) AS q2_revenue,\n    ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 3 THEN revenue ELSE 0 END), 2) AS q3_revenue,\n    ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 4 THEN revenue ELSE 0 END), 2) AS q4_revenue,\n    ROUND(SUM(revenue), 2) AS annual_total\nFROM sales\nWHERE EXTRACT(YEAR FROM sale_date) = 2024\nGROUP BY dept_name\nORDER BY annual_total DESC, dept_name ASC;"
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Quarters with no sales display `NULL` instead of `0.0`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "In SQL, a `CASE` statement without an explicit `ELSE` defaults to returning `NULL` when conditions are unmet. `SUM(NULL)` on an all-null group yields `NULL`.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Ensure every conditional branch concludes with `ELSE 0 END`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3094,7 +3094,7 @@ export const programmingModules: CurriculumModule[] = [
         "type": "code",
         "code": {
           "id": "py-sql-ctes-recursive-queries",
-          "starterCode": "import duckdb\n\ndef test_sql_window_rank():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE employees (emp_id INT, dept_name VARCHAR, emp_name VARCHAR, salary DOUBLE);\n        INSERT INTO employees VALUES\n            (1, 'Eng', 'Alice', 100000.0),\n            (2, 'Eng', 'Bob',   100000.0), -- Tie for 1st\n            (3, 'Eng', 'Carol',  80000.0), -- 2nd in DENSE_RANK\n            (4, 'Mkt', 'Dave',   90000.0);\n    \"\"\")\n    \n    query = \"\"\"\n        SELECT\n            emp_id,\n            dept_name,\n            emp_name,\n            salary,\n            DENSE_RANK() OVER (\n                PARTITION BY dept_name \n                ORDER BY salary DESC\n            ) AS dept_salary_rank,\n            ROUND(\n                MAX(salary) OVER (PARTITION BY dept_name) - salary, \n                2\n            ) AS salary_gap_to_max\n        FROM employees\n        ORDER BY dept_name ASC, dept_salary_rank ASC, salary DESC, emp_id ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert len(rows) == 4\n    # Check Eng partition\n    assert rows[0][:5] == (1, 'Eng', 'Alice', 100000.0, 1)\n    assert rows[0][5] == 0.0\n    assert rows[1][:5] == (2, 'Eng', 'Bob', 100000.0, 1)\n    assert rows[1][5] == 0.0\n    assert rows[2][:5] == (3, 'Eng', 'Carol', 80000.0, 2), \"DENSE_RANK must assign 2 to Carol, not 3!\"\n    assert rows[2][5] == 20000.0\n    \n    print(\"ALL TESTS PASSED for sql-window-dense-rank\")\n\nif __name__ == \"__main__\":\n    test_sql_window_rank()",
+          "starterCode": "-- Formulate a DuckDB SQL query computing DENSE_RANK() and max salary gap\n-- across departmental partitions.\n-- Schema: employees(emp_id, dept_name, emp_name, salary)\n\nSELECT\n    -- TODO: emp_id, dept_name, emp_name, salary, dept_salary_rank, salary_gap_to_max\nFROM employees\n-- TODO: WINDOW functions and ORDER BY\n;",
           "testCases": [
             {
               "input": "x = np.array([1.0, 2.0])",
@@ -3108,23 +3108,23 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "3.0",
           "variants": {
             "python": {
-              "starterCode": "import duckdb\n\ndef test_sql_window_rank():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE employees (emp_id INT, dept_name VARCHAR, emp_name VARCHAR, salary DOUBLE);\n        INSERT INTO employees VALUES\n            (1, 'Eng', 'Alice', 100000.0),\n            (2, 'Eng', 'Bob',   100000.0), -- Tie for 1st\n            (3, 'Eng', 'Carol',  80000.0), -- 2nd in DENSE_RANK\n            (4, 'Mkt', 'Dave',   90000.0);\n    \"\"\")\n    \n    query = \"\"\"\n        SELECT\n            emp_id,\n            dept_name,\n            emp_name,\n            salary,\n            DENSE_RANK() OVER (\n                PARTITION BY dept_name \n                ORDER BY salary DESC\n            ) AS dept_salary_rank,\n            ROUND(\n                MAX(salary) OVER (PARTITION BY dept_name) - salary, \n                2\n            ) AS salary_gap_to_max\n        FROM employees\n        ORDER BY dept_name ASC, dept_salary_rank ASC, salary DESC, emp_id ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert len(rows) == 4\n    # Check Eng partition\n    assert rows[0][:5] == (1, 'Eng', 'Alice', 100000.0, 1)\n    assert rows[0][5] == 0.0\n    assert rows[1][:5] == (2, 'Eng', 'Bob', 100000.0, 1)\n    assert rows[1][5] == 0.0\n    assert rows[2][:5] == (3, 'Eng', 'Carol', 80000.0, 2), \"DENSE_RANK must assign 2 to Carol, not 3!\"\n    assert rows[2][5] == 20000.0\n    \n    print(\"ALL TESTS PASSED for sql-window-dense-rank\")\n\nif __name__ == \"__main__\":\n    test_sql_window_rank()",
+              "starterCode": "-- Formulate a DuckDB SQL query computing DENSE_RANK() and max salary gap\n-- across departmental partitions.\n-- Schema: employees(emp_id, dept_name, emp_name, salary)\n\nSELECT\n    -- TODO: emp_id, dept_name, emp_name, salary, dept_salary_rank, salary_gap_to_max\nFROM employees\n-- TODO: WINDOW functions and ORDER BY\n;",
               "expectedOutput": "3.0"
             }
           },
-          "solution": "import duckdb\n\ndef test_sql_window_rank():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE employees (emp_id INT, dept_name VARCHAR, emp_name VARCHAR, salary DOUBLE);\n        INSERT INTO employees VALUES\n            (1, 'Eng', 'Alice', 100000.0),\n            (2, 'Eng', 'Bob',   100000.0), -- Tie for 1st\n            (3, 'Eng', 'Carol',  80000.0), -- 2nd in DENSE_RANK\n            (4, 'Mkt', 'Dave',   90000.0);\n    \"\"\")\n    \n    query = \"\"\"\n        SELECT\n            emp_id,\n            dept_name,\n            emp_name,\n            salary,\n            DENSE_RANK() OVER (\n                PARTITION BY dept_name \n                ORDER BY salary DESC\n            ) AS dept_salary_rank,\n            ROUND(\n                MAX(salary) OVER (PARTITION BY dept_name) - salary, \n                2\n            ) AS salary_gap_to_max\n        FROM employees\n        ORDER BY dept_name ASC, dept_salary_rank ASC, salary DESC, emp_id ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert len(rows) == 4\n    # Check Eng partition\n    assert rows[0][:5] == (1, 'Eng', 'Alice', 100000.0, 1)\n    assert rows[0][5] == 0.0\n    assert rows[1][:5] == (2, 'Eng', 'Bob', 100000.0, 1)\n    assert rows[1][5] == 0.0\n    assert rows[2][:5] == (3, 'Eng', 'Carol', 80000.0, 2), \"DENSE_RANK must assign 2 to Carol, not 3!\"\n    assert rows[2][5] == 20000.0\n    \n    print(\"ALL TESTS PASSED for sql-window-dense-rank\")\n\nif __name__ == \"__main__\":\n    test_sql_window_rank()"
+          "solution": "SELECT\n    emp_id,\n    dept_name,\n    emp_name,\n    salary,\n    DENSE_RANK() OVER (\n        PARTITION BY dept_name \n        ORDER BY salary DESC\n    ) AS dept_salary_rank,\n    ROUND(\n        MAX(salary) OVER (PARTITION BY dept_name) - salary, \n        2\n    ) AS salary_gap_to_max\nFROM employees\nORDER BY \n    dept_name ASC, \n    dept_salary_rank ASC, \n    salary DESC, \n    emp_id ASC;"
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The employee following a salary tie is assigned rank 3 instead of rank 2.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "`RANK()` skips ranks when ties occur (e.g. 1, 1, 3). `DENSE_RANK()` advances consecutively without gaps (1, 1, 2).",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Replace `RANK()` with `DENSE_RANK()`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3216,7 +3216,7 @@ export const programmingModules: CurriculumModule[] = [
         "type": "code",
         "code": {
           "id": "py-sql-indexing-query-plans",
-          "starterCode": "import duckdb\n\ndef test_sql_window_frame():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE daily_metrics (metric_date DATE, revenue DOUBLE);\n        INSERT INTO daily_metrics VALUES\n            ('2024-01-01', 100.0),\n            ('2024-01-02', 150.0),\n            ('2024-01-03', 200.0),\n            ('2024-01-04', 100.0);\n    \"\"\")\n    \n    query = \"\"\"\n        WITH metrics_lagged AS (\n            SELECT\n                metric_date,\n                revenue,\n                ROUND(\n                    SUM(revenue) OVER (\n                        ORDER BY metric_date \n                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW\n                    ), \n                    2\n                ) AS rolling_3day_revenue,\n                LAG(revenue, 1) OVER (ORDER BY metric_date) AS prev_day_revenue\n            FROM daily_metrics\n        )\n        SELECT\n            metric_date,\n            revenue,\n            rolling_3day_revenue,\n            prev_day_revenue,\n            CASE\n                WHEN prev_day_revenue IS NULL OR prev_day_revenue = 0 THEN NULL\n                ELSE ROUND(((revenue - prev_day_revenue) / prev_day_revenue) * 100.0, 2)\n            END AS dod_growth_pct\n        FROM metrics_lagged\n        ORDER BY metric_date ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert len(rows) == 4\n    assert rows[0][2] == 100.0 and rows[0][4] is None\n    assert rows[1][2] == 250.0 and rows[1][4] == 50.0\n    assert rows[2][2] == 450.0 and rows[2][4] == 33.33\n    assert rows[3][2] == 450.0 and rows[3][4] == -50.0\n    \n    print(\"ALL TESTS PASSED for sql-window-frame-delta\")\n\nif __name__ == \"__main__\":\n    test_sql_window_frame()",
+          "starterCode": "-- Formulate a DuckDB SQL query computing trailing rolling window sums\n-- and day-over-day growth percentages using ROWS BETWEEN and LAG().\n\nSELECT\n    -- TODO: metric_date, revenue, rolling_3day_revenue, prev_day_revenue, dod_growth_pct\nFROM daily_metrics\n-- TODO: Window frame clauses and ordering\n;",
           "testCases": [
             {
               "input": "x = np.array([1.0, 2.0])",
@@ -3230,23 +3230,23 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "3.0",
           "variants": {
             "python": {
-              "starterCode": "import duckdb\n\ndef test_sql_window_frame():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE daily_metrics (metric_date DATE, revenue DOUBLE);\n        INSERT INTO daily_metrics VALUES\n            ('2024-01-01', 100.0),\n            ('2024-01-02', 150.0),\n            ('2024-01-03', 200.0),\n            ('2024-01-04', 100.0);\n    \"\"\")\n    \n    query = \"\"\"\n        WITH metrics_lagged AS (\n            SELECT\n                metric_date,\n                revenue,\n                ROUND(\n                    SUM(revenue) OVER (\n                        ORDER BY metric_date \n                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW\n                    ), \n                    2\n                ) AS rolling_3day_revenue,\n                LAG(revenue, 1) OVER (ORDER BY metric_date) AS prev_day_revenue\n            FROM daily_metrics\n        )\n        SELECT\n            metric_date,\n            revenue,\n            rolling_3day_revenue,\n            prev_day_revenue,\n            CASE\n                WHEN prev_day_revenue IS NULL OR prev_day_revenue = 0 THEN NULL\n                ELSE ROUND(((revenue - prev_day_revenue) / prev_day_revenue) * 100.0, 2)\n            END AS dod_growth_pct\n        FROM metrics_lagged\n        ORDER BY metric_date ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert len(rows) == 4\n    assert rows[0][2] == 100.0 and rows[0][4] is None\n    assert rows[1][2] == 250.0 and rows[1][4] == 50.0\n    assert rows[2][2] == 450.0 and rows[2][4] == 33.33\n    assert rows[3][2] == 450.0 and rows[3][4] == -50.0\n    \n    print(\"ALL TESTS PASSED for sql-window-frame-delta\")\n\nif __name__ == \"__main__\":\n    test_sql_window_frame()",
+              "starterCode": "-- Formulate a DuckDB SQL query computing trailing rolling window sums\n-- and day-over-day growth percentages using ROWS BETWEEN and LAG().\n\nSELECT\n    -- TODO: metric_date, revenue, rolling_3day_revenue, prev_day_revenue, dod_growth_pct\nFROM daily_metrics\n-- TODO: Window frame clauses and ordering\n;",
               "expectedOutput": "3.0"
             }
           },
-          "solution": "import duckdb\n\ndef test_sql_window_frame():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE daily_metrics (metric_date DATE, revenue DOUBLE);\n        INSERT INTO daily_metrics VALUES\n            ('2024-01-01', 100.0),\n            ('2024-01-02', 150.0),\n            ('2024-01-03', 200.0),\n            ('2024-01-04', 100.0);\n    \"\"\")\n    \n    query = \"\"\"\n        WITH metrics_lagged AS (\n            SELECT\n                metric_date,\n                revenue,\n                ROUND(\n                    SUM(revenue) OVER (\n                        ORDER BY metric_date \n                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW\n                    ), \n                    2\n                ) AS rolling_3day_revenue,\n                LAG(revenue, 1) OVER (ORDER BY metric_date) AS prev_day_revenue\n            FROM daily_metrics\n        )\n        SELECT\n            metric_date,\n            revenue,\n            rolling_3day_revenue,\n            prev_day_revenue,\n            CASE\n                WHEN prev_day_revenue IS NULL OR prev_day_revenue = 0 THEN NULL\n                ELSE ROUND(((revenue - prev_day_revenue) / prev_day_revenue) * 100.0, 2)\n            END AS dod_growth_pct\n        FROM metrics_lagged\n        ORDER BY metric_date ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert len(rows) == 4\n    assert rows[0][2] == 100.0 and rows[0][4] is None\n    assert rows[1][2] == 250.0 and rows[1][4] == 50.0\n    assert rows[2][2] == 450.0 and rows[2][4] == 33.33\n    assert rows[3][2] == 450.0 and rows[3][4] == -50.0\n    \n    print(\"ALL TESTS PASSED for sql-window-frame-delta\")\n\nif __name__ == \"__main__\":\n    test_sql_window_frame()"
+          "solution": "WITH metrics_lagged AS (\n    SELECT\n        metric_date,\n        revenue,\n        ROUND(\n            SUM(revenue) OVER (\n                ORDER BY metric_date \n                ROWS BETWEEN 2 PRECEDING AND CURRENT ROW\n            ), \n            2\n        ) AS rolling_3day_revenue,\n        LAG(revenue, 1) OVER (ORDER BY metric_date) AS prev_day_revenue\n    FROM daily_metrics\n)\nSELECT\n    metric_date,\n    revenue,\n    rolling_3day_revenue,\n    prev_day_revenue,\n    CASE\n        WHEN prev_day_revenue IS NULL OR prev_day_revenue = 0 THEN NULL\n        ELSE ROUND(((revenue - prev_day_revenue) / prev_day_revenue) * 100.0, 2)\n    END AS dod_growth_pct\nFROM metrics_lagged\nORDER BY metric_date ASC;"
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The rolling 3-day sum accumulates *all* preceding rows indefinitely.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "In SQL, omitting the frame clause defaults to `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`, which sums from the very beginning of the dataset.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Explicitly append `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3339,7 +3339,7 @@ export const programmingModules: CurriculumModule[] = [
         "type": "code",
         "code": {
           "id": "py-columnar-storage-parquet",
-          "starterCode": "import duckdb\n\ndef test_sql_recursive_tree():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE org_chart (emp_id INT, emp_name VARCHAR, manager_id INT);\n        INSERT INTO org_chart VALUES\n            (1, 'Alice', NULL),\n            (2, 'Bob', 1),\n            (3, 'Charlie', 2),\n            (4, 'Diana', 1);\n    \"\"\")\n    \n    query = \"\"\"\n        WITH RECURSIVE hierarchy AS (\n            SELECT\n                emp_id,\n                emp_name,\n                0 AS depth,\n                CAST(emp_name AS VARCHAR) AS path\n            FROM org_chart\n            WHERE manager_id IS NULL\n\n            UNION ALL\n\n            SELECT\n                child.emp_id,\n                child.emp_name,\n                parent.depth + 1 AS depth,\n                parent.path || ' -> ' || child.emp_name AS path\n            FROM org_chart child\n            JOIN hierarchy parent ON child.manager_id = parent.emp_id\n        )\n        SELECT emp_id, emp_name, depth, path\n        FROM hierarchy\n        ORDER BY depth ASC, path ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert len(rows) == 4\n    assert rows[0] == (1, 'Alice', 0, 'Alice')\n    assert rows[1] == (2, 'Bob', 1, 'Alice -> Bob')\n    assert rows[2] == (4, 'Diana', 1, 'Alice -> Diana')\n    assert rows[3] == (3, 'Charlie', 2, 'Alice -> Bob -> Charlie')\n    \n    print(\"ALL TESTS PASSED for sql-recursive-org-tree\")\n\nif __name__ == \"__main__\":\n    test_sql_recursive_tree()",
+          "starterCode": "-- Formulate a DuckDB Recursive CTE traversing an organization hierarchy.\n-- Schema: org_chart(emp_id, emp_name, manager_id)\n\nWITH RECURSIVE hierarchy AS (\n    -- Anchor Member (Root)\n    SELECT\n        -- TODO: emp_id, emp_name, depth, path\n    FROM org_chart\n    WHERE manager_id IS NULL\n\n    UNION ALL\n\n    -- Recursive Member (Children)\n    SELECT\n        -- TODO: child.emp_id, child.emp_name, parent.depth + 1, concatenated path\n    FROM org_chart child\n    JOIN hierarchy parent ON child.manager_id = parent.emp_id\n)\nSELECT * FROM hierarchy\nORDER BY depth ASC, path ASC;",
           "testCases": [
             {
               "input": "x = np.array([1.0, 2.0])",
@@ -3353,23 +3353,23 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "3.0",
           "variants": {
             "python": {
-              "starterCode": "import duckdb\n\ndef test_sql_recursive_tree():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE org_chart (emp_id INT, emp_name VARCHAR, manager_id INT);\n        INSERT INTO org_chart VALUES\n            (1, 'Alice', NULL),\n            (2, 'Bob', 1),\n            (3, 'Charlie', 2),\n            (4, 'Diana', 1);\n    \"\"\")\n    \n    query = \"\"\"\n        WITH RECURSIVE hierarchy AS (\n            SELECT\n                emp_id,\n                emp_name,\n                0 AS depth,\n                CAST(emp_name AS VARCHAR) AS path\n            FROM org_chart\n            WHERE manager_id IS NULL\n\n            UNION ALL\n\n            SELECT\n                child.emp_id,\n                child.emp_name,\n                parent.depth + 1 AS depth,\n                parent.path || ' -> ' || child.emp_name AS path\n            FROM org_chart child\n            JOIN hierarchy parent ON child.manager_id = parent.emp_id\n        )\n        SELECT emp_id, emp_name, depth, path\n        FROM hierarchy\n        ORDER BY depth ASC, path ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert len(rows) == 4\n    assert rows[0] == (1, 'Alice', 0, 'Alice')\n    assert rows[1] == (2, 'Bob', 1, 'Alice -> Bob')\n    assert rows[2] == (4, 'Diana', 1, 'Alice -> Diana')\n    assert rows[3] == (3, 'Charlie', 2, 'Alice -> Bob -> Charlie')\n    \n    print(\"ALL TESTS PASSED for sql-recursive-org-tree\")\n\nif __name__ == \"__main__\":\n    test_sql_recursive_tree()",
+              "starterCode": "-- Formulate a DuckDB Recursive CTE traversing an organization hierarchy.\n-- Schema: org_chart(emp_id, emp_name, manager_id)\n\nWITH RECURSIVE hierarchy AS (\n    -- Anchor Member (Root)\n    SELECT\n        -- TODO: emp_id, emp_name, depth, path\n    FROM org_chart\n    WHERE manager_id IS NULL\n\n    UNION ALL\n\n    -- Recursive Member (Children)\n    SELECT\n        -- TODO: child.emp_id, child.emp_name, parent.depth + 1, concatenated path\n    FROM org_chart child\n    JOIN hierarchy parent ON child.manager_id = parent.emp_id\n)\nSELECT * FROM hierarchy\nORDER BY depth ASC, path ASC;",
               "expectedOutput": "3.0"
             }
           },
-          "solution": "import duckdb\n\ndef test_sql_recursive_tree():\n    con = duckdb.connect(\":memory:\")\n    con.execute(\"\"\"\n        CREATE TABLE org_chart (emp_id INT, emp_name VARCHAR, manager_id INT);\n        INSERT INTO org_chart VALUES\n            (1, 'Alice', NULL),\n            (2, 'Bob', 1),\n            (3, 'Charlie', 2),\n            (4, 'Diana', 1);\n    \"\"\")\n    \n    query = \"\"\"\n        WITH RECURSIVE hierarchy AS (\n            SELECT\n                emp_id,\n                emp_name,\n                0 AS depth,\n                CAST(emp_name AS VARCHAR) AS path\n            FROM org_chart\n            WHERE manager_id IS NULL\n\n            UNION ALL\n\n            SELECT\n                child.emp_id,\n                child.emp_name,\n                parent.depth + 1 AS depth,\n                parent.path || ' -> ' || child.emp_name AS path\n            FROM org_chart child\n            JOIN hierarchy parent ON child.manager_id = parent.emp_id\n        )\n        SELECT emp_id, emp_name, depth, path\n        FROM hierarchy\n        ORDER BY depth ASC, path ASC;\n    \"\"\"\n    \n    rows = con.execute(query).fetchall()\n    assert len(rows) == 4\n    assert rows[0] == (1, 'Alice', 0, 'Alice')\n    assert rows[1] == (2, 'Bob', 1, 'Alice -> Bob')\n    assert rows[2] == (4, 'Diana', 1, 'Alice -> Diana')\n    assert rows[3] == (3, 'Charlie', 2, 'Alice -> Bob -> Charlie')\n    \n    print(\"ALL TESTS PASSED for sql-recursive-org-tree\")\n\nif __name__ == \"__main__\":\n    test_sql_recursive_tree()"
+          "solution": "WITH RECURSIVE hierarchy AS (\n    -- Anchor Member: Root nodes with no manager\n    SELECT\n        emp_id,\n        emp_name,\n        0 AS depth,\n        CAST(emp_name AS VARCHAR) AS path\n    FROM org_chart\n    WHERE manager_id IS NULL\n\n    UNION ALL\n\n    -- Recursive Member: Join subordinates to existing parents\n    SELECT\n        child.emp_id,\n        child.emp_name,\n        parent.depth + 1 AS depth,\n        parent.path || ' -> ' || child.emp_name AS path\n    FROM org_chart child\n    JOIN hierarchy parent ON child.manager_id = parent.emp_id\n)\nSELECT\n    emp_id,\n    emp_name,\n    depth,\n    path\nFROM hierarchy\nORDER BY depth ASC, path ASC;"
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`Binder Error: type mismatch in recursive query between anchor and recursive member`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "In the anchor member, `emp_name` might be inferred as a fixed-length string type. The recursive member concatenates additional characters, exceeding the anchor's column width.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Explicitly cast the anchor path to unbounded `VARCHAR`: `CAST(emp_name AS VARCHAR) AS path`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3483,15 +3483,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The compression ratio for UTF-8 strings is inaccurate on non-ASCII characters.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "In Python, `len(\"é\")` returns `1` (character count), but in UTF-8 binary memory (and Apache Arrow), `\"é\"` consumes `2` bytes.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Measure binary footprint using `len(s.encode(\"utf-8\"))`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3606,15 +3606,15 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "The SCAN node loads all columns, or SORT executes before FILTER.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Evaluating filters after sorting forces the engine to sort rows that will ultimately be discarded. In lazy engines, filters must precede sorting, and scan columns must be pruned to only required fields.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Collect all needed columns across PROJECT, FILTER, and SORT; update `scan_node[\"columns\"]`, and order nodes: `[scan, *filters, *others, project]`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },

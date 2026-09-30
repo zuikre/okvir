@@ -34,21 +34,33 @@ New-Item -ItemType Directory -Path "$env:USERPROFILE\.okvir\cache" -Force | Out-
 Write-Host "==> Installation Target: $InstallDir" -ForegroundColor Gray
 
 # 3. Resolve Download URL
-$AssetName = "okvir-windows-x64-setup.exe"
-$ReleaseUrl = "https://github.com/$Repo/releases/latest/download/$AssetName"
-$InstallerTmp = "$env:TEMP\$AssetName"
-
-Write-Host "==> Downloading Okvir ($AssetName)..." -ForegroundColor Gray
+$PossibleAssets = @(
+    "OKVIR_1.0.1_x64-setup.exe",
+    "OKVIR_1.0.1_x64_en-US.msi",
+    "okvir-windows-x64-setup.exe"
+)
 
 $DownloadSuccess = $false
-try {
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    Invoke-WebRequest -Uri $ReleaseUrl -OutFile $InstallerTmp -UseBasicParsing -TimeoutSec 30
-    Write-Host "==> Running silent currentUser installation..." -ForegroundColor Gray
-    Start-Process -FilePath $InstallerTmp -ArgumentList "/S", "/currentuser" -Wait
-    $DownloadSuccess = $true
-} catch {
-    Write-Host "! Desktop installer exe packaging in progress on GitHub CI." -ForegroundColor Yellow
+foreach ($AssetName in $PossibleAssets) {
+    $ReleaseUrl = "https://github.com/$Repo/releases/latest/download/$AssetName"
+    $InstallerTmp = "$env:TEMP\$AssetName"
+    Write-Host "==> Trying Okvir installer ($AssetName)..." -ForegroundColor Gray
+
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        Invoke-WebRequest -Uri $ReleaseUrl -OutFile $InstallerTmp -UseBasicParsing -TimeoutSec 30
+        Write-Host "==> Running silent currentUser installation..." -ForegroundColor Gray
+        if ($AssetName.EndsWith(".msi")) {
+            Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$InstallerTmp`" /qn ALLUSERS=2" -Wait
+        } else {
+            Start-Process -FilePath $InstallerTmp -ArgumentList "/S", "/currentuser" -Wait
+        }
+        $DownloadSuccess = $true
+        Write-Host "✔ Installed Okvir Desktop successfully!" -ForegroundColor Green
+        break
+    } catch {
+        # Try next asset
+    }
 }
 
 if (-not $DownloadSuccess) {

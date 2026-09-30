@@ -44,12 +44,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def dpo_loss(
-    policy_win_logps: np.ndarray,
-    policy_loss_logps: np.ndarray,
-    ref_win_logps: np.ndarray,
-    ref_loss_logps: np.ndarray,
-    beta: float = 0.1
-) -> tuple[float, float, float]: ...
+import numpy as np
+
+def dpo_loss(policy_win_logps, policy_loss_logps, ref_win_logps, ref_loss_logps, beta=0.1):
+    """Compute DPO loss, reward margin, and preference accuracy."""
+    # TODO: 1. Calculate log ratios for winning and losing completions
+    # TODO: 2. Calculate beta-scaled margin logits
+    # TODO: 3. Compute loss, reward margin, and accuracy
+    pass
 ```
 :::

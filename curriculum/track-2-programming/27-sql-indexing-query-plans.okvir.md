@@ -58,57 +58,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-import duckdb
+-- Formulate a DuckDB SQL query computing trailing rolling window sums
+-- and day-over-day growth percentages using ROWS BETWEEN and LAG().
 
-def test_sql_window_frame():
-    con = duckdb.connect(":memory:")
-    con.execute("""
-        CREATE TABLE daily_metrics (metric_date DATE, revenue DOUBLE);
-        INSERT INTO daily_metrics VALUES
-            ('2024-01-01', 100.0),
-            ('2024-01-02', 150.0),
-            ('2024-01-03', 200.0),
-            ('2024-01-04', 100.0);
-    """)
-    
-    query = """
-        WITH metrics_lagged AS (
-            SELECT
-                metric_date,
-                revenue,
-                ROUND(
-                    SUM(revenue) OVER (
-                        ORDER BY metric_date 
-                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
-                    ), 
-                    2
-                ) AS rolling_3day_revenue,
-                LAG(revenue, 1) OVER (ORDER BY metric_date) AS prev_day_revenue
-            FROM daily_metrics
-        )
-        SELECT
-            metric_date,
-            revenue,
-            rolling_3day_revenue,
-            prev_day_revenue,
-            CASE
-                WHEN prev_day_revenue IS NULL OR prev_day_revenue = 0 THEN NULL
-                ELSE ROUND(((revenue - prev_day_revenue) / prev_day_revenue) * 100.0, 2)
-            END AS dod_growth_pct
-        FROM metrics_lagged
-        ORDER BY metric_date ASC;
-    """
-    
-    rows = con.execute(query).fetchall()
-    assert len(rows) == 4
-    assert rows[0][2] == 100.0 and rows[0][4] is None
-    assert rows[1][2] == 250.0 and rows[1][4] == 50.0
-    assert rows[2][2] == 450.0 and rows[2][4] == 33.33
-    assert rows[3][2] == 450.0 and rows[3][4] == -50.0
-    
-    print("ALL TESTS PASSED for sql-window-frame-delta")
-
-if __name__ == "__main__":
-    test_sql_window_frame()
+SELECT
+    -- TODO: metric_date, revenue, rolling_3day_revenue, prev_day_revenue, dod_growth_pct
+FROM daily_metrics
+-- TODO: Window frame clauses and ordering
+;
 ```
 :::

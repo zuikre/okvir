@@ -54,46 +54,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-import duckdb
+-- Formulate a DuckDB SQL query computing Customer Lifetime Value
+-- handling customers with 0 transactions using LEFT JOIN and COALESCE.
 
-def test_sql_join_coalesce():
-    con = duckdb.connect(":memory:")
-    con.execute("""
-        CREATE TABLE customers (customer_id INT, customer_name VARCHAR);
-        CREATE TABLE transactions (txn_id INT, customer_id INT, amount DOUBLE);
-        
-        INSERT INTO customers VALUES
-            (101, 'Alice'),
-            (102, 'Bob'),
-            (103, 'Charlie');
-            
-        INSERT INTO transactions VALUES
-            (1, 101, 50.0),
-            (2, 101, 75.5),
-            (3, 102, 20.0);
-            -- Charlie has 0 transactions
-    """)
-    
-    query = """
-        SELECT
-            c.customer_id,
-            c.customer_name,
-            COALESCE(ROUND(SUM(t.amount), 2), 0.0) AS total_spent,
-            COUNT(t.txn_id) AS transaction_count
-        FROM customers c
-        LEFT JOIN transactions t ON c.customer_id = t.customer_id
-        GROUP BY c.customer_id, c.customer_name
-        ORDER BY total_spent DESC, c.customer_id ASC;
-    """
-    
-    rows = con.execute(query).fetchall()
-    assert rows[0] == (101, 'Alice', 125.5, 2)
-    assert rows[1] == (102, 'Bob', 20.0, 1)
-    assert rows[2] == (103, 'Charlie', 0.0, 0), "Customer with 0 transactions must have count 0, not 1!"
-    
-    print("ALL TESTS PASSED for sql-join-coalesce-null")
-
-if __name__ == "__main__":
-    test_sql_join_coalesce()
+SELECT
+    -- TODO: customer_id, customer_name, total_spent, transaction_count
+FROM customers c
+-- TODO: LEFT JOIN, GROUP BY, ORDER BY
+;
 ```
 :::

@@ -64,15 +64,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`AssertionError: Shape mismatch: expected (N,), got scalar float` or `ValueError: operands could not be broadcast together`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Calling `np.sum((p - q)**2)` without specifying `axis=-1` flattens all batch dimensions and sums all numbers across all points into a single scalar.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Add `axis=-1` keyword argument: `np.sqrt(np.sum((p - q)**2, axis=-1))` or use `np.linalg.norm(p - q, axis=-1)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -186,15 +186,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`ValueError: operands could not be broadcast together with shapes (N-1,) (N-1,)` or wrong array shape `(N,)`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Using `y[1:] - y[:-1]` computes the first-order forward difference stencil of shape `(N-1,)`, which is shifted by $h/2$ rather than centered on interior nodes.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Offset slices symmetrically by two positions: `(y[2:] - y[:-2]) / (2.0 * dx)` so that element $i$ computes $(y_{i+1} - y_{i-1}) / 2dx$.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -308,15 +308,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Negative norm value or `RuntimeError: invalid value encountered in power` on negative inputs.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Exponentiating negative numbers with fractional powers (e.g., $(-4)^{1.5}$) yields complex numbers or NaNs in NumPy.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Wrap the input in `np.abs(v)` prior to raising to power $p$: `np.sum(np.abs(v) ** p, axis=-1) ** (1.0 / p)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -430,15 +430,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`ValueError: matmul: Input operand 1 has a mismatch in its core dimension 0` or inverted shape `(D, B)`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Dimension mismatch: `basis_vectors` is `(K, D)` and `coefficients` is `(B, K)`. Multiplying `(K, D) @ (B, K)` is invalid because $D \\ne B$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Multiply in correct algebraic order: `coefficients @ basis_vectors` with shapes `(B, K) @ (K, D) -> (B, D)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -552,15 +552,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`ValueError: np.arccos encountered NaN` or projection length differs by factor of $\\|\\mathbf{u}\\|$.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Projecting onto $\\mathbf{u}$ requires dividing by $\\|\\mathbf{u}\\|^2$ (not $\\|\\mathbf{u}\\|$). Furthermore, floating-point roundoff can yield $\\cos(\\theta) = 1.0000000000000002$, causing `np.arccos` to return `NaN`.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Divide by `np.dot(u, u)` and apply `np.clip(cos_theta, -1.0, 1.0)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -674,15 +674,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`ValueError: cross: operands must have last dimension 3` or missing area batch dimension.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Calling `np.linalg.norm(cross)` without `axis=-1` calculates the Frobenius norm across the entire tensor instead of row-wise vector norms.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Specify `axis=-1`: `np.linalg.norm(cross, axis=-1)` to reduce only the 3-element coordinate dimension.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -796,15 +796,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`ValueError: matmul: Input operand 1 has a mismatch in its core dimension 0` when computing `points @ matrix`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "`points` has shape `(B, N)` and `matrix` has shape `(M, N)`. Multiplying `(B, N) @ (M, N)` fails because $N \\ne M$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Multiply by transpose: `points @ matrix.T` with shape `(B, N) @ (N, M) -> (B, M)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -918,15 +918,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Point transforms to unexpected location, e.g., translation is scaled or rotated.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Matrix multiplication is non-commutative ($AB \\ne BA$). If written `S @ R @ T`, translation happens before scale/rotation, altering the displacement vector.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Order matrices right-to-left matching the pipeline of operations: `T @ (R @ S)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1040,15 +1040,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Singular matrix reported as `parity = 1` or `invertible = True`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Due to floating-point truncation, singular matrices often evaluate to $\\det(A) = 1.48 \\times 10^{-17}$, failing exact zero comparisons.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Use threshold tolerance: `if scale < 1e-12: parity = 0; is_invertible = False`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1162,15 +1162,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Numerical instability or `LinAlgError: Singular matrix` when calling `np.linalg.inv(A) @ b`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Inverting matrices explicitly amplifies condition numbers and incurs unnecessary $\\mathcal{O}(N^3)$ operations with rounding error accumulation.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Use LU-decomposition based `np.linalg.solve(A, b)` instead of explicit matrix inversion.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1284,15 +1284,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`null_basis` shape is transposed `(N-r, N)` or null condition $A \\mathbf{v} = \\mathbf{0}$ fails.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "`np.linalg.svd` returns $V^T$ rather than $V$. The rows of $V^T$ beyond index $r$ are the null space basis vectors, which must be transposed into columns.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Slice from `rank:` on $V^T$ and take transpose: `Vt[rank:, :].T`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1406,15 +1406,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`LinAlgError: Singular matrix` or non-symmetric projection matrix.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Calculating $(A^T A)^{-1}$ directly squares condition number $\\kappa(A)^2$, magnifying numerical instability.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Compute thin QR decomposition `Q, _ = np.linalg.qr(A)` and form projector as `Q @ Q.T`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1528,15 +1528,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Eigenvector does not converge or oscillates between $\\mathbf{v}$ and $-\\mathbf{v}$.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "If dominant eigenvalue is negative, vector flips sign every iteration: $\\mathbf{v}_{t+1} \\approx -\\mathbf{v}_t$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Check convergence modulo sign flip: `min(np.linalg.norm(v_next - v), np.linalg.norm(v_next + v)) < tol`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1651,15 +1651,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Complex numbers or non-orthonormal eigenvectors returned.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Standard `eig` is for general unsymmetric matrices and uses asymmetric QR iterations that do not enforce exact real eigenvalues or orthogonal eigenvectors.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Use `np.linalg.eigh(A)` specialized for Hermitian/symmetric matrices.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1774,15 +1774,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Slow execution timeout or `MemoryError` when constructing `np.diag(s)`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Constructing explicit diagonal matrices of size $\\min(M, N)^2$ wastes memory and creates slow matrix-matrix multiplications.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Multiply singular values into columns of $U$ via 1D broadcasting: `(U[:, :k] * s[:k]) @ Vt[:k, :]`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -1896,15 +1896,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Error convergence is only 2nd-order rather than 4th-order.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Using simple average `(d1 + d2) / 2` does not eliminate the leading $h^2$ Taylor coefficient.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Apply exact Richardson cancellation: `(4.0 * d2 - d1) / 3.0`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2018,15 +2018,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "`ValueError: operands could not be broadcast together` or scalar result returned.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Converting `query_points` into a scalar float or iterating in a loop.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Keep `query_points` as a NumPy array: `f(x0) + df(x0) * (query_points - x0)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2141,15 +2141,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Analytical gradient disagrees with numerical gradient by sign or scale.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Using $\\text{sech}^2(x)$ directly can overflow or recomputing $\\tanh(z_1)$ is redundant. Notice $\\frac{d}{dz}\\tanh(z) = 1 - \\tanh^2(z) = 1 - a_1^2$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Express local derivatives in terms of cached forward activations: `1.0 - a1**2` and `y * (1.0 - y)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2263,15 +2263,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Curvature is off by power of $dx$ or shape mismatch.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Dividing by `2.0 * dx` instead of `dx ** 2`. The second derivative stencil has dimension $\\Delta y / \\Delta x^2$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Use `(y[2:] - 2.0 * y[1:-1] + y[:-2]) / (dx ** 2)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2385,15 +2385,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Loop detected in submission or slow performance on large $N$.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Writing `for k in range(K)` incurs Python interpreter dispatch overhead.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Create 2D power matrix via 2D broadcasting: `powers = (x[:, None] - a) ** k[None, :]` and reduce along axis 1.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2507,15 +2507,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Shape mismatch `(H-2, W)` or axis confusion between $x$ and $y$.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "In NumPy indexing `Z[row, col]`, stepping in $x$ means changing the column index (axis 1: `Z[1:-1, 2:] - Z[1:-1, :-2]`).",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Slice axis 1 for $dx$: `(Z[1:-1, 2:] - Z[1:-1, :-2]) / (2*dx)` and axis 0 for $dy$: `(Z[2:, 1:-1] - Z[:-2, 1:-1]) / (2*dy)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2629,15 +2629,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Gradient vector contains all identical values or incorrect magnitude.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Adding a scalar `x0 + eps` perturbs all coordinates at once along the diagonal rather than isolating one coordinate axis at a time.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Multiply `eps` by the identity matrix `E = np.eye(d) * eps` so row $i$ perturbs exclusively coordinate $i$.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2752,15 +2752,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Directional derivative values scale with vector length instead of representing pure slopes.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Omitting normalization causes longer vectors to report artificially massive directional derivatives.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Normalize using `keepdims=True`: `directions / np.linalg.norm(directions, axis=-1, keepdims=True)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2875,15 +2875,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Slow Python loop computing $\\mathbf{v}_i^T H \\mathbf{v}_i$ or shape mismatch.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Multiplying `directions @ H @ directions.T` produces a full $B \\times B$ matrix where only the diagonal elements are needed.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Use `np.einsum('bd,de,be->b', unit_v, H, unit_v)` to directly evaluate the $B$ quadratic forms without allocating the cross-product matrix.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -2997,15 +2997,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Jacobian matrix is transposed `(N, M)` instead of `(M, N)`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Perturbing coordinate $x_j$ produces the $j$-th *column* of partial derivatives $\\frac{\\partial \\mathbf{F}}{\\partial x_j}$, not the $j$-th row.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Stack column-wise using `np.column_stack(cols)` or transpose row-stacked results.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3120,15 +3120,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Negative Jensen gap or incorrect expectation values.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "If input weights do not sum to 1.0, $\\mathbb{E}[X]$ and $\\mathbb{E}[f(X)]$ are not valid convex combinations.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Normalize weights unconditionally: `norm_weights = weights / np.sum(weights)`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3243,15 +3243,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Gradient ascent occurring (loss increases) or velocity subtracted in wrong direction.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Since $v$ accumulates positive gradient steps $\\alpha \\nabla f$, the parameter update must subtract $v$ to minimize the loss.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Compute `v_next = beta * v + lr * grad` then `x_next = x - v_next`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3365,15 +3365,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Primal stationarity condition violated ($Q\\mathbf{x}^* + \\mathbf{c} + A^T\\boldsymbol{\\lambda} \\ne \\mathbf{0}$) or sign error in $\\boldsymbol{\\lambda}^*$.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Stationarity requires $Q\\mathbf{x} + A^T\\boldsymbol{\\lambda} = -\\mathbf{c}$. Using `c` instead of `-c` flips the sign of the primal gradient balance.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Negate $c$ in the RHS vector: `np.concatenate([-c, b])`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },
@@ -3488,15 +3488,15 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Analyze the mathematical invariants and ensure correct array dimensions.",
+            "en": "Output variance is off by factor of $N$ or shape mismatch `(N,)`.",
             "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
           },
           "tier2": {
-            "en": "Use vectorized operations rather than explicit loops to avoid execution timeouts.",
+            "en": "Standardizing sample means requires dividing by the *standard error of the mean* $\\sigma_{\\bar{X}} = \\sigma / \\sqrt{N}$, not the raw population standard deviation $\\sigma$.",
             "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
           },
           "tier3": {
-            "en": "Verify your return type and boundary conditions against the test cases.",
+            "en": "Divide by `true_std / np.sqrt(samples.shape[1])`.",
             "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
           }
         },

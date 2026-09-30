@@ -42,15 +42,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def ddpm_p_sample_step(
-    x_t: np.ndarray,
-    t: int,
-    eps_cond: np.ndarray,
-    eps_uncond: np.ndarray,
-    cfg_scale: float,
-    betas: np.ndarray,
-    alpha_bars: np.ndarray,
-    z: np.ndarray | None = None
-) -> np.ndarray: ...
+import numpy as np
+
+def ddpm_p_sample_step(x_t, t, eps_cond, eps_uncond, cfg_scale, betas, alpha_bars, z=None):
+    """Execute single reverse DDPM step with CFG."""
+    # TODO: 1. Combine eps using CFG formula
+    # TODO: 2. Compute posterior mean mu_theta
+    # TODO: 3. If t == 0 return mu_theta, else add sigma_t * z
+    pass
 ```
 :::

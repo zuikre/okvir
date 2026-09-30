@@ -49,47 +49,14 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-import duckdb
+-- Write a DuckDB SQL query filtering pre-aggregation in WHERE
+-- and post-aggregation in HAVING.
+-- Schema: orders(order_id, region, product_category, status, revenue)
 
-def test_sql_logical_exec():
-    con = duckdb.connect(":memory:")
-    con.execute("""
-        CREATE TABLE orders (
-            order_id INT,
-            region VARCHAR,
-            product_category VARCHAR,
-            status VARCHAR,
-            revenue DOUBLE
-        );
-        INSERT INTO orders VALUES
-            (1, 'North', 'Tech', 'COMPLETED', 300.0),
-            (2, 'North', 'Tech', 'COMPLETED', 250.0), -- Tech North: sum=550, count=2 (PASS)
-            (3, 'North', 'Tech', 'CANCELLED', 1000.0),-- Cancelled: excluded
-            (4, 'South', 'Tech', 'COMPLETED', 600.0), -- Tech South: sum=600, count=1 (FAIL count)
-            (5, 'North', 'Home', 'COMPLETED', 100.0),
-            (6, 'North', 'Home', 'COMPLETED', 200.0); -- Home North: sum=300, count=2 (FAIL sum)
-    """)
-    
-    query = """
-        SELECT
-            region,
-            product_category,
-            ROUND(SUM(revenue), 2) AS total_revenue,
-            COUNT(*) AS order_count
-        FROM orders
-        WHERE status = 'COMPLETED'
-        GROUP BY region, product_category
-        HAVING COUNT(*) >= 2 AND SUM(revenue) >= 500.0
-        ORDER BY total_revenue DESC, region ASC;
-    """
-    
-    res = con.execute(query).fetchall()
-    assert len(res) == 1
-    assert res[0] == ('North', 'Tech', 550.0, 2)
-    
-    print("ALL TESTS PASSED for sql-logical-exec-order")
-
-if __name__ == "__main__":
-    test_sql_logical_exec()
+SELECT
+    -- TODO: Columns and aggregations
+FROM orders
+-- TODO: WHERE, GROUP BY, HAVING, ORDER BY
+;
 ```
 :::

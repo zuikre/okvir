@@ -51,54 +51,25 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-import duckdb
+-- Formulate a DuckDB Recursive CTE traversing an organization hierarchy.
+-- Schema: org_chart(emp_id, emp_name, manager_id)
 
-def test_sql_recursive_tree():
-    con = duckdb.connect(":memory:")
-    con.execute("""
-        CREATE TABLE org_chart (emp_id INT, emp_name VARCHAR, manager_id INT);
-        INSERT INTO org_chart VALUES
-            (1, 'Alice', NULL),
-            (2, 'Bob', 1),
-            (3, 'Charlie', 2),
-            (4, 'Diana', 1);
-    """)
-    
-    query = """
-        WITH RECURSIVE hierarchy AS (
-            SELECT
-                emp_id,
-                emp_name,
-                0 AS depth,
-                CAST(emp_name AS VARCHAR) AS path
-            FROM org_chart
-            WHERE manager_id IS NULL
+WITH RECURSIVE hierarchy AS (
+    -- Anchor Member (Root)
+    SELECT
+        -- TODO: emp_id, emp_name, depth, path
+    FROM org_chart
+    WHERE manager_id IS NULL
 
-            UNION ALL
+    UNION ALL
 
-            SELECT
-                child.emp_id,
-                child.emp_name,
-                parent.depth + 1 AS depth,
-                parent.path || ' -> ' || child.emp_name AS path
-            FROM org_chart child
-            JOIN hierarchy parent ON child.manager_id = parent.emp_id
-        )
-        SELECT emp_id, emp_name, depth, path
-        FROM hierarchy
-        ORDER BY depth ASC, path ASC;
-    """
-    
-    rows = con.execute(query).fetchall()
-    assert len(rows) == 4
-    assert rows[0] == (1, 'Alice', 0, 'Alice')
-    assert rows[1] == (2, 'Bob', 1, 'Alice -> Bob')
-    assert rows[2] == (4, 'Diana', 1, 'Alice -> Diana')
-    assert rows[3] == (3, 'Charlie', 2, 'Alice -> Bob -> Charlie')
-    
-    print("ALL TESTS PASSED for sql-recursive-org-tree")
-
-if __name__ == "__main__":
-    test_sql_recursive_tree()
+    -- Recursive Member (Children)
+    SELECT
+        -- TODO: child.emp_id, child.emp_name, parent.depth + 1, concatenated path
+    FROM org_chart child
+    JOIN hierarchy parent ON child.manager_id = parent.emp_id
+)
+SELECT * FROM hierarchy
+ORDER BY depth ASC, path ASC;
 ```
 :::

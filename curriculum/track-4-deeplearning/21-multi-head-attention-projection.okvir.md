@@ -43,12 +43,14 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def flash_attention_forward(
-    Q: np.ndarray,
-    K: np.ndarray,
-    V: np.ndarray,
-    block_r: int = 4,
-    block_c: int = 4
-) -> np.ndarray: ...
+import numpy as np
+
+def flash_attention_forward(Q, K, V, block_r=4, block_c=4):
+    """Tiled FlashAttention forward algorithm."""
+    # TODO: Initialize O, l, m arrays
+    # TODO: Outer loop over K, V blocks (columns)
+    # TODO: Inner loop over Q blocks (rows)
+    # TODO: Update running stats and normalize O by l at completion
+    pass
 ```
 :::

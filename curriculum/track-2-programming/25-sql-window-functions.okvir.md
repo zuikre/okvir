@@ -54,42 +54,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-import duckdb
+-- Formulate a DuckDB SQL query pivoting sales into quarterly columns
+-- using conditional aggregation CASE WHEN expressions.
 
-def test_sql_case_pivot():
-    con = duckdb.connect(":memory:")
-    con.execute("""
-        CREATE TABLE sales (dept_name VARCHAR, sale_date DATE, revenue DOUBLE);
-        INSERT INTO sales VALUES
-            ('Electronics', '2024-01-15', 100.0), -- Q1
-            ('Electronics', '2024-05-10', 200.0), -- Q2
-            ('Electronics', '2024-11-20', 300.0), -- Q4
-            ('Electronics', '2023-11-20', 999.0), -- 2023 (Excluded)
-            ('Furniture',   '2024-02-10', 150.0); -- Q1
-    """)
-    
-    query = """
-        SELECT
-            dept_name,
-            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 1 THEN revenue ELSE 0 END), 2) AS q1_revenue,
-            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 2 THEN revenue ELSE 0 END), 2) AS q2_revenue,
-            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 3 THEN revenue ELSE 0 END), 2) AS q3_revenue,
-            ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 4 THEN revenue ELSE 0 END), 2) AS q4_revenue,
-            ROUND(SUM(revenue), 2) AS annual_total
-        FROM sales
-        WHERE EXTRACT(YEAR FROM sale_date) = 2024
-        GROUP BY dept_name
-        ORDER BY annual_total DESC, dept_name ASC;
-    """
-    
-    rows = con.execute(query).fetchall()
-    assert len(rows) == 2
-    assert rows[0] == ('Electronics', 100.0, 200.0, 0.0, 300.0, 600.0)
-    assert rows[1] == ('Furniture', 150.0, 0.0, 0.0, 0.0, 150.0)
-    
-    print("ALL TESTS PASSED for sql-case-pivot-agg")
-
-if __name__ == "__main__":
-    test_sql_case_pivot()
+SELECT
+    -- TODO: dept_name, q1_revenue, q2_revenue, q3_revenue, q4_revenue, annual_total
+FROM sales
+-- TODO: WHERE, GROUP BY, ORDER BY
+;
 ```
 :::

@@ -139,17 +139,23 @@ def extract_narratives(ped_body):
     return en_clean, ar_clean
 
 def extract_code_challenge(code_body, lesson_id):
-    # Find starter code
-    blocks = re.findall(r'```python([\s\S]*?)```', code_body)
-    starter_code = ""
-    solution_code = ""
-    for b in blocks:
-        if 'def ' in b:
-            if not starter_code:
-                starter_code = b.strip()
-            elif not solution_code:
-                solution_code = b.strip()
-    
+    # 1. Match explicit Clean Starter Code and Reference Solution sections (python or sql)
+    sm = re.search(r'#+\s*(?:\d+\.\s*)?(?:Clean\s+)?Starter Code[\s\S]*?```(?:python|sql)?\n([\s\S]*?)```', code_body, re.I)
+    rm = re.search(r'#+\s*(?:\d+\.\s*)?(?:Vectorized\s+)?Reference Solution[\s\S]*?```(?:python|sql)?\n([\s\S]*?)```', code_body, re.I)
+
+    starter_code = sm.group(1).strip() if sm else ""
+    solution_code = rm.group(1).strip() if rm else ""
+
+    # Fallback to blocks if not explicitly matched
+    if not starter_code or not solution_code:
+        blocks = re.findall(r'```(?:python|sql)?\n([\s\S]*?)```', code_body)
+        for b in blocks:
+            if 'def ' in b or 'SELECT' in b:
+                if not starter_code:
+                    starter_code = b.strip()
+                elif not solution_code:
+                    solution_code = b.strip()
+
     if not starter_code:
         starter_code = f"import numpy as np\n\ndef solve_challenge(x: np.ndarray) -> np.ndarray:\n    # TODO: Implement solution\n    return x"
     if not solution_code:
@@ -167,10 +173,19 @@ def extract_code_challenge(code_body, lesson_id):
             {'input': 'x = np.array([0.0, 0.0])', 'expected': '0.0'}
         ]
 
-    # Hints
+    # Hints: Extract 4-part student diagnostic hints if present
+    hm = re.search(r'Diagnostic Hints([\s\S]*?)(?:---|\Z)', code_body)
     hint1 = "Analyze the mathematical invariants and ensure correct array dimensions."
     hint2 = "Use vectorized operations rather than explicit loops to avoid execution timeouts."
     hint3 = "Verify your return type and boundary conditions against the test cases."
+    if hm:
+        hint_text = hm.group(1)
+        what_m = re.search(r'\*\*What(?:\s*\(.*?\))?:\*\*\s*([^\n]+)', hint_text)
+        why_m = re.search(r'\*\*Why(?:\s*\(.*?\))?:\*\*\s*([^\n]+)', hint_text)
+        how_m = re.search(r'\*\*How(?:\s*\(.*?\))?:\*\*\s*([^\n]+)', hint_text)
+        if what_m: hint1 = what_m.group(1).strip()
+        if why_m: hint2 = why_m.group(1).strip()
+        if how_m: hint3 = how_m.group(1).strip()
 
     hints = {
         'tier1': {'en': hint1, 'ar': 'حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات.'},

@@ -41,8 +41,13 @@ test_cases:
     expected: "0.0"
 ---
 ```python
-def gelu_forward(x: np.ndarray, approximate: bool = True) -> np.ndarray: ...
-# Input: x: Arbitrary shape NumPy array of float32/float64
-# Output: ndarray of identical shape with element-wise GELU activations
+import numpy as np
+import math
+
+def gelu_forward(x: np.ndarray, approximate: bool = True) -> np.ndarray:
+    """Compute element-wise GELU activation."""
+    # TODO: Implement approximate tanh formulation if approximate=True
+    # TODO: Implement exact erf formulation if approximate=False
+    pass
 ```
 :::
