@@ -345,6 +345,14 @@ export class ProceduralAudioEngine {
     this.playErrorDissonance();
   }
 
+  public playConvergenceChime() {
+    this.playVictoryHarmonics();
+  }
+
+  public playDivergenceAlarm() {
+    this.playErrorDissonance();
+  }
+
   public playFanfare() {
     this.playVictoryHarmonics();
   }

@@ -145,8 +145,23 @@ export const LinearRegressionResiduals: React.FC<{
       : null;
   }, [draggedIdx, showGhostLine, points, baselineOLS]);
 
+  const animFrameIdRef = useRef<number | null>(null);
+
+  // Clean up animation on unmount
+  useEffect(() => {
+    return () => {
+      if (animFrameIdRef.current !== null) {
+        cancelAnimationFrame(animFrameIdRef.current);
+      }
+    };
+  }, []);
+
   // Spring animation helper
   const animateTo = useCallback((targetSlope: number, targetIntercept: number) => {
+    if (animFrameIdRef.current !== null) {
+      cancelAnimationFrame(animFrameIdRef.current);
+    }
+
     let step = 0;
     const totalSteps = 35;
     const startSlope = slope;
@@ -160,10 +175,12 @@ export const LinearRegressionResiduals: React.FC<{
       setIntercept(Number((startIntercept + (targetIntercept - startIntercept) * ease).toFixed(3)));
 
       if (step < totalSteps) {
-        requestAnimationFrame(animate);
+        animFrameIdRef.current = requestAnimationFrame(animate);
+      } else {
+        animFrameIdRef.current = null;
       }
     };
-    requestAnimationFrame(animate);
+    animFrameIdRef.current = requestAnimationFrame(animate);
   }, [slope, intercept, setSlope, setIntercept]);
 
   // Spring optimization snap animation at 60 FPS

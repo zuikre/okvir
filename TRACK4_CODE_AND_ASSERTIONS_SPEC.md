@@ -2740,9 +2740,7 @@ def react_step_parse_and_execute(response_text: str, tools: dict[str, callable])
     action_input = ""
     observation = ""
 
-    t_match = re.search(r"Thought:\s*(.*?)(?=
-Action:|
-Final Answer:|$)", response_text, re.DOTALL)
+    t_match = re.search(r"Thought:\s*(.*?)(?=\nAction:|\nFinal Answer:|$)", response_text, re.DOTALL)
     if t_match:
         thought = t_match.group(1).strip()
 

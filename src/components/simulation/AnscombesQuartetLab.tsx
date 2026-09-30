@@ -251,13 +251,13 @@ export const AnscombesQuartetLab: React.FC<{ compact?: boolean }> = ({ compact =
   }, [activePoints, ols, theme, draggedPointIndex]);
 
   useEffect(() => {
-    let animId: number;
-    const loop = () => {
-      renderFrame();
-      animId = requestAnimationFrame(loop);
-    };
-    animId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animId);
+    renderFrame();
+  }, [renderFrame]);
+
+  useEffect(() => {
+    const handleResize = () => renderFrame();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [renderFrame]);
 
   // Pointer interaction for dragging data points

@@ -215,7 +215,7 @@ export const SkillTree: React.FC = () => {
     setTimeout(() => setCelebratingBadgeId(null), 3000);
   };
 
-  // Compile all DAG dependency edges across all 23 modules
+  // Compile all DAG dependency edges across all 125 modules
   const allPrereqEdges = useMemo(() => {
     const edges: Array<{ fromId: string; toId: string }> = [];
     curriculum.forEach((mod) => {

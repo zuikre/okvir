@@ -102,13 +102,20 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
       onPlayStateChange?.(true);
     } else {
       cancelAnimationFrame(animFrameRef.current);
-      if (state.status !== 'SCRUBBING') {
-        sonifier.stopContinuousSonification();
-      }
       onPlayStateChange?.(false);
     }
-    return () => cancelAnimationFrame(animFrameRef.current);
+    return () => {
+      cancelAnimationFrame(animFrameRef.current);
+      sonifier.stopContinuousSonification();
+    };
   }, [state.status, tick, onPlayStateChange]);
+
+  // Ensure sonification stops on unmount
+  useEffect(() => {
+    return () => {
+      sonifier.stopContinuousSonification();
+    };
+  }, []);
 
   // Keyboard Shortcuts (Space: Play/Pause, Arrows: Step, R: Reset)
   useEffect(() => {
