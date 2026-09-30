@@ -1,0 +1,275 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bgGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#09090b"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#09090b"/>
+    </linearGradient>
+
+    <!-- Canvas Frame Gradient -->
+    <linearGradient id="canvasGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#0b0f19"/>
+    </linearGradient>
+
+    <!-- Emerald Accent Gradient -->
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <!-- Cyan Accent Gradient -->
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+
+    <!-- Grid Pattern -->
+    <pattern id="gridPattern" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#1e293b" stroke-width="0.75" stroke-opacity="0.6"/>
+    </pattern>
+
+    <!-- Drop Shadows -->
+    <filter id="windowShadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="24" stdDeviation="32" flood-color="#000000" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <style>
+    .font-sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter Display", sans-serif; }
+    .font-mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  </style>
+
+  <!-- Canvas Outer Background -->
+  <rect width="1200" height="640" fill="url(#bgGlow)"/>
+
+  <!-- Subtle Ambient Glow -->
+  <circle cx="600" cy="180" r="320" fill="#059669" opacity="0.08" filter="blur(60px)"/>
+  <circle cx="950" cy="400" r="280" fill="#0284c7" opacity="0.06" filter="blur(60px)"/>
+
+  <!-- Main Desktop Window -->
+  <g filter="url(#windowShadow)">
+    <!-- Window Border & Body -->
+    <rect x="50" y="35" width="1100" height="570" rx="14" fill="#09090b" stroke="#27272a" stroke-width="1.5"/>
+
+    <!-- Window Titlebar -->
+    <rect x="50" y="35" width="1100" height="44" rx="14" fill="#111115"/>
+    <rect x="50" y="65" width="1100" height="14" fill="#111115"/>
+    <line x1="50" y1="79" x2="1150" y2="79" stroke="#27272a" stroke-width="1"/>
+
+    <!-- Traffic Lights -->
+    <circle cx="74" cy="57" r="6" fill="#ef4444"/>
+    <circle cx="94" cy="57" r="6" fill="#f59e0b"/>
+    <circle cx="114" cy="57" r="6" fill="#10b981"/>
+
+    <!-- App Logo & Title -->
+    <g transform="translate(136, 46)">
+      <rect width="22" height="22" rx="5" fill="#09090b" stroke="#3f3f46" stroke-width="1.2"/>
+      <rect x="5" y="5" width="12" height="12" rx="1.5" fill="none" stroke="#10b981" stroke-width="1.5"/>
+      <circle cx="11" cy="11" r="2" fill="#38bdf8"/>
+      <text x="30" y="16" class="font-sans" font-size="13" font-weight="700" fill="#f4f4f5" letter-spacing="0.5">OKVIR</text>
+      <text x="82" y="16" class="font-sans" font-size="12" font-weight="500" fill="#71717a">— The Frame for AI</text>
+    </g>
+
+    <!-- Telemetry HUD in Titlebar -->
+    <g transform="translate(830, 48)">
+      <!-- FPS & Budget -->
+      <rect x="0" y="0" width="115" height="20" rx="4" fill="#18181b" stroke="#27272a" stroke-width="1"/>
+      <circle cx="10" cy="10" r="3" fill="#10b981"/>
+      <text x="20" y="14" class="font-mono" font-size="10.5" fill="#a1a1aa">60 FPS · 0.28ms</text>
+
+      <!-- RAM -->
+      <rect x="123" y="0" width="85" height="20" rx="4" fill="#18181b" stroke="#27272a" stroke-width="1"/>
+      <text x="133" y="14" class="font-mono" font-size="10.5" fill="#38bdf8">RAM: 42MB</text>
+
+      <!-- Language Toggle -->
+      <rect x="216" y="0" width="90" height="20" rx="4" fill="#18181b" stroke="#27272a" stroke-width="1"/>
+      <text x="226" y="14" class="font-sans" font-size="10.5" font-weight="600" fill="#e4e4e7">EN | العربية</text>
+    </g>
+
+    <!-- ================= SIDEBAR (LEFT) ================= -->
+    <rect x="50" y="80" width="240" height="525" fill="#0c0c0e"/>
+    <line x1="290" y1="80" x2="290" y2="605" stroke="#27272a" stroke-width="1"/>
+
+    <!-- Search / Command Palette Bar -->
+    <rect x="66" y="96" width="208" height="32" rx="6" fill="#18181b" stroke="#27272a" stroke-width="1"/>
+    <text x="78" y="117" class="font-sans" font-size="12" fill="#71717a">⌘K Quick Jump...</text>
+    <rect x="236" y="103" width="30" height="18" rx="3" fill="#27272a"/>
+    <text x="242" y="116" class="font-mono" font-size="10" fill="#a1a1aa">⌘K</text>
+
+    <!-- Curriculum Track Navigation List -->
+    <text x="68" y="152" class="font-sans" font-size="10.5" font-weight="700" fill="#71717a" letter-spacing="1">CURRICULUM TRACKS</text>
+
+    <!-- Track 1: Math Foundations -->
+    <g transform="translate(66, 164)">
+      <rect width="208" height="36" rx="6" fill="#141417"/>
+      <circle cx="16" cy="18" r="7" fill="#10b981" opacity="0.2"/>
+      <circle cx="16" cy="18" r="3.5" fill="#10b981"/>
+      <text x="32" y="22" class="font-sans" font-size="12" font-weight="500" fill="#d4d4d8">1. Mathematical Roots</text>
+      <text x="180" y="22" class="font-mono" font-size="11" fill="#10b981">6/6</text>
+    </g>
+
+    <!-- Track 2: Programming & Data -->
+    <g transform="translate(66, 206)">
+      <rect width="208" height="36" rx="6" fill="#141417"/>
+      <circle cx="16" cy="18" r="7" fill="#38bdf8" opacity="0.2"/>
+      <circle cx="16" cy="18" r="3.5" fill="#38bdf8"/>
+      <text x="32" y="22" class="font-sans" font-size="12" font-weight="500" fill="#d4d4d8">2. Vectorized Computing</text>
+      <text x="180" y="22" class="font-mono" font-size="11" fill="#71717a">4/5</text>
+    </g>
+
+    <!-- Track 3: Econometrics & ML (Active Highlighted) -->
+    <g transform="translate(66, 248)">
+      <rect width="208" height="36" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1.2"/>
+      <circle cx="16" cy="18" r="7" fill="#10b981"/>
+      <path d="M 13 18 L 15 20 L 19 15" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+      <text x="32" y="22" class="font-sans" font-size="12" font-weight="600" fill="#ffffff">3. Econometrics &amp; OLS</text>
+      <circle cx="196" cy="18" r="3" fill="#34d399"/>
+    </g>
+
+    <!-- Track 4: Deep Learning & Modern AI -->
+    <g transform="translate(66, 290)">
+      <rect width="208" height="36" rx="6" fill="#141417"/>
+      <circle cx="16" cy="18" r="7" fill="#27272a"/>
+      <circle cx="16" cy="18" r="3" fill="#71717a"/>
+      <text x="32" y="22" class="font-sans" font-size="12" font-weight="500" fill="#a1a1aa">4. Deep Learning &amp; AI</text>
+      <text x="180" y="22" class="font-mono" font-size="11" fill="#71717a">0/6</text>
+    </g>
+
+    <!-- Spaced Repetition / Daily Drill Box -->
+    <g transform="translate(66, 490)">
+      <rect width="208" height="85" rx="8" fill="#18181b" stroke="#27272a" stroke-width="1"/>
+      <text x="14" y="24" class="font-sans" font-size="11" font-weight="700" fill="#f59e0b" letter-spacing="0.5">⚡ FSRS v5 CALIBRATION</text>
+      <text x="14" y="44" class="font-sans" font-size="12" fill="#d4d4d8">Daily Drill: 4 cards due</text>
+      <text x="14" y="66" class="font-mono" font-size="10.5" fill="#71717a">Streak: 14 days · 420 XP</text>
+      <rect x="140" y="48" width="56" height="24" rx="4" fill="#f59e0b"/>
+      <text x="153" y="64" class="font-sans" font-size="11" font-weight="700" fill="#09090b">Start</text>
+    </g>
+
+    <!-- ================= MAIN WORKSPACE (CENTER & RIGHT) ================= -->
+
+    <!-- Breadcrumb & Mode Banner -->
+    <g transform="translate(310, 96)">
+      <text x="0" y="16" class="font-mono" font-size="11" fill="#10b981">TRACK 3 / MODULE 01</text>
+      <text x="135" y="16" class="font-sans" font-size="13" font-weight="600" fill="#e4e4e7">Ordinary Least Squares: Residual Geometry</text>
+      <rect x="740" y="0" width="85" height="22" rx="4" fill="#18181b" stroke="#27272a" stroke-width="1"/>
+      <text x="750" y="15" class="font-mono" font-size="10.5" fill="#a1a1aa">Beat 1 of 4</text>
+    </g>
+
+    <!-- 60 FPS INTERACTIVE SIMULATION CANVAS -->
+    <g transform="translate(310, 130)">
+      <rect width="470" height="340" rx="8" fill="url(#canvasGrad)" stroke="#1f2937" stroke-width="1.2"/>
+      <rect width="470" height="340" rx="8" fill="url(#gridPattern)"/>
+
+      <!-- Coordinate Axes -->
+      <line x1="40" y1="300" x2="440" y2="300" stroke="#334155" stroke-width="1.5"/>
+      <line x1="40" y1="300" x2="40" y2="30" stroke="#334155" stroke-width="1.5"/>
+      <text x="430" y="318" class="font-mono" font-size="10" fill="#64748b">X</text>
+      <text x="24" y="40" class="font-mono" font-size="10" fill="#64748b">Y</text>
+
+      <!-- Residual Squares (Shrinking at 60 FPS) -->
+      <!-- Point 1 -->
+      <rect x="100" y="180" width="40" height="40" fill="#10b981" fill-opacity="0.18" stroke="#10b981" stroke-width="1" stroke-dasharray="2,2"/>
+      <line x1="100" y1="180" x2="100" y2="220" stroke="#34d399" stroke-width="1.5"/>
+      <circle cx="100" cy="180" r="4.5" fill="#38bdf8"/>
+
+      <!-- Point 2 -->
+      <rect x="170" y="145" width="28" height="28" fill="#10b981" fill-opacity="0.22" stroke="#10b981" stroke-width="1" stroke-dasharray="2,2"/>
+      <line x1="170" y1="145" x2="170" y2="173" stroke="#34d399" stroke-width="1.5"/>
+      <circle cx="170" cy="145" r="4.5" fill="#38bdf8"/>
+
+      <!-- Point 3 -->
+      <rect x="235" y="112" width="34" height="34" fill="#10b981" fill-opacity="0.22" stroke="#10b981" stroke-width="1" stroke-dasharray="2,2"/>
+      <line x1="235" y1="112" x2="235" y2="146" stroke="#34d399" stroke-width="1.5"/>
+      <circle cx="235" cy="112" r="4.5" fill="#38bdf8"/>
+
+      <!-- Point 4 -->
+      <rect x="310" y="70" width="42" height="42" fill="#10b981" fill-opacity="0.22" stroke="#10b981" stroke-width="1" stroke-dasharray="2,2"/>
+      <line x1="310" y1="70" x2="310" y2="112" stroke="#34d399" stroke-width="1.5"/>
+      <circle cx="310" cy="70" r="4.5" fill="#38bdf8"/>
+
+      <!-- Point 5 -->
+      <rect x="385" y="45" width="32" height="32" fill="#10b981" fill-opacity="0.22" stroke="#10b981" stroke-width="1" stroke-dasharray="2,2"/>
+      <line x1="385" y1="45" x2="385" y2="77" stroke="#34d399" stroke-width="1.5"/>
+      <circle cx="385" cy="45" r="4.5" fill="#38bdf8"/>
+
+      <!-- Regression Line (y = mx + b) -->
+      <line x1="50" y1="245" x2="420" y2="60" stroke="#10b981" stroke-width="2.5"/>
+
+      <!-- Interactive Drag Handle on Slope -->
+      <circle cx="420" cy="60" r="8" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
+      <text x="350" y="35" class="font-sans" font-size="11" font-weight="600" fill="#34d399">Drag Slope [m]</text>
+
+      <!-- Real-Time Metrics Overlay HUD inside canvas -->
+      <rect x="15" y="15" width="220" height="52" rx="6" fill="#09090b" fill-opacity="0.85" stroke="#27272a" stroke-width="1"/>
+      <text x="25" y="33" class="font-mono" font-size="11" fill="#e4e4e7">SSR: <tspan fill="#10b981" font-weight="700">14.82</tspan> <tspan fill="#64748b">(Minimizing)</tspan></text>
+      <text x="25" y="52" class="font-mono" font-size="10.5" fill="#94a3b8">m = 0.50  ·  b = 2.40  ·  N = 25</text>
+    </g>
+
+    <!-- RIGHT PEDAGOGICAL COLUMN (BEAT 2 & BEAT 3) -->
+    <g transform="translate(800, 130)">
+      <!-- Beat 2: KaTeX Formal Anchor -->
+      <rect width="330" height="110" rx="8" fill="#111115" stroke="#27272a" stroke-width="1"/>
+      <text x="16" y="24" class="font-sans" font-size="11" font-weight="700" fill="#38bdf8" letter-spacing="0.5">BEAT 2 · MATHEMATICAL ANCHOR</text>
+      <!-- KaTeX Equation Render Mock -->
+      <rect x="16" y="36" width="298" height="58" rx="6" fill="#18181b"/>
+      <text x="28" y="70" class="font-mono" font-size="13" font-weight="600" fill="#f4f4f5">SSR(m, b) = Σ [ yᵢ - (m xᵢ + b) ]²</text>
+
+      <!-- Beat 3: Vectorized Code Challenge (Pyodide WASM) -->
+      <g transform="translate(0, 126)">
+        <rect width="330" height="204" rx="8" fill="#0f1117" stroke="#1e2230" stroke-width="1.2"/>
+
+        <!-- Code Editor Header -->
+        <rect width="330" height="30" rx="8" fill="#161a24"/>
+        <rect y="22" width="330" height="8" fill="#161a24"/>
+        <line x1="0" y1="30" x2="330" y2="30" stroke="#232938" stroke-width="1"/>
+        <text x="14" y="20" class="font-mono" font-size="10.5" fill="#38bdf8">kernel.py (CPython 3.12 WASM)</text>
+        <rect x="240" y="6" width="76" height="18" rx="4" fill="#064e3b" stroke="#059669" stroke-width="0.8"/>
+        <text x="248" y="19" class="font-mono" font-size="9.5" fill="#34d399">⌘↵ Run</text>
+
+        <!-- Python Code Lines -->
+        <g transform="translate(14, 48)">
+          <text x="0" y="10" class="font-mono" font-size="10.5" fill="#64748b">1  import numpy as np</text>
+          <text x="0" y="26" class="font-mono" font-size="10.5" fill="#64748b">2</text>
+          <text x="0" y="42" class="font-mono" font-size="10.5" fill="#c084fc">3  def compute_loss(y, y_hat):</text>
+          <text x="0" y="58" class="font-mono" font-size="10.5" fill="#38bdf8">4      residuals = y - y_hat</text>
+          <text x="0" y="74" class="font-mono" font-size="10.5" fill="#34d399">5      return np.sum(residuals**2)</text>
+        </g>
+
+        <!-- Test Runner Status -->
+        <rect x="12" y="142" width="306" height="48" rx="6" fill="#062e22" stroke="#059669" stroke-width="1"/>
+        <circle cx="26" cy="166" r="6" fill="#10b981"/>
+        <path d="M 23 166 L 25 168 L 29 164" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+        <text x="40" y="162" class="font-mono" font-size="11" font-weight="600" fill="#ecfdf5">3/3 Assertions Passed (0.42ms)</text>
+        <text x="40" y="178" class="font-sans" font-size="10" fill="#a7f3d0">All vector shapes conform. +25 XP awarded.</text>
+      </g>
+    </g>
+
+    <!-- BOTTOM FLOATING ACTION BAR (RAYCAST STYLE) -->
+    <g transform="translate(310, 490)">
+      <rect width="820" height="85" rx="8" fill="#111115" stroke="#27272a" stroke-width="1"/>
+
+      <!-- Socratic Hint Ladder Button -->
+      <g transform="translate(20, 26)">
+        <rect width="180" height="34" rx="6" fill="#18181b" stroke="#3f3f46" stroke-width="1"/>
+        <text x="14" y="22" class="font-sans" font-size="12" font-weight="600" fill="#f4f4f5">[H] Hint Tier 1 / 3</text>
+      </g>
+
+      <!-- Pedagogical Prompt -->
+      <text x="220" y="38" class="font-sans" font-size="12" fill="#d4d4d8">
+        Notice how squashing large outlier deviations drops total SSR faster than small ones?
+      </text>
+      <text x="220" y="56" class="font-sans" font-size="11" fill="#71717a">
+        This quadratic penalty is why OLS is sensitive to leverage points.
+      </text>
+
+      <!-- Advance / Next Beat Button -->
+      <g transform="translate(680, 24)">
+        <rect width="120" height="38" rx="6" fill="url(#emeraldGrad)"/>
+        <text x="24" y="24" class="font-sans" font-size="12.5" font-weight="700" fill="#09090b">Next Beat ➔</text>
+      </g>
+    </g>
+
+  </g>
+</svg>

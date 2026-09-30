@@ -19,6 +19,9 @@
 
 [**Download Desktop App**](https://github.com/zuikre/okvir/releases) • [**Architecture Specs**](ARCHITECTURE.md) • [**Curriculum Guide**](CURRICULUM_SPEC.md) • [**Contributing**](CONTRIBUTING.md)
 
+<br><br>
+<img src=".github/assets/okvir-hero.svg" alt="OKVIR Interactive Desktop Learning Engine" width="100%" />
+
 </div>
 
 ---
@@ -213,17 +216,15 @@ Okvir treats **Arabic (العربية)** alongside English as a first-class lang
 
 ---
 
-## ⌨️ Keyboard-First Ergonomics
+## <a id="instrument-grade-design-system"></a>📐 Instrument-Grade Design System
 
-Inspired by **Raycast and Linear.app**, every core action in Okvir is accessible via keyboard shortcuts:
+Okvir rejects the generic "AI Slop" aesthetic (purple gradients, glowing blobs, rounded cartoon buttons). Instead, it implements a dense, technical design language inspired by **Linear.app, Raycast, and Zed Editor**:
 
-| Shortcut | Action | Description |
-| :--- | :--- | :--- |
-| `⌘K` / `Ctrl+K` | **Universal Command Palette** | Fuzzy search across all 125 lessons, settings, and simulations |
-| `⌘↵` / `Ctrl+Enter` | **Run Code** | Execute Python challenge in Pyodide WASM worker |
-| `H` | **Socratic Hint** | Cycle through Tier 1 ➔ Tier 2 ➔ Tier 3 hints |
-| `Space` | **Next Beat** | Advance to next beat in the 4-Beat Micro-Loop |
-| `Escape` | **Close Modal** | Dismiss command palette, drawers, or dialogs |
+* **WCAG AAA Accessibility ($\ge 7:1$ Contrast):** High-contrast mathematical palette rigorously tested against deep charcoal backgrounds (`#09090b`) and pure paper light mode (`#fcfcfc`).
+* **Zero Layout Jitter:** All numerical telemetry counters, coordinates, and formula scrubbers use `tabular-nums` monospace fonts to eliminate UI flickering during rapid scrubbing.
+* **Typographic Rigor:** Engineered with `Inter Display` for UI prose, `IBM Plex Sans Arabic` for Arabic typography, and `JetBrains Mono` for computational kernels.
+* **Demand-Driven Rendering:** 60 FPS simulations halt when parameters are stationary, keeping idle CPU usage strictly at `0.0%`.
+* **Tactile Haptic Synthesizer:** Micro-sound waveforms and subtle haptic pulses accompany parameter snapping and keystrokes.
 
 ---
 
