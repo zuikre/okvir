@@ -5,10 +5,24 @@ import { initialLessons, curriculum } from './curriculum';
 import { tauriBridge } from './tauri-bridge';
 
 export function recalculateLessonStatuses(lessons: Record<string, LessonProgress>): Record<string, LessonProgress> {
-  const updated = { ...lessons };
+  const updated: Record<string, LessonProgress> = { ...initialLessons, ...lessons };
   curriculum.forEach((mod) => {
-    const current = updated[mod.id];
-    if (!current) return;
+    let current = updated[mod.id];
+    if (!current) {
+      current = {
+        id: mod.id,
+        title: mod.title,
+        titleAr: mod.titleAr,
+        trackId: mod.trackId,
+        status: mod.prerequisites.length === 0 ? 'available' : 'locked',
+        currentBeat: 1 as BeatNumber,
+        stability: 0,
+        difficulty: 0,
+        lastReviewed: null,
+        completedBeats: [],
+      };
+      updated[mod.id] = current;
+    }
 
     // Mastered concepts remain permanently mastered
     if (current.status === 'mastered') {
@@ -28,9 +42,7 @@ export function recalculateLessonStatuses(lessons: Record<string, LessonProgress
     } else {
       updated[mod.id] = {
         ...current,
-        status: 'locked',
-        currentBeat: 1,
-        completedBeats: [],
+        status: current.status === 'in_progress' ? 'in_progress' : 'locked',
       };
     }
   });
@@ -147,17 +159,34 @@ export const useOkvirStore = create<OkvirState>()(
         }),
 
       currentView: 'constellation',
-      activeLessonId: 'linear-algebra-vectors',
+      activeLessonId: 'cartesian-coordinate-metric',
       activeSimulation: 'ols',
       isCommandPaletteOpen: false,
       setCurrentView: (currentView) => set({ currentView }),
       setActiveLessonId: (activeLessonId) =>
         set((state) => {
-          const lesson = state.lessons[activeLessonId];
-          if (lesson?.status === 'locked') {
-            return { activeLessonId, currentView: 'constellation' };
-          }
-          return { activeLessonId, currentView: 'lesson' };
+          const mod = curriculum.find((m) => m.id === activeLessonId);
+          if (!mod) return {};
+          const current = state.lessons[activeLessonId];
+          return {
+            activeLessonId,
+            currentView: 'lesson' as ViewName,
+            lessons: {
+              ...state.lessons,
+              [activeLessonId]: current || {
+                id: mod.id,
+                title: mod.title,
+                titleAr: mod.titleAr,
+                trackId: mod.trackId,
+                status: 'in_progress',
+                currentBeat: 1 as BeatNumber,
+                stability: 0,
+                difficulty: 0,
+                lastReviewed: null,
+                completedBeats: [],
+              },
+            },
+          };
         }),
       setActiveSimulation: (activeSimulation) => set({ activeSimulation }),
       setCommandPaletteOpen: (isCommandPaletteOpen) => set({ isCommandPaletteOpen }),
@@ -310,7 +339,7 @@ export const useOkvirStore = create<OkvirState>()(
             pythonTimeoutMs: 5000,
             soundEnabled: true,
           },
-          activeLessonId: 'linear-algebra-vectors',
+          activeLessonId: 'cartesian-coordinate-metric',
           lessons: recalculateLessonStatuses(initialLessons),
           currentView: 'constellation',
         });
@@ -405,18 +434,24 @@ export const useOkvirStore = create<OkvirState>()(
       startLesson: (lessonId) =>
         set((state) => {
           const mod = curriculum.find((m) => m.id === lessonId);
-          const lesson = state.lessons[lessonId];
-          if (!mod || !lesson) return {};
-
-          // Strictly enforce prerequisites!
-          const uncompletedPrereqs = mod.prerequisites.filter(
-            (pId) => state.lessons[pId]?.status !== 'mastered'
-          );
-
-          if (uncompletedPrereqs.length > 0) {
-            console.warn(`Cannot start lesson "${lessonId}": missing prerequisites:`, uncompletedPrereqs);
-            return {}; // BLOCK starting locked lesson!
+          if (!mod) {
+            console.warn(`Cannot start lesson "${lessonId}": not found in curriculum.`);
+            return {};
           }
+
+          const existingLesson = state.lessons[lessonId];
+          const lesson: LessonProgress = existingLesson || {
+            id: mod.id,
+            title: mod.title,
+            titleAr: mod.titleAr,
+            trackId: mod.trackId,
+            status: 'in_progress',
+            currentBeat: 1 as BeatNumber,
+            stability: 0,
+            difficulty: 0,
+            lastReviewed: null,
+            completedBeats: [],
+          };
 
           return {
             activeLessonId: lessonId,
@@ -462,7 +497,10 @@ export const useOkvirStore = create<OkvirState>()(
             lessons: recalculateLessonStatuses(initialLessons),
           };
         }
-        return state;
+        return {
+          ...state,
+          lessons: recalculateLessonStatuses(state.lessons || initialLessons),
+        };
       },
       onRehydrateStorage: () => (state) => {
         if (state) {
@@ -470,9 +508,7 @@ export const useOkvirStore = create<OkvirState>()(
             state.xp = 0;
             state.streakDays = 0;
           }
-          if (state.lessons) {
-            state.lessons = recalculateLessonStatuses(state.lessons);
-          }
+          state.lessons = recalculateLessonStatuses(state.lessons || initialLessons);
         }
       },
       partialize: (state) => ({

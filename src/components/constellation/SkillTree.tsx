@@ -49,39 +49,10 @@ interface DagNodePos {
 }
 
 // 2D Cosmic Topological Coordinates for the Constellation DAG Star-Map
-// Systematically partitioned into 4 disciplinary columns with strictly downward-flowing topological depth
-const DAG_COORDINATES: Record<string, DagNodePos> = {
-  // Column 1: Mathematical Foundations (Track center: x = 175)
-  'linear-algebra-vectors': { x: 175, y: 70 },
-  'dot-product-geometry': { x: 175, y: 190 },
-  'gradient-vector': { x: 60, y: 330 },
-  'bayes-theorem': { x: 175, y: 330 },
-  'eigenvalues-eigenvectors': { x: 290, y: 330 },
-  'central-limit-theorem': { x: 175, y: 470 },
-
-  // Column 2: Programming & Data Systems (Track center: x = 470)
-  'numpy-vectorization': { x: 470, y: 70 },
-  'pandas-dataframe': { x: 470, y: 190 },
-  'sql-window-functions': { x: 410, y: 330 },
-  'eda-anscombe': { x: 530, y: 330 },
-
-  // Column 3: Econometrics & Classical ML (Track center: x = 790)
-  'ols-residual-geometry': { x: 790, y: 70 },
-  'knn-classification': { x: 675, y: 190 },
-  'ridge-lasso': { x: 790, y: 190 },
-  'causal-inference-confounding': { x: 905, y: 190 },
-  'kmeans-clustering': { x: 675, y: 330 },
-  'instrumental-variables-2sls': { x: 850, y: 330 },
-  'decision-trees': { x: 675, y: 470 },
-
-  // Column 4: Deep Learning & Modern AI (Track center: x = 1110)
-  'perceptron-activation': { x: 1110, y: 70 },
-  'gradient-descent': { x: 1110, y: 190 },
-  'cnn-convolution': { x: 1045, y: 330 },
-  'autograd-computational-graph': { x: 1175, y: 330 },
-  'transformer-attention': { x: 1045, y: 470 },
-  'bpe-tokenization': { x: 1045, y: 610 },
-};
+// Directly grounded in the verified multi-branch DAG topology
+const DAG_COORDINATES: Record<string, DagNodePos> = Object.fromEntries(
+  curriculum.map((m) => [m.id, { x: m.x, y: m.y }])
+);
 
 export const SkillTree: React.FC = () => {
   const { lessons, language, startLesson, xp, streakDays, config } = useOkvirStore();
@@ -215,7 +186,13 @@ export const SkillTree: React.FC = () => {
 
   const handleNodeClick = (mod: CurriculumModule) => {
     if (config.soundEnabled) audio.playClick();
-    setSelectedModule(mod);
+    if (selectedModule?.id === mod.id) {
+      if (config.soundEnabled) audio.playSuccess();
+      startLesson(mod.id);
+      setSelectedModule(null);
+    } else {
+      setSelectedModule(mod);
+    }
   };
 
   const handleClaimBadge = (badgeId: string) => {
@@ -423,9 +400,13 @@ export const SkillTree: React.FC = () => {
                 if (config.soundEnabled) audio.playSuccess();
                 startLesson(nextRecommendedModule.id);
               }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-mono text-xs font-bold hover:brightness-110 active:scale-95 shadow-md shrink-0 transition-transform"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-mono text-xs font-bold hover:brightness-110 active:scale-95 shadow-md shrink-0 transition-transform cursor-pointer"
             >
-              <span>{language === 'ar' ? 'متابعة' : 'Continue'}</span>
+              <span>
+                {lessons[nextRecommendedModule.id]?.status === 'in_progress'
+                  ? (language === 'ar' ? 'متابعة الدرس' : 'Continue Lesson')
+                  : (language === 'ar' ? 'ابدأ الدرس' : 'Start Lesson')}
+              </span>
               <kbd className="hidden sm:inline-block px-1.5 py-0.2 rounded bg-black/20 text-[10px]">Space</kbd>
               <ArrowRight size={13} className={language === 'ar' ? 'rotate-180' : ''} />
             </button>
@@ -745,8 +726,8 @@ export const SkillTree: React.FC = () => {
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-1">
                   {language === 'ar'
-                    ? 'إتمام جميع الوحدات الـ 23 عبر المسارات الرياضية والبرمجية والاقتصادية والعميقة بنسبة 100% محلياً.'
-                    : 'Awarded upon mastering all 23 foundational modules from first principles with full zero-shot transfer verification.'}
+                    ? `إتمام جميع الوحدات الـ ${curriculum.length} عبر المسارات الرياضية والبرمجية والاقتصادية والعميقة بنسبة 100% محلياً.`
+                    : `Awarded upon mastering all ${curriculum.length} foundational modules from first principles with full zero-shot transfer verification.`}
                 </p>
               </div>
 
@@ -780,8 +761,8 @@ export const SkillTree: React.FC = () => {
               <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
               <span>
                 {language === 'ar'
-                  ? 'مخطط العلاقات السببية والمتطلبات المعرفية (23 عقدة • 22 رابطاً توجيهياً موثوقاً)'
-                  : 'Directed Acyclic Graph (DAG) Prerequisite Topology (23 Modules • 22 Directed Edges)'}
+                  ? `مخطط العلاقات السببية والمتطلبات المعرفية (${curriculum.length} عقدة • ${allPrereqEdges.length} رابطاً توجيهياً موثوقاً)`
+                  : `Directed Acyclic Graph (DAG) Prerequisite Topology (${curriculum.length} Modules • ${allPrereqEdges.length} Directed Edges)`}
               </span>
             </span>
             <span className="text-[10px] text-[var(--text-tertiary)] hidden sm:inline">
@@ -789,9 +770,11 @@ export const SkillTree: React.FC = () => {
             </span>
           </div>
 
-          <ConstellationCanvas contentWidth={1260} contentHeight={720}>
-            {(_lod, _scale) => (
-              <div className="relative w-[1260px] h-[720px] select-none">
+          <ConstellationCanvas contentWidth={1260} contentHeight={Math.max(...Object.values(DAG_COORDINATES).map((c) => c.y), 720) + 140}>
+            {(_lod, _scale) => {
+              const canvasH = Math.max(...Object.values(DAG_COORDINATES).map((c) => c.y), 720) + 140;
+              return (
+              <div className="relative w-[1260px] select-none" style={{ height: `${canvasH}px` }}>
                 {/* Disciplinary Track Column Headers */}
                 <div className="absolute top-0 left-0 right-0 h-10 flex pointer-events-none z-10 border-b border-[var(--border-subtle)]/40">
                   <div className="absolute left-[175px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-mono font-bold">
@@ -814,7 +797,7 @@ export const SkillTree: React.FC = () => {
 
                 {/* SVG Edges Layer: Decoupled stable markers and photon overlay */}
                 <svg
-                  viewBox="0 0 1260 720"
+                  viewBox={`0 0 1260 ${canvasH}`}
                   className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"
                 >
                   <ConstellationConnectors edges={dagEdges} />
@@ -852,7 +835,8 @@ export const SkillTree: React.FC = () => {
                   );
                 })}
               </div>
-            )}
+            );
+            }}
           </ConstellationCanvas>
         </div>
       )}
@@ -1195,21 +1179,18 @@ const ModuleDrawer: React.FC<{
         {/* Start Button */}
         <div className="p-6 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]">
           <button
-            disabled={isLocked}
             onClick={onStart}
-            className={`w-full py-3 rounded-xl font-semibold text-xs font-mono transition-transform flex items-center justify-center gap-2 shadow-lg ${
-              isLocked
-                ? 'opacity-40 cursor-not-allowed bg-[var(--bg-app)] border border-[var(--border-strong)] text-[var(--text-tertiary)]'
-                : 'bg-[var(--math-vector)] text-black active:scale-[0.98] hover:brightness-110'
-            }`}
+            className="w-full py-3 rounded-xl font-semibold text-xs font-mono transition-transform flex items-center justify-center gap-2 shadow-lg bg-[var(--math-vector)] text-black active:scale-[0.98] hover:brightness-110 cursor-pointer"
           >
-            {isLocked ? <Lock size={14} /> : <Play size={14} fill="currentColor" />}
+            <Play size={14} fill="currentColor" />
             <span>
-              {isLocked
-                ? (language === 'ar' ? 'مقفل — أكمل المتطلبات أولاً' : 'Locked — Master Prerequisites First')
-                : isMastered
+              {isMastered
                 ? (language === 'ar' ? 'مراجعة الدرس' : 'Review Lesson')
-                : tr('startLesson', language)}
+                : progress?.status === 'in_progress'
+                ? (language === 'ar' ? 'متابعة الدرس' : 'Continue Lesson')
+                : isLocked
+                ? (language === 'ar' ? 'ابدأ الدرس (استكشاف)' : 'Start Lesson (Explore)')
+                : (language === 'ar' ? 'ابدأ الدرس' : 'Start Lesson')}
             </span>
           </button>
         </div>

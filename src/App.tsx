@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useOkvirStore } from '@/lib/store';
+import { tr } from '@/lib/i18n';
 import { DesktopTitlebar } from '@/components/shell/DesktopTitlebar';
 import { CommandPalette } from '@/components/shell/CommandPalette';
 import { RaycastActionBar } from '@/components/shell/RaycastActionBar';
@@ -54,32 +55,32 @@ function App() {
             active={currentView === 'constellation'}
             onClick={() => setCurrentView('constellation')}
             icon="network"
-            label="Constellation"
+            label={tr('constellation', language)}
           />
           <ActivityButton
             active={currentView === 'lesson'}
             onClick={() => setCurrentView('lesson')}
             icon="book"
-            label="Lesson"
+            label={tr('lesson', language)}
           />
           <ActivityButton
             active={currentView === 'sandbox'}
             onClick={() => setCurrentView('sandbox')}
             icon="flask"
-            label="Sandbox"
+            label={tr('sandbox', language)}
           />
           <ActivityButton
             active={currentView === 'review'}
             onClick={() => setCurrentView('review')}
             icon="refresh"
-            label="Review"
+            label={tr('review', language)}
           />
           <div className="mt-auto">
             <ActivityButton
               active={currentView === 'settings'}
               onClick={() => setCurrentView('settings')}
               icon="settings"
-              label="Settings & Local Storage"
+              label={tr('settings', language)}
             />
           </div>
         </div>

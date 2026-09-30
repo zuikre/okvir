@@ -26,44 +26,180 @@ interface Props {
 }
 
 export const SimulationView: React.FC<Props> = ({ type, compact = true, highlightedElement }) => {
-  switch (type) {
-    case 'ols':
-      return <LinearRegressionResiduals compact={compact} highlightedElement={highlightedElement} />;
-    case 'knn':
-      return <KNNRadar compact={compact} />;
-    case 'gradient':
-      return <GradientDescentCanvas compact={compact} />;
-    case 'kmeans':
-      return <KMeansVoronoi compact={compact} />;
-    case 'tree':
-      return <DecisionTreeLaser compact={compact} />;
-    case 'vectors':
-      return <VectorGeometryCanvas compact={compact} />;
-    case 'bayes':
-      return <BayesFrequencyTree compact={compact} />;
-    case 'neural':
-      return <NeuralActivationCanvas compact={compact} />;
-    case 'attention':
-      return <AttentionHeatmapCanvas compact={compact} />;
-    case 'conv':
-      return <ConvolutionFilterCanvas compact={compact} />;
-    case 'regularization':
-      return <RegularizationGeometryCanvas compact={compact} />;
-    case 'simpson':
-      return <SimpsonsParadoxLab />;
-    case 'anscombe':
-      return <AnscombesQuartetLab compact={compact} />;
-    case 'eigen':
-      return <EigenHunterCanvas compact={compact} />;
-    case 'clt':
-      return <GaltonBoardCltLab compact={compact} />;
-    case 'iv':
-      return <InstrumentalVariablesLab compact={compact} />;
-    case 'autograd':
-      return <AutogradGraphLab compact={compact} />;
-    case 'bpe':
-      return <BpeTokenizerLab compact={compact} />;
-    default:
-      return <LinearRegressionResiduals compact={compact} highlightedElement={highlightedElement} />;
+  const normType = (type || '').toLowerCase();
+
+  // 1. Vector & Linear Algebra Geometry
+  if (
+    normType === 'vectors' ||
+    normType.includes('vector') ||
+    normType.includes('cartesian') ||
+    normType.includes('metric') ||
+    normType.includes('projection') ||
+    normType.includes('cross') ||
+    normType.includes('linear') ||
+    normType.includes('matrix') ||
+    normType.includes('schmidt')
+  ) {
+    return <VectorGeometryCanvas compact={compact} />;
   }
+
+  // 2. Eigenpairs, Spectral & SVD
+  if (
+    normType === 'eigen' ||
+    normType.includes('eigen') ||
+    normType.includes('svd') ||
+    normType.includes('spectral') ||
+    normType.includes('diagonal')
+  ) {
+    return <EigenHunterCanvas compact={compact} />;
+  }
+
+  // 3. Gradient Descent, Optimization & Calculus
+  if (
+    normType === 'gradient' ||
+    normType.includes('gradient') ||
+    normType.includes('taylor') ||
+    normType.includes('calculus') ||
+    normType.includes('hessian') ||
+    normType.includes('tangent') ||
+    normType.includes('adam') ||
+    normType.includes('optimi')
+  ) {
+    return <GradientDescentCanvas compact={compact} />;
+  }
+
+  // 4. Probability, CLT & Bayes
+  if (normType === 'bayes' || normType.includes('bayes')) {
+    return <BayesFrequencyTree compact={compact} />;
+  }
+  if (
+    normType === 'clt' ||
+    normType.includes('clt') ||
+    normType.includes('galton') ||
+    normType.includes('sampling') ||
+    normType.includes('distribution') ||
+    normType.includes('probability')
+  ) {
+    return <GaltonBoardCltLab compact={compact} />;
+  }
+
+  // 5. Neural Networks & Activations
+  if (
+    normType === 'neural' ||
+    normType.includes('neural') ||
+    normType.includes('perceptron') ||
+    normType.includes('activation') ||
+    normType.includes('mlp') ||
+    normType.includes('norm')
+  ) {
+    return <NeuralActivationCanvas compact={compact} />;
+  }
+
+  // 6. Convolutions & Vision
+  if (
+    normType === 'conv' ||
+    normType.includes('conv') ||
+    normType.includes('kernel') ||
+    normType.includes('resnet') ||
+    normType.includes('pooling')
+  ) {
+    return <ConvolutionFilterCanvas compact={compact} />;
+  }
+
+  // 7. Attention, Transformers & LLMs
+  if (
+    normType === 'attention' ||
+    normType.includes('attention') ||
+    normType.includes('transformer') ||
+    normType.includes('rope') ||
+    normType.includes('cache') ||
+    normType.includes('mha') ||
+    normType.includes('flash') ||
+    normType.includes('lora')
+  ) {
+    return <AttentionHeatmapCanvas compact={compact} />;
+  }
+
+  // 8. Autograd & Computational DAGs / Tree of Thought
+  if (
+    normType === 'autograd' ||
+    normType.includes('autograd') ||
+    normType.includes('computational') ||
+    normType.includes('thought') ||
+    normType.includes('agent') ||
+    normType.includes('graph') ||
+    normType.includes('mamba') ||
+    normType.includes('diffusion')
+  ) {
+    return <AutogradGraphLab compact={compact} />;
+  }
+
+  // 9. Tokenization & NLP
+  if (
+    normType === 'bpe' ||
+    normType.includes('bpe') ||
+    normType.includes('token') ||
+    normType.includes('vocab')
+  ) {
+    return <BpeTokenizerLab compact={compact} />;
+  }
+
+  // 10. Tree-Based Models & Boosting
+  if (
+    normType === 'tree' ||
+    normType.includes('tree') ||
+    normType.includes('forest') ||
+    normType.includes('boost') ||
+    normType.includes('cart')
+  ) {
+    return <DecisionTreeLaser compact={compact} />;
+  }
+
+  // 11. Clustering & Manifold Learning (K-Means, PCA, UMAP, t-SNE)
+  if (
+    normType === 'kmeans' ||
+    normType.includes('kmeans') ||
+    normType.includes('pca') ||
+    normType.includes('manifold') ||
+    normType.includes('umap') ||
+    normType.includes('tsne') ||
+    normType.includes('cluster')
+  ) {
+    return <KMeansVoronoi compact={compact} />;
+  }
+
+  // 12. Nearest Neighbors & Metric Classification
+  if (normType === 'knn' || normType.includes('knn') || normType.includes('neighbor')) {
+    return <KNNRadar compact={compact} />;
+  }
+
+  // 13. Regularization (Ridge / Lasso)
+  if (
+    normType === 'regularization' ||
+    normType.includes('regular') ||
+    normType.includes('ridge') ||
+    normType.includes('lasso') ||
+    normType.includes('elastic')
+  ) {
+    return <RegularizationGeometryCanvas compact={compact} />;
+  }
+
+  // 14. Simpson's Paradox & Causal Inference
+  if (normType === 'simpson' || normType.includes('simpson')) {
+    return <SimpsonsParadoxLab />;
+  }
+  if (
+    normType === 'iv' ||
+    normType.includes('iv') ||
+    normType.includes('instrumental') ||
+    normType.includes('2sls')
+  ) {
+    return <InstrumentalVariablesLab compact={compact} />;
+  }
+  if (normType === 'anscombe' || normType.includes('anscombe')) {
+    return <AnscombesQuartetLab compact={compact} />;
+  }
+
+  // Default fallback: OLS Residual Geometry
+  return <LinearRegressionResiduals compact={compact} highlightedElement={highlightedElement} />;
 };

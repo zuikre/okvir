@@ -132,10 +132,10 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
                 className="text-[10px] font-mono font-bold uppercase tracking-wider"
                 style={{ color }}
               >
-                {track?.title}
+                {language === 'ar' ? track?.titleAr : track?.title}
               </span>
               <span className="text-[9px] font-mono text-[var(--text-tertiary)]">
-                {module.estimatedMinutes} min
+                {module.estimatedMinutes} {language === 'ar' ? 'دقيقة' : 'min'}
               </span>
             </div>
             <h4 className="text-xs font-bold text-[var(--text-primary)] mb-1">
@@ -203,10 +203,10 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
               className="text-[10px] font-mono font-bold uppercase tracking-wider"
               style={{ color }}
             >
-              {track?.title}
+              {language === 'ar' ? track?.titleAr : track?.title}
             </span>
             <span className="text-[9px] font-mono text-[var(--text-tertiary)]">
-              {module.estimatedMinutes} min
+              {module.estimatedMinutes} {language === 'ar' ? 'دقيقة' : 'min'}
             </span>
           </div>
           <h4 className="text-xs font-bold text-[var(--text-primary)] mb-1">

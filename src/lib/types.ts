@@ -21,7 +21,8 @@ export type SimulationType =
   | 'clt'
   | 'iv'
   | 'autograd'
-  | 'bpe';
+  | 'bpe'
+  | (string & {});
 
 export type LessonStatus = 'locked' | 'available' | 'in_progress' | 'mastered' | 'decaying';
 
@@ -90,6 +91,7 @@ export interface CodeChallenge {
   starterCode: string;
   testCases: TestCase[];
   expectedOutput: string;
+  solution?: string;
   variants?: Partial<Record<SupportedCodeLanguage, CodeLanguageVariant>>;
 }
 
