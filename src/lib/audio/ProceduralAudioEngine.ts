@@ -453,6 +453,14 @@ export class ProceduralAudioEngine {
     this.stopContinuousLoss();
   }
 
+  public setMuted(muted: boolean): void {
+    this.isMuted = muted;
+    if (this.isMuted) {
+      this.stopContinuousLoss();
+      this.stopExecutionHum();
+    }
+  }
+
   public toggleMute(): boolean {
     this.isMuted = !this.isMuted;
     if (this.isMuted) {

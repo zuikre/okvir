@@ -4,6 +4,7 @@ import type { Theme, Language, ViewName, SimulationType, BeatNumber, LessonProgr
 import { initialLessons, curriculum } from './curriculum';
 import { tauriBridge } from './tauri-bridge';
 import { updateCard, createNewCard, type Rating } from './fsrs';
+import { audio } from './audio';
 
 export function recalculateLessonStatuses(lessons: Record<string, LessonProgress>): Record<string, LessonProgress> {
   const updated: Record<string, LessonProgress> = { ...initialLessons, ...lessons };
@@ -74,6 +75,8 @@ export interface OkvirState {
   setUsername: (name: string) => void;
   setDailyXpGoal: (goal: number) => void;
   setPowerGovernor: (enabled: boolean) => void;
+  setSoundEnabled: (enabled: boolean) => void;
+  setPythonTimeout: (timeoutMs: number) => void;
   setArabicFont: (font: ArabicFontFamily) => void;
   exportLocalData: () => string;
   importLocalData: (jsonData: string) => boolean;
@@ -292,6 +295,14 @@ export const useOkvirStore = create<OkvirState>()(
 
       setPowerGovernor: (powerGovernorEnabled) =>
         set((state) => ({ config: { ...state.config, powerGovernorEnabled } })),
+
+      setSoundEnabled: (soundEnabled) => {
+        audio.setMuted(!soundEnabled);
+        set((state) => ({ config: { ...state.config, soundEnabled } }));
+      },
+
+      setPythonTimeout: (pythonTimeoutMs) =>
+        set((state) => ({ config: { ...state.config, pythonTimeoutMs } })),
 
       setArabicFont: (arabicFont) => {
         if (typeof document !== 'undefined') {
