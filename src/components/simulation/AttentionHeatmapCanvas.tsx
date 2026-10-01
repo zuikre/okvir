@@ -203,7 +203,7 @@ export const AttentionHeatmapCanvas: React.FC<{ compact?: boolean }> = ({ compac
             onClick={() => handleSwitchHead(2)}
             className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
               activeHead === 2
-                ? 'border-purple-400 bg-purple-500/15 text-purple-300 font-bold'
+                ? 'border-[var(--math-prediction)] bg-[var(--math-prediction)]/15 text-[var(--math-prediction)] font-bold'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
             }`}
           >
@@ -217,7 +217,7 @@ export const AttentionHeatmapCanvas: React.FC<{ compact?: boolean }> = ({ compac
             }}
             className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
               isCausal
-                ? 'border-amber-400 bg-amber-500/15 text-amber-300 font-bold'
+                ? 'border-[var(--math-gradient)] bg-[var(--math-gradient)]/15 text-[var(--math-gradient)] font-bold'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
             }`}
           >
@@ -346,7 +346,7 @@ export const AttentionHeatmapCanvas: React.FC<{ compact?: boolean }> = ({ compac
                         title={`${qToken} → ${kToken}: ${(weight * 100).toFixed(1)}%`}
                       >
                         {!isMasked && weight > 0.05 && (
-                          <span className={weight > 0.3 ? 'text-white font-bold' : 'text-purple-300/80'}>
+                          <span className={weight > 0.3 ? 'text-white font-bold' : 'text-[var(--text-primary)] font-semibold'}>
                             {(weight * 100).toFixed(0)}
                           </span>
                         )}

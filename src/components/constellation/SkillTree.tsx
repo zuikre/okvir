@@ -301,16 +301,16 @@ export const SkillTree: React.FC = () => {
           {/* Right: Gamification & 3-Way View Switcher */}
           <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
             <div className="flex items-center gap-2 font-mono text-xs">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300">
-                <Flame size={14} className="text-amber-400 animate-pulse" />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--math-gradient)]/30 bg-[var(--math-gradient)]/10 text-[var(--math-gradient)]">
+                <Flame size={14} className="text-[var(--math-gradient)] animate-pulse" />
                 <span className="tabular-nums font-bold">{streakDays}</span>
-                <span className="text-[10px] text-amber-400/80">{language === 'ar' ? 'يوم' : 'd'}</span>
+                <span className="text-[10px] text-[var(--math-gradient)]/80 font-bold">{language === 'ar' ? 'يوم' : 'd'}</span>
               </div>
 
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
-                <Zap size={14} className="text-emerald-400" />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--math-vector)]/30 bg-[var(--math-vector)]/10 text-[var(--math-vector)]">
+                <Zap size={14} className="text-[var(--math-vector)]" />
                 <span className="tabular-nums font-bold">{xp}</span>
-                <span className="text-[10px] text-emerald-400/80">XP</span>
+                <span className="text-[10px] text-[var(--math-vector)]/80 font-bold">XP</span>
               </div>
             </div>
 
@@ -665,7 +665,7 @@ export const SkillTree: React.FC = () => {
                         <div
                           className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${
                             isUnitMastered
-                              ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-md animate-bounce'
+                              ? 'bg-[var(--math-gradient)]/15 border-[var(--math-gradient)]/40 text-[var(--math-gradient)] shadow-md animate-bounce'
                               : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-tertiary)]'
                           }`}
                         >
@@ -673,7 +673,7 @@ export const SkillTree: React.FC = () => {
                         </div>
 
                         <div className="min-w-0">
-                          <div className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold">
+                          <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--math-gradient)] font-bold">
                             {isUnitMastered
                               ? (language === 'ar' ? 'تم فتح الوسام التأسيسي!' : 'Milestone Unlocked!')
                               : (language === 'ar' ? 'وسام إتقان الوحدة' : 'Unit Milestone')}
@@ -912,19 +912,19 @@ export const SkillTree: React.FC = () => {
                             <div
                               className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
                                 isMastered
-                                  ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400'
+                                  ? 'bg-[var(--math-vector)]/10 border-[var(--math-vector)]/40 text-[var(--math-vector)]'
                                   : isInProgress
-                                  ? 'bg-amber-500/10 border-amber-500/40 text-amber-400'
+                                  ? 'bg-[var(--math-gradient)]/10 border-[var(--math-gradient)]/40 text-[var(--math-gradient)]'
                                   : isAvailable
-                                  ? 'bg-sky-500/10 border-sky-500/40 text-sky-400'
+                                  ? 'bg-[var(--math-data)]/10 border-[var(--math-data)]/40 text-[var(--math-data)]'
                                   : isDecaying
-                                  ? 'bg-rose-500/10 border-rose-500/40 text-rose-400'
+                                  ? 'bg-[var(--math-loss)]/10 border-[var(--math-loss)]/40 text-[var(--math-loss)]'
                                   : 'bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-tertiary)]'
                               }`}
                             >
-                              {isMastered && <Award size={15} className="text-emerald-400" />}
+                              {isMastered && <Award size={15} className="text-[var(--math-vector)]" />}
                               {isInProgress && <Play size={13} fill="currentColor" />}
-                              {isAvailable && <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping" />}
+                              {isAvailable && <span className="w-2.5 h-2.5 rounded-full bg-[var(--math-data)] animate-ping" />}
                               {isDecaying && <AlertTriangle size={14} />}
                               {isLocked && <Lock size={13} />}
                             </div>
@@ -1059,12 +1059,12 @@ const ModuleDrawer: React.FC<{
 
           {/* Locked Notice Banner */}
           {isLocked && (
-            <div className="p-4 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-300 text-xs font-mono space-y-2">
-              <div className="flex items-center gap-2 font-semibold text-amber-400">
+            <div className="p-4 rounded-xl border border-[var(--math-gradient)]/40 bg-[var(--math-gradient)]/10 text-[var(--math-gradient)] text-xs font-mono space-y-2">
+              <div className="flex items-center gap-2 font-semibold text-[var(--math-gradient)]">
                 <Lock size={14} />
                 <span>{language === 'ar' ? 'الوحدة مقفلة حالياً' : 'Module Currently Locked'}</span>
               </div>
-              <p className="text-[11px] text-amber-200/90 leading-relaxed">
+              <p className="text-[11px] leading-relaxed">
                 {language === 'ar'
                   ? 'هذا المفهوم يتطلب المرور بالأسس الرياضية السابقة وإتقانها أولاً:'
                   : 'This concept builds directly on preceding mathematical foundations. You must master the following prerequisites first:'}
@@ -1074,7 +1074,7 @@ const ModuleDrawer: React.FC<{
                   <button
                     key={p.id}
                     onClick={() => onSelectModule(p)}
-                    className="px-2.5 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 text-[11px] font-semibold transition-colors flex items-center gap-1.5"
+                    className="px-2.5 py-1 rounded-md bg-[var(--math-gradient)]/20 hover:bg-[var(--math-gradient)]/30 text-[var(--math-gradient)] border border-[var(--math-gradient)]/40 text-[11px] font-semibold transition-colors flex items-center gap-1.5"
                   >
                     <span>→ {language === 'ar' ? p.titleAr : p.title}</span>
                   </button>
@@ -1130,17 +1130,17 @@ const ModuleDrawer: React.FC<{
                       onClick={() => onSelectModule(p)}
                       className={`px-2.5 py-1 text-xs font-mono rounded-md border text-start transition-colors flex items-center gap-1.5 ${
                         isPMastered
-                          ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:border-emerald-400'
+                          ? 'border-[var(--math-vector)]/40 bg-[var(--math-vector)]/10 text-[var(--math-vector)] hover:border-[var(--math-vector)]'
                           : isPInProgress
-                          ? 'border-amber-500/40 bg-amber-500/10 text-amber-300 hover:border-amber-400'
+                          ? 'border-[var(--math-gradient)]/40 bg-[var(--math-gradient)]/10 text-[var(--math-gradient)] hover:border-[var(--math-gradient)]'
                           : isPAvailable
-                          ? 'border-sky-500/40 bg-sky-500/10 text-sky-300 hover:border-sky-400'
+                          ? 'border-[var(--math-data)]/40 bg-[var(--math-data)]/10 text-[var(--math-data)] hover:border-[var(--math-data)]'
                           : 'border-[var(--border-subtle)] bg-[var(--bg-app)] text-[var(--text-tertiary)] opacity-60'
                       }`}
                     >
-                      {isPMastered && <CheckCircle2 size={11} className="text-emerald-400 shrink-0" />}
-                      {isPInProgress && <Play size={10} className="text-amber-400 shrink-0" fill="currentColor" />}
-                      {isPAvailable && <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0" />}
+                      {isPMastered && <CheckCircle2 size={11} className="text-[var(--math-vector)] shrink-0" />}
+                      {isPInProgress && <Play size={10} className="text-[var(--math-gradient)] shrink-0" fill="currentColor" />}
+                      {isPAvailable && <span className="w-1.5 h-1.5 rounded-full bg-[var(--math-data)] shrink-0" />}
                       {!isPMastered && !isPInProgress && !isPAvailable && <Lock size={10} className="shrink-0" />}
                       <span>{language === 'ar' ? p.titleAr : p.title}</span>
                     </button>

@@ -374,7 +374,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             onClick={() => setAddModeClass(0)}
             className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
               addModeClass === 0
-                ? 'border-sky-500 bg-sky-500/15 text-sky-300 font-bold'
+                ? 'border-[var(--math-data)] bg-[var(--math-data)]/15 text-[var(--math-data)] font-bold'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
             }`}
           >
@@ -384,7 +384,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             onClick={() => setAddModeClass(1)}
             className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
               addModeClass === 1
-                ? 'border-amber-500 bg-amber-500/15 text-amber-300 font-bold'
+                ? 'border-[var(--math-gradient)] bg-[var(--math-gradient)]/15 text-[var(--math-gradient)] font-bold'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
             }`}
           >
@@ -398,7 +398,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             onClick={() => setSecondSplitActive(!secondSplitActive)}
             className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
               secondSplitActive
-                ? 'border-purple-400 bg-purple-500/15 text-purple-300 font-bold'
+                ? 'border-[var(--math-prediction)] bg-[var(--math-prediction)]/15 text-[var(--math-prediction)] font-bold'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
             }`}
             title="Toggle second-level split"
@@ -409,10 +409,10 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
 
           <button
             onClick={handleFindBestSplit}
-            className="flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition-all shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold rounded-lg border border-[var(--math-vector)]/40 bg-[var(--math-vector)]/10 text-[var(--math-vector)] hover:bg-[var(--math-vector)]/20 transition-all shadow-sm"
             title="Greedily find threshold maximizing Information Gain"
           >
-            <Sparkles size={13} className="text-emerald-400" />
+            <Sparkles size={13} className="text-[var(--math-vector)]" />
             <span>{language === 'ar' ? 'الانقسام الأمثل' : 'Find Best Split'}</span>
           </button>
 
@@ -482,10 +482,10 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         </div>
 
         <div className="p-3 rounded-xl border border-sky-500/30 bg-sky-500/5 flex flex-col gap-0.5">
-          <span className="text-[10px] font-mono uppercase tracking-wider text-sky-400 font-semibold">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--math-data)] font-semibold">
             Left Child (X₁ ≤ {thresholdX.toFixed(1)})
           </span>
-          <span className="text-base font-mono font-bold tabular-nums text-sky-300">
+          <span className="text-base font-mono font-bold tabular-nums text-[var(--math-data)]">
             {giniLeft.toFixed(3)}
           </span>
           <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
@@ -494,10 +494,10 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         </div>
 
         <div className="p-3 rounded-xl border border-amber-500/30 bg-amber-500/5 flex flex-col gap-0.5">
-          <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-semibold">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--math-gradient)] font-semibold">
             Right Child (X₁ &gt; {thresholdX.toFixed(1)})
           </span>
-          <span className="text-base font-mono font-bold tabular-nums text-amber-300">
+          <span className="text-base font-mono font-bold tabular-nums text-[var(--math-gradient)]">
             {giniRight.toFixed(3)}
           </span>
           <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
@@ -506,10 +506,10 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         </div>
 
         <div className="p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 flex flex-col gap-0.5">
-          <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-semibold">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--math-vector)] font-semibold">
             Information Gain ΔI
           </span>
-          <span className="text-base font-mono font-bold tabular-nums text-emerald-400">
+          <span className="text-base font-mono font-bold tabular-nums text-[var(--math-vector)]">
             +{infoGain.toFixed(3)}
           </span>
           <span className="text-[10px] font-mono text-[var(--text-tertiary)]">

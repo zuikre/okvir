@@ -662,7 +662,7 @@ export const LinearRegressionResiduals: React.FC<{
             onClick={() => setShowConfidenceBands(!showConfidenceBands)}
             className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
               showConfidenceBands
-                ? 'border-sky-500 bg-sky-500/15 text-sky-300 font-bold'
+                ? 'border-[var(--math-data)] bg-[var(--math-data)]/15 text-[var(--math-data)] font-bold'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
             }`}
             title="Toggle 95% Confidence Band"
@@ -676,7 +676,7 @@ export const LinearRegressionResiduals: React.FC<{
             onClick={handleToggleOutlier}
             className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
               activeOutlierCount > 0
-                ? 'border-rose-500 bg-rose-500/15 text-rose-300 font-bold shadow-sm'
+                ? 'border-[var(--math-loss)] bg-[var(--math-loss)]/15 text-[var(--math-loss)] font-bold shadow-sm'
                 : 'border-[var(--border-subtle)] hover:border-amber-400 text-[var(--text-secondary)]'
             }`}
             title="Inject influential outliers to observe leverage, residuals, and Cook's distance"
@@ -710,9 +710,9 @@ export const LinearRegressionResiduals: React.FC<{
           <button
             onClick={handleSnapToOptimal}
             disabled={isOptimizing}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 text-xs font-mono font-semibold hover:bg-emerald-500/20 transition-all shadow-sm active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg border border-[var(--math-vector)]/40 bg-[var(--math-vector)]/10 text-[var(--math-vector)] text-xs font-mono font-semibold hover:bg-[var(--math-vector)]/20 transition-all shadow-sm active:scale-95 disabled:opacity-50"
           >
-            <Sparkles size={13} className={isOptimizing ? 'text-emerald-400 animate-spin' : 'text-emerald-400'} />
+            <Sparkles size={13} className={isOptimizing ? 'text-[var(--math-vector)] animate-spin' : 'text-[var(--math-vector)]'} />
             <span>{language === 'ar' ? 'تحسين آلي (OLS)' : 'Auto-Optimize (OLS)'}</span>
           </button>
         </div>
@@ -743,14 +743,14 @@ export const LinearRegressionResiduals: React.FC<{
         <div className="absolute top-4 end-4 flex items-center gap-3 px-3 py-1.5 rounded-lg bg-[var(--bg-surface)]/85 backdrop-blur-md border border-[var(--border-subtle)] text-xs font-mono shadow-sm">
           <div>
             <span className="text-[var(--text-tertiary)]">Σ(y - ŷ)² = </span>
-            <span className="text-rose-400 font-bold tabular-nums">
+            <span className="text-[var(--math-loss)] font-bold tabular-nums">
               {currentLoss.toFixed(2)}
             </span>
           </div>
           <div className="w-px h-3 bg-[var(--border-subtle)]" />
           <div>
             <span className="text-[var(--text-tertiary)]">R² = </span>
-            <span className={`${currentR2 >= 0 ? 'text-emerald-400' : 'text-amber-400'} font-bold tabular-nums`}>
+            <span className={`${currentR2 >= 0 ? 'text-[var(--math-vector)]' : 'text-[var(--math-gradient)]'} font-bold tabular-nums`}>
               {currentR2.toFixed(3)}
             </span>
           </div>
@@ -780,8 +780,8 @@ export const LinearRegressionResiduals: React.FC<{
               onMouseLeave={() => setActiveMathToken(null)}
               className={`px-1.5 py-0.5 rounded transition-all font-bold tabular-nums ${
                 activeMathToken === 'slope'
-                  ? 'bg-sky-500/20 text-sky-300 ring-1 ring-sky-400'
-                  : 'text-sky-400'
+                  ? 'bg-[var(--math-data)]/20 text-[var(--math-data)] ring-1 ring-[var(--math-data)]'
+                  : 'text-[var(--math-data)]'
               }`}
             >
               {slope.toFixed(2)}x
@@ -792,8 +792,8 @@ export const LinearRegressionResiduals: React.FC<{
               onMouseLeave={() => setActiveMathToken(null)}
               className={`px-1.5 py-0.5 rounded transition-all font-bold tabular-nums ${
                 activeMathToken === 'intercept'
-                  ? 'bg-sky-500/20 text-sky-300 ring-1 ring-sky-400'
-                  : 'text-sky-400'
+                  ? 'bg-[var(--math-data)]/20 text-[var(--math-data)] ring-1 ring-[var(--math-data)]'
+                  : 'text-[var(--math-data)]'
               }`}
             >
               {intercept.toFixed(2)}

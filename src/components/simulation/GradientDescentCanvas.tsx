@@ -447,7 +447,7 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
               }}
               className={`px-2.5 py-1 text-xs font-mono rounded-lg border uppercase transition-all ${
                 optimizer === opt
-                  ? 'border-emerald-400 bg-emerald-500/15 text-emerald-300 font-bold shadow-sm'
+                  ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/15 text-[var(--math-vector)] font-bold shadow-sm'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
               }`}
             >
@@ -461,7 +461,7 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
               onClick={() => setShowComparison(!showComparison)}
               className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
                 showComparison
-                  ? 'border-rose-400 bg-rose-500/15 text-rose-300 font-bold'
+                  ? 'border-[var(--math-loss)] bg-[var(--math-loss)]/15 text-[var(--math-loss)] font-bold'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
               }`}
               title="Compare against Vanilla SGD path"

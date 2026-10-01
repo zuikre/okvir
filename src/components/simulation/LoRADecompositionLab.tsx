@@ -169,10 +169,10 @@ export const LoRADecompositionLab: React.FC<Props> = ({ compact = false }) => {
         <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] p-6 flex flex-col md:flex-row items-center justify-around gap-6">
           {/* Base Frozen Model W_0 */}
           <div className="flex flex-col items-center space-y-2 text-center">
-            <div className="relative w-28 h-28 rounded-xl border-2 border-dashed border-sky-500/40 bg-sky-500/10 dark:bg-sky-950/20 flex flex-col items-center justify-center p-2 text-sky-400 dark:text-sky-300">
+            <div className="relative w-28 h-28 rounded-xl border-2 border-dashed border-sky-500/40 bg-sky-500/10 flex flex-col items-center justify-center p-2 text-[var(--math-data)]">
               <span className="text-sm font-bold font-mono">W₀</span>
-              <span className="text-[10px] text-sky-400/80 font-mono">{dim} × {dim}</span>
-              <div className="absolute top-1 right-1 flex items-center gap-0.5 text-[9px] px-1 rounded bg-sky-500/20 text-sky-400 dark:text-sky-300 font-mono">
+              <span className="text-[10px] text-[var(--math-data)]/80 font-mono">{dim} × {dim}</span>
+              <div className="absolute top-1 right-1 flex items-center gap-0.5 text-[9px] px-1 rounded bg-sky-500/20 text-[var(--math-data)] font-mono">
                 <ShieldCheck size={10} />
                 <span>FROZEN</span>
               </div>
@@ -183,23 +183,23 @@ export const LoRADecompositionLab: React.FC<Props> = ({ compact = false }) => {
           <div className="text-xl font-bold font-mono text-[var(--text-tertiary)]">+</div>
 
           {/* LoRA Adapter Branch B x A */}
-          <div className="flex items-center gap-3 p-4 rounded-xl border border-amber-500/30 bg-amber-500/5 dark:bg-amber-950/10">
+          <div className="flex items-center gap-3 p-4 rounded-xl border border-amber-500/30 bg-amber-500/5">
             {/* Matrix B */}
             <div className="flex flex-col items-center space-y-2 text-center">
-              <div className="w-10 h-28 rounded-lg border border-amber-500/60 bg-amber-500/20 flex flex-col items-center justify-center p-1 text-amber-500 dark:text-amber-300 font-mono">
+              <div className="w-10 h-28 rounded-lg border border-amber-500/60 bg-amber-500/20 flex flex-col items-center justify-center p-1 text-[var(--math-gradient)] font-mono">
                 <span className="text-xs font-bold">B</span>
-                <span className="text-[9px] text-amber-500 dark:text-amber-400">{dim}×{rank}</span>
+                <span className="text-[9px] text-[var(--math-gradient)]">{dim}×{rank}</span>
               </div>
               <span className="text-[10px] font-mono text-[var(--text-secondary)]">Zero init</span>
             </div>
 
-            <span className="text-xs font-bold font-mono text-amber-500 dark:text-amber-400">×</span>
+            <span className="text-xs font-bold font-mono text-[var(--math-gradient)]">×</span>
 
             {/* Matrix A */}
             <div className="flex flex-col items-center space-y-2 text-center">
-              <div className="w-28 h-10 rounded-lg border border-emerald-500/60 bg-emerald-500/20 flex flex-col items-center justify-center p-1 text-emerald-500 dark:text-emerald-300 font-mono">
+              <div className="w-28 h-10 rounded-lg border border-emerald-500/60 bg-emerald-500/20 flex flex-col items-center justify-center p-1 text-[var(--math-vector)] font-mono">
                 <span className="text-xs font-bold">A</span>
-                <span className="text-[9px] text-emerald-500 dark:text-emerald-400">{rank}×{dim}</span>
+                <span className="text-[9px] text-[var(--math-vector)]">{rank}×{dim}</span>
               </div>
               <span className="text-[10px] font-mono text-[var(--text-secondary)]">Gaussian init</span>
             </div>
@@ -209,9 +209,9 @@ export const LoRADecompositionLab: React.FC<Props> = ({ compact = false }) => {
 
           {/* Final Output Representation */}
           <div className="flex flex-col items-center space-y-2 text-center">
-            <div className="w-28 h-28 rounded-xl border border-emerald-500/40 bg-emerald-500/10 dark:bg-emerald-950/20 flex flex-col items-center justify-center p-2 text-emerald-500 dark:text-emerald-300 font-mono">
+            <div className="w-28 h-28 rounded-xl border border-emerald-500/40 bg-emerald-500/10 flex flex-col items-center justify-center p-2 text-[var(--math-vector)] font-mono">
               <span className="text-sm font-bold">W_adapted</span>
-              <span className="text-[10px] text-emerald-500 dark:text-emerald-400/80">W₀ + (α/r)·BA</span>
+              <span className="text-[10px] text-[var(--math-vector)]/80">W₀ + (α/r)·BA</span>
             </div>
             <span className="text-xs font-mono text-[var(--text-secondary)]">Zero Runtime Overhead</span>
           </div>
@@ -219,31 +219,31 @@ export const LoRADecompositionLab: React.FC<Props> = ({ compact = false }) => {
 
         {/* Telemetry Footprint Dashboard */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
-          <div className="rounded-xl border border-sky-500/20 bg-sky-500/5 dark:bg-sky-950/10 p-4 space-y-2">
-            <div className="text-[11px] text-sky-400 font-bold uppercase tracking-wider">
+          <div className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-4 space-y-2">
+            <div className="text-[11px] text-[var(--math-data)] font-bold uppercase tracking-wider">
               {language === 'ar' ? 'معاملات النموذج الأساسي' : 'Pre-Trained Base'}
             </div>
             <div className="text-lg font-bold text-[var(--text-primary)]">{(baseParams / 1e6).toFixed(2)}M params</div>
             <div className="text-[11px] text-[var(--text-secondary)]">Weights: {baseMemoryMB} MB (FP16)</div>
-            <div className="text-[11px] text-rose-400">Adam Memory: {optimizerMemoryBaseMB} MB</div>
+            <div className="text-[11px] text-[var(--math-loss)]">Adam Memory: {optimizerMemoryBaseMB} MB</div>
           </div>
 
-          <div className="rounded-xl border border-amber-500/20 bg-amber-950/10 p-4 space-y-2">
-            <div className="text-[11px] text-amber-400 font-bold uppercase tracking-wider">
+          <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-2">
+            <div className="text-[11px] text-[var(--math-gradient)] font-bold uppercase tracking-wider">
               {language === 'ar' ? 'معاملات المحول (LoRA)' : 'Trainable LoRA Adapters'}
             </div>
-            <div className="text-lg font-bold text-amber-300">{(loraParams / 1e3).toFixed(1)}K params</div>
+            <div className="text-lg font-bold text-[var(--math-gradient)]">{(loraParams / 1e3).toFixed(1)}K params</div>
             <div className="text-[11px] text-[var(--text-secondary)]">Weights: {loraMemoryMB} MB (FP16)</div>
-            <div className="text-[11px] text-emerald-400">Adam Memory: {optimizerMemoryLoRAMB} MB</div>
+            <div className="text-[11px] text-[var(--math-vector)]">Adam Memory: {optimizerMemoryLoRAMB} MB</div>
           </div>
 
-          <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 space-y-2">
-            <div className="text-[11px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 space-y-2">
+            <div className="text-[11px] text-[var(--math-vector)] font-bold uppercase tracking-wider flex items-center gap-1.5">
               <Flame size={14} />
               <span>{language === 'ar' ? 'نسبة خفض المعاملات' : 'Parameter Reduction'}</span>
             </div>
-            <div className="text-2xl font-bold text-emerald-300">{reductionPct}%</div>
-            <div className="text-[11px] text-emerald-400/80">
+            <div className="text-2xl font-bold text-[var(--math-vector)]">{reductionPct}%</div>
+            <div className="text-[11px] text-[var(--math-vector)]/80">
               {language === 'ar'
                 ? `تدريب ${(loraParams).toLocaleString()} معاملاً فقط بدلاً من ${(baseParams).toLocaleString()}!`
                 : `Train only ${(loraParams).toLocaleString()} instead of ${(baseParams).toLocaleString()} parameters!`}

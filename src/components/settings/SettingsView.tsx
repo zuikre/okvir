@@ -273,6 +273,22 @@ export const SettingsView: React.FC = () => {
     }
   };
 
+  const getBadgeThemeStyles = (badgeId: string) => {
+    switch (badgeId) {
+      case 'badge-math':
+        return 'bg-[var(--math-data)]/10 text-[var(--math-data)] border-[var(--math-data)]/30';
+      case 'badge-programming':
+        return 'bg-[var(--math-vector)]/10 text-[var(--math-vector)] border-[var(--math-vector)]/30';
+      case 'badge-econometrics':
+        return 'bg-[var(--math-gradient)]/10 text-[var(--math-gradient)] border-[var(--math-gradient)]/30';
+      case 'badge-deeplearning':
+        return 'bg-[var(--math-prediction)]/10 text-[var(--math-prediction)] border-[var(--math-prediction)]/30';
+      case 'badge-okvir-fellow':
+      default:
+        return 'bg-[var(--math-gradient)]/10 text-[var(--math-gradient)] border-[var(--math-gradient)]/30';
+    }
+  };
+
   const categories: {
     id: SettingsCategory;
     label: string;
@@ -1118,19 +1134,27 @@ export const SettingsView: React.FC = () => {
                       className={`p-5 rounded-2xl border transition-all ${
                         isUnlocked
                           ? 'border-amber-500/30 bg-amber-500/5 specular shadow-md'
-                          : 'border-[var(--border-subtle)] bg-[var(--bg-app)] opacity-80'
+                          : 'border-[var(--border-subtle)] bg-[var(--bg-app)]'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-4 flex-wrap sm:flex-nowrap">
                         <div className="flex items-start gap-4">
                           <div
-                            className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg ${
+                            className={`relative w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm border transition-all ${
                               isUnlocked
-                                ? `bg-gradient-to-br ${badge.gradient} ring-2 ring-amber-400/40`
-                                : 'bg-[var(--bg-surface)] text-[var(--text-disabled)] border border-[var(--border-subtle)]'
+                                ? `bg-gradient-to-br ${badge.gradient} text-white ring-2 ring-amber-400/40 border-amber-400/50 shadow-md`
+                                : getBadgeThemeStyles(badge.id)
                             }`}
                           >
-                            {isUnlocked ? renderBadgeIcon(badge.icon, 22) : <Lock size={20} />}
+                            {renderBadgeIcon(badge.icon, 22)}
+                            {!isUnlocked && (
+                              <div
+                                className="absolute -bottom-1 -end-1 w-4 h-4 rounded-full bg-[var(--bg-surface)] border border-[var(--border-strong)] text-[var(--text-secondary)] flex items-center justify-center shadow-xs"
+                                title={isRtl ? 'مغلق' : 'Locked'}
+                              >
+                                <Lock size={9} />
+                              </div>
+                            )}
                           </div>
 
                           <div className="space-y-1.5">

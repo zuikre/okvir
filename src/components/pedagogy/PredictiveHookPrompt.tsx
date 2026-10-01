@@ -101,13 +101,13 @@ export const PredictiveHookPrompt: React.FC<PredictiveHookPromptProps> = ({
           {isAr ? 'تأكيد التوقع وإلغاء قفل التجربة' : 'Lock in Prediction & Unlock Laboratory'}
         </button>
       ) : (
-        <div className="p-3.5 rounded-lg border border-emerald-800 bg-emerald-950/40 text-emerald-200 text-xs animate-fade-in flex items-start gap-2.5">
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
+        <div className="p-3.5 rounded-lg border border-[var(--math-vector)]/30 bg-[var(--math-vector)]/10 text-[var(--math-vector)] text-xs animate-fade-in flex items-start gap-2.5">
+          <CheckCircle2 className="w-4 h-4 shrink-0 text-[var(--math-vector)] mt-0.5" />
           <div className="space-y-1">
             <span className="font-bold">
               {isAr ? 'تم تسجيل فرضيتك!' : 'Prediction Registered!'}
             </span>
-            <p className="text-emerald-300/90 leading-relaxed">
+            <p className="text-[var(--text-secondary)] leading-relaxed">
               {isAr ? prompt.revealExplanation.ar : prompt.revealExplanation.en}
             </p>
           </div>

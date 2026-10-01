@@ -292,13 +292,13 @@ export const RotaryEmbeddingLab: React.FC<Props> = ({ compact = false }) => {
               <div className="space-y-2 text-[11px]">
                 <div className="flex justify-between p-2 rounded bg-[var(--bg-app)] border border-purple-500/20">
                   <span className="text-[var(--text-secondary)]">Relative Distance Δm:</span>
-                  <span className="text-purple-400 dark:text-purple-300 font-bold">m - n = {relDelta} tokens</span>
+                  <span className="text-[var(--math-prediction)] font-bold">m - n = {relDelta} tokens</span>
                 </div>
                 <div className="flex justify-between p-2 rounded bg-[var(--bg-app)] border border-purple-500/20">
                   <span className="text-[var(--text-secondary)]">Angular Displacement:</span>
-                  <span className="text-amber-500 dark:text-amber-300 font-bold">Δθ = {angleDelta.toFixed(3)} rad</span>
+                  <span className="text-[var(--math-gradient)] font-bold">Δθ = {angleDelta.toFixed(3)} rad</span>
                 </div>
-                <div className="flex justify-between p-2 rounded bg-[var(--bg-app)] border border-emerald-500/30 text-emerald-500 dark:text-emerald-300 font-bold">
+                <div className="flex justify-between p-2 rounded bg-[var(--bg-app)] border border-[var(--math-vector)]/30 text-[var(--math-vector)] font-bold">
                   <span>Inner Product ⟨R_m q, R_n k⟩:</span>
                   <span className="text-sm">{dotProduct}</span>
                 </div>

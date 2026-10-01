@@ -436,7 +436,7 @@ export const VectorGeometryCanvas: React.FC<{ compact?: boolean }> = ({ compact 
             onClick={() => setShowParallelogram(!showParallelogram)}
             className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
               showParallelogram
-                ? 'border-purple-400 bg-purple-500/15 text-purple-300 font-bold'
+                ? 'border-[var(--math-prediction)] bg-[var(--math-prediction)]/15 text-[var(--math-prediction)] font-bold'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
             }`}
             title="Toggle Determinant Parallelogram Area"
@@ -450,7 +450,7 @@ export const VectorGeometryCanvas: React.FC<{ compact?: boolean }> = ({ compact 
             onClick={() => setShowGramSchmidt(!showGramSchmidt)}
             className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
               showGramSchmidt
-                ? 'border-pink-500 bg-pink-500/15 text-pink-300 font-bold'
+                ? 'border-[var(--math-cluster)] bg-[var(--math-cluster)]/15 text-[var(--math-cluster)] font-bold'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
             }`}
             title="Toggle Gram-Schmidt Orthogonal Component"

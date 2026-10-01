@@ -316,12 +316,12 @@ export const SimpsonsParadoxLab: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {/* Pooled Model */}
         <div className="p-3 rounded-lg border border-rose-500/20 bg-rose-500/5 space-y-1">
-          <div className="text-[11px] font-mono uppercase tracking-wider text-rose-400 font-semibold flex items-center justify-between">
+          <div className="text-[11px] font-mono uppercase tracking-wider text-[var(--math-loss)] font-semibold flex items-center justify-between">
             <span>{language === 'ar' ? 'الانحدار المجمّع (المضلل)' : 'Naive Pooled OLS (Misleading)'}</span>
-            <span className="text-[10px] text-rose-300">β &gt; 0</span>
+            <span className="text-[10px] text-[var(--math-loss)] font-bold">β &gt; 0</span>
           </div>
           <div className="text-xs font-mono text-[var(--text-primary)]">
-            Slope = <span className="font-bold text-rose-400 tabular-nums">+{pooledOLS?.slope.toFixed(2)}</span>
+            Slope = <span className="font-bold text-[var(--math-loss)] tabular-nums">+{pooledOLS?.slope.toFixed(2)}</span>
             <span className="text-[11px] text-[var(--text-tertiary)] ms-2">
               ({language === 'ar' ? 'يوحي بأن الرياضة تزيد الخطر!' : 'Suggests exercise increases risk!'})
             </span>
@@ -330,12 +330,12 @@ export const SimpsonsParadoxLab: React.FC = () => {
 
         {/* Stratified Model */}
         <div className="p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5 space-y-1">
-          <div className="text-[11px] font-mono uppercase tracking-wider text-emerald-400 font-semibold flex items-center justify-between">
+          <div className="text-[11px] font-mono uppercase tracking-wider text-[var(--math-vector)] font-semibold flex items-center justify-between">
             <span>{language === 'ar' ? 'الانحدار الطبقي السببي' : 'Stratified Causal Slopes'}</span>
-            <span className="text-[10px] text-emerald-300">β &lt; 0 in all groups</span>
+            <span className="text-[10px] text-[var(--math-vector)] font-bold">β &lt; 0 in all groups</span>
           </div>
           <div className="text-xs font-mono text-[var(--text-primary)]">
-            Slopes = <span className="font-bold text-emerald-400 tabular-nums">{subgroupOLS.map((s) => s?.slope.toFixed(2)).join(', ')}</span>
+            Slopes = <span className="font-bold text-[var(--math-vector)] tabular-nums">{subgroupOLS.map((s) => s?.slope.toFixed(2)).join(', ')}</span>
             <span className="text-[11px] text-[var(--text-tertiary)] ms-2">
               ({language === 'ar' ? 'الرياضة تقلل الخطر لكل فئة!' : 'Exercise reduces risk within every age group!'})
             </span>

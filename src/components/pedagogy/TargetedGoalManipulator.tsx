@@ -100,8 +100,8 @@ export const TargetedGoalManipulator: React.FC<TargetedGoalManipulatorProps> = (
 
       {/* Success Celebration Callout */}
       {isAchieved && (
-        <div className="p-2.5 rounded-lg border border-emerald-800 bg-emerald-950/40 text-emerald-200 text-xs mb-3 flex items-start gap-2">
-          <Sparkles className="w-4 h-4 text-emerald-300 shrink-0 mt-0.5" />
+        <div className="p-2.5 rounded-lg border border-[var(--math-vector)]/30 bg-[var(--math-vector)]/10 text-[var(--math-vector)] text-xs mb-3 flex items-start gap-2 font-medium">
+          <Sparkles className="w-4 h-4 text-[var(--math-vector)] shrink-0 mt-0.5" />
           <p className="leading-relaxed">
             {isAr ? goal.successCelebration.ar : goal.successCelebration.en}
           </p>

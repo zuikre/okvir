@@ -215,7 +215,7 @@ export const LessonPlayer: React.FC = () => {
     return (
       <div className="flex-1 overflow-y-auto flex items-center justify-center p-6">
         <div className="max-w-md w-full p-8 rounded-2xl border border-amber-500/30 bg-[var(--bg-surface)] shadow-2xl text-center space-y-6">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+          <div className="w-14 h-14 rounded-2xl bg-[var(--math-gradient)]/10 border border-[var(--math-gradient)]/20 text-[var(--math-gradient)] flex items-center justify-center mx-auto">
             <Lock size={28} />
           </div>
 
@@ -319,12 +319,12 @@ export const LessonPlayer: React.FC = () => {
               }}
               className={`flex items-center gap-1.5 px-3 py-1 text-xs font-mono rounded-md border transition-all ms-2 ${
                 isHintOpen
-                  ? 'border-amber-500 bg-amber-500/10 text-amber-300 font-semibold'
+                  ? 'border-[var(--math-gradient)] bg-[var(--math-gradient)]/10 text-[var(--math-gradient)] font-semibold'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
               }`}
               title="3-Tier Socratic Hint Ladder [H]"
             >
-              <Lightbulb size={13} className="text-amber-400" />
+              <Lightbulb size={13} className="text-[var(--math-gradient)]" />
               <span>{language === 'ar' ? 'تلميح' : 'Hint'}</span>
               <kbd className="text-[9px] px-1 rounded bg-[var(--border-subtle)] text-[var(--text-tertiary)]">H</kbd>
             </button>
@@ -333,11 +333,11 @@ export const LessonPlayer: React.FC = () => {
 
         {/* 3-Tier Socratic Hint Ladder Panel */}
         {isHintOpen && (
-          <div className="p-4 rounded-xl border border-amber-500/40 bg-amber-500/5 specular space-y-3 slide-up">
-            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2">
+          <div className="p-4 rounded-xl border border-[var(--math-gradient)]/40 bg-[var(--math-gradient)]/5 specular space-y-3 slide-up">
+            <div className="flex items-center justify-between border-b border-[var(--math-gradient)]/20 pb-2">
               <div className="flex items-center gap-2">
-                <Lightbulb size={15} className="text-amber-400" />
-                <span className="text-xs font-mono font-bold text-amber-300">
+                <Lightbulb size={15} className="text-[var(--math-gradient)]" />
+                <span className="text-xs font-mono font-bold text-[var(--math-gradient)]">
                   {language === 'ar' ? 'سُلّم التلميحات السقراطية (3 درجات)' : '3-Tier Socratic Hint Ladder'}
                 </span>
               </div>
@@ -541,7 +541,7 @@ export const LessonPlayer: React.FC = () => {
                           }}
                           className={`px-1.5 py-0.5 text-[10px] font-mono rounded border transition-all ${
                             learningRate === lr
-                              ? 'border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold'
+                              ? 'border-emerald-500 bg-emerald-500/20 text-[var(--math-vector)] font-bold'
                               : 'border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
                           }`}
                         >
@@ -551,7 +551,7 @@ export const LessonPlayer: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-app)]">
-                      <span className="text-xs font-mono text-purple-400 font-semibold">β (Momentum) =</span>
+                      <span className="text-xs font-mono text-[var(--math-prediction)] font-semibold">β (Momentum) =</span>
                       {[0.0, 0.5, 0.8, 0.95].map((mom) => (
                         <button
                           key={mom}
@@ -561,7 +561,7 @@ export const LessonPlayer: React.FC = () => {
                           }}
                           className={`px-1.5 py-0.5 text-[10px] font-mono rounded border transition-all ${
                             momentum === mom
-                              ? 'border-purple-500 bg-purple-500/20 text-purple-300 font-bold'
+                              ? 'border-purple-500 bg-purple-500/20 text-[var(--math-prediction)] font-bold'
                               : 'border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
                           }`}
                         >
@@ -577,7 +577,7 @@ export const LessonPlayer: React.FC = () => {
                     <span className="text-xs font-mono text-[var(--text-secondary)]">
                       {language === 'ar' ? 'تعديل زاوية المتجه:' : 'Sample Vector Dimension:'}
                     </span>
-                    <span className="px-2 py-0.5 text-xs font-mono rounded bg-sky-500/10 border border-sky-500/30 text-sky-300 font-semibold">
+                    <span className="px-2 py-0.5 text-xs font-mono rounded bg-sky-500/10 border border-sky-500/30 text-[var(--math-data)] font-semibold">
                       v = [3.0, 4.0]ᵀ ⟹ ‖v‖ = 5.0
                     </span>
                   </div>
@@ -589,7 +589,7 @@ export const LessonPlayer: React.FC = () => {
                     {[0.0, 0.2, 0.5, 1.0, 2.0].map((l) => (
                       <span
                         key={l}
-                        className="px-2 py-0.5 text-xs font-mono rounded bg-amber-500/10 border border-amber-500/20 text-amber-300"
+                        className="px-2 py-0.5 text-xs font-mono rounded bg-amber-500/10 border border-amber-500/20 text-[var(--math-gradient)] font-semibold"
                       >
                         λ = {l}
                       </span>
@@ -750,8 +750,8 @@ export const LessonPlayer: React.FC = () => {
                       className={`w-full p-4 rounded-xl border text-start text-xs font-medium transition-all ${
                         isChosen
                           ? option.correct
-                            ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/40'
-                            : 'border-rose-500 bg-rose-500/10 text-rose-300 ring-1 ring-rose-500/40'
+                            ? 'border-emerald-500 bg-emerald-500/10 text-[var(--math-vector)] ring-1 ring-emerald-500/40'
+                            : 'border-rose-500 bg-rose-500/10 text-[var(--math-loss)] ring-1 ring-rose-500/40'
                           : 'border-[var(--border-subtle)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-app)] text-[var(--text-secondary)]'
                       }`}
                     >
@@ -780,15 +780,15 @@ export const LessonPlayer: React.FC = () => {
                 <div
                   className={`p-4 rounded-xl border text-xs font-medium leading-relaxed slide-up ${
                     isSelectedCorrect
-                      ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
-                      : 'border-amber-500/30 bg-amber-500/10 text-amber-300'
+                      ? 'border-emerald-500/30 bg-emerald-500/10 text-[var(--math-vector)]'
+                      : 'border-amber-500/30 bg-amber-500/10 text-[var(--math-gradient)]'
                   }`}
                 >
                   <div className="flex items-start gap-2.5">
                     {isSelectedCorrect ? (
-                      <Sparkles size={16} className="text-emerald-400 shrink-0 mt-0.5" />
+                      <Sparkles size={16} className="text-[var(--math-vector)] shrink-0 mt-0.5" />
                     ) : (
-                      <AlertTriangle size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                      <AlertTriangle size={16} className="text-[var(--math-gradient)] shrink-0 mt-0.5" />
                     )}
                     <div className="space-y-1">
                       <div className="font-bold">

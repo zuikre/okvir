@@ -152,7 +152,7 @@ export const FlashAttentionTilingLab: React.FC<Props> = ({ compact = false }) =>
                 setIsPlaying(!isPlaying);
                 if (config.soundEnabled) audio.playClick();
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 text-xs font-mono transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--math-gradient)]/15 border border-[var(--math-gradient)]/40 text-[var(--math-gradient)] hover:bg-[var(--math-gradient)]/25 text-xs font-mono transition-colors"
             >
               {isPlaying ? <Pause size={14} /> : <Play size={14} />}
               <span>{isPlaying ? (language === 'ar' ? 'إيقاف' : 'Pause') : (language === 'ar' ? 'تشغيل' : 'Animate')}</span>
@@ -242,14 +242,14 @@ export const FlashAttentionTilingLab: React.FC<Props> = ({ compact = false }) =>
                       key={`${r}-${c}`}
                       className={`aspect-square rounded-lg flex flex-col items-center justify-center p-1 border transition-all duration-300 text-[10px] font-mono ${
                         isActive
-                          ? 'border-amber-400 bg-amber-500/30 text-amber-200 shadow-lg shadow-amber-500/20 scale-105 z-10 animate-pulse'
+                          ? 'border-[var(--math-gradient)] bg-[var(--math-gradient)]/25 text-[var(--math-gradient)] shadow-lg scale-105 z-10 animate-pulse font-bold'
                           : isProcessed
-                          ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300'
+                          ? 'border-[var(--math-vector)]/40 bg-[var(--math-vector)]/10 text-[var(--math-vector)]'
                           : 'border-[var(--border-subtle)] bg-[var(--bg-surface)]/60 text-[var(--text-secondary)]/50'
                       }`}
                     >
                       <span>Q{r}·K{c}ᵀ</span>
-                      {isActive && <span className="text-[8px] text-amber-300 font-bold">SRAM</span>}
+                      {isActive && <span className="text-[8px] text-[var(--math-gradient)] font-bold">SRAM</span>}
                     </div>
                   );
                 })
@@ -300,19 +300,19 @@ export const FlashAttentionTilingLab: React.FC<Props> = ({ compact = false }) =>
                 {language === 'ar' ? 'مقارنة نقل الذاكرة (Memory IO Traffic)' : 'Memory Bandwidth IO Footprint'}
               </div>
 
-              <div className="flex justify-between items-center text-rose-400">
+              <div className="flex justify-between items-center text-[var(--math-loss)]">
                 <span>Standard Attention HBM IO:</span>
                 <span className="font-bold">{hbmTrafficStandardMB} MB</span>
               </div>
 
-              <div className="flex justify-between items-center text-emerald-400">
+              <div className="flex justify-between items-center text-[var(--math-vector)]">
                 <span>FlashAttention-2 HBM IO:</span>
                 <span className="font-bold">{hbmTrafficFlashMB} MB</span>
               </div>
 
-              <div className="pt-1 border-t border-[var(--border-subtle)] flex justify-between items-center text-amber-300 font-bold">
+              <div className="pt-1 border-t border-[var(--border-subtle)] flex justify-between items-center text-[var(--math-gradient)] font-bold">
                 <span>IO Bandwidth Speedup:</span>
-                <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40">
+                <span className="px-2 py-0.5 rounded bg-[var(--math-gradient)]/15 border border-[var(--math-gradient)]/40 text-[var(--math-gradient)]">
                   {ioSpeedup}x Faster
                 </span>
               </div>

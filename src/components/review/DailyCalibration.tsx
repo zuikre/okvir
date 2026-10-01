@@ -354,12 +354,12 @@ export const DailyCalibration: React.FC = () => {
                 <span
                   className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border ${
                     currentItem.format === 'flashcard'
-                      ? 'border-purple-500/30 bg-purple-500/10 text-purple-300'
+                      ? 'border-purple-500/30 bg-purple-500/10 text-[var(--math-prediction)]'
                       : currentItem.format === 'mcq'
-                      ? 'border-sky-500/30 bg-sky-500/10 text-sky-300'
+                      ? 'border-sky-500/30 bg-sky-500/10 text-[var(--math-data)]'
                       : currentItem.format === 'boolean'
-                      ? 'border-amber-500/30 bg-amber-500/10 text-amber-300'
-                      : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
+                      ? 'border-amber-500/30 bg-amber-500/10 text-[var(--math-gradient)]'
+                      : 'border-emerald-500/30 bg-emerald-500/10 text-[var(--math-vector)]'
                   }`}
                 >
                   {currentItem.format === 'flashcard' && (language === 'ar' ? 'بطاقة مفاهيمية' : 'Flashcard')}
@@ -467,9 +467,9 @@ export const DailyCalibration: React.FC = () => {
                         className={`w-full flex items-start gap-3 p-3.5 rounded-xl border text-start transition-all ${
                           showFeedback
                             ? isCorrect
-                              ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300 font-semibold'
+                              ? 'border-emerald-500 bg-emerald-500/10 text-[var(--math-vector)] font-semibold'
                               : isSelected
-                              ? 'border-rose-500 bg-rose-500/10 text-rose-300'
+                              ? 'border-rose-500 bg-rose-500/10 text-[var(--math-loss)]'
                               : 'border-[var(--border-subtle)] opacity-40 text-[var(--text-tertiary)]'
                             : 'border-[var(--border-subtle)] bg-[var(--bg-app)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] hover:translate-y-[-1px]'
                         }`}
@@ -551,15 +551,15 @@ export const DailyCalibration: React.FC = () => {
                         className={`p-4 rounded-xl border font-mono text-center transition-all ${
                           showFeedback
                             ? isCorrect
-                              ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300 font-bold'
+                              ? 'border-emerald-500 bg-emerald-500/10 text-[var(--math-vector)] font-bold'
                               : isSelected
-                              ? 'border-rose-500 bg-rose-500/10 text-rose-300 font-bold'
+                              ? 'border-rose-500 bg-rose-500/10 text-[var(--math-loss)] font-bold'
                               : 'border-[var(--border-subtle)] opacity-40 text-[var(--text-tertiary)]'
                             : 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] text-[var(--text-primary)] hover:translate-y-[-1px]'
                         }`}
                       >
                         <div className="text-sm font-bold flex items-center justify-center gap-2">
-                          {val ? <Check size={16} className="text-emerald-400" /> : <X size={16} className="text-rose-400" />}
+                          {val ? <Check size={16} className="text-[var(--math-vector)]" /> : <X size={16} className="text-[var(--math-loss)]" />}
                           <span>{val ? (language === 'ar' ? 'صحيح (نعم)' : 'True / Yes') : (language === 'ar' ? 'خطأ (لا)' : 'False / No')}</span>
                         </div>
                         <div className="text-[10px] text-[var(--text-tertiary)] mt-1">
@@ -631,9 +631,9 @@ export const DailyCalibration: React.FC = () => {
                         className={`p-3 rounded-xl border text-center font-mono transition-all ${
                           showFeedback
                             ? isCorrect
-                              ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300 font-bold'
+                              ? 'border-emerald-500 bg-emerald-500/10 text-[var(--math-vector)] font-bold'
                               : isSelected
-                              ? 'border-rose-500 bg-rose-500/10 text-rose-300'
+                              ? 'border-rose-500 bg-rose-500/10 text-[var(--math-loss)]'
                               : 'border-[var(--border-subtle)] opacity-40 text-[var(--text-tertiary)]'
                             : 'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] text-[var(--text-primary)] hover:translate-y-[-1px]'
                         }`}

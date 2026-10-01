@@ -367,13 +367,13 @@ export const BayesFrequencyTree: React.FC<{ compact?: boolean }> = ({ compact = 
           {/* Level 1: Sick vs Healthy */}
           <div className="grid grid-cols-2 gap-4 w-full max-w-md">
             <div className="p-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 text-center font-mono">
-              <div className="text-[10px] text-emerald-400 font-semibold">{language === 'ar' ? 'مصابون P(D)' : 'Condition Present'}</div>
-              <div className="text-sm font-bold text-emerald-300 tabular-nums">{sickCount}</div>
+              <div className="text-[10px] text-[var(--math-vector)] font-semibold">{language === 'ar' ? 'مصابون P(D)' : 'Condition Present'}</div>
+              <div className="text-sm font-bold text-[var(--math-vector)] tabular-nums">{sickCount}</div>
             </div>
 
             <div className="p-2.5 rounded-xl border border-sky-500/30 bg-sky-500/5 text-center font-mono">
-              <div className="text-[10px] text-sky-400 font-semibold">{language === 'ar' ? 'أصحاء P(¬D)' : 'Condition Absent'}</div>
-              <div className="text-sm font-bold text-sky-300 tabular-nums">{healthyCount.toLocaleString()}</div>
+              <div className="text-[10px] text-[var(--math-data)] font-semibold">{language === 'ar' ? 'أصحاء P(¬D)' : 'Condition Absent'}</div>
+              <div className="text-sm font-bold text-[var(--math-data)] tabular-nums">{healthyCount.toLocaleString()}</div>
             </div>
           </div>
 
@@ -381,15 +381,15 @@ export const BayesFrequencyTree: React.FC<{ compact?: boolean }> = ({ compact = 
           <div className="grid grid-cols-2 gap-3 w-full">
             {/* True Positives */}
             <div className="p-3 rounded-xl border-2 border-emerald-500/50 bg-emerald-500/10 text-center font-mono shadow-sm">
-              <div className="text-[10px] text-emerald-400 font-bold uppercase">{language === 'ar' ? 'إيجابي حقيقي' : 'True Positive'}</div>
-              <div className="text-xl font-bold text-emerald-300 tabular-nums">{truePositives}</div>
+              <div className="text-[10px] text-[var(--math-vector)] font-bold uppercase">{language === 'ar' ? 'إيجابي حقيقي' : 'True Positive'}</div>
+              <div className="text-xl font-bold text-[var(--math-vector)] tabular-nums">{truePositives}</div>
               <div className="text-[9px] text-[var(--text-tertiary)]">{language === 'ar' ? 'مصاب واختباره +' : 'Sick + Tested +'}</div>
             </div>
 
             {/* False Positives */}
             <div className="p-3 rounded-xl border-2 border-rose-500/50 bg-rose-500/10 text-center font-mono shadow-sm">
-              <div className="text-[10px] text-rose-400 font-bold uppercase">{language === 'ar' ? 'إيجابي كاذب' : 'False Positive'}</div>
-              <div className="text-xl font-bold text-rose-300 tabular-nums">{falsePositives}</div>
+              <div className="text-[10px] text-[var(--math-loss)] font-bold uppercase">{language === 'ar' ? 'إيجابي كاذب' : 'False Positive'}</div>
+              <div className="text-xl font-bold text-[var(--math-loss)] tabular-nums">{falsePositives}</div>
               <div className="text-[9px] text-[var(--text-tertiary)]">{language === 'ar' ? 'سليم واختباره +' : 'Healthy + Tested +'}</div>
             </div>
           </div>
@@ -399,7 +399,7 @@ export const BayesFrequencyTree: React.FC<{ compact?: boolean }> = ({ compact = 
       {/* Posterior Probability Result Hero */}
       <div className="p-5 rounded-2xl border border-amber-500/40 bg-amber-500/5 flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
-          <div className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-semibold mb-1">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--math-gradient)] font-semibold mb-1">
             {language === 'ar' ? 'الاحتمال البعدي: P(D | T+) عبر مبرهنة بايز' : "Posterior Probability: P(D | T+) via Bayes' Rule"}
           </div>
           <p className="text-xs text-[var(--text-secondary)] max-w-lg leading-relaxed">
@@ -411,10 +411,10 @@ export const BayesFrequencyTree: React.FC<{ compact?: boolean }> = ({ compact = 
 
         <div className="p-4 rounded-xl border border-amber-500/50 bg-[var(--bg-surface)] text-center font-mono shrink-0 shadow-lg">
           <div className="text-[10px] text-[var(--text-tertiary)] uppercase">{language === 'ar' ? 'الاحتمال البعدي الحقيقي' : 'Actual Posterior'}</div>
-          <div className="text-3xl font-extrabold text-amber-400 tabular-nums">
+          <div className="text-3xl font-extrabold text-[var(--math-gradient)] tabular-nums">
             {posteriorPct.toFixed(1)}%
           </div>
-          <div className="text-[10px] text-amber-300/70">
+          <div className="text-[10px] text-[var(--math-gradient)]/80 font-semibold">
             {truePositives} / ({truePositives} + {falsePositives})
           </div>
         </div>

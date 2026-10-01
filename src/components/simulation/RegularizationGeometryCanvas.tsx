@@ -438,7 +438,7 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
             }}
             className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
               mode === 'lasso'
-                ? 'border-emerald-500 bg-emerald-500/15 text-emerald-300 font-bold shadow-sm'
+                ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/15 text-[var(--math-vector)] font-bold shadow-sm'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
             }`}
           >
@@ -452,7 +452,7 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
             }}
             className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
               mode === 'ridge'
-                ? 'border-sky-500 bg-sky-500/15 text-sky-300 font-bold shadow-sm'
+                ? 'border-[var(--math-data)] bg-[var(--math-data)]/15 text-[var(--math-data)] font-bold shadow-sm'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
             }`}
           >
@@ -473,7 +473,7 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
               onClick={() => applyPreset(key)}
               className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
                 activePreset === key
-                  ? 'border-amber-400 bg-amber-500/15 text-amber-300 font-bold shadow-sm'
+                  ? 'border-[var(--math-gradient)] bg-[var(--math-gradient)]/15 text-[var(--math-gradient)] font-bold shadow-sm'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
               }`}
             >
@@ -532,7 +532,7 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
           <div
             className={`p-4 rounded-xl border text-xs leading-relaxed space-y-2 ${
               mode === 'lasso' && isExactZero
-                ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300'
+                ? 'border-[var(--math-vector)]/40 bg-[var(--math-vector)]/10 text-[var(--math-vector)]'
                 : 'border-[var(--border-subtle)] bg-[var(--bg-app)] text-[var(--text-secondary)]'
             }`}
           >
@@ -542,9 +542,9 @@ export const RegularizationGeometryCanvas: React.FC<{ compact?: boolean }> = ({ 
               </span>
               <span className="text-[10px] uppercase tracking-wider font-semibold">
                 {mode === 'lasso' && isExactZero ? (
-                  <span className="text-emerald-400">✓ EXACT ZERO (SPARSE)</span>
+                  <span className="text-[var(--math-vector)] font-bold">✓ EXACT ZERO (SPARSE)</span>
                 ) : (
-                  <span className="text-sky-400">Dense w ≠ 0</span>
+                  <span className="text-[var(--math-data)] font-bold">Dense w ≠ 0</span>
                 )}
               </span>
             </div>

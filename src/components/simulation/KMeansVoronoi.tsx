@@ -585,7 +585,7 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = true 
             onClick={() => handleSelectPreset('rings')}
             className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
               preset === 'rings'
-                ? 'border-rose-400 bg-rose-500/15 text-rose-300 font-bold shadow-sm'
+                ? 'border-[var(--math-loss)] bg-[var(--math-loss)]/15 text-[var(--math-loss)] font-bold shadow-sm'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
             }`}
           >
@@ -595,7 +595,7 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = true 
             onClick={() => handleSelectPreset('anisotropic')}
             className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
               preset === 'anisotropic'
-                ? 'border-purple-400 bg-purple-500/15 text-purple-300 font-bold shadow-sm'
+                ? 'border-[var(--math-prediction)] bg-[var(--math-prediction)]/15 text-[var(--math-prediction)] font-bold shadow-sm'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
             }`}
           >
@@ -615,7 +615,7 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = true 
                 onClick={() => handleChangeK(kVal)}
                 className={`w-7 h-7 text-xs font-mono font-bold rounded-lg border transition-all ${
                   k === kVal
-                    ? 'border-emerald-400 bg-emerald-500/20 text-emerald-300 shadow-sm'
+                    ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/20 text-[var(--math-vector)] shadow-sm'
                     : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
                 }`}
               >

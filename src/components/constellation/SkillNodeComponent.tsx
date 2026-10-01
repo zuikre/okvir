@@ -182,9 +182,9 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
           </div>
 
           <div className="shrink-0">
-            {isMastered && <Check size={12} className="text-emerald-400 stroke-[3]" />}
-            {isInProgress && <Play size={10} fill="currentColor" className="text-amber-400" />}
-            {isAvailable && <Play size={11} fill="currentColor" className="text-sky-400" />}
+            {isMastered && <Check size={12} className="text-[var(--math-vector)] stroke-[3]" />}
+            {isInProgress && <Play size={10} fill="currentColor" className="text-[var(--math-gradient)]" />}
+            {isAvailable && <Play size={11} fill="currentColor" className="text-[var(--math-data)]" />}
             {isLocked && <Lock size={10} className="text-[var(--text-tertiary)]" />}
           </div>
         </div>

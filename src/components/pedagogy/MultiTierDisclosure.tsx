@@ -65,22 +65,22 @@ export const PreCanvasBriefing: React.FC<{
             onClick={() => setActiveTier(1)}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono transition-all ${
               activeTier === 1
-                ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 shadow-xs'
+                ? 'bg-[var(--math-gradient)]/15 text-[var(--math-gradient)] font-bold border border-[var(--math-gradient)]/30 shadow-xs'
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
             }`}
           >
-            <Eye size={12} className={activeTier === 1 ? 'text-amber-400' : ''} />
+            <Eye size={12} className={activeTier === 1 ? 'text-[var(--math-gradient)]' : ''} />
             <span>{language === 'ar' ? '١. المجاز الذهني' : '1. Intuition'}</span>
           </button>
           <button
             onClick={() => setActiveTier(2)}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono transition-all ${
               activeTier === 2
-                ? 'bg-sky-500/20 text-sky-300 font-bold border border-sky-500/30 shadow-xs'
+                ? 'bg-[var(--math-data)]/15 text-[var(--math-data)] font-bold border border-[var(--math-data)]/30 shadow-xs'
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
             }`}
           >
-            <Shapes size={12} className={activeTier === 2 ? 'text-sky-400' : ''} />
+            <Shapes size={12} className={activeTier === 2 ? 'text-[var(--math-data)]' : ''} />
             <span>{language === 'ar' ? '٢. الثابت الهندسي' : '2. Geometry'}</span>
           </button>
         </div>
@@ -173,22 +173,22 @@ export const PostCanvasConsolidation: React.FC<{
             onClick={() => setActiveTier(3)}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono transition-all ${
               activeTier === 3
-                ? 'bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30 shadow-xs'
+                ? 'bg-[var(--math-prediction)]/15 text-[var(--math-prediction)] font-bold border border-[var(--math-prediction)]/30 shadow-xs'
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
             }`}
           >
-            <Sigma size={12} className={activeTier === 3 ? 'text-purple-400' : ''} />
+            <Sigma size={12} className={activeTier === 3 ? 'text-[var(--math-prediction)]' : ''} />
             <span>{language === 'ar' ? '٣. الاشتقاق الرياضي' : '3. Derivation'}</span>
           </button>
           <button
             onClick={() => setActiveTier(4)}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono transition-all ${
               activeTier === 4
-                ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 shadow-xs'
+                ? 'bg-[var(--math-vector)]/15 text-[var(--math-vector)] font-bold border border-[var(--math-vector)]/30 shadow-xs'
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
             }`}
           >
-            <Terminal size={12} className={activeTier === 4 ? 'text-emerald-400' : ''} />
+            <Terminal size={12} className={activeTier === 4 ? 'text-[var(--math-vector)]' : ''} />
             <span>{language === 'ar' ? '٤. الكود المصفوفي' : '4. Vectorized Code'}</span>
           </button>
         </div>

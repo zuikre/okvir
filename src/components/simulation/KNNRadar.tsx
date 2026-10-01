@@ -463,7 +463,7 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = true }) =>
             onClick={() => setShowBoundaryField(!showBoundaryField)}
             className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
               showBoundaryField
-                ? 'border-purple-400 bg-purple-500/15 text-purple-300 font-bold'
+                ? 'border-[var(--math-prediction)] bg-[var(--math-prediction)]/15 text-[var(--math-prediction)] font-bold'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
             }`}
             title="Toggle Decision Boundary Background Field"
@@ -477,7 +477,7 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = true }) =>
             onClick={() => setIsWeighted(!isWeighted)}
             className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
               isWeighted
-                ? 'border-emerald-400 bg-emerald-500/15 text-emerald-300 font-bold'
+                ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/15 text-[var(--math-vector)] font-bold'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
             }`}
             title="Weight votes by inverse distance 1/d"
@@ -568,7 +568,7 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = true }) =>
                 }}
                 className={`flex-1 py-1.5 text-xs font-mono rounded-lg border transition-all ${
                   metric === m
-                    ? 'border-sky-500 bg-sky-500/15 text-sky-300 font-bold'
+                    ? 'border-[var(--math-data)] bg-[var(--math-data)]/15 text-[var(--math-data)] font-bold'
                     : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
                 }`}
               >
@@ -590,7 +590,7 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = true }) =>
               onClick={() => setAddModeClass(0)}
               className={`flex-1 py-1.5 text-xs font-mono rounded-lg border transition-all ${
                 addModeClass === 0
-                  ? 'border-sky-500 bg-sky-500/15 text-sky-300 font-bold'
+                  ? 'border-[var(--math-data)] bg-[var(--math-data)]/15 text-[var(--math-data)] font-bold'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
               }`}
             >
@@ -600,7 +600,7 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = true }) =>
               onClick={() => setAddModeClass(1)}
               className={`flex-1 py-1.5 text-xs font-mono rounded-lg border transition-all ${
                 addModeClass === 1
-                  ? 'border-amber-500 bg-amber-500/15 text-amber-300 font-bold'
+                  ? 'border-[var(--math-gradient)] bg-[var(--math-gradient)]/15 text-[var(--math-gradient)] font-bold'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
               }`}
             >

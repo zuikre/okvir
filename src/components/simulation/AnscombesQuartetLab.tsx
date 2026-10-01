@@ -370,7 +370,7 @@ export const AnscombesQuartetLab: React.FC<{ compact?: boolean }> = ({ compact =
             }}
             className={`p-2.5 rounded-lg border text-start transition-all ${
               activeDatasetIndex === idx
-                ? 'border-sky-500 bg-sky-500/10 text-sky-300 ring-1 ring-sky-500/30'
+                ? 'border-[var(--math-data)] bg-[var(--math-data)]/10 text-[var(--math-data)] ring-1 ring-[var(--math-data)]/30'
                 : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-app)]'
             }`}
           >
@@ -386,9 +386,9 @@ export const AnscombesQuartetLab: React.FC<{ compact?: boolean }> = ({ compact =
 
       {/* Narrative Alert */}
       <div className="p-3 rounded-lg border border-amber-500/20 bg-amber-500/5 text-xs text-[var(--text-secondary)] leading-relaxed flex items-start gap-2">
-        <AlertTriangle size={15} className="text-amber-400 shrink-0 mt-0.5" />
+        <AlertTriangle size={15} className="text-[var(--math-gradient)] shrink-0 mt-0.5" />
         <div>
-          <span className="font-semibold text-amber-300">
+          <span className="font-semibold text-[var(--math-gradient)]">
             {language === 'ar' ? 'ملاحظة تشخيصية:' : 'Diagnostic Invariant:'}{' '}
           </span>
           {activeDataset.description[language]}
