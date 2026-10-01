@@ -18,6 +18,9 @@ import { GaltonBoardCltLab } from './GaltonBoardCltLab';
 import { InstrumentalVariablesLab } from './InstrumentalVariablesLab';
 import { AutogradGraphLab } from './AutogradGraphLab';
 import { BpeTokenizerLab } from './BpeTokenizerLab';
+import { FlashAttentionTilingLab } from './FlashAttentionTilingLab';
+import { RotaryEmbeddingLab } from './RotaryEmbeddingLab';
+import { LoRADecompositionLab } from './LoRADecompositionLab';
 
 interface Props {
   type: SimulationType;
@@ -106,16 +109,29 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     return <ConvolutionFilterCanvas compact={compact} />;
   }
 
-  // 7. Attention, Transformers & LLMs
+  // 7. FlashAttention-2 SRAM Tiling
+  if (normType.includes('flash') || normType.includes('tiling')) {
+    return <FlashAttentionTilingLab compact={compact} />;
+  }
+
+  // 8. Rotary Position Embeddings (RoPE)
+  if (normType.includes('rope') || normType.includes('rotary') || normType.includes('positional')) {
+    return <RotaryEmbeddingLab compact={compact} />;
+  }
+
+  // 9. Low-Rank Adaptation (LoRA / QLoRA)
+  if (normType.includes('lora') || normType.includes('qlora') || normType.includes('adapter')) {
+    return <LoRADecompositionLab compact={compact} />;
+  }
+
+  // 10. Attention, Transformers & LLMs
   if (
     normType === 'attention' ||
     normType.includes('attention') ||
     normType.includes('transformer') ||
-    normType.includes('rope') ||
     normType.includes('cache') ||
     normType.includes('mha') ||
-    normType.includes('flash') ||
-    normType.includes('lora')
+    normType.includes('gqa')
   ) {
     return <AttentionHeatmapCanvas compact={compact} />;
   }

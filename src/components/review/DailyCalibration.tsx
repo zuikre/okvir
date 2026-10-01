@@ -14,49 +14,34 @@ import {
 } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
-import { createNewCard, updateCard, retrievability, getRatingLabel } from '@/lib/fsrs';
+import { createNewCard, retrievability, getRatingLabel, type Rating } from '@/lib/fsrs';
 import { KaTeXMath } from '@/components/common/KaTeXMath';
 import { audio } from '@/lib/audio';
-import { tauriBridge } from '@/lib/tauri-bridge';
-import type { FSRSState, Rating } from '@/lib/fsrs';
 import {
   ALL_CALIBRATION_DRILLS,
-  type CalibrationDrillItem,
   type DrillFormat,
-  type DrillOption,
 } from '@/lib/drill-registry';
 
 export const DailyCalibration: React.FC = () => {
-  const { language, addXp, streakDays, lessons, setActiveLessonId, setCurrentView } = useOkvirStore();
+  const {
+    language,
+    addXp,
+    streakDays,
+    lessons,
+    setActiveLessonId,
+    setCurrentView,
+    fsrsCards,
+    recordFsrsReview,
+    syncFsrsFromDesktop,
+  } = useOkvirStore();
 
-  const [cards, setCards] = useState<Record<string, FSRSState>>({});
   const [selectedFormatFilter, setSelectedFormatFilter] = useState<'all' | DrillFormat>('all');
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Pre-load due cards from embedded SQLite database via Tauri Bridge
+  // Sync cards from embedded SQLite database via Tauri Bridge on mount
   useEffect(() => {
-    tauriBridge.getDueFsrsCards().then((dueCards) => {
-      if (dueCards && dueCards.length > 0) {
-        setCards((prev) => {
-          const updated = { ...prev };
-          dueCards.forEach((c) => {
-            updated[c.concept_id] = {
-              cardId: c.card_id,
-              conceptId: c.concept_id,
-              stability: c.stability,
-              difficulty: c.difficulty,
-              reps: Number(c.reps) || 0,
-              lapses: Number(c.lapses) || 0,
-              state: (c.state || 0) as 0 | 1 | 2 | 3,
-              lastReview: c.last_review ? new Date(c.last_review).getTime() : null,
-              due: new Date(c.due_date).getTime(),
-            };
-          });
-          return updated;
-        });
-      }
-    }).catch(console.error);
-  }, []);
+    syncFsrsFromDesktop();
+  }, [syncFsrsFromDesktop]);
 
   // Interaction States
   const [isFlipped, setIsFlipped] = useState(false); // For flashcard
@@ -71,12 +56,27 @@ export const DailyCalibration: React.FC = () => {
     xpEarned: 0,
   });
 
-  // Strictly filter drills to only those whose corresponding module is mastered
+  // Filter and sort drills: Mastered modules, prioritized by FSRS due date
   const qualifiedDrills = useMemo(() => {
-    return ALL_CALIBRATION_DRILLS.filter(
+    const mastered = ALL_CALIBRATION_DRILLS.filter(
       (drill) => lessons[drill.moduleId]?.status === 'mastered'
     );
-  }, [lessons]);
+
+    const now = Date.now();
+    return [...mastered].sort((a, b) => {
+      const cardA = fsrsCards[a.id];
+      const cardB = fsrsCards[b.id];
+      const dueA = cardA ? cardA.due : 0;
+      const dueB = cardB ? cardB.due : 0;
+
+      const isDueA = dueA <= now;
+      const isDueB = dueB <= now;
+
+      if (isDueA && !isDueB) return -1;
+      if (!isDueA && isDueB) return 1;
+      return dueA - dueB;
+    });
+  }, [lessons, fsrsCards]);
 
   // Filtered Drills by format
   const activeDrills = useMemo(() => {
@@ -89,8 +89,8 @@ export const DailyCalibration: React.FC = () => {
 
   const currentCardState = useMemo(() => {
     if (!currentItem) return null;
-    return cards[currentItem.id] || createNewCard(currentItem.id);
-  }, [currentItem, cards]);
+    return fsrsCards[currentItem.id] || createNewCard(currentItem.id);
+  }, [currentItem, fsrsCards]);
 
   // Reset answer states when question changes
   const resetInteraction = useCallback(() => {
@@ -150,8 +150,7 @@ export const DailyCalibration: React.FC = () => {
   const handleRate = useCallback((rating: Rating) => {
     if (!currentItem || !currentCardState) return;
 
-    const updated = updateCard(currentCardState, rating);
-    setCards((prev) => ({ ...prev, [currentItem.id]: updated }));
+    recordFsrsReview(currentItem.id, rating);
 
     const earned = rating >= 3 ? 20 : 10;
     addXp(earned);
@@ -168,7 +167,7 @@ export const DailyCalibration: React.FC = () => {
       if (rating >= 3) audio.playSuccessChime();
       else audio.playClick();
     }
-  }, [currentItem, currentCardState, addXp, resetInteraction]);
+  }, [currentItem, currentCardState, recordFsrsReview, addXp, resetInteraction]);
 
   // Keyboard Shortcuts: 1-4 for options/ratings, Space for flip
   useEffect(() => {

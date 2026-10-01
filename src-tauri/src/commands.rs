@@ -228,6 +228,39 @@ pub fn get_due_fsrs_cards(_state: State<'_, AppState>) -> Result<Vec<FsrsCardDTO
 }
 
 #[tauri::command]
+pub fn save_fsrs_card(
+    card: FsrsCardDTO,
+    _state: State<'_, AppState>,
+) -> Result<bool, String> {
+    let conn = get_connection()?;
+    conn.execute(
+        "INSERT INTO fsrs_cards (card_id, concept_id, stability, difficulty, reps, lapses, state, last_review, due_date)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
+         ON CONFLICT(card_id) DO UPDATE SET
+            stability = ?3,
+            difficulty = ?4,
+            reps = ?5,
+            lapses = ?6,
+            state = ?7,
+            last_review = ?8,
+            due_date = ?9",
+        rusqlite::params![
+            card.card_id,
+            card.concept_id,
+            card.stability,
+            card.difficulty,
+            card.reps,
+            card.lapses,
+            card.state,
+            card.last_review,
+            card.due_date,
+        ],
+    ).map_err(|e| e.to_string())?;
+
+    Ok(true)
+}
+
+#[tauri::command]
 pub fn record_submission(
     payload: SubmissionPayload,
     _state: State<'_, AppState>,

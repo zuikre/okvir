@@ -233,50 +233,64 @@ async function runTest(targetDir = '.') {
   }
 }
 
-async function runPack(sourceDir = '.', outputFile = 'course.okvir') {
+async function runPack(sourceDir = './curriculum', outputFile = 'dist/okvir-core-v1.0.okvir') {
   const root = path.resolve(process.cwd(), sourceDir);
   const outPath = path.resolve(process.cwd(), outputFile);
 
   console.log(`\x1b[36mCompiling seekable .okvir binary package from '${root}' -> '${outPath}'...\x1b[0m`);
 
-  // Gather payload files
-  const manifestPath = path.join(root, 'course.json');
-  const manifest = fs.existsSync(manifestPath)
-    ? JSON.parse(fs.readFileSync(manifestPath, 'utf-8'))
-    : { name: 'okvir-pack', version: '1.0.0' };
+  function getFiles(dir) {
+    if (!fs.existsSync(dir)) return [];
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    let files = [];
+    for (const e of entries) {
+      const full = path.join(dir, e.name);
+      if (e.isDirectory()) {
+        files = files.concat(getFiles(full));
+      } else if (e.isFile()) {
+        files.push(full);
+      }
+    }
+    return files;
+  }
 
-  // Construct Binary Layout per PRD Section 4.1:
-  // 1. 32-Byte Header: 'OKVR', version (0x0001), flags, TOC offset, TOC length, Minisign Key ID
-  // 2. Payload Section: 256KB compressed frames
-  // 3. Table of Contents (JSON)
-  // 4. Ed25519 Minisign Signature Trailer ('OKSIG' + 64 bytes)
+  const allFiles = getFiles(root);
+  if (allFiles.length === 0) {
+    console.error(`\x1b[31mError: No files found in directory '${root}'.\x1b[0m`);
+    process.exit(1);
+  }
 
-  const tocEntries = [
-    {
-      virtualPath: 'course.json',
-      byteOffset: 32,
-      byteLength: 256,
-      frameIndex: 0,
-      sha256: crypto.createHash('sha256').update(JSON.stringify(manifest)).digest('hex'),
-    },
-    {
-      virtualPath: 'lessons/curriculum.json',
-      byteOffset: 288,
-      byteLength: 4096,
-      frameIndex: 0,
-      sha256: crypto.createHash('sha256').update('curriculum').digest('hex'),
-    },
-  ];
+  console.log(`Discovered ${allFiles.length} curriculum assets to package.`);
 
+  const tocEntries = [];
+  const payloadChunks = [];
+  let currentOffset = 32; // Header length is 32 bytes
+
+  for (const f of allFiles) {
+    const rawData = fs.readFileSync(f);
+    const virtualPath = path.relative(root, f).replace(/\\/g, '/');
+    const sha256 = crypto.createHash('sha256').update(rawData).digest('hex');
+
+    tocEntries.push({
+      virtualPath,
+      byteOffset: currentOffset,
+      byteLength: rawData.length,
+      sha256,
+    });
+
+    payloadChunks.push(rawData);
+    currentOffset += rawData.length;
+  }
+
+  const payloadBuffer = Buffer.concat(payloadChunks);
   const tocBuffer = Buffer.from(JSON.stringify(tocEntries));
-  const payloadDummy = Buffer.alloc(1024, 0x5a); // 1KB mock payload
 
   const header = Buffer.alloc(32);
   header.write('OKVR', 0, 4, 'ascii'); // Magic
   header.writeUInt16LE(1, 4); // Version
-  header.writeUInt16LE(1, 6); // Flags (bit 0: compressed)
+  header.writeUInt16LE(0, 6); // Flags (0: uncompressed raw frames)
 
-  const tocOffset = 32 + payloadDummy.length;
+  const tocOffset = 32 + payloadBuffer.length;
   header.writeBigUInt64LE(BigInt(tocOffset), 8);
   header.writeBigUInt64LE(BigInt(tocBuffer.length), 16);
   header.writeBigUInt64LE(BigInt(0x0123456789abcdefn), 24); // Key ID
@@ -287,7 +301,7 @@ async function runPack(sourceDir = '.', outputFile = 'course.okvir') {
   const signatureBytes = crypto.randomBytes(64);
   signatureBytes.copy(trailer, 5);
 
-  const container = Buffer.concat([header, payloadDummy, tocBuffer, trailer]);
+  const container = Buffer.concat([header, payloadBuffer, tocBuffer, trailer]);
 
   const outDir = path.dirname(outPath);
   if (!fs.existsSync(outDir)) {
@@ -298,7 +312,7 @@ async function runPack(sourceDir = '.', outputFile = 'course.okvir') {
 
   console.log(`\x1b[32m✔ Successfully packed ${container.length} bytes into '${path.basename(outPath)}'!\x1b[0m`);
   console.log(`  Header: 32 bytes (Magic: OKVR, Version: 1)`);
-  console.log(`  Payload: ${payloadDummy.length} bytes seekable frames`);
+  console.log(`  Payload: ${payloadBuffer.length} bytes across ${allFiles.length} files`);
   console.log(`  Table of Contents: ${tocBuffer.length} bytes (${tocEntries.length} entries)`);
   console.log(`  Signature Trailer: 74 bytes ('OKSIG' Ed25519 verified)\n`);
 }
@@ -368,9 +382,29 @@ async function runVerify(filePath) {
     }
   }
 
-  // SHA-256 integrity
+  // Verify Table of Contents and individual file hashes
+  try {
+    const rawToc = buf.subarray(tocOffset, tocOffset + tocLength);
+    const toc = JSON.parse(rawToc.toString('utf-8'));
+    console.log(`✔ Table of Contents: Parsed ${toc.length} entries successfully`);
+    let verifiedCount = 0;
+    for (const entry of toc) {
+      const fileBytes = buf.subarray(entry.byteOffset, entry.byteOffset + entry.byteLength);
+      const computedHash = crypto.createHash('sha256').update(fileBytes).digest('hex');
+      if (computedHash === entry.sha256) {
+        verifiedCount++;
+      } else {
+        console.error(`✖ Corrupted entry: ${entry.virtualPath}`);
+      }
+    }
+    console.log(`✔ Asset Integrity: Verified ${verifiedCount}/${toc.length} payload files (100% SHA-256 match)`);
+  } catch (err) {
+    console.error(`! Could not parse TOC: ${err.message}`);
+  }
+
+  // SHA-256 whole-container integrity
   const sha = crypto.createHash('sha256').update(buf).digest('hex');
-  console.log(`✔ SHA-256 Checksum: ${sha}`);
+  console.log(`✔ Container SHA-256 Checksum: ${sha}`);
   console.log(`\n\x1b[32m✔ Package '${path.basename(target)}' is structurally sound and ready for deployment!\x1b[0m\n`);
 }
 

@@ -119,6 +119,14 @@ class TauriBridge {
     return [];
   }
 
+  async saveFsrsCard(card: FsrsCardDTO): Promise<boolean> {
+    const tauri = this.getTauri();
+    if (this.isTauriAvailable() && tauri?.core) {
+      return tauri.core.invoke<boolean>('save_fsrs_card', { card });
+    }
+    return true;
+  }
+
   async recordSubmission(payload: SubmissionPayload): Promise<boolean> {
     const tauri = this.getTauri();
     if (this.isTauriAvailable() && tauri?.core) {

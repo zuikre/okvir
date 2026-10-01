@@ -15,6 +15,7 @@ pub fn run() {
             commands::get_user_profile,
             commands::complete_lesson,
             commands::get_due_fsrs_cards,
+            commands::save_fsrs_card,
             commands::record_submission,
             commands::verify_chunk_signature,
             commands::detect_toolchains,

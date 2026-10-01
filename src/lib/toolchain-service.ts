@@ -216,7 +216,67 @@ class ToolchainService {
         }
       }
 
-      // Default Python WASM execution simulation / bridge
+      // Pyodide WASM Worker execution for Python
+      if (typeof window !== 'undefined' && typeof Worker !== 'undefined') {
+        try {
+          const worker = new Worker(
+            new URL('../workers/PyodideKernelWorker.ts', import.meta.url),
+            { type: 'module' }
+          );
+
+          return await new Promise<ExecutionResult>((resolve) => {
+            const reqId = `exec-${Date.now()}`;
+            const timer = setTimeout(() => {
+              worker.terminate();
+              resolve({
+                success: false,
+                stdout: [],
+                stderr: [`✖ Execution timed out after ${timeoutMs}ms ceiling.`],
+                executionTimeMs: timeoutMs,
+                diagnostics: parseDiagnosticError('TimeoutError', code, 'python'),
+                runtimeUsed: 'Pyodide WASM (Timeout)',
+              });
+            }, timeoutMs);
+
+            worker.onmessage = (e: MessageEvent) => {
+              clearTimeout(timer);
+              worker.terminate();
+              const res = e.data;
+              resolve({
+                success: Boolean(res.success),
+                stdout: res.output || [],
+                stderr: res.error ? [res.error] : [],
+                executionTimeMs: res.executionTimeMs || (performance.now() - startTime),
+                memoryUsedBytes: res.memoryUsedBytes,
+                runtimeUsed: 'Pyodide WASM Kernel',
+              });
+            };
+
+            worker.onerror = (e) => {
+              clearTimeout(timer);
+              worker.terminate();
+              resolve({
+                success: false,
+                stdout: [],
+                stderr: [e.message || 'Worker execution error'],
+                executionTimeMs: performance.now() - startTime,
+                runtimeUsed: 'Pyodide WASM Error',
+              });
+            };
+
+            worker.postMessage({
+              id: reqId,
+              type: 'EXECUTE',
+              code,
+              testCases,
+            });
+          });
+        } catch {
+          // Fall through to static fallback
+        }
+      }
+
+      // Default fallback
       const elapsed = performance.now() - startTime;
       return {
         success: true,
@@ -226,7 +286,7 @@ class ToolchainService {
         ],
         stderr: [],
         executionTimeMs: elapsed,
-        runtimeUsed: 'Pyodide WASM Worker',
+        runtimeUsed: 'Pyodide WASM Fallback',
       };
     } catch (err: unknown) {
       const errMsg = String(err);

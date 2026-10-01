@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Theme, Language, ViewName, SimulationType, BeatNumber, LessonProgress, LocalConfig, ArabicFontFamily, SupportedCodeLanguage } from './types';
+import type { Theme, Language, ViewName, SimulationType, BeatNumber, LessonProgress, LocalConfig, ArabicFontFamily, SupportedCodeLanguage, FSRSState } from './types';
 import { initialLessons, curriculum } from './curriculum';
 import { tauriBridge } from './tauri-bridge';
+import { updateCard, createNewCard, type Rating } from './fsrs';
 
 export function recalculateLessonStatuses(lessons: Record<string, LessonProgress>): Record<string, LessonProgress> {
   const updated: Record<string, LessonProgress> = { ...initialLessons, ...lessons };
@@ -107,6 +108,11 @@ export interface OkvirState {
   certifyLessonMastery: (lessonId: string, scorePct: number) => { success: boolean; xpAwarded: number };
   startLesson: (lessonId: string) => void;
   syncWithTauriProfile: () => Promise<void>;
+
+  // Spaced Repetition (FSRS-4.5)
+  fsrsCards: Record<string, FSRSState>;
+  recordFsrsReview: (conceptId: string, rating: Rating) => FSRSState;
+  syncFsrsFromDesktop: () => Promise<void>;
 }
 
 // Self-healing: Purge any legacy mock values (1420 XP or 14 streak) from client localStorage
@@ -483,6 +489,63 @@ export const useOkvirStore = create<OkvirState>()(
           console.error('Failed to sync with Tauri SQLite profile:', e);
         }
       },
+
+      fsrsCards: {},
+
+      recordFsrsReview: (conceptId: string, rating: Rating) => {
+        const state = get();
+        const existing = state.fsrsCards[conceptId] || createNewCard(conceptId);
+        const updated = updateCard(existing, rating);
+
+        set((s) => ({
+          fsrsCards: {
+            ...s.fsrsCards,
+            [conceptId]: updated,
+          },
+        }));
+
+        // Fire-and-forget sync to Tauri SQLite if desktop is active
+        tauriBridge.saveFsrsCard({
+          card_id: updated.cardId,
+          concept_id: updated.conceptId,
+          stability: updated.stability,
+          difficulty: updated.difficulty,
+          reps: updated.reps,
+          lapses: updated.lapses,
+          state: updated.state,
+          last_review: updated.lastReview ? new Date(updated.lastReview).toISOString() : null,
+          due_date: new Date(updated.due).toISOString(),
+        }).catch(console.error);
+
+        return updated;
+      },
+
+      syncFsrsFromDesktop: async () => {
+        try {
+          const desktopCards = await tauriBridge.getDueFsrsCards();
+          if (desktopCards && desktopCards.length > 0) {
+            set((state) => {
+              const merged = { ...state.fsrsCards };
+              desktopCards.forEach((c) => {
+                merged[c.concept_id] = {
+                  cardId: c.card_id,
+                  conceptId: c.concept_id,
+                  stability: c.stability,
+                  difficulty: c.difficulty,
+                  reps: Number(c.reps) || 0,
+                  lapses: Number(c.lapses) || 0,
+                  state: (c.state || 0) as 0 | 1 | 2 | 3,
+                  lastReview: c.last_review ? new Date(c.last_review).getTime() : null,
+                  due: new Date(c.due_date).getTime(),
+                };
+              });
+              return { fsrsCards: merged };
+            });
+          }
+        } catch (e) {
+          console.error('Failed to sync FSRS cards from desktop SQLite:', e);
+        }
+      },
     }),
     {
       name: 'okvir-local-storage-v1',
@@ -518,6 +581,7 @@ export const useOkvirStore = create<OkvirState>()(
         streakDays: state.streakDays,
         config: state.config,
         lessons: state.lessons,
+        fsrsCards: state.fsrsCards,
       }),
     }
   )
