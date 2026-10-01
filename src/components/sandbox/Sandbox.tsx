@@ -106,7 +106,7 @@ export const Sandbox: React.FC = () => {
                     : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-app)]'
                 }`}
               >
-                {isTabLocked && <Lock size={11} className="text-amber-400 shrink-0" />}
+                {isTabLocked && <Lock size={11} className="text-[var(--math-gradient)] shrink-0" />}
                 <span>{tab.label[language]}</span>
               </button>
             );
@@ -116,12 +116,12 @@ export const Sandbox: React.FC = () => {
         {/* Active Simulation or Locked Gatekeeper View */}
         {isSimulationLocked && activeModule ? (
           <div className="rounded-2xl border border-amber-500/30 bg-[var(--bg-surface)] p-8 lg:p-10 shadow-2xl specular text-center space-y-6 slide-up">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto shadow-inner">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[var(--math-gradient)] flex items-center justify-center mx-auto shadow-inner">
               <Lock size={30} />
             </div>
 
             <div className="space-y-2 max-w-md mx-auto">
-              <span className="px-2.5 py-0.5 text-[11px] font-mono font-semibold rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <span className="px-2.5 py-0.5 text-[11px] font-mono font-bold rounded-full bg-amber-500/10 text-[var(--math-gradient)] border border-amber-500/20">
                 {language === 'ar' ? 'مختبر مقفل • يتطلب إتقان المتطلبات' : 'Locked Laboratory • Prerequisite Required'}
               </span>
               <h2 className="text-xl font-bold text-[var(--text-primary)] pt-1">
@@ -143,7 +143,7 @@ export const Sandbox: React.FC = () => {
                     className="flex items-center justify-between p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-amber-500/40 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[var(--math-gradient)] shadow-sm" />
                       <div>
                         <div className="text-xs font-semibold text-[var(--text-primary)]">
                           {language === 'ar' ? prereq!.titleAr : prereq!.title}
@@ -155,7 +155,7 @@ export const Sandbox: React.FC = () => {
                     </div>
                     <button
                       onClick={() => startLesson(prereq!.id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--math-vector)] text-black text-xs font-mono font-semibold hover:brightness-110 transition-transform active:scale-95"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--math-vector)] text-black text-xs font-mono font-semibold hover:brightness-110 transition-transform active:scale-95 cursor-pointer"
                     >
                       <BookOpen size={12} />
                       <span>{language === 'ar' ? 'ابدأ المتطلب' : 'Start Lesson'}</span>
@@ -168,7 +168,7 @@ export const Sandbox: React.FC = () => {
             <div className="pt-2 flex flex-wrap justify-center gap-3">
               <button
                 onClick={() => setUnlockedPlaygroundSims((prev) => new Set([...prev, activeSimulation]))}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-mono font-semibold text-amber-400 transition-all active:scale-95"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--math-gradient)]/40 bg-[var(--math-gradient)]/10 hover:bg-[var(--math-gradient)]/20 text-xs font-mono font-bold text-[var(--math-gradient)] transition-all active:scale-95 cursor-pointer"
               >
                 <FlaskConical size={14} />
                 <span>{language === 'ar' ? 'تشغيل في وضع التجربة الحرة' : 'Launch Playground (Sandbox Override)'}</span>

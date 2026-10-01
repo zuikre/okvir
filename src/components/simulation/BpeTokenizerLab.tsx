@@ -304,7 +304,7 @@ export const BpeTokenizerLab: React.FC<{ compact?: boolean }> = ({ compact }) =>
             <span className="text-[10px] font-mono text-[var(--text-tertiary)] block">
               {language === 'ar' ? 'عدد الرموز الحالي' : 'Current Tokens'}
             </span>
-            <span className="text-sm font-mono font-bold text-sky-400 tabular-nums">
+            <span className="text-sm font-mono font-bold text-[var(--math-data)] tabular-nums">
               {currentTokenCount} tokens
             </span>
           </div>
@@ -313,7 +313,7 @@ export const BpeTokenizerLab: React.FC<{ compact?: boolean }> = ({ compact }) =>
             <span className="text-[10px] font-mono text-[var(--text-tertiary)] block">
               {language === 'ar' ? 'معامل الضغط' : 'Compression Ratio'}
             </span>
-            <span className="text-sm font-mono font-bold text-emerald-400 tabular-nums">
+            <span className="text-sm font-mono font-bold text-[var(--math-vector)] tabular-nums">
               {compressionRatio}x
             </span>
           </div>
@@ -322,7 +322,7 @@ export const BpeTokenizerLab: React.FC<{ compact?: boolean }> = ({ compact }) =>
             <span className="text-[10px] font-mono text-[var(--text-tertiary)] block">
               {language === 'ar' ? 'عمليات الدمج المنجزة' : 'Merges Performed'}
             </span>
-            <span className="text-sm font-mono font-bold text-amber-400 tabular-nums">
+            <span className="text-sm font-mono font-bold text-[var(--math-gradient)] tabular-nums">
               {merges.length} merges
             </span>
           </div>
@@ -351,7 +351,7 @@ export const BpeTokenizerLab: React.FC<{ compact?: boolean }> = ({ compact }) =>
         <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-2 select-none">
           <div className="text-[11px] font-mono text-[var(--text-tertiary)] flex items-center justify-between">
             <span>{language === 'ar' ? 'التمثيل المجزأ إلى رموز فرعية' : 'Tokenized Subword Stream'}</span>
-            <span className="text-[10px] text-sky-400 font-mono">
+            <span className="text-[10px] text-[var(--math-data)] font-mono font-bold">
               {currentTokenCount} {language === 'ar' ? 'رمز' : 'tokens'}
             </span>
           </div>
@@ -380,12 +380,12 @@ export const BpeTokenizerLab: React.FC<{ compact?: boolean }> = ({ compact }) =>
               {language === 'ar' ? 'الزوج الأكثر تكراراً' : 'Top Candidate Pair'}:
             </span>
             {nextTopPair && nextTopPair.count > 0 ? (
-              <span className="px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono font-bold text-xs flex items-center gap-1.5">
+              <span className="px-2.5 py-1 rounded-lg bg-[var(--math-gradient)]/15 border border-[var(--math-gradient)]/30 text-[var(--math-gradient)] font-mono font-bold text-xs flex items-center gap-1.5">
                 <span>"{nextTopPair.pair[0]}" + "{nextTopPair.pair[1]}"</span>
-                <span className="text-[10px] text-amber-300">({nextTopPair.count}x)</span>
+                <span className="text-[10px] opacity-80">({nextTopPair.count}x)</span>
               </span>
             ) : (
-              <span className="text-xs font-mono text-emerald-400 flex items-center gap-1">
+              <span className="text-xs font-mono text-[var(--math-vector)] flex items-center gap-1 font-bold">
                 <CheckCircle2 size={13} />
                 <span>{language === 'ar' ? 'اكتمل الدمج' : 'Corpus Fully Tokenized'}</span>
               </span>
@@ -396,7 +396,7 @@ export const BpeTokenizerLab: React.FC<{ compact?: boolean }> = ({ compact }) =>
             <button
               onClick={performMerge}
               disabled={!nextTopPair || nextTopPair.count < 1}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--math-prediction)] text-white text-xs font-mono font-semibold hover:brightness-110 disabled:opacity-40 disabled:pointer-events-none transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--math-prediction)] text-white text-xs font-mono font-semibold hover:brightness-110 disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer"
             >
               <Play size={12} fill="currentColor" />
               <span>{language === 'ar' ? 'دمج الزوج' : 'Merge Pair'}</span>
@@ -405,7 +405,7 @@ export const BpeTokenizerLab: React.FC<{ compact?: boolean }> = ({ compact }) =>
             <button
               onClick={() => fastForwardMerges(5)}
               disabled={!nextTopPair || nextTopPair.count < 1}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] disabled:opacity-40 disabled:pointer-events-none transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer"
             >
               <FastForward size={12} />
               <span>+5 Merges</span>
@@ -413,7 +413,7 @@ export const BpeTokenizerLab: React.FC<{ compact?: boolean }> = ({ compact }) =>
 
             <button
               onClick={resetTokenizer}
-              className="p-1.5 rounded-lg border border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+              className="p-1.5 rounded-lg border border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
               title={language === 'ar' ? 'إعادة تعيين للحروف' : 'Reset to Characters'}
             >
               <RotateCcw size={13} />
@@ -432,9 +432,9 @@ export const BpeTokenizerLab: React.FC<{ compact?: boolean }> = ({ compact }) =>
               {merges.map((m, idx) => (
                 <div key={idx} className="px-3 py-1.5 flex items-center justify-between hover:bg-white/5">
                   <span className="text-[var(--text-tertiary)] w-8">#{idx + 1}</span>
-                  <span className="text-amber-400">"{m.pair[0]}" + "{m.pair[1]}"</span>
+                  <span className="text-[var(--math-gradient)] font-bold">"{m.pair[0]}" + "{m.pair[1]}"</span>
                   <span className="text-[var(--text-tertiary)]">→</span>
-                  <span className="text-emerald-400 font-bold">"{m.merged}"</span>
+                  <span className="text-[var(--math-vector)] font-bold">"{m.merged}"</span>
                   <span className="text-[10px] text-[var(--text-tertiary)]">{m.count} occurrences</span>
                 </div>
               ))}

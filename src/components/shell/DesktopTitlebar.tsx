@@ -114,10 +114,10 @@ export const DesktopTitlebar: React.FC = () => {
           {/* Streak Indicator */}
           <button
             onClick={() => setCurrentView('settings')}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--bg-app)] border border-[var(--border-subtle)] text-xs font-mono font-medium text-amber-400 hover:border-amber-400/40 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--bg-app)] border border-[var(--border-subtle)] text-xs font-mono font-bold text-[var(--math-gradient)] hover:border-[var(--math-gradient)]/40 transition-colors"
             title="Daily Streak (View Local Data)"
           >
-            <Flame size={13} className="text-amber-500 fill-amber-500/20" />
+            <Flame size={13} className="text-[var(--math-gradient)] fill-[var(--math-gradient)]/20" />
             <span className="tabular-nums">
               {streakDays} {language === 'ar' ? 'يوم' : 'Days'}
             </span>
@@ -126,10 +126,10 @@ export const DesktopTitlebar: React.FC = () => {
           {/* XP Indicator */}
           <button
             onClick={() => setCurrentView('settings')}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--bg-app)] border border-[var(--border-subtle)] text-xs font-mono font-medium text-emerald-400 hover:border-emerald-400/40 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--bg-app)] border border-[var(--border-subtle)] text-xs font-mono font-bold text-[var(--math-vector)] hover:border-[var(--math-vector)]/40 transition-colors"
             title="Experience Points (View Local Data)"
           >
-            <Zap size={13} className="text-emerald-500 fill-emerald-500/20" />
+            <Zap size={13} className="text-[var(--math-vector)] fill-[var(--math-vector)]/20" />
             <span className="tabular-nums">{xp.toLocaleString()} XP</span>
           </button>
 
@@ -188,12 +188,12 @@ export const DesktopTitlebar: React.FC = () => {
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-1">
                   <span className="text-[var(--text-tertiary)] block">Active Frame Rate</span>
-                  <span className="text-lg font-bold text-emerald-400 tabular-nums">{fps} FPS</span>
+                  <span className="text-lg font-bold text-[var(--math-vector)] tabular-nums">{fps} FPS</span>
                   <span className="text-[10px] text-[var(--text-secondary)] block">Target: 60.0 FPS</span>
                 </div>
                 <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-1">
                   <span className="text-[var(--text-tertiary)] block">Frame Execution Time</span>
-                  <span className="text-lg font-bold text-sky-400 tabular-nums">{frameTimeMs} ms</span>
+                  <span className="text-lg font-bold text-[var(--math-data)] tabular-nums">{frameTimeMs} ms</span>
                   <span className="text-[10px] text-[var(--text-secondary)] block">Budget: 16.67 ms (0.28ms typ)</span>
                 </div>
               </div>
@@ -202,7 +202,7 @@ export const DesktopTitlebar: React.FC = () => {
               <div className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-2">
                 <div className="flex items-center justify-between font-semibold text-[var(--text-primary)]">
                   <span>RAM Budget Breakdown (&lt;350MB Ceiling)</span>
-                  <span className="text-emerald-400 font-bold">~253 MB RSS</span>
+                  <span className="text-[var(--math-vector)] font-bold">~253 MB RSS</span>
                 </div>
                 <div className="w-full bg-[var(--bg-surface)] h-2 rounded-full overflow-hidden flex">
                   <div className="bg-sky-500 h-full" style={{ width: '7%' }} title="Rust Backend: ~18MB" />
@@ -223,7 +223,7 @@ export const DesktopTitlebar: React.FC = () => {
               <div className="pt-2 flex items-center justify-between">
                 <button
                   onClick={handleRecycleMemory}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 font-semibold hover:bg-emerald-500/20 transition-all text-xs"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[var(--math-vector)]/40 bg-[var(--math-vector)]/10 text-[var(--math-vector)] font-bold hover:bg-[var(--math-vector)]/20 transition-all text-xs"
                 >
                   <RefreshCw size={13} className={memoryRecycled ? 'animate-spin' : ''} />
                   <span>

@@ -323,7 +323,7 @@ export const SettingsView: React.FC = () => {
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-12 selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-12">
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Executive Console HUD Header */}
         <div className="relative rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 specular overflow-hidden shadow-2xl">
@@ -340,7 +340,7 @@ export const SettingsView: React.FC = () => {
           <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1.5">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-sm">
+                <div className="w-8 h-8 rounded-lg bg-[var(--math-vector)]/10 border border-[var(--math-vector)]/20 flex items-center justify-center text-[var(--math-vector)] shadow-sm">
                   <Activity size={17} />
                 </div>
                 <div>
@@ -348,8 +348,8 @@ export const SettingsView: React.FC = () => {
                     <span>
                       {isRtl ? 'لوحة التحكم والمقاييس النظامية' : 'System Console & Telemetry'}
                     </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 inline-flex items-center gap-1.5 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--math-vector)]/10 text-[var(--math-vector)] border border-[var(--math-vector)]/20 inline-flex items-center gap-1.5 font-bold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--math-vector)] animate-pulse" />
                       AIR-GAPPED
                     </span>
                   </h1>
@@ -362,7 +362,7 @@ export const SettingsView: React.FC = () => {
                     : '100% local-first offline architecture • Zero telemetry • Deterministic execution'}
                 </span>
                 <span className="text-[var(--text-tertiary)]">•</span>
-                <span className="text-emerald-400/90 font-semibold">{localStateDigest}</span>
+                <span className="text-[var(--math-vector)] font-semibold">{localStateDigest}</span>
               </p>
             </div>
 
@@ -372,25 +372,25 @@ export const SettingsView: React.FC = () => {
                 type="button"
                 onClick={handleTestAudioPing}
                 title={isRtl ? 'اختبار النبض الصوتي' : 'Test procedural audio synthesizer'}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all active:scale-95 cursor-pointer"
               >
-                <Volume2 size={13} className="text-emerald-400" />
+                <Volume2 size={13} className="text-[var(--math-vector)]" />
                 <span>{isRtl ? 'اختبار الصوت' : 'Audio Ping'}</span>
               </button>
 
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all active:scale-95 cursor-pointer"
               >
                 {theme === 'dark' ? (
                   <>
-                    <Moon size={13} className="text-sky-400" />
+                    <Moon size={13} className="text-[var(--math-data)]" />
                     <span>OLED Dark</span>
                   </>
                 ) : (
                   <>
-                    <Sun size={13} className="text-amber-400" />
+                    <Sun size={13} className="text-[var(--math-gradient)]" />
                     <span>Warm Paper</span>
                   </>
                 )}
@@ -410,7 +410,7 @@ export const SettingsView: React.FC = () => {
                 onClick={() => handleCategorySwitch(cat.id)}
                 className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-mono font-medium transition-all shrink-0 cursor-pointer ${
                   active
-                    ? 'bg-[var(--bg-surface-active)] text-[var(--text-primary)] border border-[var(--border-strong)] shadow-sm ring-1 ring-emerald-500/30'
+                    ? 'bg-[var(--bg-surface-active)] text-[var(--text-primary)] border border-[var(--border-strong)] shadow-sm ring-1 ring-[var(--math-vector)]/30'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] border border-transparent'
                 }`}
               >
@@ -420,10 +420,10 @@ export const SettingsView: React.FC = () => {
                 <span>{isRtl ? cat.labelAr : cat.label}</span>
                 {cat.badge && (
                   <span
-                    className={`text-[9px] px-1.5 py-0.2 rounded-full font-sans uppercase tracking-wider font-semibold ${
+                    className={`text-[9px] px-1.5 py-0.2 rounded-full font-sans uppercase tracking-wider font-bold ${
                       active
-                        ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300'
-                        : 'bg-[var(--bg-surface)] text-[var(--text-tertiary)] border border-[var(--border-subtle)]'
+                        ? 'bg-[var(--math-vector)]/15 text-[var(--math-vector)] border border-[var(--math-vector)]/30'
+                        : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border border-[var(--border-subtle)]'
                     }`}
                   >
                     {cat.badge}
@@ -476,7 +476,7 @@ export const SettingsView: React.FC = () => {
                       {isRtl ? 'المستوى والحالة الأكاديمية:' : 'Current Academic Status:'}
                     </label>
                     <div className="p-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] flex items-center justify-between text-xs font-mono">
-                      <div className="flex items-center gap-2 text-emerald-400">
+                      <div className="flex items-center gap-2 text-[var(--math-vector)]">
                         <Sparkles size={14} />
                         <span className="font-semibold">
                           {xp > 2000 ? 'Advanced Fellow' : xp > 800 ? 'Researcher' : 'Foundation Apprentice'}
@@ -489,12 +489,12 @@ export const SettingsView: React.FC = () => {
 
                 <div className="flex items-center justify-between pt-2 border-t border-[var(--border-subtle)]">
                   <div className="flex items-center gap-4 text-xs font-mono">
-                    <div className="flex items-center gap-1.5 text-amber-400">
+                    <div className="flex items-center gap-1.5 text-[var(--math-gradient)]">
                       <Flame size={14} />
                       <span className="font-semibold tabular-nums">{streakDays}</span>
                       <span className="text-[var(--text-tertiary)]">{isRtl ? 'أيام متتالية' : 'Day Streak'}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-sky-400">
+                    <div className="flex items-center gap-1.5 text-[var(--math-data)]">
                       <Shield size={14} />
                       <span className="font-semibold tabular-nums">{config.streakFreezes}</span>
                       <span className="text-[var(--text-tertiary)]">{isRtl ? 'تجميدات متبقية' : 'Freezes'}</span>
@@ -524,10 +524,10 @@ export const SettingsView: React.FC = () => {
             <div className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                  <Zap size={15} className="text-amber-400" />
+                  <Zap size={15} className="text-[var(--math-gradient)]" />
                   <span>{isRtl ? 'الهدف اليومي ووتيرة التعلم' : 'Daily Study Cadence & XP Target'}</span>
                 </div>
-                <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                <span className="text-[10px] font-mono text-[var(--math-gradient)] bg-[var(--math-gradient)]/10 px-2 py-0.5 rounded border border-[var(--math-gradient)]/20 font-bold">
                   {config.dailyXpGoal || 50} XP / day
                 </span>
               </div>
@@ -614,7 +614,7 @@ export const SettingsView: React.FC = () => {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-primary)]">
                     {config.soundEnabled ? (
-                      <Volume2 size={16} className="text-emerald-400" />
+                      <Volume2 size={16} className="text-[var(--math-vector)]" />
                     ) : (
                       <VolumeX size={16} className="text-zinc-500" />
                     )}
@@ -635,7 +635,7 @@ export const SettingsView: React.FC = () => {
               <div className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular flex items-start justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-primary)]">
-                    <Battery size={16} className="text-amber-400" />
+                    <Battery size={16} className="text-[var(--math-gradient)]" />
                     <span>{isRtl ? 'محافظ الطاقة الذكي (Power Governor)' : 'Hardware Power Governor'}</span>
                   </div>
                   <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
@@ -663,7 +663,7 @@ export const SettingsView: React.FC = () => {
                   <Type size={15} className="text-[var(--math-vector)]" />
                   <span>{isRtl ? 'محرك الخطوط العربية ونظام التنضيد' : 'Arabic Typography Engine & Font Architecture'}</span>
                 </div>
-                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                <span className="text-[10px] font-mono text-[var(--math-vector)] bg-[var(--math-vector)]/10 px-2 py-0.5 rounded border border-[var(--math-vector)]/20 font-bold">
                   {config.arabicFont === 'kufi'
                     ? 'Noto Kufi Arabic'
                     : config.arabicFont === 'sans'
@@ -766,7 +766,7 @@ export const SettingsView: React.FC = () => {
             <div className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-5 shadow-sm">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                  <Sigma size={15} className="text-sky-400" />
+                  <Sigma size={15} className="text-[var(--math-data)]" />
                   <span>{isRtl ? 'مختبر المعاينة المباشرة: العربية والرياضيات' : 'Interactive Dual-Script Typography Sandbox'}</span>
                 </div>
 
@@ -802,7 +802,7 @@ export const SettingsView: React.FC = () => {
                     }}
                     className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-colors cursor-pointer ${
                       sandboxPreset === item.id
-                        ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                        ? 'bg-[var(--math-data)]/15 text-[var(--math-data)] border border-[var(--math-data)]/30 font-bold'
                         : 'bg-[var(--bg-app)] text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:text-[var(--text-primary)]'
                     }`}
                   >
@@ -859,7 +859,7 @@ export const SettingsView: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-1">
                 <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-tertiary)] flex items-center gap-1.5">
-                  <Database size={12} className="text-emerald-400" />
+                  <Database size={12} className="text-[var(--math-vector)]" />
                   <span>Storage Footprint</span>
                 </div>
                 <div className="text-base font-mono font-bold tabular-nums text-[var(--text-primary)]">
@@ -872,10 +872,10 @@ export const SettingsView: React.FC = () => {
 
               <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-1">
                 <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-tertiary)] flex items-center gap-1.5">
-                  <HardDrive size={12} className="text-sky-400" />
+                  <HardDrive size={12} className="text-[var(--math-data)]" />
                   <span>SQLite Journal Mode</span>
                 </div>
-                <div className="text-base font-mono font-bold text-sky-400">
+                <div className="text-base font-mono font-bold text-[var(--math-data)]">
                   WAL (Write-Ahead)
                 </div>
                 <div className="text-[10px] text-[var(--text-tertiary)] font-mono">
@@ -885,10 +885,10 @@ export const SettingsView: React.FC = () => {
 
               <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-1">
                 <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-tertiary)] flex items-center gap-1.5">
-                  <ShieldCheck size={12} className="text-emerald-400" />
+                  <ShieldCheck size={12} className="text-[var(--math-vector)]" />
                   <span>Network Isolation</span>
                 </div>
-                <div className="text-base font-mono font-bold text-emerald-400">
+                <div className="text-base font-mono font-bold text-[var(--math-vector)]">
                   100% Offline
                 </div>
                 <div className="text-[10px] text-[var(--text-tertiary)] font-mono">
@@ -901,7 +901,7 @@ export const SettingsView: React.FC = () => {
             <div className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                  <CheckCircle2 size={15} className="text-emerald-400" />
+                  <CheckCircle2 size={15} className="text-[var(--math-vector)]" />
                   <span>{isRtl ? 'فحص سلامة قاعدة البيانات والمخطط' : 'SQLite B-Tree & Page Integrity Check'}</span>
                 </div>
 
@@ -909,7 +909,7 @@ export const SettingsView: React.FC = () => {
                   type="button"
                   onClick={handleRunIntegrityCheck}
                   disabled={integrityState === 'checking'}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-mono font-semibold transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--math-vector)]/30 bg-[var(--math-vector)]/10 hover:bg-[var(--math-vector)]/20 text-[var(--math-vector)] text-xs font-mono font-semibold transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
                 >
                   <Activity size={13} className={integrityState === 'checking' ? 'animate-spin' : ''} />
                   <span>
@@ -935,7 +935,7 @@ export const SettingsView: React.FC = () => {
               </p>
 
               {integrityState === 'passed' && (
-                <div className="p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 flex items-center gap-2.5 text-xs font-mono text-emerald-400">
+                <div className="p-3 rounded-xl border border-[var(--math-vector)]/30 bg-[var(--math-vector)]/10 flex items-center gap-2.5 text-xs font-mono text-[var(--math-vector)] font-semibold">
                   <CheckCircle2 size={15} />
                   <span>PRAGMA integrity_check = OK. 0 corrupt pages detected. SHA-256 state matching.</span>
                 </div>
@@ -945,7 +945,7 @@ export const SettingsView: React.FC = () => {
             {/* Backup & Restore Studio */}
             <div className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-4 shadow-sm">
               <div className="flex items-center gap-2.5 text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                <Layers size={15} className="text-sky-400" />
+                <Layers size={15} className="text-[var(--math-data)]" />
                 <span>{isRtl ? 'النسخ الاحتياطي واستعادة البيانات' : 'Snapshot Backup & Disaster Recovery'}</span>
               </div>
 
@@ -959,14 +959,14 @@ export const SettingsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleExportBackup}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-emerald-500/50 hover:bg-[var(--bg-surface-hover)] text-xs font-mono text-[var(--text-primary)] transition-all cursor-pointer active:scale-95 shadow-sm"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--math-vector)]/50 hover:bg-[var(--bg-surface-hover)] text-xs font-mono text-[var(--text-primary)] transition-all cursor-pointer active:scale-95 shadow-sm"
                 >
-                  <Download size={14} className="text-emerald-400" />
+                  <Download size={14} className="text-[var(--math-vector)]" />
                   <span>{isRtl ? 'تصدير نسخة احتياطية (.json)' : 'Export JSON Snapshot'}</span>
                 </button>
 
-                <label className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-sky-500/50 hover:bg-[var(--bg-surface-hover)] text-xs font-mono text-[var(--text-primary)] transition-all cursor-pointer active:scale-95 shadow-sm">
-                  <Upload size={14} className="text-sky-400" />
+                <label className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--math-data)]/50 hover:bg-[var(--bg-surface-hover)] text-xs font-mono text-[var(--text-primary)] transition-all cursor-pointer active:scale-95 shadow-sm">
+                  <Upload size={14} className="text-[var(--math-data)]" />
                   <span>{isRtl ? 'استيراد نسخة سابقة' : 'Restore from Snapshot'}</span>
                   <input type="file" accept=".json" onChange={handleImportFile} className="hidden" />
                 </label>
@@ -976,7 +976,7 @@ export const SettingsView: React.FC = () => {
                   download="okvir-sqlite-schema.sql"
                   className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer"
                 >
-                  <FileCheck2 size={14} className="text-amber-400" />
+                  <FileCheck2 size={14} className="text-[var(--math-gradient)]" />
                   <span>{isRtl ? 'تحميل مخطط SQLite DDL' : 'Download SQLite Schema (.sql)'}</span>
                 </a>
               </div>
@@ -990,10 +990,10 @@ export const SettingsView: React.FC = () => {
             <div className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                  <Cpu size={15} className="text-purple-400" />
+                  <Cpu size={15} className="text-[var(--math-prediction)]" />
                   <span>{isRtl ? 'بيئة تنفيذ بايثون المعزولة (WebAssembly Sandbox)' : 'Python WASM Kernel & Sandbox Worker'}</span>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--math-vector)]/10 text-[var(--math-vector)] border border-[var(--math-vector)]/20 font-bold">
                   PYODIDE v0.26 ACTIVE
                 </span>
               </div>
@@ -1002,10 +1002,10 @@ export const SettingsView: React.FC = () => {
                 <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-2">
                   <div className="flex items-center justify-between text-xs font-semibold text-[var(--text-primary)]">
                     <span className="flex items-center gap-2">
-                      <Terminal size={14} className="text-purple-400" />
+                      <Terminal size={14} className="text-[var(--math-prediction)]" />
                       <span>Dedicated Web Worker Isolation</span>
                     </span>
-                    <span className="text-emerald-400 font-mono text-[11px]">Sandboxed</span>
+                    <span className="text-[var(--math-vector)] font-mono text-[11px] font-bold">Sandboxed</span>
                   </div>
                   <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
                     {isRtl
@@ -1027,7 +1027,7 @@ export const SettingsView: React.FC = () => {
                           : 'Terminates runaway loops or heavy autograd computations after threshold.'}
                       </div>
                     </div>
-                    <span className="text-xs font-mono text-purple-400 font-bold tabular-nums">
+                    <span className="text-xs font-mono text-[var(--math-prediction)] font-bold tabular-nums">
                       {((config.pythonTimeoutMs || 5000) / 1000).toFixed(1)}s
                     </span>
                   </div>
@@ -1058,7 +1058,7 @@ export const SettingsView: React.FC = () => {
                       Origin Private File System (OPFS) mount for datasets and weight checkpoints.
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[var(--math-vector)]/10 text-[var(--math-vector)] border border-[var(--math-vector)]/20 font-bold">
                     MOUNTED
                   </span>
                 </div>
@@ -1073,14 +1073,14 @@ export const SettingsView: React.FC = () => {
             <div className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                  <Award size={15} className="text-amber-400" />
+                  <Award size={15} className="text-[var(--math-gradient)]" />
                   <span>
                     {isRtl
                       ? 'الشهادات والاعتمادات الرقمية الموثقة (W3C Open Badges 3.0)'
                       : 'Cryptographic Verifiable Credentials (W3C Open Badges 3.0)'}
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20 font-medium">
+                <span className="text-[10px] font-mono text-[var(--math-data)] bg-[var(--math-data)]/10 px-2 py-0.5 rounded border border-[var(--math-data)]/20 font-bold">
                   Ed25519 Local Signed
                 </span>
               </div>
@@ -1139,7 +1139,7 @@ export const SettingsView: React.FC = () => {
                                 {isRtl ? badge.nameAr : badge.name}
                               </h3>
                               {isUnlocked ? (
-                                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-medium">
+                                <span className="text-[10px] font-mono text-[var(--math-vector)] bg-[var(--math-vector)]/10 px-2 py-0.5 rounded-full border border-[var(--math-vector)]/20 font-bold">
                                   {isRtl ? 'متقن وموثق ✓' : 'VERIFIED MASTERED ✓'}
                                 </span>
                               ) : (
@@ -1195,7 +1195,7 @@ export const SettingsView: React.FC = () => {
                               title={isRtl ? 'نسخ JSON' : 'Copy JSON-LD'}
                             >
                               {copiedBadgeId === badge.id ? (
-                                <Check size={13} className="text-emerald-400" />
+                                <Check size={13} className="text-[var(--math-vector)]" />
                               ) : (
                                 <Copy size={13} />
                               )}
@@ -1204,7 +1204,7 @@ export const SettingsView: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => handleExportCredential(badge)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-mono font-medium transition-colors shadow-sm cursor-pointer"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--math-gradient)]/40 bg-[var(--math-gradient)]/10 hover:bg-[var(--math-gradient)]/20 text-[var(--math-gradient)] text-xs font-mono font-bold transition-colors shadow-sm cursor-pointer"
                             >
                               <FileCheck2 size={13} />
                               <span>{isRtl ? 'تصدير الشهادة' : 'Export JSON'}</span>
@@ -1216,7 +1216,7 @@ export const SettingsView: React.FC = () => {
                       {/* Cryptographic Inspector Drawer */}
                       {isUnlocked && isInspecting && (
                         <div className="mt-4 pt-4 border-t border-amber-500/20 space-y-2">
-                          <div className="text-[10px] font-mono text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                          <div className="text-[10px] font-mono text-[var(--math-gradient)] font-bold uppercase tracking-wider flex items-center gap-1.5">
                             <ShieldCheck size={12} />
                             <span>W3C Verifiable Credential Proof Signature</span>
                           </div>
@@ -1241,7 +1241,7 @@ export const SettingsView: React.FC = () => {
         {activeCategory === 'danger' && (
           <div className="space-y-6">
             <div className="p-6 rounded-2xl border border-rose-500/40 bg-rose-500/5 specular space-y-5 shadow-lg">
-              <div className="flex items-center gap-2.5 text-xs font-mono font-semibold uppercase tracking-wider text-rose-400">
+              <div className="flex items-center gap-2.5 text-xs font-mono font-semibold uppercase tracking-wider text-[var(--math-loss)]">
                 <AlertTriangle size={16} />
                 <span>{isRtl ? 'منطقة الحذف وإعادة التعيين الشاملة' : 'Factory Reset & Data Purge Console'}</span>
               </div>
@@ -1252,7 +1252,7 @@ export const SettingsView: React.FC = () => {
                     ? 'سيؤدي هذا الإجراء إلى محو كافة تقدم الدروس الـ 125، ومصفوفة الذاكرة التكرارية FSRS، وسجلات نقاط الخبرة، وإعادة ضبط قاعدة البيانات المحلية بالكامل إلى الحالة الأولية.'
                     : 'This destructive operation resets all 125 curriculum progress records, FSRS-4.5 spaced repetition stability parameters, streak history, and local preferences to a clean installation state.'}
                 </p>
-                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-[11px] font-mono">
+                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[var(--math-loss)] text-[11px] font-mono font-semibold">
                   ⚠ Warning: This operation is local and non-reversible. Please export a JSON backup beforehand if you wish to preserve your records.
                 </div>
               </div>
@@ -1265,7 +1265,7 @@ export const SettingsView: React.FC = () => {
                       audio.playErrorDissonance();
                       setDangerStep(2);
                     }}
-                    className="px-4 py-2.5 rounded-xl border border-rose-500/40 text-rose-400 hover:bg-rose-500/10 text-xs font-mono font-bold transition-all cursor-pointer shadow-sm active:scale-95"
+                    className="px-4 py-2.5 rounded-xl border border-rose-500/40 text-[var(--math-loss)] hover:bg-rose-500/10 text-xs font-mono font-bold transition-all cursor-pointer shadow-sm active:scale-95"
                   >
                     {isRtl ? 'بدء إجراءات إعادة ضبط المصنع...' : 'Initiate Factory Reset Protocol...'}
                   </button>
@@ -1273,7 +1273,7 @@ export const SettingsView: React.FC = () => {
               ) : (
                 <div className="pt-2 space-y-3.5 max-w-md">
                   <div className="space-y-1">
-                    <label className="text-[11px] font-mono text-rose-300 block">
+                    <label className="text-[11px] font-mono text-[var(--math-loss)] font-semibold block">
                       {isRtl ? 'للتأكيد، اكتب كلمة "RESET" في الحقل أدناه:' : 'Type "RESET" to confirm permanent wipe:'}
                     </label>
                     <input

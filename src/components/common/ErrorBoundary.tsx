@@ -39,8 +39,8 @@ export class ErrorBoundary extends Component<Props, State> {
           className="min-h-screen w-full flex items-center justify-center p-6 bg-[var(--bg-app)] text-[var(--text-primary)] font-mono"
         >
           <div className="max-w-xl w-full p-6 rounded-xl border border-red-500/30 bg-[var(--bg-surface)] shadow-2xl space-y-4">
-            <div className="flex items-center gap-2 text-rose-400">
-              <span className="w-3 h-3 rounded-full bg-rose-500" />
+            <div className="flex items-center gap-2 text-[var(--math-loss)] font-bold">
+              <span className="w-3 h-3 rounded-full bg-[var(--math-loss)]" />
               <span className="text-sm font-semibold uppercase tracking-wider">
                 OKVIR System Diagnostics
               </span>
@@ -50,7 +50,7 @@ export class ErrorBoundary extends Component<Props, State> {
               A runtime component exception occurred. The error details have been trapped below:
             </p>
 
-            <div className="p-3.5 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)] text-xs text-rose-400 font-mono overflow-auto max-h-48 leading-relaxed">
+            <div className="p-3.5 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)] text-xs text-[var(--math-loss)] font-mono overflow-auto max-h-48 leading-relaxed">
               {this.state.error?.toString()}
               {this.state.errorInfo?.componentStack}
             </div>

@@ -162,8 +162,8 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
           <div
             className={`w-20 h-20 rounded-full flex items-center justify-center border shadow-xl ${
               isPassing
-                ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 shadow-emerald-500/20'
-                : 'bg-rose-500/20 border-rose-500/40 text-rose-400 shadow-rose-500/20'
+                ? 'bg-emerald-500/20 border-emerald-500/40 text-[var(--math-vector)] shadow-emerald-500/20'
+                : 'bg-rose-500/20 border-rose-500/40 text-[var(--math-loss)] shadow-rose-500/20'
             }`}
           >
             {isPassing ? <ShieldCheck className="w-10 h-10" /> : <AlertTriangle className="w-10 h-10" />}
@@ -173,8 +173,8 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
             <span
               className={`text-xs font-mono uppercase tracking-widest font-bold px-3 py-1 rounded-full border inline-block ${
                 isPassing
-                  ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
-                  : 'border-rose-500/30 bg-rose-500/10 text-rose-300'
+                  ? 'border-emerald-500/30 bg-emerald-500/10 text-[var(--math-vector)]'
+                  : 'border-rose-500/30 bg-rose-500/10 text-[var(--math-loss)]'
               }`}
             >
               {isPassing
@@ -214,8 +214,8 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
                 key={item.questionId}
                 className={`p-3.5 rounded-2xl border flex items-center justify-between text-xs ${
                   item.isCorrect
-                    ? 'border-emerald-500/30 bg-emerald-500/5 text-emerald-300'
-                    : 'border-rose-500/30 bg-rose-500/5 text-rose-300'
+                    ? 'border-emerald-500/30 bg-emerald-500/5 text-[var(--math-vector)] font-semibold'
+                    : 'border-rose-500/30 bg-rose-500/5 text-[var(--math-loss)] font-semibold'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -249,7 +249,7 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
           {!isPassing && (
             <button
               onClick={handleRetry}
-              className="w-full sm:w-auto px-6 py-3 rounded-2xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 rounded-2xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-[var(--math-loss)] text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               <RotateCcw className="w-4 h-4" />
               <span>{isAr ? 'إعادة التحدي التشخيصي (خيارات عشوائية)' : 'Retry Assessment Battery (Shuffled)'}</span>
@@ -258,7 +258,7 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
 
           {isPassing && (
             <div className="text-center sm:text-start">
-              <span className="text-xs font-mono text-emerald-400 font-bold flex items-center gap-2">
+              <span className="text-xs font-mono text-[var(--math-vector)] font-bold flex items-center gap-2">
                 <Sparkles className="w-4 h-4" />
                 {isAr ? 'انتقل إلى القسم الأخير أدناه لحصد الـ 100 XP' : 'Scroll to the final section below to claim your +100 XP!'}
               </span>
@@ -274,10 +274,10 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
   // =========================================================================
   const tierColor =
     currentQuestion.depthTier === 1
-      ? 'border-sky-500/30 bg-sky-500/10 text-sky-300'
+      ? 'border-sky-500/30 bg-sky-500/10 text-[var(--math-data)] font-bold'
       : currentQuestion.depthTier === 2
-      ? 'border-purple-500/30 bg-purple-500/10 text-purple-300'
-      : 'border-amber-500/30 bg-amber-500/10 text-amber-300';
+      ? 'border-purple-500/30 bg-purple-500/10 text-[var(--math-prediction)] font-bold'
+      : 'border-amber-500/30 bg-amber-500/10 text-[var(--math-gradient)] font-bold';
 
   const tierLabel =
     currentQuestion.depthTier === 1
@@ -353,9 +353,9 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
 
           if (showFeedback) {
             if (isCorrect) {
-              cardStyle = 'border-emerald-500 bg-emerald-500/10 text-emerald-300 font-semibold shadow-md ring-1 ring-emerald-500/30';
+              cardStyle = 'border-[var(--math-vector)] bg-[var(--math-vector)]/10 text-[var(--math-vector)] font-semibold shadow-md ring-1 ring-[var(--math-vector)]/30';
             } else if (isSelected) {
-              cardStyle = 'border-rose-500 bg-rose-500/10 text-rose-300 font-semibold shadow-md ring-1 ring-rose-500/30';
+              cardStyle = 'border-[var(--math-loss)] bg-[var(--math-loss)]/10 text-[var(--math-loss)] font-semibold shadow-md ring-1 ring-[var(--math-loss)]/30';
             } else {
               cardStyle = 'border-[var(--border-subtle)] bg-[var(--bg-app)] opacity-40 text-[var(--text-tertiary)]';
             }
@@ -372,9 +372,9 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
                 <span
                   className={`w-6 h-6 rounded-lg text-xs font-mono font-bold flex items-center justify-center shrink-0 mt-0.5 border ${
                     showFeedback && isCorrect
-                      ? 'border-emerald-500 bg-emerald-500 text-black'
+                      ? 'border-[var(--math-vector)] bg-[var(--math-vector)] text-black'
                       : showFeedback && isSelected
-                      ? 'border-rose-500 bg-rose-500 text-white'
+                      ? 'border-[var(--math-loss)] bg-[var(--math-loss)] text-white'
                       : 'border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)]'
                   }`}
                 >
@@ -385,8 +385,8 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
                   <MathText text={isAr ? opt.text.ar : opt.text.en} />
                 </div>
 
-                {showFeedback && isCorrect && <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />}
-                {showFeedback && isSelected && !isCorrect && <XCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />}
+                {showFeedback && isCorrect && <CheckCircle2 className="w-5 h-5 text-[var(--math-vector)] shrink-0 mt-0.5" />}
+                {showFeedback && isSelected && !isCorrect && <XCircle className="w-5 h-5 text-[var(--math-loss)] shrink-0 mt-0.5" />}
               </div>
             </button>
           );
@@ -398,12 +398,12 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
         <div className="p-5 rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-app)] space-y-3 animate-fade-in">
           <div className="flex items-center gap-2 text-xs font-bold">
             {currentOptions[currentSelectedIdx]?.correct ? (
-              <span className="text-emerald-400 flex items-center gap-1.5">
+              <span className="text-[var(--math-vector)] flex items-center gap-1.5 font-bold">
                 <CheckCircle2 className="w-4 h-4" />
                 {isAr ? '✓ تشخيص صحيح تماماً:' : '✓ Accurately Diagnosed:'}
               </span>
             ) : (
-              <span className="text-rose-400 flex items-center gap-1.5">
+              <span className="text-[var(--math-loss)] flex items-center gap-1.5 font-bold">
                 <AlertTriangle className="w-4 h-4" />
                 {isAr ? '✗ كشف المفهوم الخاطئ أو الشرك:' : '✗ Misconception or Boundary Detected:'}
               </span>

@@ -62,7 +62,7 @@ const SocraticHintLadder: React.FC<SocraticHintLadderProps> = ({ hints, isAr, so
   return (
     <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden shadow-sm">
       <div className="px-5 py-3.5 bg-[var(--bg-app)] border-b border-[var(--border-subtle)] flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs font-bold text-amber-400">
+        <div className="flex items-center gap-2 text-xs font-bold text-[var(--math-gradient)]">
           <HelpCircle className="w-4 h-4" />
           <span>{isAr ? 'سلم التلميحات السقراطي التدريجي' : 'Progressive Socratic Hint Ladder'}</span>
         </div>
@@ -75,9 +75,9 @@ const SocraticHintLadder: React.FC<SocraticHintLadderProps> = ({ hints, isAr, so
       <div className="p-5 space-y-4">
         {/* Tier 1 */}
         <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 space-y-1.5">
-          <div className="flex items-center justify-between text-xs font-bold text-amber-400">
+          <div className="flex items-center justify-between text-xs font-bold text-[var(--math-gradient)]">
             <span>{isAr ? 'المستوى ١: تنبيه مفاهيمي' : 'Tier 1: Conceptual Nudge'}</span>
-            <span className="text-[10px] text-emerald-400 font-semibold">✓ {isAr ? 'مفتوح' : 'Unlocked'}</span>
+            <span className="text-[10px] text-[var(--math-vector)] font-semibold">✓ {isAr ? 'مفتوح' : 'Unlocked'}</span>
           </div>
           <p className="text-sm text-[var(--text-primary)] leading-relaxed">
             {isAr ? hints.tier1.ar : hints.tier1.en}
@@ -87,9 +87,9 @@ const SocraticHintLadder: React.FC<SocraticHintLadderProps> = ({ hints, isAr, so
         {/* Tier 2 */}
         {unlockedTier >= 2 ? (
           <div className="p-4 rounded-xl border border-sky-500/20 bg-sky-500/5 space-y-1.5 animate-fade-in">
-            <div className="flex items-center justify-between text-xs font-bold text-sky-400">
+            <div className="flex items-center justify-between text-xs font-bold text-[var(--math-data)]">
               <span>{isAr ? 'المستوى ٢: إشارة رياضية صارمة' : 'Tier 2: Mathematical Hint'}</span>
-              <span className="text-[10px] text-emerald-400 font-semibold">✓ {isAr ? 'مفتوح' : 'Unlocked'}</span>
+              <span className="text-[10px] text-[var(--math-vector)] font-semibold">✓ {isAr ? 'مفتوح' : 'Unlocked'}</span>
             </div>
             <p className="text-sm text-[var(--text-primary)] leading-relaxed">
               {isAr ? hints.tier2.ar : hints.tier2.en}
@@ -101,7 +101,7 @@ const SocraticHintLadder: React.FC<SocraticHintLadderProps> = ({ hints, isAr, so
               setUnlockedTier(2);
               if (soundEnabled) audio.playClick();
             }}
-            className="w-full py-2.5 px-4 rounded-xl border border-dashed border-[var(--border-subtle)] hover:border-sky-500/50 hover:bg-sky-500/5 text-xs text-[var(--text-secondary)] hover:text-sky-400 flex items-center justify-between transition-all cursor-pointer"
+            className="w-full py-2.5 px-4 rounded-xl border border-dashed border-[var(--border-subtle)] hover:border-sky-500/50 hover:bg-sky-500/5 text-xs text-[var(--text-secondary)] hover:text-[var(--math-data)] flex items-center justify-between transition-all cursor-pointer"
           >
             <span className="flex items-center gap-2">
               <Lock className="w-3.5 h-3.5" />
@@ -114,9 +114,9 @@ const SocraticHintLadder: React.FC<SocraticHintLadderProps> = ({ hints, isAr, so
         {/* Tier 3 */}
         {unlockedTier >= 3 ? (
           <div className="p-4 rounded-xl border border-purple-500/20 bg-purple-500/5 space-y-1.5 animate-fade-in">
-            <div className="flex items-center justify-between text-xs font-bold text-purple-400">
+            <div className="flex items-center justify-between text-xs font-bold text-[var(--math-prediction)]">
               <span>{isAr ? 'المستوى ٣: خطوات الاشتقاق والحل' : 'Tier 3: Implementation / Derivation Guide'}</span>
-              <span className="text-[10px] text-emerald-400 font-semibold">✓ {isAr ? 'مفتوح' : 'Unlocked'}</span>
+              <span className="text-[10px] text-[var(--math-vector)] font-semibold">✓ {isAr ? 'مفتوح' : 'Unlocked'}</span>
             </div>
             <p className="text-sm text-[var(--text-primary)] leading-relaxed">
               {isAr ? hints.tier3.ar : hints.tier3.en}
@@ -129,7 +129,7 @@ const SocraticHintLadder: React.FC<SocraticHintLadderProps> = ({ hints, isAr, so
               setUnlockedTier(3);
               if (soundEnabled) audio.playClick();
             }}
-            className="w-full py-2.5 px-4 rounded-xl border border-dashed border-[var(--border-subtle)] hover:border-purple-500/50 hover:bg-purple-500/5 text-xs text-[var(--text-secondary)] hover:text-purple-400 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-between transition-all cursor-pointer"
+            className="w-full py-2.5 px-4 rounded-xl border border-dashed border-[var(--border-subtle)] hover:border-purple-500/50 hover:bg-purple-500/5 text-xs text-[var(--text-secondary)] hover:text-[var(--math-prediction)] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-between transition-all cursor-pointer"
           >
             <span className="flex items-center gap-2">
               <Lock className="w-3.5 h-3.5" />
@@ -314,7 +314,7 @@ const HypothesisPrimingCard: React.FC<HypothesisPrimingCardProps> = ({
   return (
     <div className="p-6 rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-surface)] space-y-4 shadow-sm">
       <div className="flex items-center justify-between text-xs">
-        <div className="flex items-center gap-2 text-amber-400 font-bold">
+        <div className="flex items-center gap-2 text-[var(--math-gradient)] font-bold">
           <Lightbulb className="w-4 h-4 animate-pulse" />
           <span>{isAr ? 'صياغة الفرضية والحدس الأولي' : 'Pre-Simulation Hypothesis Challenge'}</span>
         </div>
@@ -336,11 +336,11 @@ const HypothesisPrimingCard: React.FC<HypothesisPrimingCardProps> = ({
             'border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] text-[var(--text-secondary)]';
           if (committedPrediction !== null) {
             if (h.correct && isSelected) {
-              style = 'border-emerald-500 bg-emerald-950/30 text-emerald-200';
+              style = 'border-[var(--math-vector)] bg-[var(--math-vector)]/15 text-[var(--math-vector)] font-semibold';
             } else if (!h.correct && isSelected) {
-              style = 'border-rose-500 bg-rose-950/30 text-rose-200';
+              style = 'border-[var(--math-loss)] bg-[var(--math-loss)]/15 text-[var(--math-loss)] font-semibold';
             } else if (h.correct) {
-              style = 'border-emerald-600/50 bg-emerald-950/15 text-emerald-300/80';
+              style = 'border-[var(--math-vector)]/50 bg-[var(--math-vector)]/10 text-[var(--math-vector)] font-medium';
             }
           }
 
@@ -370,12 +370,12 @@ const HypothesisPrimingCard: React.FC<HypothesisPrimingCardProps> = ({
         <div className="p-4 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-app)] text-sm space-y-1.5 animate-fade-in">
           <div className="flex items-center gap-2 font-bold">
             {hypotheses[committedPrediction].correct ? (
-              <span className="text-emerald-400 flex items-center gap-1.5">
+              <span className="text-[var(--math-vector)] flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4" />
                 {isAr ? 'فرضية علمية دقيقة ومثبتة!' : 'Hypothesis Confirmed! ★'}
               </span>
             ) : (
-              <span className="text-amber-400 flex items-center gap-1.5">
+              <span className="text-[var(--math-gradient)] flex items-center gap-1.5">
                 <AlertTriangle className="w-4 h-4" />
                 {isAr ? 'فخ مفاهيمي شائع — انتبه للفرق!' : 'Classic Misconception Trap!'}
               </span>
@@ -742,7 +742,7 @@ export const OkvirWorkbench: React.FC = () => {
             title={config.soundEnabled ? 'Mute Audio (M)' : 'Enable Audio (M)'}
           >
             {config.soundEnabled ? (
-              <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
+              <Volume2 className="w-3.5 h-3.5 text-[var(--math-vector)]" />
             ) : (
               <VolumeX className="w-3.5 h-3.5 text-[var(--text-disabled)]" />
             )}
@@ -786,7 +786,7 @@ export const OkvirWorkbench: React.FC = () => {
               <span>{isAr ? 'دقيقة إتقان شامل' : 'MIN MASTERCLASS'}</span>
             </span>
 
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-[var(--math-vector)]/10 text-[var(--math-vector)] border border-[var(--math-vector)]/30">
               +100 XP
             </span>
           </div>
@@ -806,15 +806,15 @@ export const OkvirWorkbench: React.FC = () => {
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-[var(--text-secondary)]">
               <div className="flex items-center gap-2 p-2.5 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)]">
-                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <Check className="w-3.5 h-3.5 text-[var(--math-vector)] shrink-0" />
                 <span className="font-medium">{isAr ? '١. الحدس الفطري الحركي' : '1. Tactile Intuition'}</span>
               </div>
               <div className="flex items-center gap-2 p-2.5 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)]">
-                <Check className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                <Check className="w-3.5 h-3.5 text-[var(--math-data)] shrink-0" />
                 <span className="font-medium">{isAr ? '٢. الصياغة الرياضية الصارمة' : '2. Exact Mathematical Invariant'}</span>
               </div>
               <div className="flex items-center gap-2 p-2.5 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)]">
-                <Check className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                <Check className="w-3.5 h-3.5 text-[var(--math-prediction)] shrink-0" />
                 <span className="font-medium">{isAr ? '٣. النواة البرمجية المتجهة' : '3. Vectorized NumPy Kernel'}</span>
               </div>
             </div>
@@ -826,7 +826,7 @@ export const OkvirWorkbench: React.FC = () => {
         {/* ======================================================================= */}
         <section id="section-intuition" className="space-y-8 pt-10 border-t border-[var(--border-subtle)]">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs text-amber-400 font-bold">
+            <div className="flex items-center gap-2 text-xs text-[var(--math-gradient)] font-bold">
               <Compass className="w-4 h-4" />
               <span className="font-mono text-[11px]">01 //</span>
               <span className="font-bold">{isAr ? 'الحدس الفطري والنموذج الذهني' : 'SPATIAL INTUITION & MENTAL MODEL'}</span>
@@ -855,7 +855,7 @@ export const OkvirWorkbench: React.FC = () => {
         {/* ======================================================================= */}
         <section id="section-lab" className="space-y-8 pt-10 border-t border-[var(--border-subtle)]">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs text-sky-400 font-bold">
+            <div className="flex items-center gap-2 text-xs text-[var(--math-data)] font-bold">
               <Layers className="w-4 h-4" />
               <span className="font-mono text-[11px]">02 //</span>
               <span className="font-bold">{isAr ? 'المختبر الفيزيائي التفاعلي' : 'INTERACTIVE VISUAL LABORATORY'}</span>
@@ -875,12 +875,12 @@ export const OkvirWorkbench: React.FC = () => {
             {/* Bezel Titlebar */}
             <div className="h-10 px-5 bg-[var(--bg-app)] border-b border-[var(--border-subtle)] flex items-center justify-between text-xs text-[var(--text-tertiary)]">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[var(--math-vector)] animate-pulse" />
                 <span className="font-semibold text-[var(--text-secondary)]">
                   {isAr ? 'محاكاة رياضية نشطة' : '60 FPS Canvas Engine'}
                 </span>
               </div>
-              <span className="text-[10px] text-emerald-400 font-mono font-bold tracking-wider">
+              <span className="text-[10px] text-[var(--math-vector)] font-mono font-bold tracking-wider">
                 RETINA 2X • ZERO GC
               </span>
             </div>
@@ -972,7 +972,7 @@ export const OkvirWorkbench: React.FC = () => {
         {/* ======================================================================= */}
         <section id="section-math" className="space-y-8 pt-10 border-t border-[var(--border-subtle)]">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs text-purple-400 font-bold">
+            <div className="flex items-center gap-2 text-xs text-[var(--math-prediction)] font-bold">
               <Sigma className="w-4 h-4" />
               <span className="font-mono text-[11px]">03 //</span>
               <span className="font-bold">{isAr ? 'المرساة الرياضية الصارمة' : 'MATHEMATICAL INVARIANT'}</span>
@@ -990,7 +990,7 @@ export const OkvirWorkbench: React.FC = () => {
           {beat2.formula && (
             <div className="p-8 rounded-3xl border border-[var(--border-strong)] bg-[var(--bg-surface)] space-y-6 shadow-sm">
               <div className="flex items-center justify-between text-xs text-[var(--text-tertiary)]">
-                <span className="flex items-center gap-2 text-amber-400 font-bold">
+                <span className="flex items-center gap-2 text-[var(--math-gradient)] font-bold">
                   <Sparkles className="w-4 h-4" />
                   <span>{isAr ? 'المعادلة الأساسية الصارمة' : 'Core Analytical Formula'}</span>
                 </span>
@@ -1060,7 +1060,7 @@ export const OkvirWorkbench: React.FC = () => {
         {/* ======================================================================= */}
         <section id="section-code" className="space-y-8 pt-10 border-t border-[var(--border-subtle)]">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
+            <div className="flex items-center gap-2 text-xs text-[var(--math-vector)] font-bold">
               <Code2 className="w-4 h-4" />
               <span className="font-mono text-[11px]">04 //</span>
               <span className="font-bold">{isAr ? 'النواة البرمجية والحساب المتجه' : 'VECTORIZED COMPUTATIONAL LAB (PYTHON)'}</span>
@@ -1095,7 +1095,7 @@ export const OkvirWorkbench: React.FC = () => {
         {/* ======================================================================= */}
         <section id="section-quiz" className="space-y-8 pt-10 border-t border-[var(--border-subtle)]">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs text-rose-400 font-bold">
+            <div className="flex items-center gap-2 text-xs text-[var(--math-loss)] font-bold">
               <Award className="w-4 h-4" />
               <span className="font-mono text-[11px]">05 //</span>
               <span className="font-bold">{isAr ? 'تحدي النقل وتشخيص الفهم' : 'ACTIVE DIAGNOSTIC TRANSFER'}</span>
@@ -1131,12 +1131,12 @@ export const OkvirWorkbench: React.FC = () => {
         <section id="section-complete" className="pt-10 pb-16 border-t border-[var(--border-subtle)]">
           {masteryCertified ? (
             <div className="p-8 md:p-12 rounded-3xl border border-emerald-500/30 bg-emerald-950/20 text-center space-y-6 shadow-2xl">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
+              <div className="w-16 h-16 rounded-full bg-[var(--math-vector)]/20 border border-[var(--math-vector)]/40 text-[var(--math-vector)] flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
 
               <div className="space-y-2">
-                <span className="text-xs text-emerald-400 font-bold block">
+                <span className="text-xs text-[var(--math-vector)] font-bold block">
                   {isAr ? 'تهانينا! لقد أتقنت الدرس معتمداً' : 'MASTERY CERTIFIED & VERIFIED!'}
                 </span>
                 <h3 className="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)]">
@@ -1164,7 +1164,7 @@ export const OkvirWorkbench: React.FC = () => {
             </div>
           ) : (
             <div className="p-8 md:p-12 rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-center space-y-5 shadow-lg">
-              <div className="w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+              <div className="w-14 h-14 rounded-full bg-[var(--math-gradient)]/10 border border-[var(--math-gradient)]/20 text-[var(--math-gradient)] flex items-center justify-center mx-auto">
                 <Lock className="w-7 h-7" />
               </div>
               <div className="space-y-2 max-w-md mx-auto">
@@ -1179,9 +1179,9 @@ export const OkvirWorkbench: React.FC = () => {
               </div>
               <button
                 onClick={() => scrollToSection('section-quiz')}
-                className="px-6 py-3 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-app)] hover:border-amber-500/50 text-xs font-medium text-[var(--text-secondary)] hover:text-amber-400 transition-colors inline-flex items-center gap-2 cursor-pointer"
+                className="px-6 py-3 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-app)] hover:border-amber-500/50 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--math-gradient)] transition-colors inline-flex items-center gap-2 cursor-pointer"
               >
-                <Award className="w-4 h-4 text-amber-400" />
+                <Award className="w-4 h-4 text-[var(--math-gradient)]" />
                 <span>{isAr ? 'الانتقال إلى الاختبار التشخيصي' : 'Take Diagnostic Battery (Section 05)'}</span>
               </button>
             </div>

@@ -329,12 +329,12 @@ export const CommandPalette: React.FC = () => {
               }`}
             >
               <span
-                className={`text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                className={`text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded font-bold ${
                   action.category === 'settings'
-                    ? 'text-amber-400 bg-amber-500/10 border border-amber-500/20'
+                    ? 'text-[var(--math-gradient)] bg-[var(--math-gradient)]/10 border border-[var(--math-gradient)]/20'
                     : action.category === 'simulation'
-                    ? 'text-sky-400 bg-sky-500/10 border border-sky-500/20'
-                    : 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20'
+                    ? 'text-[var(--math-data)] bg-[var(--math-data)]/10 border border-[var(--math-data)]/20'
+                    : 'text-[var(--math-vector)] bg-[var(--math-vector)]/10 border border-[var(--math-vector)]/20'
                 }`}
               >
                 {action.category}

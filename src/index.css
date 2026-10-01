@@ -145,6 +145,20 @@ html[dir='rtl'][data-arabic-font="ibm"],
   color-scheme: light;
 }
 
+/* ==========================================================================
+   GLOBAL HIGH-CONTRAST TEXT SELECTION
+   ========================================================================== */
+::selection {
+  background-color: rgba(52, 211, 153, 0.35);
+  color: #fafafa;
+}
+
+[data-theme="light"] ::selection,
+[data-theme="light"]::selection {
+  background-color: rgba(4, 120, 87, 0.22);
+  color: #09090b;
+}
+
 * {
   box-sizing: border-box;
 }

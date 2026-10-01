@@ -362,15 +362,15 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-strong)] bg-[var(--bg-surface)] text-xs font-mono font-bold text-[var(--text-primary)] hover:border-emerald-500 transition-all shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-strong)] bg-[var(--bg-surface)] text-xs font-mono font-bold text-[var(--text-primary)] hover:border-emerald-500 transition-all shadow-sm cursor-pointer"
           >
-            {isPlaying ? <Pause size={13} className="text-amber-400" /> : <Play size={13} className="text-emerald-400" />}
+            {isPlaying ? <Pause size={13} className="text-[var(--math-gradient)]" /> : <Play size={13} className="text-[var(--math-vector)]" />}
             <span>{isPlaying ? (language === 'ar' ? 'إيقاف' : 'Pause') : (language === 'ar' ? 'تشغيل المسح' : 'Scan Image')}</span>
           </button>
 
           <button
             onClick={handlePrevWindow}
-            className="p-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] text-[var(--text-secondary)]"
+            className="p-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] text-[var(--text-secondary)] cursor-pointer"
             title="Step Backward"
           >
             <SkipBack size={13} />
@@ -378,7 +378,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
 
           <button
             onClick={handleNextWindow}
-            className="p-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] text-[var(--text-secondary)]"
+            className="p-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] text-[var(--text-secondary)] cursor-pointer"
             title="Step Forward"
           >
             <SkipForward size={13} />
@@ -391,7 +391,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
               setWindowCol(0);
               if (config.soundEnabled) audio.playClick();
             }}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-tertiary)] hover:border-[var(--border-strong)]"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-tertiary)] hover:border-[var(--border-strong)] cursor-pointer"
             title="Reset to default image"
           >
             <RotateCcw size={11} />
@@ -399,7 +399,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
           </button>
         </div>
 
-        <div className="text-xs font-mono text-emerald-400">
+        <div className="text-xs font-mono text-[var(--math-vector)] font-bold">
           Receptive Field Window: [{windowRow}, {windowCol}]
         </div>
       </div>
@@ -451,7 +451,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
             <span className="text-[var(--text-primary)] font-semibold">
               {language === 'ar' ? 'مرشح الالتفاف K' : 'Kernel Filter K (3×3)'}
             </span>
-            <span className="text-[10px] text-amber-400 font-mono">
+            <span className="text-[10px] text-[var(--math-gradient)] font-mono font-bold">
               {divisor !== 1 ? `÷ ${divisor}` : ''}
             </span>
           </div>
@@ -461,7 +461,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
               row.map((kval, kc) => (
                 <div
                   key={`${kr}-${kc}`}
-                  className="w-9 h-9 rounded bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] text-amber-300 font-mono text-xs font-bold flex items-center justify-center shadow-inner"
+                  className="w-9 h-9 rounded bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] text-[var(--math-gradient)] font-mono text-xs font-bold flex items-center justify-center shadow-inner"
                 >
                   {kval > 0 ? `+${kval}` : kval}
                 </div>
@@ -476,7 +476,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
         {/* 3. Output Feature Map 4x4 */}
         <div className="lg:col-span-5 flex flex-col items-center gap-2 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
           <div className="w-full flex justify-between items-center text-xs font-mono">
-            <span className="text-emerald-400 font-semibold">
+            <span className="text-[var(--math-vector)] font-bold">
               {language === 'ar' ? 'خريطة الخصائص الناتجة (4×4)' : 'Feature Map Output (4×4)'}
             </span>
             <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
@@ -499,9 +499,9 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
                         : `rgba(${displayLum}, ${displayLum}, ${displayLum}, 0.2)`,
                       borderColor: isSelected ? 'var(--math-vector)' : 'var(--border-subtle)',
                     }}
-                    className={`w-10 h-10 rounded-lg border text-xs font-mono font-bold flex flex-col items-center justify-center transition-all ${
+                    className={`w-10 h-10 rounded-lg border text-xs font-mono font-bold flex flex-col items-center justify-center transition-all cursor-pointer ${
                       isSelected
-                        ? 'ring-2 ring-emerald-400 scale-105 text-emerald-300 shadow-md'
+                        ? 'ring-2 ring-[var(--math-vector)] scale-105 text-[var(--math-vector)] shadow-md'
                         : 'text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
                     }`}
                   >
@@ -511,7 +511,7 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
               })
             )}
           </div>
-          <span className="text-[10px] font-mono text-emerald-400/90 text-center">
+          <span className="text-[10px] font-mono text-[var(--math-vector)] text-center font-bold">
             {language === 'ar'
               ? `القيمة عند النقطة (${windowRow}, ${windowCol}): ${currentDetails.finalVal}`
               : `Current pixel value at (${windowRow}, ${windowCol}): ${currentDetails.finalVal}`}
@@ -525,19 +525,19 @@ export const ConvolutionFilterCanvas: React.FC<{ compact?: boolean }> = ({ compa
           <span className="text-[var(--text-tertiary)] uppercase tracking-wider font-semibold">
             {language === 'ar' ? 'تفصيل الحساب الرياضي للبكسل المحدد:' : 'Inner-Product Convolution Calculation Step:'}
           </span>
-          <span className="text-emerald-400 font-bold font-mono">
+          <span className="text-[var(--math-vector)] font-bold font-mono">
             Output({windowRow}, {windowCol}) = {currentDetails.finalVal}
           </span>
         </div>
 
         <div dir="ltr" className="text-xs font-mono text-[var(--text-secondary)] overflow-x-auto py-1 leading-relaxed">
-          <span className="text-amber-400">Sum</span> = {currentDetails.terms.map((t, idx) => (
+          <span className="text-[var(--math-gradient)] font-bold">Sum</span> = {currentDetails.terms.map((t, idx) => (
             <span key={idx}>
               ({t.inVal} × {t.kVal})
               {idx < currentDetails.terms.length - 1 ? ' + ' : ''}
             </span>
           ))}
-          {divisor !== 1 && ` = (${currentDetails.sum}) / ${divisor}`} = <strong className="text-emerald-300">{currentDetails.finalVal}</strong>
+          {divisor !== 1 && ` = (${currentDetails.sum}) / ${divisor}`} = <strong className="text-[var(--math-vector)] font-bold">{currentDetails.finalVal}</strong>
         </div>
       </div>
 
