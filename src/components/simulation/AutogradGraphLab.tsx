@@ -266,7 +266,7 @@ export const AutogradGraphLab: React.FC<{ compact?: boolean }> = ({ compact }) =
         </div>
 
         {/* Directed Acyclic Computational Graph (DAG) Visualizer */}
-        <div className="p-5 rounded-xl border border-[var(--border-subtle)] bg-black/40 overflow-x-auto select-none">
+        <div className="p-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] overflow-x-auto select-none">
           <div className="min-w-[620px] flex items-center justify-between gap-4 py-3 relative">
             {/* Layer 1: Inputs & Parameters */}
             <div className="flex flex-col gap-3">

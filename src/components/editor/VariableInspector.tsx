@@ -35,10 +35,10 @@ export const VariableInspector: React.FC<VariableInspectorProps> = ({
 
   return (
     <div
-      className={`flex flex-col h-full bg-[#0e0e11] border border-[var(--border-subtle)] rounded-xl overflow-hidden font-mono text-xs shadow-xl select-none ${className}`}
+      className={`flex flex-col h-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl overflow-hidden font-mono text-xs shadow-xl select-none ${className}`}
     >
       {/* Hardware Telemetry Header */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[var(--border-subtle)] bg-[#141418]">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[var(--border-subtle)] bg-[var(--bg-surface-active)]">
         <div className="flex items-center gap-2.5">
           <div className="flex items-center justify-center w-5 h-5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
             <Cpu size={12} className="animate-pulse" />
@@ -46,17 +46,17 @@ export const VariableInspector: React.FC<VariableInspectorProps> = ({
           <span className="font-bold tracking-wider text-[11px] text-[var(--text-primary)]">
             {isAr ? 'مرسمة المتغيرات والذاكرة WASM' : 'WASM TELEMETRY & TENSOR HUD'}
           </span>
-          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#1f1f26] border border-[#2e2e38] text-zinc-400">
+          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] text-[var(--text-secondary)]">
             {variables.length} {isAr ? 'عناصر' : 'SYMBOLS'}
           </span>
         </div>
 
         {/* 16-Segment LED Hardware VU Meter */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-zinc-400 tabular-nums font-semibold">
+          <span className="text-[10px] text-[var(--text-secondary)] tabular-nums font-semibold">
             {formatBytes(usedBytes)}
           </span>
-          <div className="flex items-center gap-[2px] p-1 rounded bg-[#09090c] border border-[#22222a]">
+          <div className="flex items-center gap-[2px] p-1 rounded bg-[var(--bg-app)] border border-[var(--border-subtle)]">
             {Array.from({ length: totalSegments }).map((_, i) => {
               const isActive = i < activeSegments;
               const isWarning = i >= 11 && i < 14;
@@ -71,7 +71,7 @@ export const VariableInspector: React.FC<VariableInspectorProps> = ({
                         : isWarning
                         ? 'bg-amber-400 shadow-[0_0_4px_#fbbf24]'
                         : 'bg-emerald-400 shadow-[0_0_4px_#34d399]'
-                      : 'bg-[#1a1a22]'
+                      : 'bg-[var(--bg-surface-hover)]'
                   }`}
                 />
               );
@@ -95,21 +95,21 @@ export const VariableInspector: React.FC<VariableInspectorProps> = ({
       {/* Variables Table */}
       <div className="flex-1 overflow-y-auto">
         {variables.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-44 text-center text-zinc-500 p-6 space-y-2">
-            <Activity size={24} className="text-zinc-600 animate-pulse" />
+          <div className="flex flex-col items-center justify-center h-44 text-center text-[var(--text-tertiary)] p-6 space-y-2">
+            <Activity size={24} className="text-[var(--text-disabled)] animate-pulse" />
             <span className="text-xs">
               {isAr
                 ? 'لا توجد مصفوفات أو متغيرات في النطاق الحالي. شغّل الكود للفحص.'
                 : 'No active tensors in scope. Execute Python kernel to inspect.'}
             </span>
-            <span className="text-[10px] text-zinc-600 font-sans">
+            <span className="text-[10px] text-[var(--text-disabled)] font-sans">
               Pyodide WebAssembly V8 linear memory scope
             </span>
           </div>
         ) : (
           <table className="w-full text-start border-collapse">
             <thead>
-              <tr className="border-b border-[#1f1f26] bg-[#121216] text-[9px] uppercase tracking-wider text-zinc-400">
+              <tr className="border-b border-[var(--border-subtle)] bg-[var(--bg-surface-hover)] text-[9px] uppercase tracking-wider text-[var(--text-secondary)]">
                 <th className="px-3 py-2 text-start font-semibold">{isAr ? 'الرمز' : 'SYMBOL'}</th>
                 <th className="px-2.5 py-2 text-start font-semibold">{isAr ? 'الشكل' : 'SHAPE'}</th>
                 <th className="px-2.5 py-2 text-start font-semibold">{isAr ? 'النوع' : 'DTYPE'}</th>
@@ -124,7 +124,7 @@ export const VariableInspector: React.FC<VariableInspectorProps> = ({
                 return (
                   <tr
                     key={v.name}
-                    className={`border-b border-[#181820] hover:bg-[#15151c] transition-colors ${
+                    className={`border-b border-[var(--border-subtle)] hover:bg-[var(--bg-surface-hover)] transition-colors ${
                       hasAnomaly ? 'bg-rose-950/20' : ''
                     }`}
                   >
@@ -132,9 +132,9 @@ export const VariableInspector: React.FC<VariableInspectorProps> = ({
                       <span className="w-1.5 h-1.5 rounded-full bg-sky-400/80" />
                       <span>{v.name}</span>
                     </td>
-                    <td className="px-2.5 py-2 text-zinc-300 font-semibold">{shapeStr}</td>
-                    <td className="px-2.5 py-2 text-zinc-400">{v.dtype || v.type}</td>
-                    <td className="px-2.5 py-2 text-zinc-300 tabular-nums">
+                    <td className="px-2.5 py-2 text-[var(--text-primary)] font-semibold">{shapeStr}</td>
+                    <td className="px-2.5 py-2 text-[var(--text-secondary)]">{v.dtype || v.type}</td>
+                    <td className="px-2.5 py-2 text-[var(--text-primary)] tabular-nums">
                       {formatBytes(v.sizeBytes)}
                     </td>
                     <td className="px-3 py-2 text-end">

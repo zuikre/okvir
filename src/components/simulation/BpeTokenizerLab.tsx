@@ -348,7 +348,7 @@ export const BpeTokenizerLab: React.FC<{ compact?: boolean }> = ({ compact }) =>
         </div>
 
         {/* Tokenized Stream Visualization (Colored Pills) */}
-        <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-black/45 space-y-2 select-none">
+        <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-2 select-none">
           <div className="text-[11px] font-mono text-[var(--text-tertiary)] flex items-center justify-between">
             <span>{language === 'ar' ? 'التمثيل المجزأ إلى رموز فرعية' : 'Tokenized Subword Stream'}</span>
             <span className="text-[10px] text-sky-400 font-mono">

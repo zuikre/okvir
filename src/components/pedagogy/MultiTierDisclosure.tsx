@@ -241,7 +241,7 @@ export const PostCanvasConsolidation: React.FC<{
                   O(1) Memory Layout
                 </span>
               </div>
-              <div dir="ltr" className="p-3 rounded-lg bg-black/60 border border-[var(--border-subtle)] text-[11px] font-mono text-emerald-300 overflow-x-auto">
+              <div dir="ltr" className="p-3 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[11px] font-mono text-emerald-600 dark:text-emerald-300 overflow-x-auto">
                 <pre>{content.code.snippet}</pre>
               </div>
             </div>
@@ -392,7 +392,7 @@ export const MultiTierDisclosure: React.FC<MultiTierDisclosureProps> = ({
                 O(1) Memory Layout
               </span>
             </div>
-            <div dir="ltr" className="p-3 rounded-lg bg-black/60 border border-[var(--border-subtle)] text-[11px] font-mono text-emerald-300 overflow-x-auto">
+            <div dir="ltr" className="p-3 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[11px] font-mono text-emerald-600 dark:text-emerald-300 overflow-x-auto">
               <pre>{content.code.snippet}</pre>
             </div>
           </div>

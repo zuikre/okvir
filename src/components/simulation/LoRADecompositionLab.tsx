@@ -107,7 +107,7 @@ export const LoRADecompositionLab: React.FC<Props> = ({ compact = false }) => {
         </div>
 
         {/* Sliders */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono bg-black/20 p-4 rounded-xl border border-[var(--border-subtle)]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono bg-[var(--bg-app)] p-4 rounded-xl border border-[var(--border-subtle)]">
           <div className="space-y-1.5">
             <div className="flex justify-between text-[var(--text-secondary)]">
               <span>{language === 'ar' ? 'بُعد النموذج (d):' : 'Model Hidden Dim (d):'}</span>
@@ -166,13 +166,13 @@ export const LoRADecompositionLab: React.FC<Props> = ({ compact = false }) => {
         </div>
 
         {/* Visual Architecture Diagram */}
-        <div className="rounded-xl border border-[var(--border-subtle)] bg-black/40 p-6 flex flex-col md:flex-row items-center justify-around gap-6">
+        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] p-6 flex flex-col md:flex-row items-center justify-around gap-6">
           {/* Base Frozen Model W_0 */}
           <div className="flex flex-col items-center space-y-2 text-center">
-            <div className="relative w-28 h-28 rounded-xl border-2 border-dashed border-sky-500/40 bg-sky-950/20 flex flex-col items-center justify-center p-2 text-sky-300">
+            <div className="relative w-28 h-28 rounded-xl border-2 border-dashed border-sky-500/40 bg-sky-500/10 dark:bg-sky-950/20 flex flex-col items-center justify-center p-2 text-sky-400 dark:text-sky-300">
               <span className="text-sm font-bold font-mono">W₀</span>
               <span className="text-[10px] text-sky-400/80 font-mono">{dim} × {dim}</span>
-              <div className="absolute top-1 right-1 flex items-center gap-0.5 text-[9px] px-1 rounded bg-sky-500/20 text-sky-300 font-mono">
+              <div className="absolute top-1 right-1 flex items-center gap-0.5 text-[9px] px-1 rounded bg-sky-500/20 text-sky-400 dark:text-sky-300 font-mono">
                 <ShieldCheck size={10} />
                 <span>FROZEN</span>
               </div>
@@ -180,38 +180,38 @@ export const LoRADecompositionLab: React.FC<Props> = ({ compact = false }) => {
             <span className="text-xs font-mono text-[var(--text-secondary)]">Base Weight Matrix</span>
           </div>
 
-          <div className="text-xl font-bold font-mono text-zinc-500">+</div>
+          <div className="text-xl font-bold font-mono text-[var(--text-tertiary)]">+</div>
 
           {/* LoRA Adapter Branch B x A */}
-          <div className="flex items-center gap-3 p-4 rounded-xl border border-amber-500/30 bg-amber-950/10">
+          <div className="flex items-center gap-3 p-4 rounded-xl border border-amber-500/30 bg-amber-500/5 dark:bg-amber-950/10">
             {/* Matrix B */}
             <div className="flex flex-col items-center space-y-2 text-center">
-              <div className="w-10 h-28 rounded-lg border border-amber-500/60 bg-amber-500/20 flex flex-col items-center justify-center p-1 text-amber-300 font-mono">
+              <div className="w-10 h-28 rounded-lg border border-amber-500/60 bg-amber-500/20 flex flex-col items-center justify-center p-1 text-amber-500 dark:text-amber-300 font-mono">
                 <span className="text-xs font-bold">B</span>
-                <span className="text-[9px] text-amber-400">{dim}×{rank}</span>
+                <span className="text-[9px] text-amber-500 dark:text-amber-400">{dim}×{rank}</span>
               </div>
               <span className="text-[10px] font-mono text-[var(--text-secondary)]">Zero init</span>
             </div>
 
-            <span className="text-xs font-bold font-mono text-amber-400">×</span>
+            <span className="text-xs font-bold font-mono text-amber-500 dark:text-amber-400">×</span>
 
             {/* Matrix A */}
             <div className="flex flex-col items-center space-y-2 text-center">
-              <div className="w-28 h-10 rounded-lg border border-emerald-500/60 bg-emerald-500/20 flex flex-col items-center justify-center p-1 text-emerald-300 font-mono">
+              <div className="w-28 h-10 rounded-lg border border-emerald-500/60 bg-emerald-500/20 flex flex-col items-center justify-center p-1 text-emerald-500 dark:text-emerald-300 font-mono">
                 <span className="text-xs font-bold">A</span>
-                <span className="text-[9px] text-emerald-400">{rank}×{dim}</span>
+                <span className="text-[9px] text-emerald-500 dark:text-emerald-400">{rank}×{dim}</span>
               </div>
               <span className="text-[10px] font-mono text-[var(--text-secondary)]">Gaussian init</span>
             </div>
           </div>
 
-          <div className="text-xl font-bold font-mono text-zinc-500">=</div>
+          <div className="text-xl font-bold font-mono text-[var(--text-tertiary)]">=</div>
 
           {/* Final Output Representation */}
           <div className="flex flex-col items-center space-y-2 text-center">
-            <div className="w-28 h-28 rounded-xl border border-emerald-500/40 bg-emerald-950/20 flex flex-col items-center justify-center p-2 text-emerald-300 font-mono">
+            <div className="w-28 h-28 rounded-xl border border-emerald-500/40 bg-emerald-500/10 dark:bg-emerald-950/20 flex flex-col items-center justify-center p-2 text-emerald-500 dark:text-emerald-300 font-mono">
               <span className="text-sm font-bold">W_adapted</span>
-              <span className="text-[10px] text-emerald-400/80">W₀ + (α/r)·BA</span>
+              <span className="text-[10px] text-emerald-500 dark:text-emerald-400/80">W₀ + (α/r)·BA</span>
             </div>
             <span className="text-xs font-mono text-[var(--text-secondary)]">Zero Runtime Overhead</span>
           </div>
@@ -219,11 +219,11 @@ export const LoRADecompositionLab: React.FC<Props> = ({ compact = false }) => {
 
         {/* Telemetry Footprint Dashboard */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
-          <div className="rounded-xl border border-sky-500/20 bg-sky-950/10 p-4 space-y-2">
+          <div className="rounded-xl border border-sky-500/20 bg-sky-500/5 dark:bg-sky-950/10 p-4 space-y-2">
             <div className="text-[11px] text-sky-400 font-bold uppercase tracking-wider">
               {language === 'ar' ? 'معاملات النموذج الأساسي' : 'Pre-Trained Base'}
             </div>
-            <div className="text-lg font-bold text-white">{(baseParams / 1e6).toFixed(2)}M params</div>
+            <div className="text-lg font-bold text-[var(--text-primary)]">{(baseParams / 1e6).toFixed(2)}M params</div>
             <div className="text-[11px] text-[var(--text-secondary)]">Weights: {baseMemoryMB} MB (FP16)</div>
             <div className="text-[11px] text-rose-400">Adam Memory: {optimizerMemoryBaseMB} MB</div>
           </div>

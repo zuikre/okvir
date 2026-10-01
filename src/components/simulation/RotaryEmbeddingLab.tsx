@@ -218,7 +218,7 @@ export const RotaryEmbeddingLab: React.FC<Props> = ({ compact = false }) => {
         </div>
 
         {/* Sliders */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono bg-black/20 p-4 rounded-xl border border-[var(--border-subtle)]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono bg-[var(--bg-app)] p-4 rounded-xl border border-[var(--border-subtle)]">
           <div className="space-y-1.5">
             <div className="flex justify-between text-[var(--text-secondary)]">
               <span>{language === 'ar' ? 'موضع الاستعلام (m):' : 'Query Token Position (m):'}</span>
@@ -277,34 +277,34 @@ export const RotaryEmbeddingLab: React.FC<Props> = ({ compact = false }) => {
         {/* Interactive Canvas & Telemetry */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           <div className="lg:col-span-7 flex justify-center">
-            <div className="relative w-full aspect-square max-w-[380px] rounded-2xl border border-[var(--border-subtle)] bg-black/40 p-4">
+            <div className="relative w-full aspect-square max-w-[380px] rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-app)] p-4">
               <canvas ref={canvasRef} className="w-full h-full block" />
             </div>
           </div>
 
           <div className="lg:col-span-5 space-y-4 font-mono text-xs">
-            <div className="rounded-xl border border-purple-500/30 bg-purple-950/20 p-4 space-y-3">
+            <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 dark:bg-purple-950/20 p-4 space-y-3">
               <div className="flex items-center gap-2 text-purple-400 font-bold">
                 <Sparkles size={16} />
                 <span>{language === 'ar' ? 'مبرهنة الثبات النسبي' : 'Shift-Invariance Property'}</span>
               </div>
 
               <div className="space-y-2 text-[11px]">
-                <div className="flex justify-between p-2 rounded bg-black/40 border border-purple-500/20">
+                <div className="flex justify-between p-2 rounded bg-[var(--bg-app)] border border-purple-500/20">
                   <span className="text-[var(--text-secondary)]">Relative Distance Δm:</span>
-                  <span className="text-purple-300 font-bold">m - n = {relDelta} tokens</span>
+                  <span className="text-purple-400 dark:text-purple-300 font-bold">m - n = {relDelta} tokens</span>
                 </div>
-                <div className="flex justify-between p-2 rounded bg-black/40 border border-purple-500/20">
+                <div className="flex justify-between p-2 rounded bg-[var(--bg-app)] border border-purple-500/20">
                   <span className="text-[var(--text-secondary)]">Angular Displacement:</span>
-                  <span className="text-amber-300 font-bold">Δθ = {angleDelta.toFixed(3)} rad</span>
+                  <span className="text-amber-500 dark:text-amber-300 font-bold">Δθ = {angleDelta.toFixed(3)} rad</span>
                 </div>
-                <div className="flex justify-between p-2 rounded bg-black/40 border border-emerald-500/30 text-emerald-300 font-bold">
+                <div className="flex justify-between p-2 rounded bg-[var(--bg-app)] border border-emerald-500/30 text-emerald-500 dark:text-emerald-300 font-bold">
                   <span>Inner Product ⟨R_m q, R_n k⟩:</span>
                   <span className="text-sm">{dotProduct}</span>
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-black/50 text-[10px] text-[var(--text-secondary)] leading-relaxed">
+              <div className="p-2.5 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[10px] text-[var(--text-secondary)] leading-relaxed">
                 {language === 'ar'
                   ? 'لاحظ أن تغيير m و n بنفس المقدار يحافظ تماماً على الجداء القياسي، لأن الزاوية النسبية بينهما تظل ثابتة.'
                   : 'Notice that shifting both positions equally (e.g. m+k, n+k) preserves the exact same dot product score.'}

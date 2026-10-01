@@ -84,7 +84,7 @@ const TactileSwitch: React.FC<TactileSwitchProps> = ({
       className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--math-vector)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-app)] ${
         checked
           ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.35)]'
-          : 'bg-zinc-700/80 hover:bg-zinc-600'
+          : 'bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-700/80 dark:hover:bg-zinc-600'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
     >
       <span
@@ -410,7 +410,7 @@ export const SettingsView: React.FC = () => {
                 onClick={() => handleCategorySwitch(cat.id)}
                 className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-mono font-medium transition-all shrink-0 cursor-pointer ${
                   active
-                    ? 'bg-zinc-800 text-[var(--text-primary)] border border-zinc-700 shadow-md ring-1 ring-emerald-500/30'
+                    ? 'bg-[var(--bg-surface-active)] text-[var(--text-primary)] border border-[var(--border-strong)] shadow-sm ring-1 ring-emerald-500/30'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] border border-transparent'
                 }`}
               >
@@ -422,8 +422,8 @@ export const SettingsView: React.FC = () => {
                   <span
                     className={`text-[9px] px-1.5 py-0.2 rounded-full font-sans uppercase tracking-wider font-semibold ${
                       active
-                        ? 'bg-emerald-500/20 text-emerald-300'
-                        : 'bg-zinc-800 text-zinc-400'
+                        ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300'
+                        : 'bg-[var(--bg-surface)] text-[var(--text-tertiary)] border border-[var(--border-subtle)]'
                     }`}
                   >
                     {cat.badge}
@@ -1127,7 +1127,7 @@ export const SettingsView: React.FC = () => {
                             className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg ${
                               isUnlocked
                                 ? `bg-gradient-to-br ${badge.gradient} ring-2 ring-amber-400/40`
-                                : 'bg-zinc-800 text-zinc-500 border border-zinc-700/50'
+                                : 'bg-[var(--bg-surface)] text-[var(--text-disabled)] border border-[var(--border-subtle)]'
                             }`}
                           >
                             {isUnlocked ? renderBadgeIcon(badge.icon, 22) : <Lock size={20} />}
@@ -1163,7 +1163,7 @@ export const SettingsView: React.FC = () => {
                             {/* Progress Bar for Locked */}
                             {!isUnlocked && (
                               <div className="w-full sm:w-64 pt-1">
-                                <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden border border-zinc-700/50">
+                                <div className="h-1.5 w-full bg-[var(--bg-surface-active)] rounded-full overflow-hidden border border-[var(--border-subtle)]">
                                   <div
                                     className="h-full bg-emerald-500 transition-all duration-300"
                                     style={{ width: `${percent}%` }}
@@ -1220,7 +1220,7 @@ export const SettingsView: React.FC = () => {
                             <ShieldCheck size={12} />
                             <span>W3C Verifiable Credential Proof Signature</span>
                           </div>
-                          <pre className="p-3 rounded-xl bg-black/60 border border-zinc-800 text-[10px] font-mono text-emerald-400 overflow-x-auto">
+                          <pre className="p-3 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[10px] font-mono text-[var(--math-vector)] overflow-x-auto">
                             {JSON.stringify(
                               generateVerifiableCredential(badge, config.username || 'Okvir Scholar').proof,
                               null,
@@ -1281,7 +1281,7 @@ export const SettingsView: React.FC = () => {
                       value={confirmInput}
                       onChange={(e) => setConfirmInput(e.target.value)}
                       placeholder="RESET"
-                      className="w-full px-3.5 py-2 text-xs font-mono rounded-xl border border-rose-500/50 bg-black/50 text-white outline-none focus:ring-2 focus:ring-rose-500/50"
+                      className="w-full px-3.5 py-2 text-xs font-mono rounded-xl border border-rose-500/50 bg-[var(--bg-app)] text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-rose-500/50"
                     />
                   </div>
 

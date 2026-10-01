@@ -136,16 +136,16 @@ export const TactileSlider: React.FC<TactileSliderProps> = ({
 
         {/* Tactile Hardware Thumb */}
         <div
-          className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-5 rounded-[4px] border border-[var(--border-strong)] bg-gradient-to-b from-[#2a2a30] to-[#16161a] shadow-[0_2px_6px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.15)] flex items-center justify-center transition-transform duration-75 ${
+          className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-5 rounded-[4px] border border-[var(--border-strong)] bg-gradient-to-b from-[var(--bg-surface-active)] to-[var(--bg-surface-hover)] dark:from-[#2a2a30] dark:to-[#16161a] shadow-[0_2px_6px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.15)] flex items-center justify-center transition-transform duration-75 ${
             isDragging ? 'scale-110 shadow-lg ring-2 ring-sky-400/50' : 'group-hover:scale-105'
           }`}
           style={{ left: `${percentage}%` }}
         >
           {/* Tactile Friction Ribs */}
           <div className="flex flex-col gap-[2px]">
-            <div className="w-2 h-[1px] bg-zinc-500/80" />
-            <div className="w-2 h-[1px] bg-zinc-500/80" />
-            <div className="w-2 h-[1px] bg-zinc-500/80" />
+            <div className="w-2 h-[1px] bg-[var(--text-disabled)]" />
+            <div className="w-2 h-[1px] bg-[var(--text-disabled)]" />
+            <div className="w-2 h-[1px] bg-[var(--text-disabled)]" />
           </div>
         </div>
       </div>

@@ -172,7 +172,7 @@ export const FlashAttentionTilingLab: React.FC<Props> = ({ compact = false }) =>
         </div>
 
         {/* Sliders Configuration */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono bg-black/20 p-4 rounded-xl border border-[var(--border-subtle)]">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono bg-[var(--bg-app)] p-4 rounded-xl border border-[var(--border-subtle)]">
           <div className="space-y-1.5">
             <div className="flex justify-between text-[var(--text-secondary)]">
               <span>{language === 'ar' ? 'طول التتابع (N):' : 'Sequence Length (N):'}</span>
@@ -227,7 +227,7 @@ export const FlashAttentionTilingLab: React.FC<Props> = ({ compact = false }) =>
             </div>
 
             <div
-              className="grid gap-1.5 p-3 rounded-xl border border-[var(--border-subtle)] bg-black/40"
+              className="grid gap-1.5 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]"
               style={{
                 gridTemplateColumns: `repeat(${numTiles}, minmax(0, 1fr))`,
               }}
@@ -266,36 +266,36 @@ export const FlashAttentionTilingLab: React.FC<Props> = ({ compact = false }) =>
               </div>
 
               <div className="space-y-2 text-xs font-mono">
-                <div className="flex justify-between p-2 rounded bg-black/40 border border-sky-500/20">
+                <div className="flex justify-between p-2 rounded bg-[var(--bg-app)] border border-sky-500/20">
                   <span className="text-[var(--text-secondary)]">Loaded Q Block:</span>
-                  <span className="text-sky-300 font-bold">Tile Q_{currentQTile} ({blockSize}×128)</span>
+                  <span className="text-sky-400 font-bold">Tile Q_{currentQTile} ({blockSize}×128)</span>
                 </div>
-                <div className="flex justify-between p-2 rounded bg-black/40 border border-sky-500/20">
+                <div className="flex justify-between p-2 rounded bg-[var(--bg-app)] border border-sky-500/20">
                   <span className="text-[var(--text-secondary)]">Loaded K, V Block:</span>
-                  <span className="text-sky-300 font-bold">Tile K_{currentKVTile}, V_{currentKVTile} ({blockSize}×128)</span>
+                  <span className="text-sky-400 font-bold">Tile K_{currentKVTile}, V_{currentKVTile} ({blockSize}×128)</span>
                 </div>
               </div>
 
               {/* Online Softmax Rescaling Formula Live Box */}
-              <div className="rounded-lg bg-black/50 p-3 border border-amber-500/20 space-y-1.5 text-[11px] font-mono text-amber-200">
-                <div className="text-[10px] text-amber-400 uppercase font-bold tracking-wider flex items-center gap-1">
+              <div className="rounded-lg bg-[var(--bg-app)] p-3 border border-amber-500/30 space-y-1.5 text-[11px] font-mono text-amber-600 dark:text-amber-200">
+                <div className="text-[10px] text-amber-500 uppercase font-bold tracking-wider flex items-center gap-1">
                   <Info size={12} />
                   <span>{language === 'ar' ? 'معادلة المعايرة المباشرة (Online Softmax)' : 'Online Rescaling Update Step'}</span>
                 </div>
-                <div className="text-xs text-white">
+                <div className="text-xs text-[var(--text-primary)] font-bold">
                   m_new = max(m_old, max(S_tile))
                 </div>
                 <div className="text-[10px] text-[var(--text-secondary)]">
                   P_tile = exp(S_tile - m_new)
                 </div>
-                <div className="text-[10px] text-emerald-400">
+                <div className="text-[10px] text-emerald-500 dark:text-emerald-400 font-semibold">
                   O_accum = O_accum · exp(m_old - m_new) + P_tile · V_tile
                 </div>
               </div>
             </div>
 
             {/* IO Telemetry Comparison */}
-            <div className="rounded-xl border border-[var(--border-subtle)] bg-black/30 p-4 space-y-2.5 font-mono text-xs">
+            <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] p-4 space-y-2.5 font-mono text-xs">
               <div className="text-[11px] text-[var(--text-secondary)] font-bold uppercase tracking-wider">
                 {language === 'ar' ? 'مقارنة نقل الذاكرة (Memory IO Traffic)' : 'Memory Bandwidth IO Footprint'}
               </div>
