@@ -73,7 +73,7 @@ export interface Beat {
   code?: CodeChallenge;
   question?: QuizQuestion;
   hints?: SocraticHints;
-  narrative: { en: string; ar: string };
+  narrative?: { en: string; ar: string };
 }
 
 export type SupportedCodeLanguage = 'python' | 'javascript' | 'c' | 'rust' | 'java' | 'r';
@@ -92,7 +92,7 @@ export interface CodeChallenge {
   testCases: TestCase[];
   expectedOutput: string;
   solution?: string;
-  variants?: Partial<Record<SupportedCodeLanguage, CodeLanguageVariant>>;
+  variants?: Partial<Record<SupportedCodeLanguage | 'sql', CodeLanguageVariant>>;
 }
 
 export interface TestCase {

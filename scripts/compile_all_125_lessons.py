@@ -226,7 +226,12 @@ def build_transfer_quiz(title, title_ar, lesson_id):
     }
 
 def main():
-    print("Beginning extraction and compilation of all 125 OKVIR lessons...")
+    if '--from-specs' not in sys.argv:
+        import sync_curriculum
+        sync_curriculum.sync_all()
+        return
+
+    print("Beginning extraction and compilation of all 125 OKVIR lessons from raw specifications...")
     
     # 1. Extract from all 12 spec files
     t1_ped, t1_code, t1_vis = bcd.extract_track_1()

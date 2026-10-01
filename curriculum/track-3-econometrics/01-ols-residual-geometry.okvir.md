@@ -12,9 +12,19 @@ i18n:
 
 # Bivariate OLS & The Geometry of Orthogonal Residuals
 
-Ordinary Least Squares (OLS) is frequently introduced as an optimization problem where one calculates the line that minimizes vertical squared distances. However, the deepest, most foundational insight of econometrics is geometric: OLS is an orthogonal projection of the observed outcome vector $\mathbf{y} \in \mathbb{R}^N$ onto the linear subspace spanned by the regressors, $\text{col}(\mathbf{X})$.
+## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-When we collect data on $N$ economic agents, the outcome $\mathbf{y}$ is a single point in an $N$-dimensional sample space. The regressor matrix $\mathbf{X} \in \mathbb{R}^{N \times K}$ defines a
+Ordinary Least Squares (OLS) is almost universally introduced as a curve-fitting optimization: drawing a line across a 2D scatterplot to minimize the sum of squared vertical gaps. But this two-dimensional view obscures the deepest, most foundational insight of modern econometrics: **OLS is an orthogonal projection in sample space $\mathbb{R}^N$**.
+
+Imagine collecting data on $N$ people. The observed outcome $\mathbf{y}$ is not a cloud of points—it is a single high-dimensional vector in an $N$-dimensional universe. Your regressors (like education, experience, and the constant intercept) span a much smaller $K$-dimensional flat subspace $\text{col}(\mathbf{X})$. Because $N \gg K$, the outcome vector $\mathbf{y}$ almost never lies inside this subspace. 
+
+Think of a flagpole standing at an angle on a flat lawn. If the midday sun shines directly from straight above, the shadow cast upon the grass is the fitted value $\hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol{\beta}}$. The plumb line dropping straight down from the flagpole's tip to its shadow is the residual vector $\mathbf{e}$. Just as that vertical plumb line is strictly perpendicular ($90^\circ$) to every blade of grass on the lawn, the OLS residual vector $\mathbf{e}$ is mathematically perpendicular to every single regressor in $\mathbf{X}$. Least squares is simply finding the best "line of sight" to project high-dimensional reality onto the subspace we can observe.
+
+يُقدَّم الانحدار الخطي العادي (OLS) في الغالب كمسألة حسابية لرسم خط يقلل المسافات الرأسية في رسم بياني ثنائي الأبعاد. لكن هذا التبسيط يحجب الرؤية الهندسية الأكثر عمقًا وأصالة في القياس الاقتصادي: **OLS هو إسقاط متعامد في فضاء العينة ذي الأبعاد الـ $N$**.
+
+عندما نجمع بيانات عن $N$ شخص، فإن المتغير التابع $\mathbf{y}$ ليس سحابة نقاط، بل هو متجه واحد في فضاء هائل ذي $N$ بعدًا. وتشكل المتغيرات المستقلة (كالتعليم والخبرة والثابت) فضاءً فرعيًا مسطحًا ذا بعد $K$ (حيث $N \gg K$). ولأن $\mathbf{y}$ لا يقع عمومًا داخل هذا الفضاء، فإن أفضل تقدير له هو إسقاط ظله العمودي تمامًا.
+
+تخيل سارية علم تميل بزاوية فوق أرضية عشبية مسطحة. عندما تسطع شمس الظهيرة عموديًا من كبد السماء، يكون الظل المنعكس على العشب هو القيم المقدرة $\hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol{\beta}}$. أما خيط الشاقول المتدلي من قمة السارية إلى قمة الظل فهو متجه البواقي $\mathbf{e}$. تمامًا كما يشكل خيط الشاقول زاوية قائمة ($90^\circ$) مع كل عشبة على الأرضية، يتعامد متجه البواقي $\mathbf{e}$ رياضيًا مع كل متغير مفسر في المصفوفة $\mathbf{X}$. إن الانحدار الخطي في جوهره هو البحث عن أفضل زاوية رؤية لإسقاط الواقع على الفضاء الذي نستطيع قياسه.
 
 :::simulation-widget{engine="canvas2d" component="LinearRegressionResiduals"}
 ---
@@ -23,24 +33,63 @@ highlighted_metric: "loss"
 ---
 :::
 
-### Mathematical Foundations
+## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
+
+The population data generating process across $N$ observations is represented in matrix notation as:
 
 $$
 \mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}
 $$
 
-يُقدَّم الانحدار الخطي العادي (OLS) غالبًا كمسألة استمثال حسابية لحساب خط يقلل مجموع مربعات المسافات الرأسية. لكن الرؤية الأكثر عمقًا وأصالة في القياس الاقتصادي هي الرؤية الهندسية: OLS هو في حقيقته إسقاط متعامد (Orthogonal Projection) لمتجه المشاهدات $\mathbf{y} \in \mathbb{R}^N$ على الفضاء الفرعي الخطي الذي تولده المتغيرات المستقلة $\text{col}(\mathbf{X})$.
+The empirical sum of squared residuals objective function minimizes the squared Euclidean length of the error vector:
 
-في فضاء العينة ذي الأبعاد الـ $N$، يمثل المتجه $\mathbf{y}$ نقطة في $\mathbb{R}^N$، بينما تشكل مصفوفة البيانات $\mathbf{X}$ فضاءً فرعيًا ذا بعد $K$ (حيث $N \gg K$). ونظرًا لأن $\mathbf{y}$ لا يقع عمومًا داخل هذا الفضاء، فإن أفضل تقريب خطي
+$$
+S(\boldsymbol{\beta}) = \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 = (\mathbf{y} - \mathbf{X}\boldsymbol{\beta})^T (\mathbf{y} - \mathbf{X}\boldsymbol{\beta}) = \mathbf{y}^T\mathbf{y} - 2\boldsymbol{\beta}^T \mathbf{X}^T \mathbf{y} + \boldsymbol{\beta}^T \mathbf{X}^T \mathbf{X} \boldsymbol{\beta}
+$$
+
+Setting the gradient to zero yields the celebrated **Normal Equations**:
+
+$$
+\nabla_{\boldsymbol{\beta}} S(\boldsymbol{\beta}) = -2\mathbf{X}^T \mathbf{y} + 2\mathbf{X}^T \mathbf{X}\boldsymbol{\beta} = \mathbf{0} \implies \mathbf{X}^T (\mathbf{y} - \mathbf{X}\hat{\boldsymbol{\beta}}) = \mathbf{X}^T \mathbf{e} = \mathbf{0}
+$$
+
+Under the assumption of full column rank ($\text{rank}(\mathbf{X}) = K < N$), $\mathbf{X}^T \mathbf{X}$ is strictly positive definite and invertible:
+
+$$
+\hat{\boldsymbol{\beta}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y}
+$$
+
+The fitted values and residuals are generated via the symmetric, idempotent **Hat Matrix** ($\mathbf{P}_X$) and **Annihilator Matrix** ($\mathbf{M}_X$):
+
+$$
+\hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol{\beta}} = \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y} \equiv \mathbf{P}_X \mathbf{y}, \quad \mathbf{e} = \mathbf{y} - \hat{\mathbf{y}} = (\mathbf{I}_N - \mathbf{P}_X)\mathbf{y} \equiv \mathbf{M}_X \mathbf{y}
+$$
+
+### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
+
+* $\mathbf{y} \in \mathbb{R}^{N \times 1}$: Observed response vector containing the outcome variable for all $N$ economic agents.
+* $\mathbf{X} \in \mathbb{R}^{N \times K}$: Design matrix containing $K$ regressor columns (including an intercept vector of ones $\boldsymbol{\iota}_N$).
+* $\boldsymbol{\beta} \in \mathbb{R}^{K \times 1}$: True, unobservable population parameter vector.
+* $\hat{\boldsymbol{\beta}} \in \mathbb{R}^{K \times 1}$: OLS coefficient vector that minimizes the sum of squared residuals.
+* $\hat{\mathbf{y}} \in \text{col}(\mathbf{X})$: Orthogonal projection of $\mathbf{y}$ onto the subspace spanned by the columns of $\mathbf{X}$.
+* $\mathbf{e} \in \mathbb{R}^{N \times 1}$: Sample residual vector satisfying $\mathbf{X}^T \mathbf{e} = \mathbf{0}$ by first-order construction.
+* $\mathbf{P}_X \in \mathbb{R}^{N \times N}$: The projection (hat) matrix with $\text{rank}(\mathbf{P}_X) = \text{tr}(\mathbf{P}_X) = K$.
+* $\mathbf{M}_X \in \mathbb{R}^{N \times N}$: The residual maker (annihilator) matrix with $\text{rank}(\mathbf{M}_X) = \text{tr}(\mathbf{M}_X) = N - K$, satisfying $\mathbf{M}_X \mathbf{X} = \mathbf{0}$.
+
+## Beat 3: Interactive Python Challenge | التحدي البرمجي
+
+Implement the closed-form Ordinary Least Squares estimator using NumPy. Rather than directly computing `np.linalg.inv`, solve the linear system $(\mathbf{X}^T \mathbf{X})\boldsymbol{\beta} = \mathbf{X}^T \mathbf{y}$ using `np.linalg.solve` to preserve numerical stability and avoid condition-number blowups.
 
 :::python-challenge{id="py-ols-residual-geometry"}
 ---
 timeout_ms: 3000
 test_cases:
-  - input: "x = np.array([1.0, 2.0])"
-    expected: "3.0"
-  - input: "x = np.array([0.0, 0.0])"
-    expected: "0.0"
+  - input: "fit_ols(np.array([[1.0, 1.0], [1.0, 2.0], [1.0, 3.0]]), np.array([3.0, 5.0, 7.0]))['beta'].round(4).tolist()"
+    expected: "[1.0, 2.0]"
+  - input: "fit_ols(np.array([[1.0, 0.0], [1.0, 4.0]]), np.array([2.0, 10.0]))['beta'].round(4).tolist()"
+    expected: "[2.0, 2.0]"
+  - input: "fit_ols(np.array([[1.0, 2.0], [1.0, 4.0], [1.0, 6.0]]), np.array([4.0, 8.0, 12.0]))['residuals'].round(4).tolist()"
+    expected: "[0.0, 0.0, 0.0]"
 ---
 ```python
 import numpy as np
@@ -54,13 +103,45 @@ def fit_ols(X: np.ndarray, y: np.ndarray) -> dict[str, np.ndarray]:
     X : np.ndarray of shape (N, K)
         Design matrix of regressors (must have full column rank).
     y : np.ndarray of shape (N,)
-        Response vector.
+        Observed response vector.
         
     Returns
     -------
-    dict with keys 'beta', 'y_hat', 'residuals'
+    dict with keys:
+        'beta': estimated parameter vector of shape (K,)
+        'y_hat': fitted values vector of shape (N,)
+        'residuals': residual errors vector of shape (N,)
     """
-    # TODO: Solve (X^T X) beta = X^T y without explicit matrix inversion
-    pass
+    # Step 1: Form the cross-product matrix X^T X
+    XtX = X.T @ X
+    
+    # Step 2: Form the regressor-outcome vector X^T y
+    Xty = X.T @ y
+    
+    # Step 3: Solve the normal equations (X^T X) beta = X^T y stably
+    beta = np.linalg.solve(XtX, Xty)
+    
+    # Step 4: Compute the orthogonal projection (fitted values) y_hat = X beta
+    y_hat = X @ beta
+    
+    # Step 5: Compute the residual vector e = y - y_hat
+    residuals = y - y_hat
+    
+    return {
+        "beta": beta,
+        "y_hat": y_hat,
+        "residuals": residuals,
+    }
 ```
 :::
+
+## Beat 4: Reality Transfer Challenge | اختبار الانتقال المعرفي الواقعي
+
+A data scientist at an economic consulting firm runs an OLS regression of worker wages on years of education and notes with excitement: *"My computer output shows that the sum of the residuals is $0.00000000$ and the correlation between education and the residuals is exactly $0.00000000$. This proves that education is completely exogenous and my estimate is free from unobserved ability bias!"*
+
+How should a trained econometrician evaluate this statement?
+
+* [ ] The scientist is correct: if residuals are orthogonal to education, there cannot be omitted variable bias.
+* [x] The scientist is mistaken: residual orthogonality ($\mathbf{X}^T \mathbf{e} = \mathbf{0}$) is an algebraic identity forced by the first-order conditions of least squares; it holds identically even if omitted ability severely confounds the regression.
+* [ ] The scientist is mistaken only because the sample size might be too small for the central limit theorem to apply.
+* [ ] The scientist is correct only if the true error term is normally distributed.

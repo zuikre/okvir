@@ -16,6 +16,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "test": "node ./bin/okvir.js test curriculum",
+    "sync:curriculum": "python3 scripts/sync_curriculum.py",
     "cli": "node ./bin/okvir.js",
     "tauri": "tauri"
   },

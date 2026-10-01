@@ -12,12 +12,29 @@ i18n:
 
 # Gradient Descent, Learning Rates & Landscape Navigation
 
-Imagine you are blindfolded on a foggy mountain slope in a thick mist. You cannot see the valley at the bottom. How can you navigate to the safety of the valley? 
+## Beat 1: Tactile Intuition
 
-You can feel the slant of the ground with your boots. If your boots tell you that the ground slopes steeply upward toward the north and east, you simply take a step in the exact opposite direction: toward the south and west! 
-This is Gradient Descent. 
-You take a step downhill, feel the new slope, take another step downhill, and repeat. But be careful about your step size (the learning rate $\eta$):
-- If your steps are tiny
+Imagine you are blindfolded on a steep, fog-shrouded mountainside in a thick mist. You cannot see the safety of the valley floor below. How can you find your way down to camp?
+
+You can feel the local tilt of the terrain with the soles of your boots. If the ground slopes steeply upward toward the northeast, you take a step in the exact opposite direction: toward the southwest! 
+This is **Gradient Descent**.
+
+You step downhill, pause to feel the new slope, take another step downhill, and repeat. But you must be remarkably disciplined about your step size (the **learning rate** $\eta$):
+- If your steps are infinitesimal baby steps ($\eta \to 0$), you will freeze to death before reaching camp.
+- If your steps are wild, gigantic leaps ($\eta \gg 0$), you will overshoot the valley floor completely, catapult yourself onto the opposite mountain ridge, and diverge into disaster!
+
+Furthermore, in narrow elliptical ravines, standard gradient descent zig-zags frantically from wall to wall. Adding **Polyak Momentum** solves this: it acts like rolling a heavy bowling ball down the canyon, allowing accumulated momentum along the valley floor to wash away transverse oscillations.
+
+تخيل أنك معصوب العينين وتقف على سفح جبل وعر يلفه ضباب كثيف. لا يمكنك رؤية قاع الوادي أو المخيم الآمن في الأسفل. كيف يمكنك شق طريقك نحو النجاة؟
+
+يمكنك استشعار ميل الأرض تحت باطن حذائك مباشرة. إذا شعرت بأن الأرض ترتفع بشدة نحو الشمال الشرقي، فستخطو خطوة في الاتجاه المعاكس تماماً: نحو الجنوب الغربي!
+هذا هو جوهر **خوارزمية الانحدار التدريجي** (Gradient Descent).
+
+تخطو خطوة نحو الأسفل، وتتوقف لجس نبض الميل الجديد، ثم تخطو خطوة هبوطية أخرى، وتكرر العملية. ولكن يجب أن تكون منضبطاً للغاية بشأن حجم خطوتك (**معدل التعلم** $\eta$):
+- إذا كانت خطواتك بالغة الصغر كالذر ($\eta \to 0$)، فستتجمد من البرد قبل أن تقطع متراً واحداً نحو الوادي.
+- وإذا كانت خطواتك قفزات عملاقة مفرطة ($\eta \gg 0$)، فستقفز فوق الوادي بأكمله، لترتطم بالجرف المقابل وتتشتت إلى الهاوية!
+
+وعلاوة على ذلك، في الوديان الضيقة، يتذبذب الانحدار العادي بعنف بين الجدران المتقابلة. وهنا يأتي دور **زخم بولياك** (Polyak Momentum): الذي يتصرف ككرة بولينغ ثقيلة تتدحرج في الوادي، فتتراكم سرعتها على طول مسار القاع وتتلاشى التذبذبات الجانبية المزعجة.
 
 :::simulation-widget{engine="canvas2d" component="GradientDescentDynamicsLab"}
 ---
@@ -26,50 +43,102 @@ highlighted_metric: "loss"
 ---
 :::
 
-### Mathematical Foundations
+## Beat 2: Formal Mathematical Anchor
 
 $$
-\mathbf{x}_{t+1} = \mathbf{x}_t - \eta_t \nabla f(\mathbf{x}_t), \quad t = 0, 1, 2, \dots
+\mathbf{x}_{t+1} = \mathbf{x}_t - \eta \nabla f(\mathbf{x}_t) \quad (\text{Vanilla Gradient Descent})
+$$
+$$
+\mathbf{v}_{t+1} = \beta \mathbf{v}_t + \eta \nabla f(\mathbf{x}_t), \quad \mathbf{x}_{t+1} = \mathbf{x}_t - \mathbf{v}_{t+1} \quad (\text{Polyak Heavy-Ball Momentum})
+$$
+$$
+f(\mathbf{x}_{t+1}) \le f(\mathbf{x}_t) - \eta \left(1 - \frac{L\eta}{2}\right) \|\nabla f(\mathbf{x}_t)\|_2^2 \quad (\text{Descent Lemma for } L\text{-smooth } f)
 $$
 
-خوارزمية الانحدار التدريجي هي العمود الفقري لتدريب كافة نماذج الذكاء الاصطناعي؛ إذ تُحاكي متسلقاً أعمى يهبط جبلاً غارقاً في الضباب عبر التحسس المستمر لدرجة ميل الأرض تحت قدميه والمشي في عكس اتجاه الصعود ($-\nabla f$). يُحدد "معدل التعلم" $\eta$ حجم الخطوة: فالخطوات المتناهية الصغر تؤدي لبطء شديد وتجمد، بينما الخطوات المفرطة تؤدي للقفز العنيف فوق الوادي وتشتت النموذج. وفي الأودية الضيقة ذات الانحناء غير المتناسق، تعاني الخوارزمية من تذبذبات متعرجة حادة.
+### Demystifying the Equation
+
+| Symbol | Dimensional Type | Geometric Meaning | Operational Role |
+| :--- | :--- | :--- | :--- |
+| $\mathbf{x}_t$ | $\mathbb{R}^D$ | Current parameter coordinates at step $t$ | State vector of model weights |
+| $\nabla f(\mathbf{x}_t)$ | $\mathbb{R}^D$ | Instantaneous direction of steepest ascent | Drives downhill step direction via negative sign |
+| $\eta$ | $\mathbb{R}_{> 0}$ | Learning rate / step length multiplier | Hyperparameter controlling step size magnitude |
+| $\mathbf{v}_t$ | $\mathbb{R}^D$ | Accumulated velocity buffer vector | Encodes directional kinetic memory across iterations |
+| $\beta \in [0, 1)$ | Scalar | Momentum friction damping coefficient | Governs exponential memory retention factor |
+| $L$ | $\mathbb{R}_{> 0}$ | Lipschitz smoothness constant of $\nabla f$ | Imposes strict upper bound on step size: $\eta < 2/L$ |
+
+The descent lemma guarantees monotonic decrease in loss at every iteration, provided the learning rate satisfies $\eta < 2/L$.
+
+### تفكيك المعادلة
+
+| الرمز | النوع البُعدي | المعنى الهندسي | الدور العملياتي |
+| :--- | :--- | :--- | :--- |
+| $\mathbf{x}_t$ | $\mathbb{R}^D$ | إحداثيات المعاملات الحالية عند الخطوة $t$ | متجه أوزان النموذج |
+| $\nabla f(\mathbf{x}_t)$ | $\mathbb{R}^D$ | اتجاه الصعود الأشد اللحظي | يوجه خطوة الهبوط عبر الإشارة السالبة |
+| $\eta$ | $\mathbb{R}_{> 0}$ | معدل التعلم / مقياس طول الخطوة | معامل فائق يتحكم في مقدار الإزاحة |
+| $\mathbf{v}_t$ | $\mathbb{R}^D$ | متجه مخزن السرعة التراكمي | يمثل الذاكرة الحركية للاتجاه عبر التكرارات |
+| $\beta \in [0, 1)$ | قيمة قياسية | معامل تخميد الاحتكاك للزخم | يحدد نسبة الاحتفاظ بالسرعة السابقة |
+| $L$ | $\mathbb{R}_{> 0}$ | ثابت ليبشيتز لنعومة التدرج | يفرض حداً أقصى حرجاً لحجم الخطوة: $\eta < 2/L$ |
+
+تضمن مبرهنة الهبوط (Descent Lemma) التناقص الرتيب المستمر في قيمة الخسارة في كل خطوة، بشرط أن يلتزم معدل التعلم بالشرط الصارم $\eta < 2/L$.
+
+## Beat 3: Interactive Python Scratchpad
 
 :::python-challenge{id="py-hessian-matrix-extrema"}
 ---
 timeout_ms: 3000
 test_cases:
-  - input: "x = np.array([1.0, 2.0])"
-    expected: "3.0"
-  - input: "x = np.array([0.0, 0.0])"
-    expected: "0.0"
+  - input: "x_next, v_next = momentum_gradient_descent_step(np.array([5.0, 5.0]), np.array([2.0, 4.0]), np.array([0.0, 0.0]), 0.1, 0.9); list(np.round(x_next, 2))"
+    expected: "[4.8, 4.6]"
+  - input: "x_next, v_next = momentum_gradient_descent_step(np.array([5.0, 5.0]), np.array([2.0, 4.0]), np.array([0.0, 0.0]), 0.1, 0.9); list(np.round(v_next, 2))"
+    expected: "[0.2, 0.4]"
 ---
 ```python
 import numpy as np
 
-def momentum_gradient_descent_step(x: np.ndarray, grad: np.ndarray, v: np.ndarray, lr: float, beta: float) -> tuple[np.ndarray, np.ndarray]:
+def momentum_gradient_descent_step(
+    x: np.ndarray,
+    grad: np.ndarray,
+    v: np.ndarray,
+    lr: float,
+    beta: float
+) -> tuple[np.ndarray, np.ndarray]:
     """
-    Execute a single update step of classical Polyak momentum gradient descent.
+    Execute a single iteration update of classical Polyak heavy-ball momentum.
     
     Parameters
     ----------
     x : np.ndarray
-        Current parameters, shape (D,)
+        Current parameter vector of shape (D,).
     grad : np.ndarray
-        Gradient vector, shape (D,)
+        Current loss gradient vector nabla f(x) of shape (D,).
     v : np.ndarray
-        Velocity vector, shape (D,)
+        Velocity buffer vector of shape (D,).
     lr : float
-        Learning rate
+        Learning rate alpha > 0.
     beta : float
-        Momentum factor
+        Momentum damping coefficient beta in [0, 1).
         
     Returns
     -------
     tuple[np.ndarray, np.ndarray]
-        x_next: Updated parameters of shape (D,)
-        v_next: Updated velocity buffer of shape (D,)
+        x_next : Updated parameter vector, shape (D,).
+        v_next : Updated velocity buffer vector, shape (D,).
     """
-    # TODO: Implement momentum velocity and coordinate update
-    pass
+    # Step 1: Accumulate momentum velocity v_{t+1} = beta * v_t + lr * grad
+    v_next = beta * v + lr * grad
+    
+    # Step 2: Update coordinates opposite to velocity x_{t+1} = x_t - v_{t+1}
+    x_next = x - v_next
+    
+    return x_next, v_next
 ```
 :::
+
+## Beat 4: Reality Transfer Challenge
+
+When optimizing an ill-conditioned quadratic ravine $f(x, y) = 100x^2 + y^2$, standard gradient descent oscillates violently back and forth across the steep $x$-walls while crawling agonizingly slowly along the shallow $y$-axis. How does introducing Polyak momentum ($\beta \approx 0.9$) resolve this failure?
+
+* [ ] It rotates the coordinate frame so that $x$ and $y$ are uncoupled.
+* [x] It averages velocity vectors over time, causing alternating positive and negative oscillations across the steep walls to cancel out while persistently compounding forward velocity along the shallow valley floor.
+* [ ] It sets the learning rate to zero whenever rapid oscillations are detected.
+* [ ] It computes the exact inverse of the Hessian matrix at every step.

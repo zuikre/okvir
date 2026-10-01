@@ -836,10 +836,11 @@ export const OkvirWorkbench: React.FC = () => {
             </h2>
           </div>
 
-          {/* Narrative Content with generous typography */}
-          <div className="text-base md:text-lg text-[var(--text-secondary)] leading-relaxed space-y-4">
-            <MathText text={isAr ? beat1.narrative.ar : beat1.narrative.en} />
-          </div>
+          {beat1?.narrative && (
+            <div className="text-base md:text-lg text-[var(--text-secondary)] leading-relaxed space-y-4">
+              <MathText text={isAr ? beat1.narrative.ar : beat1.narrative.en} />
+            </div>
+          )}
 
           {/* Pre-Simulation Hypothesis Priming Challenge */}
           <HypothesisPrimingCard
@@ -982,9 +983,11 @@ export const OkvirWorkbench: React.FC = () => {
             </h2>
           </div>
 
-          <div className="text-base md:text-lg text-[var(--text-secondary)] leading-relaxed space-y-4">
-            <MathText text={isAr ? beat2.narrative.ar : beat2.narrative.en} />
-          </div>
+          {beat2?.narrative && (
+            <div className="text-base md:text-lg text-[var(--text-secondary)] leading-relaxed space-y-4">
+              <MathText text={isAr ? beat2.narrative.ar : beat2.narrative.en} />
+            </div>
+          )}
 
           {/* Large, Beautiful KaTeX Formula Card */}
           {beat2.formula && (
@@ -1075,9 +1078,11 @@ export const OkvirWorkbench: React.FC = () => {
             </p>
           </div>
 
-          <div className="text-base text-[var(--text-secondary)] leading-relaxed space-y-4">
-            <MathText text={isAr ? beat3.narrative.ar : beat3.narrative.en} />
-          </div>
+          {beat3?.narrative && (
+            <div className="text-base text-[var(--text-secondary)] leading-relaxed space-y-4">
+              <MathText text={isAr ? beat3.narrative.ar : beat3.narrative.en} />
+            </div>
+          )}
 
           {/* Full-Width Code Challenge Editor */}
           <div className="w-full rounded-3xl border border-[var(--border-strong)] overflow-hidden shadow-2xl bg-[var(--bg-surface)]">
@@ -1110,9 +1115,11 @@ export const OkvirWorkbench: React.FC = () => {
             </p>
           </div>
 
-          <div className="text-base text-[var(--text-secondary)] leading-relaxed">
-            <MathText text={isAr ? beat4.narrative.ar : beat4.narrative.en} />
-          </div>
+          {beat4?.narrative && (
+            <div className="text-base text-[var(--text-secondary)] leading-relaxed">
+              <MathText text={isAr ? beat4.narrative.ar : beat4.narrative.en} />
+            </div>
+          )}
 
           {/* Multi-Question Diagnostic Assessment Battery with Passing Score Gate */}
           <QuizBatteryComponent

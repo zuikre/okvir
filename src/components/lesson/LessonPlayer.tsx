@@ -211,6 +211,21 @@ export const LessonPlayer: React.FC = () => {
 
   const isLocked = uncompletedPrereqs.length > 0;
 
+  const renderNarrative = (narrativeText?: string) => {
+    if (!narrativeText) return null;
+    const paragraphs = narrativeText.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
+    if (paragraphs.length === 0) return null;
+    return (
+      <div className="space-y-3">
+        {paragraphs.map((para, idx) => (
+          <p key={idx} className="leading-relaxed">
+            <MathText text={para.trim()} />
+          </p>
+        ))}
+      </div>
+    );
+  };
+
   if (isLocked) {
     return (
       <div className="flex-1 overflow-y-auto flex items-center justify-center p-6">
@@ -391,7 +406,7 @@ export const LessonPlayer: React.FC = () => {
                   {hintTier === 2 && '📐 [Tier 2]:'}
                   {hintTier === 3 && '🎯 [Tier 3]:'}
                 </span>
-                {getHintContent(hintTier)}
+                <MathText text={getHintContent(hintTier)} />
               </div>
             </div>
           </div>
@@ -403,7 +418,7 @@ export const LessonPlayer: React.FC = () => {
         {currentBeat === 1 && (
           <div className="space-y-4 fade-in">
             <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm text-[var(--text-secondary)] leading-relaxed">
-              {mod.beats.find((b) => b.number === 1)?.narrative[language]}
+              {renderNarrative(mod.beats.find((b) => b.number === 1)?.narrative?.[language])}
             </div>
 
             {renderSimulationWidget()}
@@ -438,7 +453,7 @@ export const LessonPlayer: React.FC = () => {
               </div>
 
               <h2 className="text-base font-semibold text-[var(--text-primary)]">
-                {beat2?.formulaNote ? beat2.formulaNote[language] : (language === 'ar' ? 'المرساة الرياضية الرسمية' : 'Formal Mathematical Anchor')}
+                <MathText text={beat2?.formulaNote ? beat2.formulaNote[language] : (language === 'ar' ? 'المرساة الرياضية الرسمية' : 'Formal Mathematical Anchor')} />
               </h2>
 
               {/* KaTeX Math Box (Strict LTR Isolation) */}
@@ -599,8 +614,8 @@ export const LessonPlayer: React.FC = () => {
               </div>
 
               {/* Narrative */}
-              <div className="text-sm text-[var(--text-secondary)] leading-relaxed space-y-3 pt-2">
-                <p>{beat2?.narrative[language]}</p>
+              <div className="text-sm text-[var(--text-secondary)] leading-relaxed pt-2">
+                {renderNarrative(beat2?.narrative?.[language])}
               </div>
 
               <div className="flex justify-between pt-3 border-t border-[var(--border-subtle)]">
@@ -633,7 +648,7 @@ export const LessonPlayer: React.FC = () => {
           return (
             <div className="space-y-4 fade-in">
               <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm text-[var(--text-secondary)] leading-relaxed">
-                {beat3?.narrative[language] || (language === 'ar' ? 'طبّق الكود المطلوب:' : 'Implement the required computational kernel:')}
+                {renderNarrative(beat3?.narrative?.[language]) || (language === 'ar' ? 'طبّق الكود المطلوب:' : 'Implement the required computational kernel:')}
               </div>
 
               <CodeChallengeEditor
