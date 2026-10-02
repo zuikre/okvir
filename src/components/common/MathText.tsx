@@ -236,8 +236,94 @@ function parseMarkdownBlocks(text: string): MarkdownBlock[] {
 }
 
 /**
+ * Splits a dense multi-sentence paragraph into bite-sized, cognitive sentence chunks.
+ * Strictly preserves math ($...$, $$...$$), inline code (`...`), decimals (3.14),
+ * abbreviations (e.g., i.e., vs., إلخ.), and initials (A. Smith).
+ */
+export function splitIntoSentenceChunks(text: string): string[] {
+  if (!text || text.length < 60) return [text];
+
+  // Tokenize math and code to protect them from splitting
+  const tokens: string[] = [];
+  let tokenized = text.replace(/(\$[^$\n]+?\$|`[^`\n]+?`)/g, (match) => {
+    const placeholder = `___TOKEN_${tokens.length}___`;
+    tokens.push(match);
+    return placeholder;
+  });
+
+  // Protect abbreviations
+  const ABBREVS = [
+    'e.g.', 'i.e.', 'vs.', 'etc.', 'al.', 'approx.', 'fig.', 'eq.', 'dr.', 'prof.', 'mr.', 'mrs.', 'ms.', 'إلخ.'
+  ];
+  for (let i = 0; i < ABBREVS.length; i++) {
+    const ab = ABBREVS[i];
+    const escaped = ab.replace(/\./g, '\\.');
+    const re = new RegExp(`\\b${escaped}`, 'gi');
+    tokenized = tokenized.replace(re, (m) => {
+      const placeholder = `___TOKEN_${tokens.length}___`;
+      tokens.push(m);
+      return placeholder;
+    });
+  }
+
+  // Protect initials (e.g. "A. Smith")
+  tokenized = tokenized.replace(/\b([A-Z])\.\s+/g, (_m, letter) => {
+    const placeholder = `___TOKEN_${tokens.length}___`;
+    tokens.push(`${letter}. `);
+    return placeholder;
+  });
+
+  // Protect decimals (e.g. 3.14)
+  tokenized = tokenized.replace(/(\d+)\.(\d+)/g, (m) => {
+    const placeholder = `___TOKEN_${tokens.length}___`;
+    tokens.push(m);
+    return placeholder;
+  });
+
+  // Protect ellipsis
+  tokenized = tokenized.replace(/\.{2,}/g, (m) => {
+    const placeholder = `___TOKEN_${tokens.length}___`;
+    tokens.push(m);
+    return placeholder;
+  });
+
+  // Split on sentence boundaries: [.!?؟۔] followed by optional quotes/brackets/markdown, then whitespace, then start of next sentence
+  const SPLIT_REGEX = /([.!?؟۔]+["'\)\]*`_]*)\s+(?=[A-Z\u0621-\u064A0-9("'\*$#])/;
+
+  const rawChunks: string[] = [];
+  let remaining = tokenized;
+
+  while (remaining) {
+    const match = remaining.match(SPLIT_REGEX);
+    if (!match || match.index === undefined) {
+      rawChunks.push(remaining);
+      break;
+    }
+
+    const splitPos = match.index + match[1].length;
+    const chunk = remaining.slice(0, splitPos).trim();
+    rawChunks.push(chunk);
+    remaining = remaining.slice(splitPos).trim();
+  }
+
+  // Restore protected tokens
+  const restoredChunks = rawChunks
+    .map((chunk) => {
+      let res = chunk;
+      for (let i = 0; i < tokens.length; i++) {
+        res = res.replace(`___TOKEN_${i}___`, tokens[i]);
+      }
+      return res.trim();
+    })
+    .filter(Boolean);
+
+  return restoredChunks.length > 0 ? restoredChunks : [text];
+}
+
+/**
  * MathText renders text containing inline LaTeX math ($...$), code snippets (`...`),
  * markdown bold (**...**), italics (*...*), and structured markdown blocks (tables, headings, lists).
+ * Automatically chunked into readable, cognitive micro-paragraphs.
  * Fully responsive and theme-aware (light/dark mode).
  */
 export const MathText: React.FC<MathTextProps> = ({ text, className = '', inline = false }) => {
@@ -250,7 +336,8 @@ export const MathText: React.FC<MathTextProps> = ({ text, className = '', inline
       text.includes('|') ||
       text.startsWith('#') ||
       text.startsWith('$$') ||
-      /^\s*(\d+\.|[-*])\s+/.test(text));
+      /^\s*(\d+\.|[-*])\s+/.test(text) ||
+      text.length > 90);
 
   if (!hasBlockFeatures) {
     return <span className={className}>{renderInline(text)}</span>;
@@ -379,12 +466,28 @@ export const MathText: React.FC<MathTextProps> = ({ text, className = '', inline
             return <hr key={bKey} className="border-t border-[var(--border-subtle)] my-4" />;
 
           case 'p':
-          default:
+          default: {
+            const chunks = splitIntoSentenceChunks(block.text);
+            if (chunks.length <= 1) {
+              return (
+                <p key={bKey} className="leading-relaxed text-sm text-[var(--text-secondary)]">
+                  {renderInline(block.text, `${bKey}-p`)}
+                </p>
+              );
+            }
             return (
-              <p key={bKey} className="leading-relaxed text-sm text-[var(--text-secondary)]">
-                {renderInline(block.text, `${bKey}-p`)}
-              </p>
+              <div key={bKey} className="space-y-3">
+                {chunks.map((chunk, cIdx) => (
+                  <p
+                    key={`${bKey}-p-${cIdx}`}
+                    className="leading-relaxed text-sm text-[var(--text-secondary)]"
+                  >
+                    {renderInline(chunk, `${bKey}-p-${cIdx}`)}
+                  </p>
+                ))}
+              </div>
             );
+          }
         }
       })}
     </div>
