@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlaskConical, Lock, ArrowRight, BookOpen, Compass } from 'lucide-react';
+import { FlaskConical, Lock, ArrowRight, BookOpen, Compass, Clock } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
 import { curriculum } from '@/lib/curriculum';
@@ -120,7 +120,7 @@ export const Sandbox: React.FC = () => {
               <Lock size={30} />
             </div>
 
-            <div className="space-y-2 max-w-md mx-auto">
+            <div className="space-y-2 max-w-xl mx-auto">
               <span className="px-2.5 py-0.5 text-[11px] font-mono font-bold rounded-full bg-amber-500/10 text-[var(--math-gradient)] border border-amber-500/20">
                 {language === 'ar' ? 'مختبر مقفل • يتطلب إتقان المتطلبات' : 'Locked Laboratory • Prerequisite Required'}
               </span>
@@ -136,29 +136,31 @@ export const Sandbox: React.FC = () => {
 
             {/* Prerequisite List */}
             {uncompletedPrereqs.length > 0 && (
-              <div className="max-w-md mx-auto space-y-2.5 text-start">
+              <div className="max-w-xl mx-auto space-y-2.5 text-start">
                 {uncompletedPrereqs.map((prereq) => (
                   <div
                     key={prereq!.id}
-                    className="flex items-center justify-between p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-amber-500/40 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-amber-500/40 transition-colors shadow-sm"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[var(--math-gradient)] shadow-sm" />
-                      <div>
-                        <div className="text-xs font-semibold text-[var(--text-primary)]">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[var(--math-gradient)] shadow-sm shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs sm:text-sm font-semibold text-[var(--text-primary)] leading-snug break-words">
                           {language === 'ar' ? prereq!.titleAr : prereq!.title}
                         </div>
-                        <div className="text-[10px] text-[var(--text-tertiary)] font-mono">
-                          ~{prereq!.estimatedMinutes} mins • {prereq!.trackId.toUpperCase()}
+                        <div className="text-[10px] text-[var(--text-tertiary)] font-mono mt-0.5 flex items-center gap-1.5">
+                          <Clock size={10} className="shrink-0" />
+                          <span>~{prereq!.estimatedMinutes} mins • {prereq!.trackId.toUpperCase()}</span>
                         </div>
                       </div>
                     </div>
                     <button
                       onClick={() => startLesson(prereq!.id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--math-vector)] text-black text-xs font-mono font-semibold hover:brightness-110 transition-transform active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
+                      className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-[var(--math-vector)] text-black text-xs font-mono font-bold hover:brightness-110 transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0 w-full sm:w-auto shadow-sm"
                     >
-                      <BookOpen size={12} className="shrink-0" />
+                      <BookOpen size={13} className="shrink-0" />
                       <span className="whitespace-nowrap">{language === 'ar' ? 'ابدأ المتطلب' : 'Start Lesson'}</span>
+                      <ArrowRight size={12} className={`shrink-0 ${language === 'ar' ? 'rotate-180' : ''}`} />
                     </button>
                   </div>
                 ))}

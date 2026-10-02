@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRight, Check, Lightbulb, Compass, Target, Sparkles, Lock, X, AlertTriangle, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Lightbulb, Compass, Target, Sparkles, Lock, X, AlertTriangle, RotateCcw, BookOpen, Clock } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
 import { curriculum } from '@/lib/curriculum';
@@ -276,7 +276,7 @@ export const LessonPlayer: React.FC = () => {
   if (isLocked) {
     return (
       <div className="flex-1 overflow-y-auto flex items-center justify-center p-6">
-        <div className="max-w-md w-full p-8 rounded-2xl border border-amber-500/30 bg-[var(--bg-surface)] shadow-2xl text-center space-y-6">
+        <div className="max-w-xl w-full p-6 sm:p-8 rounded-2xl border border-amber-500/30 bg-[var(--bg-surface)] shadow-2xl text-center space-y-6">
           <div className="w-14 h-14 rounded-2xl bg-[var(--math-gradient)]/10 border border-[var(--math-gradient)]/20 text-[var(--math-gradient)] flex items-center justify-center mx-auto">
             <Lock size={28} />
           </div>
@@ -292,23 +292,31 @@ export const LessonPlayer: React.FC = () => {
             </p>
           </div>
 
-          <div className="space-y-2 text-start">
+          <div className="space-y-2.5 text-start">
             {uncompletedPrereqs.map((p) => (
               <div
                 key={p!.id}
-                className="flex items-center justify-between p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-amber-500/40 transition-colors shadow-sm"
               >
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2 h-2 rounded-full bg-amber-400" />
-                  <span className="text-xs font-semibold text-[var(--text-primary)]">
-                    {language === 'ar' ? p!.titleAr : p!.title}
-                  </span>
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs sm:text-sm font-semibold text-[var(--text-primary)] leading-snug break-words">
+                      {language === 'ar' ? p!.titleAr : p!.title}
+                    </div>
+                    <div className="text-[10px] text-[var(--text-tertiary)] font-mono mt-0.5 flex items-center gap-1.5">
+                      <Clock size={10} className="shrink-0" />
+                      <span>~{p!.estimatedMinutes} mins • {p!.trackId.toUpperCase()}</span>
+                    </div>
+                  </div>
                 </div>
                 <button
                   onClick={() => startLesson(p!.id)}
-                  className="px-3 py-1 rounded-lg bg-[var(--math-vector)] text-black text-[11px] font-mono font-semibold hover:brightness-110 transition-transform active:scale-95 whitespace-nowrap shrink-0 cursor-pointer"
+                  className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-[var(--math-vector)] text-black text-xs font-mono font-bold hover:brightness-110 transition-all active:scale-95 whitespace-nowrap shrink-0 w-full sm:w-auto cursor-pointer shadow-sm"
                 >
-                  <span className="whitespace-nowrap">{language === 'ar' ? 'ابدأ المتطلب' : 'Start Prerequisite'}</span>
+                  <BookOpen size={12} className="shrink-0" />
+                  <span className="whitespace-nowrap">{language === 'ar' ? 'ابدأ المتطلب' : 'Start Lesson'}</span>
+                  <ArrowRight size={11} className={`shrink-0 ${language === 'ar' ? 'rotate-180' : ''}`} />
                 </button>
               </div>
             ))}
