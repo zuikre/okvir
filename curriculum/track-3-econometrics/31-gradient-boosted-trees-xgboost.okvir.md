@@ -12,16 +12,23 @@ i18n:
 
 # Gradient Boosted Decision Trees & XGBoost 2nd-Order Expansion
 
-While Random Forests build an army of deep, independent trees that vote in parallel, **Gradient Boosted Decision Trees (GBDT)** construct an ensemble sequentially through iterative correction. 
+## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Think of an apprentice golfer taking shots under the watchful eye of a master instructor:
-- On Shot 1, the apprentice swings and misses the pin, landing 30 yards to the right (the initial error or residual).
-- On Shot 2, the apprentice does not try to hit the ball from the beginning again; instead, they focus strictly on correcting the 30-yard error.
-- On Shot 3, only a 4-yard error remains, which the next tiny corrective tap adjusts.
+In the previous lesson, Random Forests achieved predictive stability through mass democracy: an ensemble of 500 deep, independent trees voting simultaneously in parallel. **Gradient Boosted Decision Trees (GBDT)** abandon this parallel democracy entirely, adopting a philosophy of **disciplined sequential craftsmanship**. Instead of training a crowd of trees all at once, boosting constructs trees one by one, where every single new tree is explicitly manufactured to target, repair, and neutralize the residual errors made by its predecessors.
 
-Jerome Friedman (2001) formulated this as Gradient Descent in function space: each subsequent shallow tree fits the negative gradient (the pseudo-residuals) of the loss function. 
+Imagine an aspiring archer training for the Olympic games under the watchful eye of a master coach. On Shot 1, the archer releases an arrow: it strikes the target 30 inches too high and 10 inches to the right of the bullseye. A novice might pull out another arrow and try to shoot blindly again from scratch. But the master coach commands: *"Keep your stance! Do not start over. We are going to isolate your error. Your next shot will be a micro-correction: aim precisely 30 inches lower and 10 inches left."* The archer fires Shot 2, leaving an error of only 2 inches. The third shot is a delicate, millimeter adjustment. Each successive shot does not replace the past; it directly targets and chips away at the **residual deficit** left behind by all previous attempts.
 
-Tianqi Chen and Carlos Guestrin (2016) elevated this into **XGBoost (Extreme Gradient Boosting)**. Instead of using a simple 1st-order gradient step, XGBoost uses a **2nd-order Taylor approximation** that incorporates both the slope ($g_i$, the gradient) and the curvature ($h_i$, the Hessian) of the loss function. Combined with analytical $L_2$ regularization on leaf weights, XGBoost calculates the exact optimal leaf score and split gain in a single closed-form arithmetic step!
+Jerome Friedman (2001) elevated this physical metaphor into rigorous mathematics by introducing **Gradient Descent in function space**. In classical neural networks, gradient descent updates parameter weights $\mathbf{w}$ along the slope of the loss function. In gradient boosting, we do not adjust fixed weights; instead, we take steps in the infinite-dimensional space of functions! Each new shallow decision tree (often called a "weak learner," restricted to a depth of only 3 to 6 splits) is trained to predict the negative gradient of the loss function. This negative gradient acts as a set of customized "pseudo-residuals," pointing each new tree toward the exact training instances that were previously misclassified or underpredicted.
+
+In 2016, Tianqi Chen and Carlos Guestrin sparked an empirical revolution with **XGBoost (Extreme Gradient Boosting)**. Friedman's original algorithm relied on first-order linear Taylor approximations (gradients alone). XGBoost elevated boosting into Newton-Raphson optimization by executing a **second-order Taylor series expansion** that simultaneously evaluates both the slope ($g_i$, the first derivative) and the curvature ($h_i$, the second derivative or Hessian) of the loss function. Knowing both slope and curvature allows the algorithm to determine not only the direction to step, but the exact step size required to hit the minimum. Coupled with analytic $L_2$ regularization on leaf weights ($\lambda$) and structural complexity penalties ($\gamma$), XGBoost evaluates the mathematically optimal leaf scores and split gain in a single, lightning-fast closed-form calculation.
+
+في الدرس السابق، رأينا كيف حققت الغابات العشوائية استقرارها التنبؤي عبر ديمقراطية جماعية تعتمد على تصويت 500 شجرة عميقة ومستقلة بالتوازي. على النقيض من ذلك تماماً، تتخلى **أشجار التدرج المعززة (Gradient Boosted Decision Trees - GBDT)** عن هذا التصويت المتوازي لتتبنى فلسفة **التعلم التتابعي التراكمي وتصحيح الأخطاء خطوة بخطوة**. فبدلاً من بناء جيش من الأشجار دفعة واحدة، تبني خوارزمية التعزيز الأشجار شجرة تلو الأخرى؛ بحيث تُصمم كل شجرة جديدة خصيصاً لملاحقة وإصلاح الأخطاء والبواقي التي عجزت الأشجار السابقة عن حلها.
+
+تخيل رامي سهام مبتدئاً يتدرب للمشاركة في الأولمبياد تحت إشراف مدرب محترف وخبير. في الضربة الأولى، يطلق الرامي سهمه فيصيب لوحة الهدف بعيداً عن المركز بمقدار 30 سنتيمتراً للأعلى و 10 سنتيمترات لليمين. المبتدئ الساذج قد يسحب سهماً جديداً ليرمي عشوائياً من البداية. لكن المدرب الحكيم يوقفه قائلاً: *"اثبت في مكانك! لا تعد للصفر. سنعالج الخطأ تحديداً: اجعل رميتك التالية تصحيحاً حركياً دقيقاً يستهدف التحرك 30 سنتيمتراً للأسفل و 10 سنتيمترات لليسار"*. يطلق الرامي السهم الثاني، فيتقلص الخطأ إلى 2 سنتيمتر فقط، لتأتي الرمية الثالثة بلمسة مجهرية تضع السهم في قلب الهدف. لا تلغي كل خطوة سابقتها، بل تبني فوقها وتصقل بواقيها بدقة متناهية.
+
+صاغ جيروم فريدمان (2001) هذا الحدس الرياضي عبر مفهوم عبقري: **الهبوط التدرجي في فضاء الدوال (Gradient Descent in Function Space)**. ففي الشبكات العصبية الكلاسيكية، نحدث أوزان المعاملات $\mathbf{w}$ على طول ميل دالة الخطأ. أما في أشجار التدرج المعززة، فإننا نتحرك في فضاء الدوال ذاته؛ حيث تُدرب كل شجرة قرار جديدة بسيطة (تُسمى متعلماً ضعيفاً، بعمق 3 إلى 6 تفرعات فقط) لتتنبأ بالتدرج السالب لدالة الخسارة. يعمل هذا التدرج السالب كـ "بواقي تقريبية" تكشف للشجرة الجديدة بدقة الحالات التي أخطأ النموذج التراكمي في تقديرها.
+
+وفي عام 2016، أحدث تيانكي تشن وكارلوس غويسترين ثورة كبرى بابتكار **XGBoost (التعزيز التدرجي الأقصى)**. كان نموذج فريدمان الأصلي يكتفي بتقريب تايلور الخطي من الدرجة الأولى (التدرجات فقط). بينما نقل نظام XGBoost التعزيز إلى آفاق طريقة نيوتن-رافسون عبر استخدام **تقريب متسلسلة تايلور من الدرجة الثانية**؛ حيث يدمج بين ميل الخطأ ($g_i$ - المشتقة الأولى) وانحناء دالة الخسارة ($h_i$ - المشتقة الثانية أو الهيسيان). تتيح معرفة الميل والانحناء معاً للنموذج تحديد المسار الأمثل وحجم الخطوة المطلوبة بدقة مطلقة. وبفضل الدمج بين تنظيم $L_2$ لأوزان الأوراق ($\lambda$) وجزاء تعقيد الشجرة ($\gamma$)، يحسب XGBoost الوزن الأمثل لكل ورقة ومكسب التفرع الرياضي في خطوة حسابية مغلقة وفائقة السرعة.
 
 :::simulation-widget{engine="canvas2d" component="DecisionTreeLaser"}
 ---
@@ -30,63 +37,95 @@ highlighted_metric: "loss"
 ---
 :::
 
-بينما تبني الغابات العشوائية جيشاً من الأشجار العميقة المستقلة التي تصوت بالتوازي، تعتمد **أشجار التدرج المعززة (GBDT)** على البناء التتابعي التراكمي وتصحيح الأخطاء خطوة بخطوة.
+## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-تخيل لاعب جولف مبتدئاً يتدرب تحت إشراف مدرب محترف:
-- في الضربة الأولى، يسدد اللاعب الكرة فتخطئ الحفرة بـ 30 متراً إلى اليمين (الخطأ الأولي أو البواقي).
-- في الضربة الثانية، لا يعيد اللاعب التسديد من البداية، بل يركز حصراً على تصحيح خطأ الـ 30 متراً السابق.
-- في الضربة الثالثة، يتبقى خطأ طفيف بمسافة 4 أمتار فقط، فتأتي الشجرة التالية بلمسة دقيقة لتصحيحه.
-
-صاغ جيروم فريدمان (2001) هذه الفكرة كـ "هبوط تدرجي في فضاء الدوال"، حيث تُدرب كل شجرة جديدة على بواقي التدرج السالب لدالة الخسارة.
-
-ثم أحدث نظام **XGBoost** قفزة نوعية عبر استخدام **تقريب تايلور من الدرجة الثانية**؛ حيث لا يكتفي بميل الخطأ ($g_i$ - التدرج)، بل يستفيد أيضاً من انحناء دالة الخسارة ($h_i$ - الهيسيان) مع تطبيق تنظيم $L_2$ صريح على أوزان الأوراق، مما يتيح حساب الوزن الأمثل لكل ورقة ومكسب التفرع بصيغة مغلقة ومباشرة.
-
-### Mathematical Foundations
-
-At iteration $t$, we seek a new tree $f_t(\mathbf{x})$ that minimizes the penalized objective:
+At boosting step $t \in \{1, \dots, M\}$, we construct a new tree $f_t(\mathbf{x})$ that adds to the current cumulative prediction $\hat{y}_i^{(t-1)}$. The regularized objective function is:
 
 $$
 \mathcal{L}^{(t)} = \sum_{i=1}^N \ell\left(y_i, \hat{y}_i^{(t-1)} + f_t(\mathbf{x}_i)\right) + \Omega(f_t)
 $$
 
-where the tree complexity penalty is $\Omega(f) = \gamma T + \frac{1}{2}\lambda \sum_{j=1}^T w_j^2$, with $T$ being the number of leaves and $w_j$ the leaf weights.
-
-#### The 2nd-Order Taylor Series Approximation
-Expanding the loss function around the previous prediction $\hat{y}_i^{(t-1)}$:
+The tree structural regularization term $\Omega(f_t)$ penalizes leaf count $T$ and the $L_2$ norm of leaf weights $\mathbf{w}$:
 
 $$
-\tilde{\mathcal{L}}^{(t)} \approx \sum_{i=1}^N \left[ \ell(y_i, \hat{y}_i^{(t-1)}) + g_i f_t(\mathbf{x}_i) + \frac{1}{2} h_i f_t^2(\mathbf{x}_i) \right] + \gamma T + \frac{1}{2}\lambda \sum_{j=1}^T w_j^2
+\Omega(f_t) = \gamma T + \frac{1}{2}\lambda \sum_{j=1}^T w_j^2 = \gamma T + \frac{1}{2}\lambda \|\mathbf{w}\|_2^2
 $$
 
-where the 1st and 2nd derivatives are:
+### The 2nd-Order Taylor Series Expansion
+Expanding the differentiable loss function $\ell(y_i, \hat{y})$ in a quadratic Taylor series around the previous state $\hat{y}_i^{(t-1)}$:
 
 $$
-g_i = \left. \frac{\partial \ell(y_i, \hat{y})}{\partial \hat{y}} \right|_{\hat{y} = \hat{y}_i^{(t-1)}}, \quad h_i = \left. \frac{\partial^2 \ell(y_i, \hat{y})}{\partial \hat{y}^2} \right|_{\hat{y} = \hat{y}_i^{(t-1)}}
+\ell\left(y_i, \hat{y}_i^{(t-1)} + f_t(\mathbf{x}_i)\right) \approx \ell\left(y_i, \hat{y}_i^{(t-1)}\right) + g_i f_t(\mathbf{x}_i) + \frac{1}{2} h_i f_t^2(\mathbf{x}_i)
 $$
 
-#### Optimal Leaf Weight & Objective Form
-Let $I_j = \{i : q(\mathbf{x}_i) = j\}$ be the instance set mapped to leaf $j$. Define $G_j = \sum_{i \in I_j} g_i$ and $H_j = \sum_{i \in I_j} h_i$. Setting the derivative with respect to $w_j$ to zero yields the **Optimal Leaf Weight**:
+where the first-order gradient $g_i$ and second-order Hessian $h_i$ are defined as:
+
+$$
+g_i \equiv \left. \frac{\partial \ell(y_i, \hat{y})}{\partial \hat{y}} \right|_{\hat{y} = \hat{y}_i^{(t-1)}}, \quad h_i \equiv \left. \frac{\partial^2 \ell(y_i, \hat{y})}{\partial \hat{y}^2} \right|_{\hat{y} = \hat{y}_i^{(t-1)}}
+$$
+
+Dropping the constant term $\ell(y_i, \hat{y}_i^{(t-1)})$ simplifies the surrogate objective:
+
+$$
+\tilde{\mathcal{L}}^{(t)} = \sum_{i=1}^N \left[ g_i f_t(\mathbf{x}_i) + \frac{1}{2} h_i f_t^2(\mathbf{x}_i) \right] + \gamma T + \frac{1}{2}\lambda \sum_{j=1}^T w_j^2
+$$
+
+### Closed-Form Optimal Leaf Weights
+Let $I_j = \{i : q(\mathbf{x}_i) = j\}$ represent the subset of training instances mapped to leaf node $j$. Define the aggregated leaf gradient and Hessian:
+
+$$
+G_j \equiv \sum_{i \in I_j} g_i, \quad H_j \equiv \sum_{i \in I_j} h_i
+$$
+
+Rewriting the objective as a sum over independent leaf quadratic forms:
+
+$$
+\tilde{\mathcal{L}}^{(t)} = \sum_{j=1}^T \left[ G_j w_j + \frac{1}{2}(H_j + \lambda) w_j^2 \right] + \gamma T
+$$
+
+Taking the partial derivative $\frac{\partial \tilde{\mathcal{L}}^{(t)}}{\partial w_j} = G_j + (H_j + \lambda)w_j = 0$ yields the **Optimal Leaf Weight**:
 
 $$
 w_j^* = -\frac{G_j}{H_j + \lambda} = -\frac{\sum_{i \in I_j} g_i}{\sum_{i \in I_j} h_i + \lambda}
 $$
 
-Substituting $w_j^*$ back into the objective yields the minimal achievable loss for a given tree structure:
+Substituting $w_j^*$ back into the objective yields the minimum achievable loss for a given tree topology:
 
 $$
-\tilde{\mathcal{L}}^* = -\frac{1}{2} \sum_{j=1}^T \frac{G_j^2}{H_j + \lambda} + \gamma T
+\tilde{\mathcal{L}}^*(\text{Tree}) = -\frac{1}{2} \sum_{j=1}^T \frac{G_j^2}{H_j + \lambda} + \gamma T
 $$
 
-#### The Exact Split Gain Formula
-When considering splitting a leaf into Left ($L$) and Right ($R$) children, the exact reduction in loss is:
+### The Exact Greedy Split Gain Formula
+When considering splitting a parent leaf into Left ($L$) and Right ($R$) children with gradient sums $G_L, G_R$ and Hessian sums $H_L, H_R$, the exact reduction in the loss function is:
 
 $$
 \text{Gain} = \frac{1}{2} \left[ \frac{G_L^2}{H_L + \lambda} + \frac{G_R^2}{H_R + \lambda} - \frac{(G_L + G_R)^2}{H_L + H_R + \lambda} \right] - \gamma
 $$
 
-If $\text{Gain} \le 0$, the candidate split is rejected, providing automatic regularization.
+If $\text{Gain} \le 0$, the algorithm refuses to split the leaf. The hyperparameter $\gamma$ acts as an automatic, built-in pre-pruning threshold, while $\lambda$ smooths leaf predictions in regions with sparse data ($H_j \approx 0$).
 
-تعمل معلمة التنظيم $\lambda$ كمخمد للأوزان يمنع الأوراق التي تحتوي على عينات قليلة من اكتساب أوزان مفرطة، بينما تعمل معلمة $\gamma$ كعتبة قبول حاسمة تقص أي تفرع لا يقدم مكسباً حقيقياً يفوق تكلفتها.
+### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
+
+* $t \in \{1, \dots, M\}$: Current sequential boosting iteration.
+* $f_t(\mathbf{x})$: New additive decision tree learned at round $t$.
+* $\hat{y}_i^{(t-1)}$: Cumulative ensemble prediction for instance $i$ up to round $t-1$.
+* $\ell(y, \hat{y})$: Differentiable convex loss function (e.g., Squared Error or Binary Logistic Loss).
+* $g_i \in \mathbb{R}$: First-order partial derivative of the loss with respect to prediction (Gradient).
+* $h_i \in \mathbb{R}^+$: Second-order partial derivative of the loss with respect to prediction (Hessian/Curvature).
+* $G_j, H_j$: Sum of instance gradients and Hessians residing inside leaf node $j$.
+* $T$: Number of terminal leaf nodes in the tree candidate.
+* $w_j \in \mathbb{R}$: Continuous prediction score emitted by terminal leaf $j$.
+* $\lambda \ge 0$: Analytical $L_2$ regularization parameter preventing extreme leaf scores.
+* $\gamma \ge 0$: Minimum split gain required to justify creating an additional leaf (pre-pruning penalty).
+* $\text{Gain}$: Closed-form arithmetic formula quantifying exact loss reduction for candidate splits.
+
+## Beat 3: Interactive Python Challenge | التحدي البرمجي
+
+Implement the XGBoost second-order split gain and optimal child weight evaluation in NumPy. You will:
+1. Partition 1st-order gradients $g$ and 2nd-order Hessians $h$ into left and right child subsets at candidate `split_idx`.
+2. Compute the cumulative sums $G_L, H_L, G_R, H_R$ and total parent sums $G_{\text{total}}, H_{\text{total}}$.
+3. Evaluate the optimal leaf weights $w_L^* = -\frac{G_L}{H_L + \lambda}$ and $w_R^* = -\frac{G_R}{H_R + \lambda}$.
+4. Compute the 2nd-order split gain: $\text{Gain} = \frac{1}{2}\left[\frac{G_L^2}{H_L + \lambda} + \frac{G_R^2}{H_R + \lambda} - \frac{G_{\text{total}}^2}{H_{\text{total}} + \lambda}\right] - \gamma$.
 
 :::python-challenge{id="py-gradient-boosted-trees-xgboost"}
 ---
@@ -130,23 +169,23 @@ def compute_xgboost_split_gain(
         'w_left': Optimal weight for left leaf.
         'w_right': Optimal weight for right leaf.
     """
-    # 1. Left child sums
+    # Step 1: Left child gradient and Hessian sums
     G_L = float(np.sum(g[:split_idx]))
     H_L = float(np.sum(h[:split_idx]))
     
-    # 2. Right child sums
+    # Step 2: Right child gradient and Hessian sums
     G_R = float(np.sum(g[split_idx:]))
     H_R = float(np.sum(h[split_idx:]))
     
-    # 3. Combined parent sums
+    # Step 3: Combined parent sums
     G_total = G_L + G_R
     H_total = H_L + H_R
     
-    # 4. Optimal leaf weights: w = -G / (H + lambda)
+    # Step 4: Closed-form optimal leaf weights: w* = -G / (H + lambda)
     w_left = -G_L / (H_L + lmbda)
     w_right = -G_R / (H_R + lmbda)
     
-    # 5. Split gain calculation
+    # Step 5: 2nd-order split gain with complexity penalty gamma
     score_L = (G_L ** 2) / (H_L + lmbda)
     score_R = (G_R ** 2) / (H_R + lmbda)
     score_parent = (G_total ** 2) / (H_total + lmbda)
@@ -161,18 +200,29 @@ def compute_xgboost_split_gain(
 ```
 :::
 
-### Practical ML Transfer Challenge
+## Beat 4: Reality Transfer Challenge | اختبار الانتقال المعرفي الواقعي
 
-#### Scenario: Financial Credit Default Scoring Under Regularization
-A data science team trains an XGBoost classifier on credit card records. For a rare category of high-risk business loans, a terminal leaf node receives only 2 observations, with gradients $g_1 = -0.9, g_2 = -0.9$ and Hessians $h_1 = 0.05, h_2 = 0.05$.
+A credit risk analytics team trains an XGBoost classifier to forecast default risk on small business commercial loans. In an obscure, illiquid loan tier, a proposed leaf split isolates exactly 2 borrower records, with sample gradients $g_1 = -0.9, g_2 = -0.9$ and tiny sample Hessians $h_1 = 0.05, h_2 = 0.05$.
 
-When running the model with unregularized parameters ($\lambda = 0, \gamma = 0$), the leaf weight explodes to:
-$$w^* = -\frac{-1.8}{0.10} = +18.0$$
-producing extreme, unstable probabilities on out-of-sample data.
+When training unregularized boosting ($\lambda = 0.0, \gamma = 0.0$), the leaf weight explodes into severe instability:
+$$w^* = -\frac{G}{H} = -\frac{-1.80}{0.10} = +18.0$$
+producing extreme, destabilized logit scores that destroy out-of-sample calibration.
 
-**Diagnostic Question:** How does setting $\lambda = 5.0$ and $\gamma = 1.0$ mathematically neutralize this instability?
+**Diagnostic Question:** How does configuring $\lambda = 5.0$ and $\gamma = 1.0$ mathematically neutralize this instability?
 
-- **Option A (Correct):** Adding $\lambda = 5.0$ acts as a Bayesian ridge prior on the denominator: the leaf weight shrinks from $+18.0$ to $-\frac{-1.8}{0.10 + 5.0} = +0.35$. Furthermore, the split gain will fail to overcome the $\gamma = 1.0$ pruning threshold, causing the tree to automatically prune this low-evidence split and preserve generalization.
-- **Option B:** $\lambda$ converts the Hessian values into negative numbers to invert the gradient.
-- **Option C:** $\gamma$ forces the tree to replace binary trees with a neural perceptron layer.
-- **Option D:** Regularization parameters only apply during test inference and have no effect during tree construction.
+* [x] Adding $\lambda = 5.0$ acts as a quadratic $L_2$ damper in the denominator, collapsing the explosive leaf weight from $+18.0$ down to $-\frac{-1.80}{0.10 + 5.0} = +0.35$. Simultaneously, the net gain of this two-sample split drops well below the $\gamma = 1.0$ hurdle, prompting XGBoost to reject the split automatically and prevent overfitting on low-evidence noise.
+  *تعمل إضافة $\lambda = 5.0$ كمخمد تربيعي $L_2$ في المقام، مما يقلص وزن الورقة المنفلت من $+18.0$ إلى $-\frac{-1.80}{0.10 + 5.0} = +0.35$. وفي الوقت نفسه، يهبط مكسب التفرع الصافي دون عتبة $\gamma = 1.0$ الإلزامية، مما يجعل XGBoost يرفض هذا التفرع الضعيف تلقائياً ويمنع فرط التخصيص على عينات ضئيلة.*
+  > **Why this is correct:** The leaf weight formula $w^* = -\frac{G}{H + \lambda}$ guarantees that when sample evidence is scarce ($H \to 0$), the denominator is dominated by $\lambda$, keeping weights close to zero. Furthermore, the $\gamma$ penalty enforces a minimum gain hurdle, automatically pruning insignificant splits.
+  > **لماذا هذا الخيار صحيح:** تضمن صيغة وزن الورقة $w^* = -\frac{G}{H + \lambda}$ أنه عند ندرة العينات ($H \to 0$)، يسيطر المعامل $\lambda$ على المقام ويكبح تضخم الأوزان نحو الصفر. كما يفرض المعامل $\gamma$ حداً أدنى لمكسب التفرع، مما يقص التفرعات الهامشية تلقائياً.
+* [ ] Setting $\lambda = 5.0$ converts the Hessian curvature into negative values, mathematically inverting the direction of the gradient.
+  *يحول ضبط $\lambda = 5.0$ انحناء الهيسيان إلى قيم سالبة، مما يعكس اتجاه التدرج رياضياً.*
+  > **Why this is incorrect:** $\lambda$ is a strictly positive scalar added to $H_j \ge 0$; it reinforces positive-definiteness and never flips signs.
+  > **لماذا هذا الخيار خاطئ:** المعامل $\lambda$ قيمة موجبة قطعية تُضاف إلى الهيسيان الموجب $H_j \ge 0$؛ فهو يعزز الانحناء الموجب ولا يعكس الإشارة أبداً.
+* [ ] Setting $\gamma = 1.0$ instructs the algorithm to replace decision tree splits with dense neural network perceptrons.
+  *يوجه ضبط $\gamma = 1.0$ الخوارزمية لاستبدال تفرعات شجرة القرار بطبقات شبكات عصبية كثيفة.*
+  > **Why this is incorrect:** $\gamma$ is purely a scalar tree complexity penalty within CART structures; it has nothing to do with neural networks.
+  > **لماذا هذا الخيار خاطئ:** المعامل $\gamma$ مجرد جزاء عددي لتعقيد هيكل الشجرة ولا يحول النموذج إلى شبكة عصبية.
+* [ ] Regularization parameters $\lambda$ and $\gamma$ apply exclusively during inference on unseen test data and have no effect during tree training.
+  *تُطبق معاملات التنظيم $\lambda$ و $\gamma$ حصرياً أثناء مرحلة التنبؤ بالبيانات الجديدة وليس لها أي دور أثناء تدريب الشجرة.*
+  > **Why this is incorrect:** $\lambda$ and $\gamma$ directly govern the training objective function, determining leaf weights and split acceptance during tree construction.
+  > **لماذا هذا الخيار خاطئ:** يتحكم المعاملان $\lambda$ و $\gamma$ مباشرة في دالة الهدف أثناء التدريب، ويحددان أوزان الأوراق وقرارات قبول أو رفض التفرعات لحظياً.

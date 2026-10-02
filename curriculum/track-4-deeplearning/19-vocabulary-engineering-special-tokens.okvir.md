@@ -12,8 +12,20 @@ i18n:
 
 # Vocabulary Engineering, Special Tokens & Token Embeddings
 
-## Beat 1: Tactile Intuition
-An LLM does not understand text or characters—it is purely a high-dimensional vector processor. Once BPE slices text into token IDs like [104, 3921, 88], the model converts these numbers into continuous geometry using an Embedding Matrix: an enormous lookup catalog where each row is a dense vector in R^{d_model}. Beyond words, modern architectures require Special Tokens: control operators like [BOS] (begin sequence), [EOS] (stop generating), and conversation turn tags like <|im_start|>user. Vocabulary size is a delicate balance: larger vocabularies compress text into fewer tokens (faster generation), but inflate parameter size and can create severe 'fertility rate' inequalities across languages.
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
+
+A Large Language Model does not understand human words, syllables, or characters. At its core, a Transformer is an ultra-high-dimensional geometric processor that performs linear algebra on continuous vectors in $\mathbb{R}^{d_{\text{model}}}$. Once a tokenizer chops text into discrete integer IDs—such as `[104, 3921, 88]`—how does the model translate those cold numbers into rich mathematical meaning?
+
+The answer is the **Embedding Matrix ($\mathbf{E}$)**: an enormous lookup catalog containing one row for every single token in the vocabulary. If your vocabulary size is $V = 128,000$ and your model dimension is $d = 4,096$, the embedding table contains 128,000 dense rows. When token ID `3921` arrives, the network simply extracts row `3921` from the table. Through months of pretraining, the model positions these vectors so that semantically similar concepts (like `"king"` and `"queen"`, or `"Cairo"` and `"Egypt"`) cluster tightly together in semantic space.
+
+Beyond regular language tokens, modern AI models require **Special Control Tokens**: invisible traffic directors embedded directly into the stream of thought:
+* **`[BOS]` / `<s>` (Beginning of Sequence):** Wakes up the model and resets attention state.
+* **`[EOS]` / `</s>` (End of Sequence):** The crucial stop signal; without this token, the model would hallucinate endless sentences until running out of context memory!
+* **Chat Delimiters (e.g. `<|im_start|>user`, `<|im_start|>assistant`):** Protect the model from prompt injections by establishing unbreakable structural boundaries between user queries and assistant responses.
+
+Finally, engineers face the strategic dilemma of **Vocabulary Engineering & Token Fertility**. A larger vocabulary (e.g. 128k or 256k tokens) compresses text into fewer total tokens, speeding up generation and fitting longer documents into context. However, a bloated vocabulary inflates the embedding and unembedding matrices by hundreds of millions of parameters. Even more critically, tokenizers trained mostly on English exhibit **high fertility rates** on non-Latin scripts: an English sentence might compress into 10 tokens, while the exact same Arabic or Hindi sentence fragments into 30 tokens! This forces Arabic users to pay $3\times$ higher inference costs and grants them only one-third of the effective context window.
+
+> **Frontier Analogy:** Think of the embedding table as a universal currency exchange counter at an international airport. Travelers arrive holding discrete tickets from 128,000 different towns (token IDs). The teller immediately hands them a standardized gold currency pouch of 4,096 distinct gold coins (the continuous embedding vector) that can be spent anywhere in the city.
 
 :::simulation-widget{engine="canvas2d" component="BpeTokenizerLab"}
 ---
@@ -22,18 +34,66 @@ highlighted_metric: "loss"
 ---
 :::
 
-لا تعالج النماذج اللغوية الكلمات كنصوص حقيقية، بل تتعامل مع متجهات رقمية في فضاء متعدد الأبعاد. بعد أن يقطع المحلل النص إلى أرقام معرفية (Token IDs)، تُستخدم 'مصفوفة التضمين' (Embedding Matrix) كقاموس فوري يستبدل كل رقم بمتجه مستمر. وإلى جانب الكلمات العادية، تُهندس المعاجم برموز تحكم خاصة مثل [BOS] للإعلان عن بداية السياق، و [EOS] لإيقاف التوليد التلقائي. وتعد هندسة حجم المعجم موازنة دقيقة بين ضغط السلاسل النصية وتقليص حجم المعاملات لضمان عدالة تمثيل اللغات المختلفة كالعربية والإنجليزية.
+لا تدرك النماذج اللغوية الكلمات كأصوات أو نصوص حقيقية؛ فالمحولات التوليدية في جوهرها ليست سوى معالجات هندسية تجري حسابات الجبر الخطي على متجهات متصلة في فضاء متعدد الأبعاد $\mathbb{R}^{d_{\text{model}}}$. بعد أن يقطع المحلل النص إلى أرقام معرفية صحيحة مثل `[104, 3921, 88]`، كيف تُحول هذه الأرقام المجردة إلى معانٍ دلالية عميقة؟
 
-## Beat 2: Formal Mathematical Anchor
+الحل يكمن في **مصفوفة التضمين (Embedding Matrix $\mathbf{E}$)**: وهي بمثابة فهرس عملاق يحتوي على سطر متجهي مستقل لكل رمز في المعجم. إذا كان حجم المعجم $V = 128,000$ وبعد النموذج $d = 4,096$، فإن مصفوفة التضمين تتألف من 128 ألف صف متجهي كثيف. عند ورود الرمز رقم 3921، يستخرج النموذج الصف المقابل فوراً. وأثناء التدريب المسبق، تترتب هذه المتجهات هندسياً بحيث تتقارب المفاهيم المترابطة (مثل "ملك" و"ملكة"، أو "بغداد" و"العراق") في الفضاء الرياضي.
+
+وإلى جانب مفردات اللغة، تُهندس المعاجم **برموز تحكم خاصة (Special Tokens)** توجه حركة الإشارات:
+* **`[BOS]` (بداية السلسلة):** يعلن عن انطلاق النص ويهيئ مصفوفات الانتباه.
+* **`[EOS]` (نهاية السلسلة):** رمز التوقف الحاسم؛ وبدونه يستمر النموذج في التوليد العشوائي إلى ما لا نهاية!
+* **فواصل المحادثة (مثل `<|im_start|>user`):** تفصل بين تعليمات النظام وكلام المستخدم ورد المساعد لمنع الاختراق عبر الأوامر الخبيثة (Prompt Injections).
+
+تتطلب هندسة المعاجم موازنة دقيقة بين ضغط النصوص وحجم المعاملات. وتبرز هنا قضية **معدل الخصوبة (Token Fertility Rate)**: فالمعاجم المنحازة للغة الإنجليزية تقسم الجملة الإنجليزية إلى 10 رموز، بينما تتفتت نفس الجملة العربية إلى 30 رمزاً؛ مما يفرض على المستخدم العربي تكلفة استدلال تفوق ثلاثة أضعاف ويقلص نافذة الذاكرة الفعالة إلى الثلث!
+
+---
+
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
+
+Let $\mathcal{V} = \{0, 1, \dots, V-1\}$ be the discrete vocabulary of size $V$. The token embedding table is parameterized as a continuous matrix:
+
 $$
-\mathbf{E} \in \mathbb{R}^{V \times d_{\text{model}}}, \quad \mathbf{x}_t = \mathbf{E}[\text{token\_id}_t], \quad \text{Fertility} = \frac{\text{Tokens}}{\text{Words}}
+\mathbf{E} \in \mathbb{R}^{V \times d_{\text{model}}}
 $$
 
-The embedding table E maps discrete token indices {0, ..., V - 1} into continuous semantic vectors of dimension d_model. Special tokens serve as structural delimiters for multi-turn dialogues and system instructions. Token fertility measures how many subwords a language requires per word: if an English sentence takes 10 tokens while its Arabic translation takes 30 tokens due to vocabulary bias, the Arabic user pays 3x higher inference cost and gets 3x shorter effective context memory.
+Given a discrete sequence of token IDs $\mathbf{t} = (t_1, t_2, \dots, t_T) \in \mathcal{V}^T$, the embedding operation retrieves the corresponding row via one-hot indexing or direct matrix slicing:
 
-تحول مصفوفة التضمين E المؤشرات الرقمية للرموز إلى متجهات دلالية مستمرة ببعد d_model. تعمل الرموز الخاصة كفواصل هيكلية للمحادثات وتعليمات النظام. يقيس 'معدل الخصوبة' عدد الرموز الفرعية التي تتطلبها الكلمة الواحدة في لغة ما: إذا تطلبت الجملة العربية أضعاف ما تتطلبه الإنجليزية بسبب انحياز المعجم، فإن المستخدم يدفع تكلفة أعلى بثلاثة أضعاف ويعاني من نافذة سياق أضيق بكثير.
+$$
+\mathbf{x}_i = \mathbf{E}[t_i] \in \mathbb{R}^{d_{\text{model}}}
+$$
 
-## Beat 3: Python Challenge
+### Structural Framing with Special Tokens:
+A raw input token sequence $\mathbf{t}_{\text{raw}}$ is wrapped with control delimiters before entering the Transformer:
+
+$$
+\mathbf{t}_{\text{input}} = [t_{\text{BOS}}] \circ \mathbf{t}_{\text{raw}} \circ [t_{\text{EOS}}] \in \mathcal{V}^{T+2}
+$$
+
+### Token Fertility Metric:
+The representational efficiency of a tokenizer on language $\mathcal{L}$ across a corpus of $N$ words is quantified by its fertility rate:
+
+$$
+\text{Fertility}(\mathcal{L}) = \frac{\sum_{i=1}^N \text{tokens}(w_i)}{N}
+$$
+
+A fertility near $1.0$ indicates that words are cleanly mapped to single tokens. A fertility of $3.0$ indicates heavy fragmentation into sub-character byte pieces.
+
+### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
+
+* $V$: Total vocabulary size (number of distinct token IDs in dictionary).
+* $d_{\text{model}}$: Embedding vector dimension (e.g. 4,096 in LLaMA-3-8B).
+* $\mathbf{E} \in \mathbb{R}^{V \times d_{\text{model}}}$: Token input embedding matrix.
+* $P_{\text{vocab}} = 2 \times V \times d_{\text{model}}$: Total parameter footprint allocated to embeddings and unembeddings (untied head).
+* For $V = 128,000$ and $d_{\text{model}} = 4,096$:
+  $$P_{\text{vocab}} = 2 \times 128,000 \times 4,096 = 1,048,576,000 \approx 1.05 \text{ Billion weights!}$$
+
+توضح هذه الصياغة أن المعجم اللغوي ليس مجرد أداة مساعدة، بل يشكل بمفرده أكثر من مليار معامل في النماذج الحديثة. وتبرهن معادلة الخصوبة ($\text{Fertility}$) الأثر الاقتصادي والتقني لانحياز المعاجم، مما حفز النماذج الرائدة مثل LLaMA 3 و Gemma على توسيع المعجم وتضمين ملايين النصوص العربية ومتعددة اللغات لخفض معدل الخصوبة وتحقيق الكفاءة المثلى.
+
+---
+
+## Beat 3: Python Challenge | التحدي البرمجي التفاعلي
+
+Implement `embed_tokens_with_special(token_ids, embedding_matrix, bos_id, eos_id)` which prepends the `bos_id`, appends the `eos_id`, and performs vectorized row-lookup from `embedding_matrix` to return the complete sequence embeddings of shape $(T + 2, d_{\text{model}})$.
+
 :::python-challenge{id="py-vocabulary-engineering-special-tokens"}
 ---
 timeout_ms: 3000
@@ -46,20 +106,59 @@ test_cases:
 ```python
 import numpy as np
 
-def embed_tokens_with_special(token_ids: list[int], embedding_matrix: np.ndarray, bos_id: int, eos_id: int) -> np.ndarray:
+def embed_tokens_with_special(token_ids: list[int], embedding_matrix: np.ndarray, 
+                              bos_id: int, eos_id: int) -> np.ndarray:
     """
-    Prepend BOS, append EOS, and perform embedding table lookup.
+    Prepend BOS, append EOS, and perform vectorized embedding table lookup.
+    
+    Parameters
+    ----------
+    token_ids : list of int
+        List of integer token identifiers.
+    embedding_matrix : np.ndarray of shape (V, d_model)
+        Continuous embedding table.
+    bos_id : int
+        Special token ID for Beginning-Of-Sequence.
+    eos_id : int
+        Special token ID for End-Of-Sequence.
+        
+    Returns
+    -------
+    np.ndarray of shape (len(token_ids) + 2, d_model)
+        Extracted token embedding vectors.
     """
     # Step 1: Wrap sequence with special control tokens [BOS] + token_ids + [EOS]
-    # TODO: full_sequence = [bos_id] + list(token_ids) + [eos_id]
-    # Step 2: Extract rows from embedding_matrix using vectorized indexing
-    # TODO: return embedding_matrix[full_sequence]
-    pass
+    full_sequence = [bos_id] + list(token_ids) + [eos_id]
+
+    # Step 2: Extract rows from embedding_matrix using vectorized numpy fancy indexing
+    embeddings = embedding_matrix[full_sequence]
+
+    return embeddings
 ```
 :::
 
-## Beat 4: Reality Transfer Challenge
-Why does a high 'token fertility rate' for non-Latin scripts (such as Arabic) create an unfair handicap in LLMs?
+---
 
-* [x] Sentences fragment into significantly more tokens, exhausting the model's context window faster and multiplying inference costs.
-* [ ] High fertility causes the model to output syntax errors in Python code.
+## Beat 4: Reality Transfer Challenge | اختبار الانتقال المعرفي الواقعي
+
+### Transfer Question / سؤال نقل الأثر المعرفي
+
+Why does a high "token fertility rate" for non-Latin writing systems (such as Arabic or Japanese) create a severe economic and functional disadvantage when using foundation LLMs?
+
+* [x] Non-Latin sentences fragment into significantly more tokens per sentence, exhausting the model's finite context window three times faster and multiplying API inference latency and billing costs by $3\times$.
+* [ ] High token fertility causes the GPU to trigger floating-point underflow in the feedforward activation layers.
+* [ ] Models with high token fertility cannot output valid JSON or markdown syntax.
+* [ ] High fertility forces the attention matrix to become strictly non-invertible.
+
+### Pedagogical Explanation & Distractor Analysis | التحليل البيداغوجي وتفكيك البدائل
+
+**Why the correct option is right:**
+Token fertility is defined as the ratio of generated tokens to words ($\frac{\text{tokens}}{\text{word}}$). When a tokenizer is trained predominantly on English corpora, it constructs subword tokens representing entire English words or common stems (fertility $\approx 1.1$). For Arabic or other scripts, however, words are split into individual bytes or sub-characters, yielding fertility rates of $2.5$ to $3.5$. Because commercial LLM APIs charge per token and compute self-attention quadratically ($\mathcal{O}(N^2)$) based on sequence length $N$, an Arabic document with identical information content costs nearly three times more to process, incurs threefold higher time-to-first-token latency, and exhausts context windows three times faster.
+
+**Why the distractors are incorrect:**
+1. *High fertility causes floating-point underflow in FFN...*: False. Activation layers like SwiGLU process whatever continuous vectors are passed into them; token count affects sequence length $T$, not numerical underflow in feedforward float registers.
+2. *Models cannot output valid JSON or markdown...*: False. Valid syntax generation is governed by model instruction-tuning and pretraining data, completely independent of the tokenizer's fertility rate on specific languages.
+3. *High fertility forces attention to become non-invertible...*: False. The self-attention matrix $\mathbf{A} \in \mathbb{R}^{N \times N}$ is normalized via softmax across rows, and is generally not required to be invertible in Transformer forward inference.
+
+*الشرح باللغة العربية:*
+يُقصد بمعدل الخصوبة عدد الرموز الناتجة عن تقسيم الكلمة الواحدة. عندما يُدرب المحلل على نصوص إنجليزية في المقام الأول، فإنه يمنح الكلمات الإنجليزية رموزاً مكتملة (خصوبة تقارب 1.1)، بينما تتفتت الكلمات العربية إلى بايتات وحروف مجزأة (خصوبة تصل إلى 3.0 فأكثر). ولأن تسعير واجهات برمجة التطبيقات (APIs) وحسابات الذاكرة في المحولات تعتمد على عدد الرموز لا الكلمات، فإن الجملة العربية تكلف المستخدم ثلاثة أضعاف نظيرتها الإنجليزية، وتستهلك سعة الذاكرة السياقية بسرعة مضاعفة، مما دفع كبرى الشركات لتوسيع المعاجم إلى 128 ألف رمز لإنصاف كافة اللغات عالمياً.

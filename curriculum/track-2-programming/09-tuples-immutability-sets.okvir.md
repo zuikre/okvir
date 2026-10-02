@@ -12,9 +12,15 @@ i18n:
 
 # Tuples, Immutability & Set Theory Mechanics
 
-Beginners frequently assume a tuple is merely a 'read-only list', but their architectural roles are fundamentally different. A list is a dynamic array designed to grow and shrink. A **tuple** is a fixed-size structured record (like a database row: `('Alice', 30, 'Engineer')`).
+When novice developers encounter Python's `tuple` type, they almost invariably dismiss it as nothing more than a "read-only list." After all, both store ordered collections, both support indexing `seq[0]`, both allow slicing `seq[1:3]`, and both can be looped over. But in software architecture and memory design, lists and tuples serve two radically different purposes.
 
-Because a tuple's length is frozen upon creation, CPython optimizes it aggressively: zero over-allocation headroom, smaller memory overhead, and internal freelist recycling for small tuples. However, beware: **immutability in Python is shallow**! A tuple cannot change which memory addresses it holds. But if one of those addresses points to a mutable list, that list's internal contents can still be mutated! Meanwhile, a **set** is an ultra-fast hash table without values, granting $O(1)$ set membership testing and mathematical union/intersection operations.
+A list is a **dynamic shopping cart**. It is designed for homogeneous sequences of varying length that are meant to expand, shrink, and reorder as items are acquired. In contrast, a tuple is a **sealed, welded cargo crate**. It represents a fixed-dimension heterogeneous record—analogous to a single row in an SQL database or a `struct` in C (for example: `("Alice", 30, "Staff Engineer", True)`).
+
+Because a tuple's length is permanently frozen upon creation, CPython optimizes it aggressively. Unlike a list, a tuple never over-allocates spare memory headroom. An empty tuple consumes just 40 bytes on 64-bit CPython, compared to 56 bytes for an empty list. Furthermore, CPython maintains internal **freelists** for small tuples: when a small tuple is destroyed, its memory is not returned to the operating system; it is recycled instantly for the next tuple allocation, dramatically cutting memory fragmentation.
+
+However, programmers must beware of Python's most notorious trap: **immutability in Python is strictly shallow!** A tuple's immutability means only that the sequence of memory addresses (pointers) it holds is permanently locked. But if one of those pointers happens to point to a *mutable* object—such as a list—the contents of that list can still be modified in place! The crate itself cannot change which rooms it connects to, but someone inside one of those rooms can still rearrange the furniture! Consequently, a tuple is only hashable (and eligible as a dictionary key or set member) if *all* of its constituent elements are recursively immutable.
+
+Meanwhile, a **set** is an ultra-fast collection modeled on mathematical set theory. Under the hood, a set is implemented as a modified hash table that stores only keys without values. This grants $O(1)$ constant-time membership testing (`item in my_set`) and empowers developers with instantaneous mathematical operations like unions (`|`), intersections (`&`), and symmetric differences (`^`).
 
 :::simulation-widget{engine="canvas2d" component="RecursionTreeExplorer"}
 ---
@@ -29,13 +35,42 @@ $$
 \text{sizeof}(\text{tuple}_n) = 40 + 8n \text{ bytes}, \quad \text{sizeof}(\text{list}_n) = 56 + 8 \cdot \text{allocated}, \quad \text{Shallow Immutability}
 $$
 
-يعتقد المبتدئون أن الصف (Tuple) مجرد 'قائمة للقراءة فقط'، لكن غرضهما المعماري مختلف جوهرياً. القائمة مصفوفة ديناميكية صُممت لتنمو وتنكمش. بينما **الصف** هو سجل بيانات بنيوي ثابت الحجم (مثل صف في قاعدة بيانات: `('Alice', 30, 'Engineer')`).
+```text
+Memory Comparison: List vs Tuple vs Shallow Immutability:
+PyTupleObject (Frozen 2-element record):
++------------------------------------+
+| ob_refcnt: 1                       |
+| ob_type: &PyTuple_Type             |
+| ob_size: 2                         |
+| ob_item[0]: ---------> Heap: 42    |  (Immutable Integer)
+| ob_item[1]: ---------> Heap: [*]   |  (Mutable List!)
++-------------------------|----------+
+                          v
+               +----------------------+
+               | PyListObject         |
+               | contents: [1, 2]     |  <-- Can mutate via t[1].append(3)!
+               +----------------------+
+```
 
-ولأن حجم الصف مجمد عند إنشائه، يستمثله CPython بكفاءة عالية: لا مساحات محجوزة فائضة، واستهلاك أقل للذاكرة، وإعادة تدوير الصفوف الصغيرة في الذاكرة. ولكن احذر: **اللاقابلية للتعديل في بايثون سطحية** (Shallow Immutability)! لا يمكن للصف أن يغير مؤشرات الذاكرة التي يحملها؛ لكن إذا كان أحد تلك المؤشرات يشير إلى قائمة قابلة للتعديل، فإن محتويات القائمة الداخلية يمكن أن تتغير! أما **المجموعة** (`set`) فهي جدول تجزئة فائق السرعة يحوي مفاتيح فقط دون قيم، مما يمنح فحص الانتماء الرياضي بزمن ثابت $O(1)$.
+عندما يتعرف المبرمج المبتدئ على الصفوف في بايثون (`tuple`)، يتبادر إلى ذهنه فوراً أنها مجرد "قوائم للقراءة فقط". فكلاهما يخزن عناصر مرتبة، وكلاهما يدعم الفهرسة `seq[0]`، والتقطيع `seq[1:3]`، والتكرار الحلقي. لكن في المعمارية البرمجية وهندسة الذاكرة، يؤدي كل منهما غرضاً مختلفاً جذرياً.
 
-Memory footprint comparison reveals the architecture: on 64-bit CPython, an empty tuple consumes 40 bytes, while an empty list consumes 56 bytes. For $N$ items, a tuple allocates exactly $40 + 8N$ bytes, whereas a list allocates $56 + 8 \times \text{allocated}$ bytes where $\text{allocated} > N$. A set requires a minimum 224 bytes because it maintains an internal 8-slot hash table table from birth.
+القائمة هي **عربة تسوق ديناميكية ذات جوانب قابلة للتمدد**؛ صُممت للبيانات المتجانسة ذات الأطوال المتغيرة التي تحتاج للإضافة والحذف وإعادة الترتيب باستمرار. أما الصف (`tuple`) فهو **صندوق شحن خشبي مصفح ومختوم**؛ يمثل سجلاً بياناتياً بنيوياً ثابت الأبعاد غير متجانس الأنواع—تماماً مثل صف وحيد في جدول قاعدة بيانات SQL أو بنية `struct` في C (مثل: `("Alice", 30, "Engineer")`).
 
-يكشف فحص الذاكرة عن الفارق المعماري: في أنظمة 64-بت، يستهلك الصف الفارغ 40 بايتاً فقط، بينما تستهلك القائمة الفارغة 56 بايتاً. ولعدد $N$ من العناصر، يخصص الصف $40 + 8N$ بايتاً بدقة، في حين تخصص القائمة $56 + 8 \times \text{allocated}$ بايت حيث السعة المحجوزة أكبر من $N$. أما المجموعة فتحجز 224 بايتاً كحد أدنى لأنها تبني جدول تجزئة من 8 خانات منذ لحظة ولادتها.
+ولأن حجم الصف يتجمد نهائياً في لحظة ولادته، يستمثله CPython بقوة خارقة في الذاكرة. فعلى خلاف القائمة، لا يحجز الصف أي خانات ذاكرية فائضة للمستقبل. يستهلك الصف الفارغ 40 بايتاً فقط في معالجات 64 بت مقارنة بـ 56 بايتاً للقائمة الفارغة. والأهم من ذلك: يحتفظ بايثون داخلياً بـ **قوائم إعادة تدوير مجانية (Freelists)** للصفوف الصغيرة؛ فعند حذف صف صغير، لا تُعاد ذاكرته للنظام، بل يُعاد استخدامه فوراً للصف التالي لتسريع الحجز وتجنب تشتت الذاكرة.
+
+ومع ذلك، يجب على كل مهندس الحذر من أشهر فخ معماري في بايثون: **اللاقابلية للتعديل في بايثون سطحية بحتة (Shallow Immutability)!** معنى ثبات الصف هو أن شريط عناوين الذاكرة (المؤشرات) التي يحملها بداخله مقفل لا يمكن استبداله. ولكن إذا كان أحد تلك المؤشرات يشير إلى كائن *قابل للتعديل*—مثل قائمة—فإن محتويات تلك القائمة الداخلية يمكن تعديلها في مكانها بحرية! الصندوق الخشبي لا يستطيع تبديل الغرف التي يشير إليها، لكن يمكن لأي شخص داخل الغرفة أن يغير أثاثها! ولهذا السبب، لا يكون الصف قابلاً للتجزئة (Hashable) وصالحاً كمفتاح قاموس إلا إذا كانت *كافة* عناصره الداخلية مجمدة وغير قابلة للتعديل بدورها.
+
+أما **المجموعة (`set`)**، فهي بنية مستلهمة مباشرة من نظرية المجموعات الرياضية. تُبنى المجموعة كجدول تجزئة مخصص يخزن المفاتيح فقط دون أي قيم مرافقة. يمنح هذا الهيكل فحص انتماء لحظي بزمن ثابت $O(1)$ (`x in my_set`)، ويدعم العمليات الجبرية الفائقة كالتقاطع والاتحاد والفرق التناظري بسرعة استثنائية.
+
+#### Architectural Breakdown & Freelist Recycling:
+- **`PyTupleObject`**: Immutable variable-length object struct with no `allocated` field; `sizeof(tuple) = sizeof(PyVarObject) + sizeof(PyObject*) * ob_size`.
+- **Tuple Freelists**: CPython maintains an array of single-linked freelists for tuples of size $1 \le n < 20$, avoiding system heap allocations during hot loops.
+- **Set Invariants**: Sets maintain an 8-slot hash table initially, requiring items to be fully hashable. Set lookups bypass value fetching, matching keys directly via pointer identity followed by `__eq__`.
+
+#### التحليل المعماري وإعادة تدوير الذاكرة:
+- **هيكل `PyTupleObject`**: كائن متغير الطول ثابت الحجم، لا يحمل حقلاً للسعة المحجوزة `allocated`، مما يجعله أكثر رشاقة من القوائم في الذاكرة.
+- **قوائم الصفوف المجانية (Tuple Freelists)**: يحتفظ CPython بقوائم خاصة للصفوف التي يقل حجمها عن 20 عنصراً لإعادة استخدامها فوراً دون المرور بمدير ذاكرة النظام.
+- **ثوابت المجموعات**: تبدأ المجموعة بجدول تجزئة من 8 خانات، وتتطلب أن تكون جميع العناصر قابلة للتجزئة. وتعتمد على هوية المؤشرات أولاً ثم المقارنة `__eq__`.
 
 :::python-challenge{id="py-tuples-immutability-sets"}
 ---
@@ -65,12 +100,19 @@ def deep_freeze(obj: Any) -> Any:
     Returns:
         The recursively frozen, hashable equivalent.
     """
+    # Step 1: Recursively freeze list elements and convert to tuple
     if isinstance(obj, list):
         return tuple(deep_freeze(x) for x in obj)
+
+    # Step 2: Recursively freeze dict values and convert to frozenset of items
     elif isinstance(obj, dict):
         return frozenset((k, deep_freeze(v)) for k, v in obj.items())
+
+    # Step 3: Recursively freeze set items and convert to frozenset
     elif isinstance(obj, set):
         return frozenset(deep_freeze(x) for x in obj)
+
+    # Step 4: Base case - primitive atomic values are returned unchanged
     return obj
 ```
 :::
@@ -100,12 +142,18 @@ t[2] += [5]
   *ينفذ الكود بنجاح دون أي أخطاء ويضيف 5 للقائمة الفرعية.*
 
 **Analysis & Architectural Explanation / التحليل والشرح المعماري:**
-**Correct / الإجابة الصحيحة:** The `+=` operator executes `t[2].__iadd__([5])`, which successfully mutates the list in-place on the heap. Then, it attempts to assign the result back to `t[2]`, which raises `TypeError: 'tuple' object does not support item assignment` because the tuple container is immutable!
-*تستدعي `+=` التابع `t[2].__iadd__([5])` الذي يعدل القائمة في الكومة بنجاح، ثم تحاول العملية إعادة إسناد النتيجة إلى `t[2]`، فيطلق الصف خطأ `TypeError` لأنه لا يدعم تعديل عناصره!*
+**Correct / الإجابة الصحيحة:** The augmented assignment statement `t[2] += [5]` performs two distinct bytecode steps:
+1. In-place addition: It calls `t[2].__iadd__([5])`. Because lists are mutable, this succeeds in place, extending the list in heap memory to `[3, 4, 5]`.
+2. Re-assignment: The `+=` operator then attempts to assign the returned list reference back to the container: `STORE_SUBSCR` on `t[2]`. Because `t` is a tuple, CPython's `tuple_setitem` raises `TypeError: 'tuple' object does not support item assignment`!
+The mutation succeeded before the assignment failed, leaving the data mutated despite the crash!
+*تنفذ العملية المركبة `t[2] += [5]` خطوتين منفصلتين في شفرة البايت:
+1. التعديل في الموضع: تستدعي `__iadd__` على القائمة، فتنجح القائمة في إضافة الرقم 5 في الكومة لتصبح `[3, 4, 5]`.
+2. محاولة الإسناد: يحاول المعامل `+=` إعادة تعيين المؤشر إلى `t[2]` عبر أمر `STORE_SUBSCR`؛ ولأن الحاوية صف (`tuple`)، يرفض بايثون تعديل عناصره ويطلق `TypeError`!
+وبالتالي يقع التعديل أولاً ثم يفشل الإسناد، لتتغير البيانات رغم انهيار البرنامج!*
 
-**Incorrect / مشتت غير صحيح:** The in-place mutation occurs before the assignment step is evaluated.
-*التعديل في الموضع يقع بالفعل قبل محاولة إعادة الإسناد الفاشلة.*
+**Incorrect / مشتت غير صحيح:** The in-place mutation executes during the expression evaluation phase *before* the assignment step triggers the exception.
+*التعديل في الموضع يحدث بالفعل أثناء تقييم التعبير وقبل أن يطلق أمر الإسناد الخطأ.*
 
-**Incorrect / مشتت غير صحيح:** Assignment to a tuple element always raises a TypeError.
-*إسناد قيمة لأي عنصر في الصف يطلق خطأ نظامياً دائماً.*
+**Incorrect / مشتت غير صحيح:** Direct assignment to an indexed position in a tuple is forbidden by the Python runtime and will always raise a `TypeError`.
+*إسناد أي قيمة لفهرس محدد داخل الصف ممنوع تماماً في بايثون ويطلق `TypeError` حتماً.*
 :::

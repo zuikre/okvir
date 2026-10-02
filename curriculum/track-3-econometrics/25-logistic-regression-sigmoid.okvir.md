@@ -12,11 +12,23 @@ i18n:
 
 # Logistic Regression, Sigmoid Probability & Maximum Likelihood
 
-When predicting binary outcomes (loan default vs. repayment, disease presence vs. absence, customer churn vs. retention), fitting Ordinary Least Squares (the Linear Probability Model) is hazardous. A straight line is rigid: as regressors take extreme values, predicted probabilities inevitably crash below $0\%$ into negative numbers or soar above $100\%$, violating the fundamental Kolmogorov axioms of probability.
+## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Logistic regression solves this by using the **Sigmoid S-curve as an elastic damper**. Think of the Sigmoid function as a shock absorber that intercepts any unbounded linear score $z = \mathbf{x}^T \mathbf{w} \in (-\infty, +\infty)$ and compresses it smoothly into the open probability interval $(0, 1)$. 
+Imagine attempting to measure the curvature of a delicate crystal bowl using a rigid wooden yardstick. In classical statistics, fitting Ordinary Least Squares (OLS) to a binary classification problem—often termed the **Linear Probability Model (LPM)**—is guilty of the exact same mechanical blunder. When predicting whether a borrower will default on a mortgage, whether a patient has a malignant tumor, or whether an enterprise client will churn, the true target $y \in \{0, 1\}$ is categorical and bounded. But a straight line is relentlessly linear: as an applicant's debt-to-income ratio climbs, a linear equation will unblinkingly output a default probability of $140\%$, or assign a $-25\%$ probability of disease to an exceptionally healthy patient. These nonsensical outputs violate the fundamental Kolmogorov axioms of probability.
 
-Instead of modeling probability as a linear function, Logistic regression models the **log-odds (logit)** as a linear function. This means that each unit increase in a feature does not add a fixed percentage to the probability; instead, it multiplies the *odds ratio* by a constant factor $e^{\beta_j}$, ensuring probabilities naturally saturate as they approach certainty (0 or 1).
+Logistic regression resolves this pathology by replacing the rigid wooden ruler with an **elastic hydraulic shock absorber: the Sigmoid S-curve**. Think of the Sigmoid activation as a mathematical dampening chamber. You feed it any raw, unbounded linear score $z = \mathbf{w}^T \mathbf{x}$—whether it is $-5,000$, $+42$, or zero—and the chamber smoothly compresses and squashes the output into the strictly bounded open interval $(0, 1)$. As the score shoots toward positive infinity, the curve saturates gracefully toward certainty ($1.0$); as the score plummets into deep negative territory, it flattens out toward impossibility ($0.0$), but it can never breach the physical boundaries of probability.
+
+To understand why this dampening works so naturally, we must demystify the concept of **odds and log-odds (the logit)**. In daily conversation, if a horse has an $80\%$ chance of winning, its probability is $p = 0.8$. But bookmakers speak in *odds*: the ratio of winning to losing, which is $0.8 / 0.2 = 4 \text{ to } 1$. Odds live in the asymmetric domain $[0, \infty)$. By taking the natural logarithm of the odds—computing $\ln(p / (1 - p))$—we unlock the entire infinite real number line $(-\infty, +\infty)$. Logistic regression does not assume that your explanatory variables linearly shift probability itself; rather, it posits that each unit change in a feature linearly increments the *log-odds*, which corresponds to multiplying the *odds ratio* by a constant geometric scale factor $e^{w_j}$.
+
+Under the hood, we do not train logistic regression by minimizing squared residuals, because squaring probability errors creates a warped, non-convex landscape plagued with deceptive local traps. Instead, we embrace **Maximum Likelihood Estimation (MLE)** guided by **Binary Cross-Entropy Loss**. Imagine you are an auditor inspecting historical data: your objective is to rotate and tilt the decision boundary until the observed historical reality becomes the least surprising outcome possible. Binary cross-entropy acts as an unforgiving referee that levies an exponential penalty when the model is confidently wrong—such as assigning a $99\%$ probability of repayment to a borrower who subsequently defaults.
+
+تخيل أنك تحاول قياس انحناءات إناء بلوري رقيق باستخدام مسطرة خشبية صلبة ومستقيمة. في الإحصاء الكلاسيكي، يؤدي تطبيق انحدار المربعات الصغرى العادي (OLS) على مسائل التصنيف الثنائي—وهو ما يُعرف بنموذج الاحتمال الخطي (Linear Probability Model)—إلى نفس الخطأ الميكانيكي الفادح. عندما نحاول التنبؤ بما إذا كان المقترض سيتعثر في سداد قرضه، أو ما إذا كان الورم خبيثاً، أو ما إذا كان العميل سيلغي اشتراكه، فإن النتيجة المستهدفة محصورة تماماً بين الصفر والواحد $\{0, 1\}$. لكن الخط المستقيم بطبيعته صلب وممتد بلا حدود: فمع ارتفاع نسبة ديون المقترض، سيتنبأ النموذج الخطي دون أي تردد باحتمال تعثر يبلغ $140\%$، أو سيعطي احتمالاً سالباً مثل $-25\%$ لمريض يتمتع بصحة ممتازة! هذه القيم غير المنطقية تنتهك أبسط بديهيات نظرية الاحتمالات الرياضية.
+
+يعالج الانحدار اللوجستي هذا الخلل الجوهري باستبدال المسطرة الخشبية الصلبة بـ **ممتص صدمات هيدروليكي مرن: منحنى السجمويد (Sigmoid S-curve)**. تخيل دالة السجمويد كغرفة تخميد انسيابية؛ تستقبل أي ناتج ترجيح خطي غير مقيد $z = \mathbf{w}^T \mathbf{x}$—سواء كان $-5,000$ أو $+42$ أو صفراً—وتقوم بضغطه وتعديله بسلاسة ليستقر دائماً داخل المجال الاحتمالي المفتوح $(0, 1)$. كلما اندفعت النتيجة الخطية نحو اللانهاية الموجبة، تشبع المنحنى تدريجياً مقترباً من اليقين التام ($1.0$)؛ وكلما هوت النتيجة نحو السالب السحيق، استقر المنحنى مقترباً من الاستحالة ($0.0$)، مستحيلاً عليه اختراق الحدود المنطقية للاحتمال.
+
+ولفهم السر الكامن وراء هذا التوافق الهندسي، يجب أن نزيل الغموض عن مفهوم **الأرجحية ولوغاريتم الأرجحية (Log-Odds أو Logit)**. في الحياة اليومية، إذا كان احتمال فوز فريق ما هو $80\%$ ($p = 0.8$)، فإن أرجحية الفوز (Odds) هي نسبة النجاح إلى الفشل، أي $0.8 / 0.2 = 4$ إلى $1$. تمتد الأرجحية في المجال الموجب $[0, \infty)$. وحينما نأخذ اللوغاريتم الطبيعي لهذه الأرجحية $\ln(p / (1-p))$، فإننا نحصل على خط الأعداد الحقيقية كاملاً من $-\infty$ إلى $+\infty$. لا يفترض الانحدار اللوجستي أن المتغيرات التفسيرية تغير الاحتمال بشكل خطي ومباشر؛ بل يفترض أنها تزيد لوغاريتم الأرجحية زيادة خطية، وهو ما يكافئ ضرب نسبة الأرجحية الحقيقية في معامل هندسي مضاعف $e^{w_j}$.
+
+لا يتم تدريب الانحدار اللوجستي بتقليل مجموع مربعات الأخطاء (MSE)، لأن تربيع أخطاء الاحتمالات يولد سطحاً متعرجاً غير محدب مليئاً بالفخاخ والقيعان المحلية المضللة. وبدلاً من ذلك، نستخدم **تقدير الأرجحية القصوى (Maximum Likelihood Estimation - MLE)** عبر تقليل **خسارة الإنتروبيا المتقاطعة الثنائية (Binary Cross-Entropy)**. تخيل أنك محقق يفحص وقائع تاريخية: هدفك هو تدوير وضبط حد الفصل (Decision Boundary) حتى يصبح الواقع التاريخي المشاهد هو النتيجة الأكثر احتمالاً والأقل مفاجأة رياضياً. وتعمل دالة الإنتروبيا المتقاطعة كحكم صارم يفرض غرامة فلكية تتصاعد أضعافاً مضاعفة عندما يكون النموذج واثقاً من تنبؤ خاطئ تماماً.
 
 :::simulation-widget{engine="canvas2d" component="LogisticSigmoidSurface"}
 ---
@@ -25,62 +37,80 @@ highlighted_metric: "loss"
 ---
 :::
 
-عندما نحاول التنبؤ بنتائج ثنائية (التعثر المالي مقابل السداد، تشخيص المرض مقابل السلامة، إلغاء الاشتراك مقابل البقاء)، فإن استخدام الانحدار الخطي العادي (Linear Probability Model) محفوف بالمخاطر. الخط المستقيم صلب وغير مرن: فمع القيم القصوى للمتغيرات، تخترق التنبؤات الحدود المنطقية لتهوي دون $0\%$ إلى احتمالات سالبة أو تتجاوز $100\%$، مما ينتهك بديهيات نظرية الاحتمالات.
+## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-يعالج الانحدار اللوجستي هذه المعضلة باستخدام **منحنى السجمويد (Sigmoid) كمخمد مرن للصدمات**. تخيل دالة السجمويد كممتص صدمات يستقبل أي قيمة خطية غير محدودة $z = \mathbf{x}^T \mathbf{w} \in (-\infty, +\infty)$ ويضغطها بسلاسة وانسيابية داخل مجال الاحتمالات المقيد $(0, 1)$.
-
-وبدلاً من افتراض علاقة خطية مع الاحتمال مباشرة، يفترض النموذج علاقة خطية مع **لوغاريتم الأرجحية (Log-Odds)**. هذا يعني أن كل زيادة بوحدة واحدة في المتغير التفسيري لا تضيف نسبة مئوية ثابتة للاحتمال، بل تضاعف نسبة الأرجحية (Odds Ratio) بالمعامل $e^{\beta_j}$، مما يجعل التغير في الاحتمال يتشبع تدريجياً عند الاقتراب من اليقين التام (0 أو 1).
-
-### Mathematical Foundations
-
-#### The Sigmoid Activation Function
-For a continuous linear score $z = \mathbf{x}_i^T \mathbf{w}$, the Sigmoid link function is defined as:
+Let $\mathbf{x}_i \in \mathbb{R}^D$ denote the regressor vector for observation $i \in \{1, \dots, N\}$, and let $y_i \in \{0, 1\}$ represent the observed binary outcome. The continuous linear logit score is defined by the inner product:
 
 $$
-\sigma(z) \equiv \frac{1}{1 + e^{-z}} = \frac{e^z}{1 + e^z}
+z_i \equiv \mathbf{x}_i^T \mathbf{w} = \sum_{j=1}^D x_{ij} w_j
 $$
 
-The first derivative satisfies the elegant algebraic identity:
+The Sigmoid link function $\sigma: \mathbb{R} \to (0, 1)$ transforms the linear score into a posterior class probability:
 
 $$
-\sigma'(z) = \sigma(z) \left( 1 - \sigma(z) \right)
+p_i \equiv \mathbb{P}(Y_i = 1 \mid \mathbf{x}_i; \mathbf{w}) = \sigma(z_i) = \frac{1}{1 + e^{-z_i}} = \frac{e^{z_i}}{1 + e^{z_i}}
 $$
 
-The modeled posterior probability of the positive class $Y_i = 1$ is:
+### Fundamental Algebraic Properties of the Sigmoid:
+1. **Symmetry:** $1 - \sigma(z) = \sigma(-z)$.
+2. **Derivative Factorization:**
+   $$
+   \frac{d\sigma(z)}{dz} = \frac{e^{-z}}{(1 + e^{-z})^2} = \sigma(z) \left(1 - \sigma(z)\right)
+   $$
+3. **Logit Transformation:** The inverse link isolates the linear predictor:
+   $$
+   \text{logit}(p_i) \equiv \ln \left( \frac{p_i}{1 - p_i} \right) = \mathbf{x}_i^T \mathbf{w}
+   $$
+
+### Maximum Likelihood & Cross-Entropy Optimization
+Modeling each observation as an independent Bernoulli trial, the joint likelihood function across $N$ observations is:
 
 $$
-p_i \equiv \mathbb{P}(Y_i = 1 \mid \mathbf{x}_i) = \sigma(\mathbf{x}_i^T \mathbf{w}) \iff \ln \left( \frac{p_i}{1 - p_i} \right) = \mathbf{x}_i^T \mathbf{w}
+\mathcal{L}(\mathbf{w}) = \prod_{i=1}^N p_i^{y_i} (1 - p_i)^{1 - y_i} = \prod_{i=1}^N \sigma(\mathbf{x}_i^T \mathbf{w})^{y_i} \left(1 - \sigma(\mathbf{x}_i^T \mathbf{w})\right)^{1 - y_i}
 $$
 
-#### Maximum Likelihood Estimation & Binary Cross-Entropy
-Assuming independent Bernoulli trials, the likelihood of observing data $\{(\mathbf{x}_i, y_i)\}_{i=1}^N$ is:
+Taking the negative natural logarithm and dividing by $N$ converts the product into the empirical **Binary Cross-Entropy Loss** $J(\mathbf{w})$:
 
 $$
-\mathcal{L}(\mathbf{w}) = \prod_{i=1}^N p_i^{y_i} (1 - p_i)^{1 - y_i}
+J(\mathbf{w}) = -\frac{1}{N} \ln \mathcal{L}(\mathbf{w}) = -\frac{1}{N} \sum_{i=1}^N \left[ y_i \ln(p_i) + (1 - y_i) \ln(1 - p_i) \right]
 $$
 
-Minimizing the Negative Log-Likelihood (Binary Cross-Entropy Loss) yields the objective function:
+### Vectorized Gradient & Hessian
+Using the chain rule and the derivative identity $\sigma'(z) = p(1-p)$, the partial derivative with respect to weight vector $\mathbf{w}$ collapses into a clean error-weighted residual:
 
 $$
-J(\mathbf{w}) = -\frac{1}{N} \sum_{i=1}^N \left[ y_i \ln p_i + (1 - y_i) \ln(1 - p_i) \right]
+\nabla_{\mathbf{w}} J(\mathbf{w}) = \frac{1}{N} \sum_{i=1}^N (p_i - y_i) \mathbf{x}_i = \frac{1}{N} \mathbf{X}^T (\mathbf{p} - \mathbf{y})
 $$
 
-#### Gradient & Hessian
-Using the chain rule, the gradient vector takes a remarkably compact form identical in structure to OLS residuals:
+The second-order derivative defines the $D \times D$ Hessian matrix $\mathbf{H}$:
 
 $$
-\nabla_{\mathbf{w}} J = \frac{1}{N} \mathbf{X}^T (\mathbf{p} - \mathbf{y})
+\mathbf{H}(\mathbf{w}) = \nabla_{\mathbf{w}}^2 J(\mathbf{w}) = \frac{1}{N} \mathbf{X}^T \mathbf{S} \mathbf{X}, \quad \text{where } \mathbf{S} = \text{diag}\left(p_1(1-p_1), \dots, p_N(1-p_N)\right)
 $$
 
-The Hessian matrix is strictly positive semi-definite:
+Because $p_i \in (0, 1)$, every diagonal element $p_i(1-p_i) > 0$. Consequently, $\mathbf{S}$ is strictly positive definite, making $\mathbf{H}$ positive semi-definite for any design matrix $\mathbf{X}$. This mathematical guarantee proves that $J(\mathbf{w})$ is strictly convex: it possesses a unique global minimum with zero risk of converging to suboptimal local traps.
 
-$$
-\mathbf{H} = \nabla_{\mathbf{w}}^2 J = \frac{1}{N} \mathbf{X}^T \mathbf{S} \mathbf{X}, \quad \text{where } \mathbf{S} = \text{diag}\left( p_i (1 - p_i) \right)
-$$
+### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-Because the Hessian is positive semi-definite everywhere, the binary cross-entropy loss is strictly convex, guaranteeing a unique global minimum reachable via Gradient Descent or Newton-Raphson (Iteratively Reweighted Least Squares).
+* $\mathbf{x}_i \in \mathbb{R}^D$: Feature vector for the $i$-th observation, typically including a leading $1$ for bias.
+* $\mathbf{w} \in \mathbb{R}^D$: Parameter weight vector governing the orientation and scale of the decision boundary.
+* $z_i = \mathbf{x}_i^T \mathbf{w}$: Unbounded linear logit score driving classification confidence.
+* $\sigma(z) = \frac{1}{1 + e^{-z}}$: Sigmoid activation function mapping real numbers to calibrated probabilities.
+* $p_i \in (0, 1)$: Modeled posterior probability $\mathbb{P}(Y_i = 1 \mid \mathbf{x}_i)$ of the positive class.
+* $\text{logit}(p) = \ln(p / (1-p))$: Natural log of the odds ratio, mapping bounded probability back to the real line.
+* $\mathcal{L}(\mathbf{w})$: Bernoulli likelihood function measuring probability of the observed dataset given weights $\mathbf{w}$.
+* $J(\mathbf{w})$: Binary Cross-Entropy loss function to be minimized via numerical optimization.
+* $\nabla_{\mathbf{w}} J$: Gradient vector dictating the direction of steepest ascent in empirical prediction error.
+* $\mathbf{S} \in \mathbb{R}^{N \times N}$: Diagonal weighting matrix of Bernoulli variances $p_i(1 - p_i)$ driving the curvature of the loss.
+* $\mathbf{H} \in \mathbb{R}^{D \times D}$: Hessian matrix ensuring global convexity and enabling Newton-Raphson optimization.
 
-تتميز دالة خسارة الإنتروبيا المتقاطعة (Cross-Entropy) بأنها دالة محدبة تماماً (Convex)، مما يعني عدم وجود قيعان محلية تضلل الخوارزمية. ويشبه متجه التدرج $\mathbf{X}^T(\mathbf{p} - \mathbf{y})$ بواقي الانحدار الخطي، حيث يمثل الفرق بين الاحتمال المتوقع والنتيجة الحقيقية محرك التحديث في كل خطوة.
+## Beat 3: Interactive Python Challenge | التحدي البرمجي
+
+Implement the vectorized Binary Logistic Regression optimization engine in NumPy. You will:
+1. Define a numerically robust Sigmoid activation $\sigma(z) = \frac{1}{1 + e^{-\text{clip}(z)}}$ that guards against floating-point overflow.
+2. Compute the predicted posterior probabilities $\mathbf{p} = \sigma(\mathbf{X}\mathbf{w})$ across all training instances.
+3. Evaluate the analytical gradient vector $\nabla_{\mathbf{w}} J = \frac{1}{N}\mathbf{X}^T(\mathbf{p} - \mathbf{y})$.
+4. Update parameter weights iteratively via gradient descent: $\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla_{\mathbf{w}} J$.
 
 :::python-challenge{id="py-logistic-regression-sigmoid"}
 ---
@@ -123,34 +153,45 @@ def fit_logistic_regression(
     w = np.zeros(D)
     
     def sigmoid(z: np.ndarray) -> np.ndarray:
-        # Numerically stable sigmoid avoiding overflow
+        # Step 1: Numerically stable sigmoid avoiding overflow via clipping
         z_clipped = np.clip(z, -30.0, 30.0)
         return 1.0 / (1.0 + np.exp(-z_clipped))
 
     for _ in range(n_iters):
-        # 1. Forward pass: compute probabilities
+        # Step 2: Forward pass - compute model posterior probabilities
         p = sigmoid(X @ w)
         
-        # 2. Vectorized gradient: (1/N) * X^T (p - y)
+        # Step 3: Vectorized gradient computation: (1/N) * X^T (p - y)
         gradient = (1.0 / N) * (X.T @ (p - y))
         
-        # 3. Parameter update step
+        # Step 4: Parameter update step along steepest descent
         w -= lr * gradient
         
     return w
 ```
 :::
 
-### Practical ML Transfer Challenge
+## Beat 4: Reality Transfer Challenge | اختبار الانتقال المعرفي الواقعي
 
-#### Scenario: Loan Default Odds Interpretation in Fintech
-A quantitative risk analyst at a commercial bank trains a logistic regression model to predict loan default within 12 months. The fitted coefficient for the feature `Number of Overdue Inquiries in Past 6 Months` is $\hat{\beta}_j = 0.693$.
+A quantitative risk analyst at a commercial bank trains a binary logistic regression model to predict consumer loan default within 12 months. The fitted coefficient for the regressor `Number of Overdue Inquiries in Past 6 Months` ($X_j$) is estimated as $\hat{\beta}_j = 0.693$.
 
-In an executive committee meeting, a junior analyst announces: *"Each additional overdue inquiry increases the customer's probability of default by exactly 69.3%."*
+In an executive credit committee meeting, a junior analyst announces: *"Every additional overdue credit inquiry submitted by an applicant increases their probability of default by exactly 69.3 percentage points!"*
 
-**Diagnostic Question:** What is the correct statistical interpretation of this estimated coefficient?
+**Diagnostic Question:** What is the correct statistical interpretation of this estimated coefficient, and why is the junior analyst's statement fundamentally flawed?
 
-- **Option A (Correct):** The announcement is incorrect: in logistic regression, coefficients represent changes in log-odds. Because $e^{0.693} \approx 2.0$, each additional inquiry multiplies the borrower's *odds of default* by 2 (the odds double). The actual percentage point change in probability is non-linear and depends heavily on baseline risk: $\Delta p \approx p(1-p)\beta_j$.
-- **Option B:** The announcement is correct: the derivative of the Sigmoid function is everywhere equal to 1, maintaining strict linear additivity.
-- **Option C:** The true probability increases by $0.693^2 = 0.48$ because probability is the square root of the likelihood.
-- **Option D:** The coefficient is uninterpretable because logistic regression parameters are scale-invariant scale factors.
+* [x] The announcement is incorrect: in logistic regression, coefficients represent changes in log-odds, not probabilities. Because $e^{0.693} \approx 2.0$, each additional inquiry multiplies the borrower's *odds of default* by approximately $2.0$ (the odds double). The actual percentage point change in probability is non-linear and depends heavily on baseline risk: $\Delta p \approx p(1-p)\beta_j$.
+  *الاستنتاج خاطئ: في الانحدار اللوجستي، تمثل المعاملات التغير في لوغاريتم الأرجحية وليس في الاحتمال مباشرة. وحيث إن $e^{0.693} \approx 2.0$، فإن كل استفسار ائتماني إضافي يضاعف أرجحية التعثر مرتين ($2.0$). أما التغير في النسبة المئوية للاحتمال فهو غير خطي ويعتمد على مستوى الخطر الأولي للمقترض: $\Delta p \approx p(1-p)\beta_j$.*
+  > **Why this is correct:** The logit link models $\ln(p / (1-p)) = \mathbf{x}^T \mathbf{w}$. Exponentiating both sides shows that increasing $x_j$ by $1$ multiplies the odds ratio by $e^{\beta_j} = e^{0.693} \approx 2.0$. The marginal effect on probability itself equals $\frac{\partial p}{\partial x_j} = p(1 - p)\beta_j$, which is maximal at $p = 0.5$ and approaches zero as $p \to 0$ or $p \to 1$.
+  > **لماذا هذا الخيار صحيح:** يربط تابع اللوجيت بين لوغاريتم الأرجحية والمتغيرات المستقلة؛ وبرفع الطرفين للأس الطبيعي نجد أن زيادة المتغير بوحدة واحدة يضاعف نسبة الأرجحية بالمعامل $e^{\beta_j} = e^{0.693} \approx 2.0$. والأثر الحدي على الاحتمال ذاته غير خطي $\frac{\partial p}{\partial x_j} = p(1 - p)\beta_j$، حيث يبلغ أقصاه عند $p=0.5$ ويتلاشى عند الأطراف.
+* [ ] The announcement is correct: the derivative of the Sigmoid link function is constant and equal to $1.0$, maintaining linear additivity between features and probability.
+  *الاستنتاج صحيح: مشتقة دالة السجمويد ثابتة وتساوي 1.0 دائماً، مما يحافظ على التناسب الخطي التام بين المتغيرات والاحتمال.*
+  > **Why this is incorrect:** The Sigmoid derivative $\sigma'(z) = \sigma(z)(1 - \sigma(z))$ is bell-shaped and non-linear, varying continuously between $0$ and $0.25$.
+  > **لماذا هذا الخيار خاطئ:** مشتقة السجمويد ليست ثابتة، بل تأخذ شكلاً جرسياً غير خطي وتتغير قيمتها باستمرار بين $0$ و $0.25$.
+* [ ] The true probability increases by $0.693^2 = 0.480$ ($48.0\%$) because probability is the quadratic integral of the Bernoulli likelihood.
+  *يزداد الاحتمال الحقيقي بمقدار $0.693^2 = 0.480$ (أي 48%) لأن الاحتمال يمثل التكامل التربيعي لدالة الأرجحية البرنولية.*
+  > **Why this is incorrect:** Squaring the coefficient has no mathematical basis in generalized linear models; probabilities are governed by the Sigmoid transformation, not polynomial squaring.
+  > **لماذا هذا الخيار خاطئ:** لا يوجد أي أساس رياضي لتربيع المعامل في النماذج الخطية المعممة؛ فالاحتمالات تخضع لتحويل السجمويد وليس لدوال قوى تربيعية.
+* [ ] The estimated coefficient is completely uninterpretable because logistic regression parameters are scale-invariant constants that carry no empirical meaning.
+  *المعامل المقدر غير قابل للتفسير تماماً لأن معاملات الانحدار اللوجستي ثوابت لا تحمل أي مدلول إحصائي.*
+  > **Why this is incorrect:** Logistic regression coefficients are directly interpretable as adjusted log-odds ratios, providing a cornerstone of modern biostatistics, credit scoring, and epidemiological risk modeling.
+  > **لماذا هذا الخيار خاطئ:** معاملات الانحدار اللوجستي قابلة للتفسير بدقة بوصفها نسب لوغاريتم الأرجحية المعدلة، وهي الركيزة الأساسية في نماذج المخاطر الائتمانية والوبائيات.

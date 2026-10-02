@@ -12,6 +12,8 @@ i18n:
 
 # Denoising Diffusion Probabilistic Models (DDPM) & Score-Based Matching
 
+## Beat 1: Tactile Intuition
+
 Generative modeling historically struggled with a fundamental architectural dilemma: Generative Adversarial Networks (GANs) generate crisp samples in a single step but suffer from notorious training instability and mode collapse, while Variational Autoencoders (VAEs) train stably with variational lower bounds but produce blurry images due to intractable likelihood approximations.
 
 **Diffusion Models** (Sohl-Dickstein et al. 2015, Ho et al. 2020) resolved this conflict by formulating generative modeling through non-equilibrium thermodynamics. Instead of synthesizing a high-dimensional image in a single risky leap, diffusion frames generation as a gradual iterative denoising process across $T = 1\,000$ discrete timesteps.
@@ -37,28 +39,53 @@ highlighted_metric: "loss"
 ---
 :::
 
-### Mathematical Foundations
+---
+
+## Beat 2: Formal Mathematical Anchor
+
+The forward Markov diffusion transition allows closed-form sampling of any latent state $\mathbf{x}_t$ directly from original data $\mathbf{x}_0$:
 
 $$
 q(\mathbf{x}_t \mid \mathbf{x}_0) = \mathcal{N}\left(\mathbf{x}_t; \sqrt{\bar{\alpha}_t} \mathbf{x}_0, (1 - \bar{\alpha}_t) \mathbf{I}\right) \implies \mathbf{x}_t = \sqrt{\bar{\alpha}_t} \mathbf{x}_0 + \sqrt{1 - \bar{\alpha}_t} \boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})
 $$
 
+The network parameters $\theta$ are trained using the simplified Mean Squared Error (MSE) denoising score objective:
+
 $$
 \mathcal{L}_{\text{simple}}(\theta) = \mathbb{E}_{t, \mathbf{x}_0, \boldsymbol{\epsilon}} \left[ \left\| \boldsymbol{\epsilon} - \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t) \right\|^2 \right]
 $$
+
+During inference, iterative reverse denoising steps reconstruct the trajectory backwards from $T$ down to $0$:
 
 $$
 \mathbf{x}_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( \mathbf{x}_t - \frac{\beta_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t) \right) + \sigma_t \mathbf{z}, \quad \mathbf{z} \sim \mathcal{N}(0, \mathbf{I})
 $$
 
-#### Step-by-Step Parameter Breakdown
-- $\mathbf{x}_0$: Clean, uncorrupted input data sample (e.g. image).
-- $\beta_t \in (0, 1)$: Variance schedule hyperparameter at timestep $t$ (e.g., linear schedule from $10^{-4}$ to $0.02$).
-- $\alpha_t = 1 - \beta_t$: Fraction of underlying signal retained at timestep $t$.
-- $\bar{\alpha}_t = \prod_{s=1}^t \alpha_s$: Cumulative signal retention product. As $t \to T$, $\bar{\alpha}_t \to 0$, meaning the original signal $\mathbf{x}_0$ completely vanishes.
-- $\boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})$: Ground-truth Gaussian noise added during training.
-- $\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)$: Neural network conditioned on noisy state $\mathbf{x}_t$ and timestep embedding $t$, trained via simple Mean Squared Error (MSE).
-- Score matching equivalence: By Tweedie's Formula, the predicted noise is directly proportional to the Stein score of the data distribution: $\nabla_{\mathbf{x}_t} \log p(\mathbf{x}_t) = -\frac{\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)}{\sqrt{1 - \bar{\alpha}_t}}$.
+By Tweedie's formula, the network's predicted noise is directly proportional to the Stein score of the data distribution:
+
+$$
+\nabla_{\mathbf{x}_t} \log p(\mathbf{x}_t) = -\frac{\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)}{\sqrt{1 - \bar{\alpha}_t}}
+$$
+
+### Comprehensive Symbol & Parameter Breakdown
+
+| Symbol | Dimensionality | Mathematical Interpretation | Operational Role |
+| :--- | :--- | :--- | :--- |
+| $\mathbf{x}_0$ | Tensor | Clean uncorrupted data sample (e.g. image) | Ground truth target anchoring the diffusion trajectory. |
+| $\beta_t \in (0, 1)$ | Scalar | Variance schedule coefficient at timestep $t$ | Controls the rate of Gaussian noise injection per step. |
+| $\alpha_t = 1 - \beta_t$ | Scalar | Proportion of signal preserved at timestep $t$ | Complementary signal retention multiplier. |
+| $\bar{\alpha}_t = \prod_{s=1}^t \alpha_s$ | Scalar | Cumulative signal retention product | Governs the relative ratio of signal to noise at arbitrary step $t$. |
+| $\boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})$ | Tensor | Ground truth isotropic Gaussian noise | Standard normal perturbation sampled during training. |
+| $\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)$ | Tensor | Neural network noise predictor (U-Net or DiT) | Learns to estimate the precise perturbation corrupting $\mathbf{x}_t$. |
+| $\sigma_t = \sqrt{\beta_t}$ | Scalar | Reverse transition standard deviation | Re-injects controlled stochastic variance during reverse sampling. |
+
+تضمن هذه الصياغة الرياضية استقرار عملية التدريب عبر مطابقة درجات الاحتمال (Score Matching)، حيث يتعلم النموذج اتجاهات التدفق نحو التوزيع الحقيقي للبيانات، مما يلغي تماماً مخاطر انهيار الأنماط الشائعة في شبكات GAN.
+
+---
+
+## Beat 3: Python Challenge
+
+Implement `q_sample` to compute closed-form forward diffusion sampling, and `p_sample_step` to execute a single reverse denoising step.
 
 :::python-challenge{id="py-diffusion-models-score-sde"}
 ---
@@ -97,7 +124,10 @@ def q_sample(
     x_t : np.ndarray
         Noisy sample at timestep t.
     """
+    # Step 1: Retrieve cumulative signal retention coefficient alpha_bar_t
     alpha_bar_t = alpha_bars[t]
+    
+    # Step 2: Combine clean data and noise using closed-form analytical formula
     # x_t = sqrt(alpha_bar_t) * x_0 + sqrt(1 - alpha_bar_t) * noise
     return np.sqrt(alpha_bar_t) * x_0 + np.sqrt(1.0 - alpha_bar_t) * noise
 
@@ -116,21 +146,26 @@ def p_sample_step(
     alpha_t = alphas[t]
     alpha_bar_t = alpha_bars[t]
     
-    # Mean of the reverse distribution
+    # Step 1: Compute mean vector of reverse Gaussian distribution
     coef = beta_t / np.sqrt(1.0 - alpha_bar_t)
     mean = (1.0 / np.sqrt(alpha_t)) * (x_t - coef * pred_noise)
     
+    # Step 2: If at the final step t=0, return deterministic mean
     if t == 0:
         return mean
     
-    # Variance: sigma_t^2 = beta_t
+    # Step 3: Add stochastic noise scaled by sigma_t = sqrt(beta_t)
     sigma_t = np.sqrt(beta_t)
     z = np.random.randn(*x_t.shape)
     return mean + sigma_t * z
 ```
 :::
 
-### Transfer & Architectural Reasoning
+---
+
+## Beat 4: Reality Transfer Challenge
+
+### Transfer Question / سؤال نقل الأثر المعرفي
 
 **Scenario:** In modern text-to-image diffusion models (e.g. Stable Diffusion 3, Flux), generation utilizes **Classifier-Free Guidance (CFG)** during inference with an extrapolation factor $w > 1$:
 
@@ -140,9 +175,13 @@ $$
 
 If an operator sets the guidance scale excessively high (e.g., $w = 25.0$), what visual artifact appears in the synthesized images, and what mathematical dynamic causes it?
 
-* **A.** The image collapses to a completely black canvas because the learning rate during sampling diverges to infinity.
-* **B.** (*Correct*) Extreme guidance over-amplifies the conditional score vector along the direction of prompt tokens, driving pixel activations outside the valid $[-1, 1]$ bounding box; this causes severe dynamic range saturation, unnatural contrast artifacts ("burnt" / over-saturated textures), and severe loss of sample diversity (mode collapse).
-* **C.** The U-Net weights revert to random initialization due to numerical overflow in floating-point normalization.
-* **D.** The reverse SDE converts into an ordinary differential equation (ODE) that cannot be solved by Euler integrators.
+* [ ] The image collapses to a completely black canvas because the learning rate during sampling diverges to infinity.
+* [x] Extreme guidance over-amplifies the conditional score vector along the direction of prompt tokens, driving pixel activations outside the valid $[-1, 1]$ bounding box; this causes severe dynamic range saturation, unnatural contrast artifacts ("burnt" / over-saturated textures), and severe loss of sample diversity (mode collapse).
+* [ ] The U-Net weights revert to random initialization due to numerical overflow in floating-point normalization.
+* [ ] The reverse SDE converts into an ordinary differential equation (ODE) that cannot be solved by Euler integrators.
 
-*Explanation:* CFG shifts probability mass towards regions with high conditional density $p(c \mid x) \propto (p(x \mid c) / p(x))^w$. Setting $w$ moderately ($5.0 \le w \le 7.5$) balances sharp text prompt alignment with natural photorealism. Excessive $w$ drives gradients out-of-bounds, requiring specialized dynamic thresholding algorithms to clamp saturated latents.
+> **Insight & Option Analysis:**
+> - **Option A is incorrect:** Inference sampling does not update model weights; there is no learning rate during generation.
+> - **Option B is correct:** CFG shifts probability mass towards regions with high conditional density $p(c \mid x) \propto (p(x \mid c) / p(x))^w$. Setting $w$ moderately ($5.0 \le w \le 7.5$) balances sharp text prompt alignment with natural photorealism. Excessive $w$ drives gradients out-of-bounds, requiring specialized dynamic thresholding algorithms to clamp saturated latents.
+> - **Option C is incorrect:** Model parameters are frozen during inference; weights do not re-initialize.
+> - **Option D is incorrect:** Continuous-time score diffusion can be sampled using both stochastic differential equations (SDEs) and deterministic probability-flow ODEs (e.g. DDIM or DPMSolver) regardless of guidance scale.

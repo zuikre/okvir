@@ -30,6 +30,8 @@ Here lies **The Fundamental Problem of Causal Inference**: in the real physical 
 
 Therefore, causal inference is fundamentally a **missing data problem**. We can never know an individual's personal causal effect $\tau_i$ with certainty. The entire enterprise of empirical science is designing clever ways to replace the missing counterfactual with a credible group-level substitute.
 
+This framework exposes the sharp division between machine learning prediction and causal decision-making. Predictive algorithms predict conditional expectations in the observed world: $\mathbb{E}[Y \mid D = 1]$. For an emergency room triage model, predicting that ICU patients have a high mortality rate is mathematically accurate and clinically useful for allocating palliative resources. But mistaking this predictive risk score for a causal effect leads to the horrifying conclusion that ICUs kill patients! Machine learning asks: *"What is the expected outcome of people who choose treatment?"* Causal inference asks: *"What would be the outcome if we actively assigned treatment to someone who otherwise would not have received it?"* Prediction looks at passive realization; causality evaluates counterfactual intervention.
+
 قبل أن يصوغ جيرزي نيمان ودونالد روبين **إطار النتائج المحتملة (Potential Outcomes Framework)**، كانت مناقشات السببية حبيسة جدالات فلسفية ولغوية غامضة. أزال روبين الغموض عن السببية بربطها بسؤال واحد دقيق ومحدد: **"ماذا لو حدث العكس؟"**
 
 لكل شخص $i$ في المجتمع، تخيل وجود عالمين متوازيين:
@@ -46,6 +48,8 @@ $$
 
 لهذا السبب، فإن الاستدلال السببي هو في جوهره **مسألة بيانات مفقودة**. لا يمكننا أبدًا معرفة الأثر الفردي $\tau_i$ بدقة مطلقة لأي شخص بمفرده. وغاية العلم التجريبي برمته هي ابتكار طرق منهجية ذكية لاستبدال المسار المفقود ببديل جماعي موثوق ومكافئ للواقع.
 
+يوضح هذا الإطار بدقة بالغة الحد الفاصل بين التنبؤ والقرار السببي: نماذج تعلم الآلة التنبؤية تحسب التوقع الشرطي في الواقع المرصود $\mathbb{E}[Y \mid D = 1]$. فلو تنبأ نموذج في قسم الطوارئ بأن المرضى الذين يدخلون العناية المركزة ترتفع احتمالية وفاتهم، فهذا تنبؤ إحصائي دقيق ومفيد لفرز الحالات الحرجة. لكن الخلط بين هذا التنبؤ والسببية يقود إلى نتيجة كارثية تدعي أن العناية المركزة تقتل المرضى! تعلم الآلة يسأل: *"ما هي النتيجة المتوقعة لمن اختاروا العلاج في الواقع؟"* بينما الاستدلال السببي يسأل: *"ماذا كان سيحدث لهذا المريض تحديدًا لو تدخلنا ومنحناه العلاج بدلاً من تركه دون علاج؟"* التنبؤ يرصد الواقع القائم، بينما السببية تفحص التدخل المقابل للواقع.
+
 :::simulation-widget{engine="canvas2d" component="PotentialOutcomesSplitLab"}
 ---
 interactive: true
@@ -61,11 +65,22 @@ $$
 Y_i = D_i Y_i(1) + (1 - D_i) Y_i(0) = Y_i(0) + D_i \big[Y_i(1) - Y_i(0)\big]
 $$
 
-Two foundational population causal benchmarks exist:
+### SUTVA (Stable Unit Treatment Value Assumption)
+
+The potential outcomes representation implicitly requires two structural pillars known as **SUTVA**:
+1. **No Interference:** The potential outcome of unit $i$ does not depend on the treatment assignment of unit $j$ ($Y_i(d_1, \dots, d_N) = Y_i(d_i)$).
+2. **No Hidden Variations:** There is only one version of treatment $D_i = 1$ (e.g. all treated patients receive the identical dosage and drug potency).
+
+### Foundational Population Causal Benchmarks
+
 1. **Average Treatment Effect (ATE):**
    $$\text{ATE} \equiv \mathbb{E}\big[Y_i(1) - Y_i(0)\big]$$
 2. **Average Treatment Effect on the Treated (ATT):**
    $$\text{ATT} \equiv \mathbb{E}\big[Y_i(1) - Y_i(0) \mid D_i = 1\big]$$
+3. **Average Treatment Effect on the Untreated (ATUT):**
+   $$\text{ATUT} \equiv \mathbb{E}\big[Y_i(1) - Y_i(0) \mid D_i = 0\big]$$
+
+### Mathematical Derivation of the Selection Bias Decomposition
 
 When an analyst naively compares observed group means:
 
@@ -73,17 +88,29 @@ $$
 \Delta_{\text{naive}} \equiv \mathbb{E}[Y_i \mid D_i = 1] - \mathbb{E}[Y_i \mid D_i = 0]
 $$
 
-Substituting the potential outcome definitions reveals the **Selection Bias Decomposition**:
+Substituting the realized outcome equation:
 
 $$
 \Delta_{\text{naive}} = \mathbb{E}[Y_i(1) \mid D_i = 1] - \mathbb{E}[Y_i(0) \mid D_i = 0]
 $$
 
-Adding and subtracting $\mathbb{E}[Y_i(0) \mid D_i = 1]$:
+Add and subtract $\mathbb{E}[Y_i(0) \mid D_i = 1]$:
+
+$$
+\Delta_{\text{naive}} = \Big(\mathbb{E}[Y_i(1) \mid D_i = 1] - \mathbb{E}[Y_i(0) \mid D_i = 1]\Big) + \Big(\mathbb{E}[Y_i(0) \mid D_i = 1] - \mathbb{E}[Y_i(0) \mid D_i = 0]\Big)
+$$
 
 $$
 \Delta_{\text{naive}} = \underbrace{\mathbb{E}[Y_i(1) - Y_i(0) \mid D_i = 1]}_{\text{ATT}} + \underbrace{\Big\{ \mathbb{E}[Y_i(0) \mid D_i = 1] - \mathbb{E}[Y_i(0) \mid D_i = 0] \Big\}}_{\text{Baseline Selection Bias}}
 $$
+
+If treatment effects are heterogeneous across groups, the decomposition relative to population ATE becomes:
+
+$$
+\Delta_{\text{naive}} = \text{ATE} + \underbrace{\Big( \mathbb{E}[Y(0) \mid D=1] - \mathbb{E}[Y(0) \mid D=0] \Big)}_{\text{Baseline Selection Bias}} + \underbrace{(1 - \pi)\Big( \text{ATT} - \text{ATUT} \Big)}_{\text{Heterogeneous Effect Bias}}
+$$
+
+where $\pi = \mathbb{P}(D_i = 1)$ is the proportion of treated units.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
@@ -174,3 +201,16 @@ How does the Rubin Causal Model selection bias decomposition explain why this cl
 * [x] The naive comparison is heavily contaminated by negative selection bias: patients who enter the ICU were already critically ill at baseline ($\mathbb{E}[Y_i(0) \mid D_i=1] \gg \mathbb{E}[Y_i(0) \mid D_i=0]$); the hospital actually saves lives, but severe baseline sickness masks this causal benefit.
 * [ ] The claim is true because ICUs expose patients to hospital-acquired bacterial infections.
 * [ ] The anchor is correct because potential outcomes cannot be defined for medical treatments.
+
+### Pedagogical Explanation & Distractor Analysis | التحليل البيداغوجي وتفكيك البدائل
+
+**Why the correct option is right:**
+Under the Rubin decomposition, $\Delta_{\text{naive}} = \text{ATT} + [\mathbb{E}[Y(0) \mid D=1] - \mathbb{E}[Y(0) \mid D=0]]$. Here, the outcome $Y$ is mortality. The baseline health of patients sent to the ICU without treatment ($Y(0)$) is catastrophic compared to people resting at home with a mild cold: $\mathbb{E}[Y(0) \mid D=1] \approx 0.60$ while $\mathbb{E}[Y(0) \mid D=0] \approx 0.01$. This yields a massive positive baseline selection bias of $+0.59$. Even if ICU treatment saves dozens of lives ($\text{ATT} = -0.34$, reducing mortality by 34 percentage points), the naive observed difference is $\Delta_{\text{naive}} = -0.34 + 0.59 = +0.25$ (+25%). The hospital is life-saving, but severe baseline selection bias completely swamps the true causal effect.
+
+**Why the distractors are incorrect:**
+1. *Mortality is a binary outcome and OLS requires Gaussian metrics...*: Potential outcomes apply to any variable type (binary, count, continuous). Linear probability models or non-linear odds models all face identical selection bias.
+2. *The claim is true because of bacterial infections...*: While nosocomial infections exist, attributing the entire 25% gap to hospital malice ignores the overwhelming baseline difference in organ failure and trauma.
+3. *Potential outcomes cannot be defined for medical treatments...*: Clinical medicine is the foundational birthplace of the potential outcomes framework (dating back to Neyman's 1923 agricultural and medical trials).
+
+*الشرح باللغة العربية:*
+وفق تفكيك روبين للانحياز، فإن الفارق الظاهري المرصود يساوي: $\Delta_{\text{naive}} = \text{ATT} + \text{Selection Bias}$. بما أن النتيجة هي احتمالية الوفاة، فإن المرضى الذين يدخلون العناية المركزة هم في الأصل مصابون بجلطات وفشل في الأعضاء الحيوية، فاحتمالية وفاتهم دون أي علاج $\mathbb{E}[Y(0) \mid D=1]$ قد تتجاوز 60%، بينما احتمالية وفاة شخص في منزله دون علاج $\mathbb{E}[Y(0) \mid D=0]$ لا تتعدى 1%. هذا يولد انحياز اختيار إيجابي هائل (+59%). حتى لو كانت أجهزة العناية المركزة تنقذ حياة ثلث هؤلاء المرضى فعليًا ($\text{ATT} = -34\%$)، فإن النتيجة المرصودة تظل موجبة: $-34\% + 59\% = +25\%$. إغفال المسار المقابل للواقع جعل المذيع يتهم المنقذ بالقتل!

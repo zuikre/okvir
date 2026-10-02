@@ -14,21 +14,27 @@ i18n:
 
 ## Beat 1: Tactile Intuition
 
-Imagine three interlocking brass gears in a precision mechanical clockwork: Gear $A$ drives Gear $B$, which in turn drives Gear $C$. 
-- When you turn Gear $A$ by 1 revolution, Gear $B$ completes 3 revolutions (the sensitivity ratio $\frac{dB}{dA} = 3$).
-- When Gear $B$ turns by 1 revolution, Gear $C$ completes 5 revolutions (the sensitivity ratio $\frac{dC}{dB} = 5$).
+Imagine three interlocking brass gears nestled inside the clockwork mechanism of an antique pocket watch. Gear $A$ turns Gear $B$, which in turn turns Gear $C$. 
+- When you nudge Gear $A$ through 1 full rotation, Gear $B$ spins through 3 complete revolutions (its sensitivity ratio is $\frac{dB}{dA} = 3$).
+- When Gear $B$ completes 1 revolution, Gear $C$ spins through 5 complete revolutions (its sensitivity ratio is $\frac{dC}{dB} = 5$).
 
-Now ask yourself: if you turn Gear $A$ by 1 revolution, how many revolutions does Gear $C$ execute? Without hesitation, you multiply the ratios: $3 \times 5 = 15$ revolutions! The end-to-end sensitivity is simply the product of the intermediate gear ratios: $\frac{dC}{dA} = \frac{dC}{dB} \cdot \frac{dB}{dA}$.
+Now ask yourself a straightforward common-sense question: if you rotate Gear $A$ by just a single turn, how many times will Gear $C$ spin? Without cracking open a calculus textbook, your intuition immediately multiplies the two ratios: $3 \times 5 = 15$ full spins! The overall sensitivity of the final gear with respect to the initial crank is simply the direct product of all the intermediate gear ratios: $\frac{dC}{dA} = \frac{dC}{dB} \cdot \frac{dB}{dA}$. 
 
-The **Chain Rule** is nothing more than this gear-ratio multiplication applied to mathematical functions chained in series. In deep learning architectures, every neural network is a deep compositional pipeline of functions: inputs feed into hidden layers, which feed into activations, which feed into downstream loss functions. The chain rule governs how credit and blame (sensitivities) propagate backward through the computational graph.
+The **Chain Rule** is nothing more than this exact mechanical gear-ratio multiplication applied to mathematical functions connected in a pipeline. Imagine peering through two magnifying glasses lined up one behind the other. If the first lens doubles the apparent size of an object ($2\times$) and the second lens triples the image produced by the first ($3\times$), the combined image arriving at your retina is magnified six times ($2 \times 3 = 6\times$). The rate of stretching compounds multiplicatively across each stage of the journey.
 
-تخيل ثلاثة تروس نحاسية متعشقة بدقة داخل ساعة ميكانيكية: الترس $A$ يدير الترس $B$، والذي بدوره يدير الترس $C$.
-- عندما تدير الترس $A$ دورة واحدة كاملة، يدور الترس $B$ بمقدار 3 دورات (نسبة الحساسية $\frac{dB}{dA} = 3$).
-- وعندما يدور الترس $B$ دورة واحدة كاملة، يدور الترس $C$ بمقدار 5 دورات (نسبة الحساسية $\frac{dC}{dB} = 5$).
+In deep learning and neural network training, this principle is the undisputed king of algorithms. Every deep neural network—from ChatGPT to vision models—is nothing more than a giant chain of hundreds of nested functions. Raw tokens or pixels pass into layer 1, whose activations pass into layer 2, which pass through layer 3, ultimately outputting a prediction that is compared to ground truth to yield a single loss number. When we train the network, the backward pass (backpropagation) is simply the chain rule in reverse: it walks backwards through the gear train, multiplying local derivative ratios to tell every single neuron precisely how much blame it carries for the final error.
 
-والآن، إذا أدرت الترس $A$ دورة واحدة، فكم دورة سيدور الترس $C$؟ دون أدنى تردد، ستقوم بضرب نسب التروس معاً: $3 \times 5 = 15$ دورة! الحساسية الإجمالية للمنظومة هي حاصل ضرب نسب الحساسيات الوسيطة: $\frac{dC}{dA} = \frac{dC}{dB} \cdot \frac{dB}{dA}$.
+---
 
-قاعدة السلسلة (Chain Rule) ليست سوى هذا المبدأ الميكانيكي البسيط مطبقاً على الدوال الرياضية المركبة المتتالية. في الشبكات العصبية العميقة، يمثل النموذج بأكمله سلسلة طويلة من الدوال المتراكبة: تتدفق المدخلات إلى الطبقات الخطية، ثم إلى دوال التنشيط غير الخطية، وصولاً إلى دالة الخسارة النهائية. تضبط قاعدة السلسلة كيفية تدفق إشارات التدرج إلى الوراء عبر الرسم البياني الحسابي لتحديث الأوزان بدقة متناهية.
+تخيل ثلاثة تروس نحاسية مصقولة تتعشق بعناية داخل ساعة يد ميكانيكية عريقة. الترس $A$ يدير الترس $B$، والذي يدير بدوره الترس $C$.
+- عندما تدير الترس $A$ دورة واحدة كاملة، يدور الترس $B$ بمقدار 3 دورات كاملة (نسبة الحساسية الميكانيكية هي $\frac{dB}{dA} = 3$).
+- وعندما يدور الترس $B$ دورة واحدة، يدور الترس $C$ بمقدار 5 دورات كاملة (نسبة الحساسية الميكانيكية هي $\frac{dC}{dB} = 5$).
+
+والآن، اطرح على نفسك سؤالاً بديهياً بسيطاً: إذا أدرت الترس الأول $A$ دورة واحدة فقط، فكم دورة سيدور الترس الأخير $C$؟ دون الحاجة لفتح أي مرجع في الرياضيات المتقدمة، سيخبرك حدسك المباشر بضرب النسبتين: $3 \times 5 = 15$ دورة كاملة! الحساسية الإجمالية لمنظومة التروس بالنسبة للمقبض الابتدائي هي حاصل ضرب نسب التروس الوسيطة المتعاقبة: $\frac{dC}{dA} = \frac{dC}{dB} \cdot \frac{dB}{dA}$.
+
+**قاعدة السلسلة** (Chain Rule) في الحسبان والتفاضل ليست سوى هذا المبدأ الميكانيكي البسيط مطبقاً على الدوال الرياضية المركبة والمتتالية في سلسلة معالجة. تخيل أنك تنظر إلى نص دقيق عبر عدستين مكبرتين متتاليتين: إذا كانت العدسة الأولى تضاعف حجم الكلمات مرتين ($2\times$)، وكانت العدسة الثانية تضاعف الصورة الناتجة عن الأولى ثلاث مرات ($3\times$)، فإن الصورة الإجمالية التي تستقبلها عينك ستكون مكبرة بمقدار ست مرات ($2 \times 3 = 6\times$). يتضاعف معدل التمدد الهندسي عبر ضرب معاملات التكبير في كل محطة.
+
+وفي هندسة الذكاء الاصطناعي الحديثة، تمثل قاعدة السلسلة المحرك الخفي لكل نماذج التعلم العميق. فالنماذج اللغوية الكبرى والرؤية الحاسوبية ليست إلا سلاسل هائلة من مئات الدوال الرياضية المتداخلة. تدخل مصفوفات البكسلات أو الكلمات إلى الطبقة الأولى، فتنتقل مخرجاتها إلى الطبقة الثانية، ومنها إلى الثالثة، حتى نصل إلى دالة الخسارة النهائية. وعند تدريب النموذج، تمثل خوارزمية الانتشار الخلفي (Backpropagation) تطبيقاً مباشراً لقاعدة السلسلة: حيث تعود الخوارزمية بالزمن إلى الوراء عبر شبكة التروس الرياضية، ضاربةً المشتقات المحلية ببعضها لتبلغ كل وزن في الشبكة بحصته الدقيقة من المسؤولية عن الخطأ النهائي.
 
 :::simulation-widget{engine="canvas2d" component="CurvatureOsculatingCanvas"}
 ---
@@ -50,27 +56,31 @@ $$
 
 | Symbol | Dimensional Type | Geometric Meaning | Operational Role |
 | :--- | :--- | :--- | :--- |
-| $x$ | $\mathbb{R}$ | Primary input coordinate | Initial dial adjusted by the experimenter |
-| $u = g(x)$ | $\mathbb{R}$ | Intermediate hidden state | Output of inner function, input to outer function |
-| $y = f(u)$ | $\mathbb{R}$ | Final scalar output | Target response quantity |
+| $x$ | $\mathbb{R}$ | Primary input coordinate | The original knob or slider adjusted by the user |
+| $u = g(x)$ | $\mathbb{R}$ | Intermediate hidden state / activation | Output of the inner function, input to the outer function |
+| $y = f(u)$ | $\mathbb{R}$ | Final scalar output response | The ultimate output whose sensitivity we seek to measure |
 | $g'(x)$ | $\mathbb{R}$ | Local stretching factor of the inner map | First gear ratio in the compositional sequence |
-| $f'(g(x))$ | $\mathbb{R}$ | Local stretching factor of the outer map at state $u$ | Second gear ratio evaluated at the active state |
-| $\frac{dy}{dx}$ | $\mathbb{R}$ | End-to-end composite sensitivity | Compounded multiplicative gradient |
+| $f'(g(x))$ | $\mathbb{R}$ | Local stretching factor of outer map evaluated at state $u$ | Second gear ratio evaluated at the active intermediate state |
+| $\frac{dy}{dx}$ | $\mathbb{R}$ | End-to-end composite sensitivity | Compounded multiplicative gradient across the full pipeline |
 
-A fatal beginner trap is writing $f'(x) \cdot g'(x)$. The outer function $f$ never sees the original input $x$; it only receives the transformed state $g(x)$. The outer derivative must always be evaluated at the intermediate state $u = g(x)$.
+#### Intuitive Rationale for the Formula
+The single most common beginner mistake in calculus is writing $f'(x) \cdot g'(x)$. Why is this fatally wrong? Because the outer function $f$ never touches or sees the original input $x$! 
+Think back to the interlocking gears: Gear $C$ is not connected to Gear $A$; it is physically touched only by Gear $B$. Therefore, Gear $C$'s sensitivity must be measured relative to where Gear $B$ is currently positioned ($g(x)$). The outer derivative must *always* be evaluated at the active intermediate state $u = g(x)$, not the distant starting point $x$.
 
 ### تفكيك المعادلة
 
 | الرمز | النوع البُعدي | المعنى الهندسي | الدور العملياتي |
 | :--- | :--- | :--- | :--- |
-| $x$ | $\mathbb{R}$ | متغير المدخلات الأصلي | المقبض الأولي الذي يتحكم به النموذج |
-| $u = g(x)$ | $\mathbb{R}$ | الحالة الوسيطة الكامنة | مخرج الدالة الداخلية ومدخل الدالة الخارجية |
-| $y = f(u)$ | $\mathbb{R}$ | المخرج النهائي للدالة المركبة | كمية الاستجابة النهائية المستهدفة |
-| $g'(x)$ | $\mathbb{R}$ | معامل التمدد المحلي للدالة الداخلية | نسبة الترس الأول في مسار التركيب |
-| $f'(g(x))$ | $\mathbb{R}$ | معامل التمدد للدالة الخارجية عند الحالة $u$ | نسبة الترس الثاني مقاسة عند الحالة النشطة $g(x)$ |
-| $\frac{dy}{dx}$ | $\mathbb{R}$ | الحساسية الإجمالية للمركب | حاصل ضرب التدرجات المتسلسلة |
+| $x$ | $\mathbb{R}$ | متغير المدخلات الأولي | المقبض أو المعامل الأصلي المراد تعديله واختباره |
+| $u = g(x)$ | $\mathbb{R}$ | الحالة الكامنة الوسيطة (التنشيط) | مخرج الدالة الداخلية ومدخل الدالة الخارجية |
+| $y = f(u)$ | $\mathbb{R}$ | المخرج القياسي النهائي للمنظومة | القيمة المستهدفة التي نقيس مدى حساسيتها للمدخل الأصلي |
+| $g'(x)$ | $\mathbb{R}$ | معامل التمدد المحلي للدالة الداخلية | نسبة الترس الأول في مسار التركيب الرياضي |
+| $f'(g(x))$ | $\mathbb{R}$ | معامل التمدد للدالة الخارجية عند الحالة $u$ | نسبة الترس الثاني مقاسة عند الحالة النشطة الفعلية $g(x)$ |
+| $\frac{dy}{dx}$ | $\mathbb{R}$ | الحساسية الإجمالية للمركب الرياضي | حاصل ضرب كافة التدرجات المتسلسلة على طول المسار |
 
-من الأخطاء الكلاسيكية الشائعة كتابة $f'(x) \cdot g'(x)$. الدالة الخارجية $f$ لا ترى المدخل الأصلي $x$ مطلقاً؛ بل تستقبل المخرج الوسيط $g(x)$. لذلك يجب دوماً تقييم مشتقة الدالة الخارجية عند النقطة الوسيطة $u = g(x)$.
+#### التفسير المنطقي لصياغة المعادلة
+من أكثر الأخطاء شيوعاً بين المبتدئين في الحسبان كتابة $f'(x) \cdot g'(x)$. لماذا يُعد هذا خطأً فادحاً؟ لأن الدالة الخارجية $f$ لا تلامس المدخل الأولي $x$ ولا تعرفه على الإطلاق!
+تذكر مثال التروس: الترس الأخير $C$ لا يلامس الترس الأول $A$، بل يتأثر حصرياً بحركة الترس الوسيط $B$. ولذلك يجب قياس حساسية الترس الأخير بناءً على الموضع الذي وصل إليه الترس الوسيط بالفعل ($g(x)$). يجب تقييم مشتقة الدالة الخارجية دوماً عند النقطة الوسيطة النشطة $u = g(x)$، وليس عند نقطة البداية البعيدة $x$.
 
 ## Beat 3: Interactive Python Scratchpad
 
@@ -147,9 +157,28 @@ def composite_chain_rule(
 
 ## Beat 4: Reality Transfer Challenge
 
-A deep neural network contains 40 stacked layers where each activation function has a maximum local derivative of $|f'(z)| \le 0.25$ (such as the standard sigmoid). When training via gradient descent, the early layers fail to learn entirely. Based on the chain rule, what is the mathematical root cause of this failure?
+### Conceptual Diagnostic
+
+**English:** A deep neural network contains 40 stacked layers where each activation function has a maximum local derivative of $|f'(z)| \le 0.25$ (such as the standard sigmoid). When training via gradient descent, the early layers fail to learn entirely. Based on the chain rule, what is the mathematical root cause of this failure?
+
+**العربية:** تحتوي شبكة عصبية عميقة على 40 طبقة متتالية حيث تمتلك دالة التنشيط في كل طبقة حداً أقصى للمشتقة المحلية مقداره $|f'(z)| \le 0.25$ (مثل دالة السيجمويد القياسية). عند تدريب الشبكة بخوارزمية الانحدار التدريجي، تتوقف الطبقات الأولى تماماً عن التعلم. استناداً إلى قاعدة السلسلة، ما السبب الرياضي الجذري لهذا الفشل التدريبي؟
+
+* [x] Vanishing gradients, because multiplying 40 consecutive factors bounded by $0.25$ scales as $(0.25)^{40} \approx 8.3 \times 10^{-25}$, decaying the backpropagated signal to machine epsilon.
+  * تلاشي التدرجات (Vanishing Gradients)، لأن ضرب 40 حداً متتالياً لا تتجاوز قيمتها $0.25$ يؤول إلى $(0.25)^{40} \approx 8.3 \times 10^{-25}$، مما يخمد إشارة التدرج الراجعة إلى مستوى الصفر الحسابي للأجهزة.
+  > **Why this is correct:** The chain rule states that total sensitivity is the product of all intermediate derivatives: $\prod_{l=1}^{40} f'_l(z_l)$. When every factor is smaller than $1/4$, multiplying forty such fractions shrinks the gradient exponentially, starving the earliest layers of learning signal.
+  > **لماذا هذا الخيار صحيح:** تنص قاعدة السلسلة على أن الحساسية الإجمالية هي حاصل ضرب جميع المشتقات الوسيطة: $\prod_{l=1}^{40} f'_l(z_l)$. وعندما يكون كل عامل أقل من ربع ($1/4$)، يؤدي ضرب 40 كسراً إلى اضمحلال التدرج أسياً، مما يحرم الطبقات المبكرة من أي إشارة لتحديث أوزانها.
 
 * [ ] Exploding gradients caused by compounding large integer ratios across layers.
-* [x] Vanishing gradients, because multiplying 40 consecutive factors bounded by $0.25$ scales as $(0.25)^{40} \approx 8.3 \times 10^{-25}$, decaying the backpropagated signal to machine epsilon.
+  * انفجار التدرجات (Exploding Gradients) الناتج عن تضاعف نسب عددية صحيحة كبيرة عبر الطبقات.
+  > **Why this is incorrect:** Exploding gradients occur when intermediate derivatives are strictly greater than $1.0$ (e.g., unbounded weights), causing exponential growth rather than exponential decay.
+  > **لماذا هذا الخيار خاطئ:** يحدث انفجار التدرجات عندما تكون المشتقات الوسيطة أكبر قطعياً من $1.0$ (كوجود أوزان ضخمة غير مقيدة)، مما يسبب نمواً أسياً هائلاً وليس اضمحلالاً نحو الصفر.
+
 * [ ] Matrix singularities caused by non-invertible weight matrices.
+  * شذوذ المصفوفات وانعدام محددها نتيجة لمصفوفات أوزان غير قابلة للعكس.
+  > **Why this is incorrect:** Backpropagation requires only matrix-vector multiplications, never matrix inversions. The issue stems purely from scalar product shrinkage.
+  > **لماذا هذا الخيار خاطئ:** لا يتطلب حساب الانتشار الخلفي قلب المصفوفات أبداً، بل يكتفي بعمليات الضرب المتجهي. المشكلة تنبع حصراً من تضاؤل حاصل ضرب الكسور.
+
 * [ ] Numerical overflow in the loss function's numerator.
+  * فيض حسابي رقمي (Numerical Overflow) في بسط دالة الخسارة.
+  > **Why this is incorrect:** Vanishing gradient is an underflow phenomenon (decaying to zero), not an overflow (exploding to infinity).
+  > **لماذا هذا الخيار خاطئ:** تلاشي التدرج هو ظاهرة نقص حسابي (Underflow) تؤول إلى الصفر، وليس فيضاً حسابياً يتجاوز حدود الذاكرة نحو اللانهاية.

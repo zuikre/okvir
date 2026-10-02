@@ -14,18 +14,22 @@ i18n:
 
 ## Beat 1: Intuition & Mental Model
 
-Standard SQL `GROUP BY` is like a heavy hydraulic trash compactor: it takes 1,000 individual employee rows in the Engineering department and squashes them into a single summary dot: `("Engineering", 1000, 125000)`. The names, individual salaries, and hire dates of all 1,000 employees are permanently destroyed from the output!
+A standard SQL `GROUP BY` clause behaves like a heavy industrial hydraulic trash compactor: it takes 1,000 distinct employee records in the Engineering department and crushes them into a single summary dot: `("Engineering", 1000, 125000)`. In that instant, the individual names, hire dates, granular titles, and exact salaries of all 1,000 engineers are permanently crushed and destroyed from the query result set!
 
-What if you need to calculate each employee's salary rank or compare their pay to the department maximum, *while still keeping every individual employee's row visible*?
-Enter **Window Functions** (`OVER (PARTITION BY ...)`).
+What if your business question demands both aggregate intelligence AND granular individual rows?
+- *"What is each employee's salary rank compared to peers in their department?"*
+- *"What is the dollar difference between each employee's salary and their department's top earner?"*
+- *"What is the percentage contribution of this specific trade to today's regional trading volume?"*
 
-### The Glass Observation Gallery Analogy
-Imagine an elevated glass catwalk suspended above a buzzing trading floor:
-- The trading analysts remain sitting at their desks, working uninterrupted. Every single employee's row remains completely untouched.
-- An auditor walks along the glass observation walkway above.
-- The auditor looks down through a transparent glass frame (`OVER`), groups the desks by department (`PARTITION BY dept_name`), sorts them by compensation (`ORDER BY salary DESC`), and writes down their ranking (`DENSE_RANK()`) alongside each person's desk.
+To calculate these metrics using basic SQL, you would be forced to execute expensive self-joins against aggregated subqueries. Enter **Window Functions** (`OVER (PARTITION BY ...)`).
 
-You get rich, multi-tiered aggregate analytics **without losing a single row of granular data**!
+### The Glass Catwalk Observation Gallery Analogy
+To visualize window execution, imagine a bustling financial trading floor viewed from an elevated glass observation walkway suspended from the ceiling:
+- The traders remain sitting at their desks, working uninterrupted. Every individual employee's desk and record remains completely visible and untouched.
+- An auditor walks along the transparent glass catwalk above.
+- Through a movable glass frame (`OVER`), the auditor visually groups the desks by department (`PARTITION BY dept_name`), sorts the traders by compensation (`ORDER BY salary DESC`), and writes down each person's relative standing (`DENSE_RANK()`) on a digital tablet pinned to their row.
+
+You achieve multi-level analytic aggregations **without destroying or collapsing a single row of underlying data**!
 
 :::simulation-widget{engine="canvas2d" component="WindowFunctionFrameLab"}
 ---
@@ -34,18 +38,22 @@ highlighted_metric: "loss"
 ---
 :::
 
-تعتبر عملية التجميع التقليدية `GROUP BY` في SQL كأنها مكبس نفايات هيدروليكي: تأخذ 1,000 موظف في قسم الهندسة وتضغطهم في سطر ملخص واحد: `("الهندسة"، 1000، 125000)`. فتختفي أسماء وتفاصيل ورواتب أولئك الموظفين الـ 1,000 تماماً من الناتج!
+تتصرف عبارة التجميع التقليدية `GROUP BY` في SQL كمكبس نفايات هيدروليكي صناعي: تأخذ 1,000 سجل مستقل لمهندسي قسم التطوير وتضغطهم جميعاً في سطر ملخص واحد: `("الهندسة"، 1000، 125000)`. وفي تلك اللحظة، تُسحق وتُمحى أسماء وتواريخ تعيين وتفاصيل رواتب أولئك المهندسين الـ 1,000 نهائياً من مخرجات الاستعلام!
 
-ماذا لو أردت حساب ترتيب كل موظف أو مقارنة راتبه بأعلى راتب في قسمه، *مع الإبقاء على كل صف فردي كما هو دون حذفه*؟
-هنا يأتي دور **الدوال النافذية (Window Functions)** عبر العبارة السحرية `OVER (PARTITION BY ...)`.
+ماذا لو كان سؤال الأعمال يتطلب الحصول على الإحصائيات الإجمالية مع الاحتفاظ بكل صف تفصيلي في الوقت نفسه؟
+- *"ما هو الترتيب النسبي لراتب كل موظف مقارنة بزملائه في نفس القسم؟"*
+- *"كم يبلغ الفارق المالي بين راتب هذا الموظف وأعلى راتب في قسمه؟"*
+- *"ما هي النسبة المئوية لمساهمة هذه الصفقة الفردية في إجمالي تداولات المنطقة اليوم؟"*
 
-### تشبيه شرفة المراقبة الزجاجية المعلقة
-تخيل ممشى زجاجياً مرتفعاً معلقاً فوق قاعة تداول كبرى:
-- يبقى كل متداول جالساً في مكتبه، وتظل تفاصيل كل صف محفوظة بالكامل دون أي ضغط أو حذف.
-- يمشي مشرف التدقيق على الممشى الزجاجي في الأعلى.
-- ينظر المشرف عبر نافذة زجاجية (`OVER`)، ويقسم المكاتب ذهنياً حسب القسم (`PARTITION BY dept_name`)، ويرتبهم حسب الراتب (`ORDER BY salary DESC`)، ثم يسجل ترتيب كل فرد (`DENSE_RANK()`) والفارق بين راتبه وأعلى راتب في القسم بجانب اسمه.
+للإجابة عن هذه الأسئلة بـ SQL التقليدية، ستضطر إلى كتابة عمليات ربط ذاتي شاقة وبطيئة ضد استعلامات فرعية. وهنا تأتي القوة الخارقة لـ **الدوال النافذية (Window Functions)** عبر العبارة السحرية `OVER (PARTITION BY ...)`.
 
-تحصل على مؤشرات تجميعية وتحليلية عميقة **دون التضحية بأي صف أو تفصيلة دقيقة في البيانات**!
+### تشبيه ممر المراقبة الزجاجي المعلق
+لتجسيد آلية عمل الدوال النافذية، تخيل قاعة تداول مالي كبرى يعلوها ممشى زجاجي شفاف معلق في السقف:
+- يظل جميع المتداولين جالسين في مكاتبهم يمارسون أعمالهم؛ وكل موظف وبياناته تظل محفوظة بالكامل دون أي ضغط أو حذف.
+- يمشي مدقق الحسابات على الممشى الزجاجي الشفاف في الأعلى.
+- ومن خلال إطار زجاجي متحرك (`OVER`)، يقسم المكاتب ذهنياً حسب القسم (`PARTITION BY dept_name`)، ويرتبهم حسب الرواتب (`ORDER BY salary DESC`)، ثم يسجل الترتيب النسبي لكل موظف (`DENSE_RANK()`) وفارق راتبه عن سقف القسم في بطاقة معلقة بجانب مكتبه.
+
+تحصل بذلك على أعمق المؤشرات الإحصائية والتجميعية **دون التضحية بأي صف أو تفصيلة واحدة في قاعدة البيانات**!
 
 ## Beat 2: Formal Foundations & Mathematical Invariants
 
@@ -55,24 +63,19 @@ $$
 
 ### Mathematical Invariants & Symbol Breakdown
 
-The formal definitions characterize the non-reductive nature of window calculations:
+| الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
+| :--- | :--- | :--- | :--- |
+| $R$ | Active relation stream | Tuple stream reaching Step 5 ($\pi_{\text{SELECT}}$) in query execution | تيار السجلات النشط الواصل لمرحلة الإسقاط في الاستعلام |
+| $p(t)$ | Partition projection function | Evaluates partition key mapping tuples into disjoint subsets $\mathcal{P}_k$ | دالة إسقاط مفتاح التقسيم التي تجزئ السجلات لمجموعات منفصلة |
+| $\text{Frame}(t)$ | Sliding window subset | Bounded set of tuples visible to tuple $t$ for localized aggregation | الإطار الانزلاقي للصفوف المرئية للصف الحالي لحساب المقياس |
+| $\mathcal{W}_f(t)$ | Analytic scalar function | Value appended as a new column attribute to tuple $t$ | القيمة العددية التحليلية المحسوبة والمضافة كعمود جديد للصف |
+| $\text{vals}(p(t))$ | Ordered partition domain | Set of distinct scalar values present in partition $p(t)$ | مجموعة القيم الفريدة المرتبة الموجودة داخل نفس القسم |
+| $\text{DENSE\_RANK}$ | Dense ranking sequence | Strict consecutive integers: $1, 2, 2, 3$ (no gaps after ties) | ترقيم ترتيبي متصل دون فجوات عند تكرار نفس القيمة |
+| $\text{RANK}$ | Sparse ranking sequence | Gap-introducing integers: $1, 2, 2, 4$ (leaves gap equal to tied count) | ترقيم ترتيبي يترك فجوات مساوية لعدد القيم المكررة |
 
-- **$R$**: Active relation stream entering Step 5 ($\pi_{\text{SELECT}}$) of the execution lifecycle.
-- **$p(t)$**: Partition hash key (e.g., `dept_name`), dividing relation into disjoint subsets $\mathcal{P}_k$.
-- **$\text{Frame}(t)$**: Ordered subset of rows visible to tuple $t$ dictated by the window framing specification.
-- **$\mathcal{W}_f(t)$**: Analytic scalar value appended to tuple $t$ as an additional projected attribute.
-- **Row Preservation Invariant**: $|\text{Output}| = |R|$, ensuring exactly one output row per input row.
-- **DENSE_RANK vs. RANK**: `DENSE_RANK` produces consecutive integer ranks ($1, 2, 2, 3$) upon ties; `RANK` introduces gaps ($1, 2, 2, 4$).
+The definitive relational invariant of window functions is **Row Cardinality Preservation**: $|\text{Output}| = |R|$. Unlike `GROUP BY` which reduces cardinality to $|\mathcal{K}| \ll |R|$, a window function guarantees a strict bijective 1-to-1 mapping between input rows and output rows.
 
-### الشرح الرياضي وتفصيل الرموز
-
-توضح الصياغة الرياضية الطبيعة غير الاختزالية للعمليات النافذية:
-- **$R$**: تيار السجلات النشط الواصل لمرحلة الإسقاط في خطة الاستعلام.
-- **$p(t)$**: مفتاح التجزئة الفئوي (مثل اسم القسم) الذي يقسم السجلات إلى مجموعات منفصلة.
-- **$\text{Frame}(t)$**: الإطار المرئي للصف الحالي بناءً على شروط الترتيب والحدود.
-- **$\mathcal{W}_f(t)$**: القيمة العددية المحسوبة والمضافة كخاصية جديدة للصف.
-- **ثابت الحفاظ على الصفوف**: عدد الصفوف الناتجة يساوي بالضبط عدد صفوف المدخلات دون أي تقليص.
-- **الفرق بين DENSE_RANK و RANK**: ينتج DENSE_RANK أرقاماً متتالية بلا فجوات عند التعادل ($1, 2, 2, 3$)، بينما يترك RANK فجوة ($1, 2, 2, 4$).
+الثابت الرياضي القاطع للدوال النافذية هو **الحفاظ الكامل على عدد الصفوف**: $|\text{Output}| = |R|$. فعلى عكس `GROUP BY` التي تقلص عدد الصفوف إلى عدد المجموعات $|\mathcal{K}| \ll |R|$، تضمن الدوال النافذية علاقة تقابلية تامة تخرج صفاً واحداً مقابلاً لكل صف دخل في المعالجة.
 
 ## Beat 3: Interactive Code Challenge
 
@@ -105,9 +108,9 @@ FROM employees
 ## Beat 4: Real-World Transfer Scenario
 
 ### Industry Problem Context
-A payroll auditing system across 20,000,000 employee records compares each worker's pay to their regional cohort median. The legacy query self-joins the table against a `GROUP BY region` subquery, taking 45 minutes and spilling 120 GB to disk. Why does rewriting this query with `OVER (PARTITION BY region)` finish in under 6 seconds?
+A national payroll auditing platform processes 20,000,000 employee records to identify salary anomalies by comparing each worker's wage against their regional department median. A legacy query computes this by self-joining the 20-million-row `employees` table against a pre-aggregated subquery (`SELECT dept, region, MEDIAN(salary) FROM employees GROUP BY dept, region`). The query runs for 45 minutes, saturates the CPU, and spills 120 GB of intermediate state to disk before crashing. When refactored to use `MEDIAN(salary) OVER (PARTITION BY dept, region)`, the query completes in 5.8 seconds using under 800 MB of RAM. Why does the window function execute over 450x faster?
 
-نظام تدقيق رواتب يضم 20 مليون موظف يقارن راتب كل فرد بمتوسط منطقته. يستخدم الاستعلام القديم ربطاً ذاتياً مع استعلام فرعي `GROUP BY`، فيستغرق 45 دقيقة ويستهلك 120 جيجابايت على القرص المؤقت. لماذا ينتهي نفس الحساب في أقل من 6 ثوانٍ عند إعادة كتابته باستخدام `OVER (PARTITION BY region)`؟
+تقوم منصة وطنية لتدقيق الرواتب بمعالجة 20,000,000 سجل وظيفي لرصد الشذوذ في الأجور عبر مقارنة راتب كل موظف بالوسيط الإحصائي لمنطقته وقسمه. اعتمد استعلام قديم على إجراء ربط ذاتي بين جدول الموظفين (20 مليون صف) واستعلام فرعي مجمع عبر `GROUP BY`. استغرق الاستعلام 45 دقيقة وأهدر موارد الخادم وسكب 120 جيجابايت على القرص المؤقت قبل أن ينهار. عند إعادة كتابة الاستعلام باستخدام الدالة النافذية `MEDIAN(salary) OVER (PARTITION BY dept, region)`، انتهى الحساب كاملاً في 5.8 ثوانٍ مستهلكاً أقل من 800 ميجابايت من الذاكرة! لماذا تتفوق الدالة النافذية بأكثر من 450 ضعفاً؟
 
 ### Transfer Assessment Question
 - **(A)** *(Correct)* Window functions sort and stream the dataset in a single linear pass over partition buffers in memory without materializing expensive $O(N^2)$ Cartesian self-joins or intermediate disk spool files.
@@ -122,7 +125,13 @@ A payroll auditing system across 20,000,000 employee records compares each worke
 **Correct Answer:** Option (A)
 
 **Deep Engineering Post-Mortem & Explanation:**
-Self-joining against aggregated subqueries forces the engine to hash or sort the table twice and perform an expensive nested loop or hash join. A window function sorts once by partition key and streams aggregate accumulators in $O(N \log N)$ time.
+- **Why Option (A) is correct:** Self-joining a 20-million-row table against an aggregated subquery forces the query engine to scan the base table twice, materialize an intermediate hash table of groups, and perform an expensive hash or merge join that spills to temporary disk storage when RAM is exhausted. In contrast, a window function sorts the table once by `(dept, region)` in $O(N \log N)$ time, maintains running accumulators in memory, and evaluates the window metric in a single streaming pass without allocating intermediate cross-product buffers.
+- **Why Option (B) is incorrect:** Window functions are standard relational operators parsed and planned by the database query optimizer like any other SQL construct.
+- **Why Option (C) is incorrect:** DuckDB is an embedded in-process database; it operates entirely in local memory and has no dependency on Redis or external caching servers.
+- **Why Option (D) is incorrect:** Read-only joins never delete primary keys or mutate table constraints.
 
-*التفسير الهندسي المعمق:*
-الربط الذاتي يجبر المحرك على فرز وتجزئة الجدول مرتين وإجراء عملية دمج مكلفة. بينما تفرز الدالة النافذية البيانات مرة واحدة وتحسب التجميعات عبر تدفق الذاكرة بزمن $O(N \log N)$.
+*التفسير الهندسي المعمق وتحليل الخيارات:*
+- **لماذا الخيار (A) صحيح:** إجراء ربط ذاتي لجدول يضم 20 مليون صف مع استعلام فرعي يجبر المحرك على مسح الجدول مرتين، وبناء جدول تجزئة وسيط في الذاكرة، ثم إجراء عملية ربط مكلفة تسكب البيانات على القرص عند امتلاء RAM. أما الدالة النافذية فتفرز البيانات مرة واحدة فقط حسب حقول التقسيم بزمن $O(N \log N)$، وتحتفظ بمجمعات إحصائية سريعة في الذاكرة، ثم تمر على الصفوف في مسار تدفق خطي واحد مخرجة النتائج فوراً دون أي جداول وسيطة على القرص.
+- **لماذا الخيار (B) خاطئ:** تخضع الدوال النافذية لتحليل وتخطيط محسن الاستعلامات القياسي كأي جزء آخر في لغة SQL ولا تتجاوزه.
+- **لماذا الخيار (C) خاطئ:** محرك DuckDB هو محرك داخلي مدمج في نفس المعالجة (In-process) ويعمل في الذاكرة المحلية دون أي اتصال بخوادم Redis الخارجية.
+- **لماذا الخيار (D) خاطئ:** استعلامات القراءة والربط لا تعدل قيود الجداول ولا تحذف المفاتيح الأساسية أبداً.

@@ -29,6 +29,8 @@ $$
 
 The selection bias term evaporates to exactly zero! Any difference in post-treatment outcomes can now be attributed solely and unambiguously to the causal potency of the treatment itself.
 
+This highlights the profound chasm between passive prediction and active policy intervention. Consider a mobile health app: an AI algorithm predicting user health will observe that users who log 30 workouts a month have resting heart rates 15 beats per minute lower than non-users. For a life insurance company pricing risk, this predictive score is completely valid—it identifies healthy people. But for a user deciding whether to pay for the subscription, the causal question is entirely different: *"If I, as a sedentary individual, start using this app, will my heart rate drop by 15 bpm?"* The answer is almost certainly no. A huge fraction of that 15 bpm gap reflects self-selection—the people who voluntarily exercise daily are already younger, leaner, and eat healthier diets. Prediction passively sorts individuals based on existing differences; RCTs actively intervene to measure true biological or economic transformation.
+
 لماذا اعتُبر الفعل البسيط المتمثل في رمي قطعة نقود أو السحب بالقرعة فتحًا علميًا استحق أرفع جوائز نوبل في الاقتصاد والعلوم الاجتماعية؟
 
 لأنه في المجتمعات البشرية، **لا يتخذ أحد قراراته بصورة عشوائية**. فالمرضى هم من يقصدون الأطباء، والطلاب الأوسع طموحًا وثراءً هم من يلتحقون بالجامعات المرموقة، والشركات الأشد تعثرًا هي من تتقدم بطلبات الدعم الحكومي. وعندما يختار الأفراد مسارهم بأنفسهم، تتلوث المقارنات المباشرة بـ **انحياز الاختيار (Selection Bias)**.
@@ -43,6 +45,8 @@ $$
 $$
 
 يتلاشى انحياز الاختيار ليصبح صفرًا رياضيًا تامًا! وأي فارق يُرصد لاحقًا في النتائج يُنسب يقينًا إلى الأثر السببي الصافي للمعالجة وحدها دون أي تشويش.
+
+وهنا يبرز الصدع العميق بين التنبؤ السلبي والتدخل السببي الفعلي: تأمل تطبيقًا للهواتف الذكية للياقة البدنية؛ يستطيع نموذج تنبؤي أن يرصد بدقة أن مستخدمي التطبيق الذين يمارسون الرياضة 30 يومًا شهريًا ينخفض معدل نبضات قلوبهم بمقدار 15 نبضة/دقيقة مقارنة بغيرهم. لشركة تأمين تسعى لتسعير البوالص، هذا التنبؤ ممتاز لتصنيف الأصحاء. لكن بالنسبة لشخص خامل يفكر في شراء التطبيق، فإن السؤال السببي مختلف تمامًا: *"إذا بدأتُ أنا في استخدام هذا التطبيق، هل سينخفض نبضي بمقدار 15 نبضة؟"* الإجابة هي لا؛ لأن جزءًا هائلاً من هذا الفارق يعود لانحياز الاختيار الذاتي؛ فالذين يمارسون الرياضة بانتظام هم في الأصل أصغر سنًا وأفضل تغذية ويمتلكون جينات رياضية مسبقة. التنبؤ يرصد الفروق القائمة، بينما التجارب العشوائية تصنع التغيير الحقيقي وتقيسه.
 
 :::simulation-widget{engine="canvas2d" component="SelectionBiasPropensityLab"}
 ---
@@ -75,11 +79,33 @@ $$
 \Delta_{\text{naive}} = \mathbb{E}[Y_i \mid D_i = 1] - \mathbb{E}[Y_i \mid D_i = 0] = \mathbb{E}[Y_i(1)] - \mathbb{E}[Y_i(0)] \equiv \text{ATE} = \text{ATT}
 $$
 
-When working with observational data where random assignment is impossible, the **Conditional Independence Assumption (CIA)** ($D_i \perp\!\!\perp (Y_i(0), Y_i(1)) \mid \mathbf{X}_i$) allows recovery of the causal ATE via the **Inverse Probability Weighting (IPW)** estimator:
+### Observational Identification: The Horvitz-Thompson IPW Proof
+
+When working with observational data where random assignment is absent, we invoke the **Conditional Independence Assumption (CIA)**:
 
 $$
-e(\mathbf{X}_i) \equiv P(D_i = 1 \mid \mathbf{X}_i) \quad (\text{Propensity Score})
+D_i \perp\!\!\perp \big(Y_i(0), Y_i(1)\big) \mid \mathbf{X}_i
 $$
+
+along with the **Overlap / Positivity Assumption**: $0 < e(\mathbf{X}_i) < 1$, where the **Propensity Score** is:
+
+$$
+e(\mathbf{X}_i) \equiv \mathbb{P}(D_i = 1 \mid \mathbf{X}_i)
+$$
+
+We now rigorously prove that Inverse Probability Weighting (IPW) recovers $\mathbb{E}[Y_i(1)]$ using the Law of Iterated Expectations:
+
+$$
+\mathbb{E}\left[ \frac{D_i Y_i}{e(\mathbf{X}_i)} \right] = \mathbb{E}\left[ \mathbb{E}\left[ \frac{D_i Y_i(1)}{e(\mathbf{X}_i)} \;\Bigg|\; \mathbf{X}_i \right] \right] = \mathbb{E}\left[ \frac{\mathbb{E}[D_i \mid \mathbf{X}_i] \cdot \mathbb{E}[Y_i(1) \mid \mathbf{X}_i]}{e(\mathbf{X}_i)} \right]
+$$
+
+Because $\mathbb{E}[D_i \mid \mathbf{X}_i] \equiv e(\mathbf{X}_i)$, the propensity score in the numerator and denominator cancel out exactly:
+
+$$
+= \mathbb{E}\left[ \frac{e(\mathbf{X}_i) \mathbb{E}[Y_i(1) \mid \mathbf{X}_i]}{e(\mathbf{X}_i)} \right] = \mathbb{E}\big[\mathbb{E}[Y_i(1) \mid \mathbf{X}_i]\big] = \mathbb{E}[Y_i(1)]
+$$
+
+By an identical algebraic step, $\mathbb{E}\left[ \frac{(1 - D_i) Y_i}{1 - e(\mathbf{X}_i)} \right] = \mathbb{E}[Y_i(0)]$. Subtracting the two terms yields the consistent **IPW ATE Estimator**:
 
 $$
 \hat{\tau}_{\text{IPW}} = \frac{1}{N} \sum_{i=1}^N \left( \frac{D_i Y_i}{e(\mathbf{X}_i)} - \frac{(1 - D_i) Y_i}{1 - e(\mathbf{X}_i)} \right)
@@ -163,3 +189,16 @@ If the company subsequently conducts a strict Randomized Controlled Trial (forci
 * [x] Because the observational comparison suffered from massive selection bias: users who voluntarily work out 30 times a month are already younger, more health-conscious, and more biologically fit at baseline ($\mathbb{E}[Y_i(0) \mid D_i=1] < \mathbb{E}[Y_i(0) \mid D_i=0]$).
 * [ ] Because RCTs are only capable of identifying Local Average Treatment Effects (LATE), not ATE.
 * [ ] Because the app's code runs faster on treated users' phones.
+
+### Pedagogical Explanation & Distractor Analysis | التحليل البيداغوجي وتفكيك البدائل
+
+**Why the correct option is right:**
+In the observational data, users freely self-select into exercising. Those who complete 30 workouts a month possess unobserved healthy habits, better cardiovascular genetics, and disciplined diets. Even if they had never touched the app ($D=0$), their counterfactual resting heart rate $\mathbb{E}[Y(0) \mid D=1]$ would be substantially lower than that of sedentary individuals $\mathbb{E}[Y(0) \mid D=0]$. Under the Rubin decomposition, this baseline health difference forms a huge selection bias. When the company runs an RCT, randomization balances baseline health across groups, stripping away this selection bias and revealing the true biological impact of the workouts alone, which is typically much smaller than 15 bpm.
+
+**Why the distractors are incorrect:**
+1. *Random assignment introduces measurement error...*: Randomization changes the assignment mechanism, not the precision of sensor hardware.
+2. *RCTs are only capable of identifying LATE, not ATE...*: Perfect compliance in an RCT identifies the full population ATE. LATE arises only in quasi-experiments with non-compliance (Instrumental Variables).
+3. *The app's code runs faster on treated phones...*: Irrelevant humorous distraction with zero econometric basis.
+
+*الشرح باللغة العربية:*
+في البيانات الرصدية، يختار المستخدمون سلوكهم بحرية؛ فالذين يمارسون الرياضة يوميًا يتمتعون بنمط حياة صحي وجينات قلبية أفضل وغذاء متوازن. وحتى لو لم يستخدموا التطبيق أبدًا ($D=0$)، فإن معدل نبضهم الأساسي سيكون أقل بكثير من غيرهم. هذا الفارق المسبق يمثل انحياز اختيار هائل يلوث المقارنة. عند إجراء تجربة عشوائية منضبطة (RCT)، يضمن التوزيع بالقرعة تماثل المجموعتين تمامًا قبل بدء التمرين، فيختفي انحياز الاختيار كليًا، وتظهر الفائدة البيولوجية الحقيقية للتمرين وحده، والتي تكون عادة أقل بكثير من 15 نبضة في الدقيقة.

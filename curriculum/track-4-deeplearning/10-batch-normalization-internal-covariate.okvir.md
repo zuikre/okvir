@@ -12,21 +12,20 @@ i18n:
 
 # Batch Normalization: Internal Covariate Shift & Mini-Batch Statistics
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
-Imagine building a skyscraper where every floor is made of shifting quicksand. As workers on the 1st floor make minor adjustments to their support pillars, the 2nd floor shifts and tilts. Because the 2nd floor tilted, the 3rd floor tilts even more violently. By the time you reach the 50th floor, the ground is thrashing unpredictably!
+Imagine constructing a 50-story skyscraper where every floor is made of shifting quicksand. When construction workers on the 1st floor make a minor realignment to their foundation pillars, the 2nd floor shifts and tilts. Because the 2nd floor tilted, the 3rd floor tilts even more violently. By the time this mechanical cascade propagates to the 50th floor, the ground is thrashing uncontrollably, threatening to tear the entire structure apart!
 
-This is the nightmare of training deep neural networks without normalization, historically termed **internal covariate shift**. When Layer 1 updates its weights during a gradient step, the distribution of outputs it hands to Layer 2 shifts. Layer 2 must now constantly struggle to adapt to a moving target, causing gradients in deep layers to explode, vanish, or saturate.
+This architectural nightmare was the central bottleneck in training deep neural networks prior to 2015, historically termed **internal covariate shift**. When Layer 1 updates its weights during a gradient descent step, the statistical distribution (mean and variance) of the activations it outputs to Layer 2 shifts. Layer 2 must now constantly struggle to adapt to a moving target. In networks with dozens of layers, this compounding distribution drift causes activations to either explode toward infinity or collapse into saturated activation zones where gradients vanish entirely.
 
-In 2015, Sergey Ioffe and Christian Szegedy introduced a breakthrough remedy: **Batch Normalization (BatchNorm)**.
-Instead of letting activations drift wildly, BatchNorm intercepts the activations between layers and tames them across the mini-batch:
-1. It calculates the mini-batch mean $\mu_B$ and variance $\sigma_B^2$ across all samples in the batch.
-2. It standardizes each feature coordinate to zero mean and unit variance: $\hat{x} = \frac{x - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}$.
-3. To ensure the network doesn't lose expressive power, it introduces two learnable parameters: scale $\gamma$ and shift $\beta$, producing $y = \gamma \hat{x} + \beta$. If the network decides that a non-zero mean is actually optimal, it can learn to restore it!
+In 2015, Sergey Ioffe and Christian Szegedy introduced a transformative stabilizer: **Batch Normalization (BatchNorm)**. Instead of allowing layer outputs to drift unchecked, BatchNorm intercepts the intermediate activations between layers and anchors them firmly across the mini-batch:
+1. It computes the empirical mean $\mu_{\mathcal{B}}$ and variance $\sigma_{\mathcal{B}}^2$ vertically across all samples in the current mini-batch.
+2. It standardizes each feature coordinate to zero mean and unit variance: $\hat{x} = \frac{x - \mu_{\mathcal{B}}}{\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}}$.
+3. To prevent the network from losing representational capacity, it introduces two learnable parameters: a scale factor $\gamma$ and a shift offset $\beta$, producing $y = \gamma \hat{x} + \beta$. If the network determines that a non-zero mean or scaled variance is optimal, it can simply learn to restore it!
 
-**The Dual-Mode Lifecycle:**
-* **During Training:** BatchNorm calculates statistics dynamically from the current mini-batch and maintains an exponential moving average (running mean and running variance).
-* **During Evaluation / Inference:** The mini-batch statistics are frozen! The layer normalizes using the stored running averages, ensuring that predicting a single sample produces deterministic, stable results.
+**The Dual-Mode Lifecycle (Training vs. Inference):**
+* **During Training:** BatchNorm calculates statistics dynamically from the active mini-batch. Simultaneously, it maintains non-differentiable running averages (`running_mean` and `running_var`) using exponential smoothing.
+* **During Evaluation / Inference:** Mini-batch calculation is completely frozen! The layer normalizes incoming samples using the stored population running statistics. This guarantees that when deploying a model to evaluate a single customer request ($B=1$), the prediction is completely deterministic and stable.
 
 :::simulation-widget{engine="canvas2d" component="NeuralActivationCanvas"}
 ---
@@ -35,23 +34,23 @@ highlighted_metric: "loss"
 ---
 :::
 
-تخيّل أنك تبني ناطحة سحاب من خمسين طابقاً، وكل طابق مبني فوق رمال متحركة غير مستقرة. كل تعديل طفيف يجريه العمال في الطابق الأول يؤدي إلى انزلاق أرضية الطابق الثاني، مما يضاعف الانحراف في الطوابق العليا حتى تنهار القمة.
+تخيّل أنك تبني ناطحة سحاب عملاقة من خمسين طابقاً، ولكن أرضية كل طابق مبنية فوق رمال متحركة غير مستقرة. كل تعديل طفيف يجريه العمال على أعمدة الطابق الأول يؤدي إلى انزلاق أرضية الطابق الثاني، مما يضاعف الانحراف في الطابق الثالث حتى تصل الارتجاجات إلى قمة المبنى فتهدده بالانهيار التام.
 
-هذه هي المعضلة الكبرى في تدريب الشبكات العصبية العميقة، والتي تُعرف بـ **انحراف التوزيع الداخلي (Internal Covariate Shift)**. مع كل خطوة تحديث للأوزان في الطبقات الدنيا، تتغير التوزيعات الإحصائية للتنشيطات الداخلة إلى الطبقات اللاحقة، مما يضطر الطبقات العميقة لإعادة تكييف نفسها باستمرار من الصفر، مسبباً تلاشي التدرجات أو انفجارها.
+كانت هذه المعضلة الكبرى في تدريب الشبكات العصبية العميقة قبل عام 2015، وتُعرف بـ **انحراف التوزيع الداخلي (Internal Covariate Shift)**. فمع كل تحديث لأوزان الطبقة الأولى، تتغير التوزيعات الإحصائية (المتوسط والتباين) للمخرجات الداخلة إلى الطبقة الثانية. تجد الطبقات العميقة نفسها في مطاردة مستمرة لهدف متحرك، مما يسبب تضخماً هائلاً في التنشيطات أو وقوعها في مناطق التشبع الخاملة التي تتلاشى فيها التدرجات تماماً.
 
-ابتكرت تقنية **تطبيع الدفعات (Batch Normalization)** حلاً جذرياً: اعتراض التنشيطات بين الطبقات وإخضاعها لعملية معايرة إحصائية فورية:
-1. حساب المتوسط والتباين عبر كافة عينات الدفعة المصغرة الحالية.
+قدمت تقنية **تطبيع الدفعات (Batch Normalization)** صمام أمان معماري: اعتراض التنشيطات بين الطبقات وإخضاعها لمعايرة إحصائية صارمة:
+1. حساب المتوسط والتباين الإحصائي رأسياً عبر كافة عينات الدفعة المصغرة الحالية.
 2. توحيد التنشيطات لتصبح ذات متوسط صفري وتباين يساوي 1.0.
-3. إضافة معاملين قابلين للتعلم: المقياس $\gamma$ والإزاحة $\beta$، مما يسمح للشبكة باستعادة أي توزيع غير خطي تراه مفيداً للتمثيل.
+3. إضافة معاملين قابلين للتعلم: المقياس $\gamma$ والإزاحة $\beta$، مما يتيح للشبكة استعادة أي توزيع تحتاجه لتمثيل البيانات بمرونة تامة.
 
-**وضع التدريب مقابل وضع الاستدلال:**
-أثناء التدريب، يتم استخدام إحصائيات الدفعة الحالية مع تحديث متوسط متحرك تراكمي. وعند الاختبار والإنتاج (Inference)، يتم تجميد هذه الإحصائيات واستخدام المتوسطات التراكمية المحفوظة، لضمان استقرار التنبؤ لعينة واحدة منفردة.
+**دورة الحياة المزدوجة (التدريب مقابل الاستدلال):**
+أثناء التدريب، تُحسب الإحصائيات لحظياً من الدفعة الحالية مع تحديث متوسط متحرك تراكمي في الخلفية. وعند النشر والاستدلال (Inference)، يتم تجميد حسابات الدفعة واستخدام المتوسطات التراكمية المحفوظة، لضمان استقرار تنبؤ النموذج لعينة واحدة منفصلة ($B=1$) دون أي تذبذب.
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
-For a mini-batch $\mathcal{B} = \{x_1, \dots, x_B\}$ of activations for a given dimension, the Batch Normalization transform is defined as:
+For a mini-batch $\mathcal{B} = \{x_1, \dots, x_B\}$ of activations along a specific feature channel, the Batch Normalization transform is defined as:
 
 $$
 \mu_{\mathcal{B}} = \frac{1}{B} \sum_{i=1}^B x_i, \quad \sigma_{\mathcal{B}}^2 = \frac{1}{B} \sum_{i=1}^B (x_i - \mu_{\mathcal{B}})^2
@@ -61,27 +60,43 @@ $$
 \hat{x}_i = \frac{x_i - \mu_{\mathcal{B}}}{\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}}, \quad y_i = \gamma \hat{x}_i + \beta \equiv \text{BN}_{\gamma, \beta}(x_i)
 $$
 
-During training, population running statistics are tracked with momentum $m \in (0, 1)$:
+During training, population running statistics are tracked using momentum factor $m \in (0, 1)$:
+
 $$
 \mu_{\text{run}} \leftarrow (1 - m) \mu_{\text{run}} + m \mu_{\mathcal{B}}, \quad \sigma_{\text{run}}^2 \leftarrow (1 - m) \sigma_{\text{run}}^2 + m \sigma_{\mathcal{B}}^2
 $$
 
-During inference (evaluation mode), the fixed running estimates replace mini-batch statistics:
+During inference (evaluation mode), frozen running statistics replace mini-batch estimates:
+
 $$
 \hat{x}_{\text{eval}} = \frac{x - \mu_{\text{run}}}{\sqrt{\sigma_{\text{run}}^2 + \epsilon}}, \quad y_{\text{eval}} = \gamma \hat{x}_{\text{eval}} + \beta
 $$
 
-Where:
-* $B$: Mini-batch size.
-* $\epsilon \approx 10^{-5}$: Numerical variance stabilizer.
-* $\gamma, \beta \in \mathbb{R}$: Learnable affine scale and shift parameters initialized to $\gamma=1, \beta=0$.
-* $\mu_{\text{run}}, \sigma_{\text{run}}^2$: Non-differentiable tracking buffers used strictly during deployment.
+During reverse-mode backpropagation, given the upstream adjoint gradient $\frac{\partial L}{\partial y_i}$, the analytical gradients with respect to the learnable scale and shift parameters, and input activations are:
 
-تضمن عملية التطبيع بقاء تدرجات دالة الخسارة مستقرة ومحصورة داخل نطاق عددي آمن، مما يسمح باستخدام معدلات تعلم أكبر بعشر مرات وتدريب شبكات ذات مئات الطبقات بنجاح وسرعة فائقة.
+$$
+\frac{\partial L}{\partial \gamma} = \sum_{j=1}^B \frac{\partial L}{\partial y_j} \hat{x}_j, \quad \frac{\partial L}{\partial \beta} = \sum_{j=1}^B \frac{\partial L}{\partial y_j}
+$$
+
+$$
+\frac{\partial L}{\partial x_i} = \frac{\gamma}{\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}} \left[ \frac{\partial L}{\partial y_i} - \frac{1}{B} \sum_{j=1}^B \frac{\partial L}{\partial y_j} - \frac{\hat{x}_i}{B} \sum_{j=1}^B \frac{\partial L}{\partial y_j} \hat{x}_j \right]
+$$
+
+### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
+
+* $B$: Mini-batch size (dimension $0$ of the activation tensor).
+* $\mu_{\mathcal{B}}, \sigma_{\mathcal{B}}^2$: Mean and variance calculated across the mini-batch dimension.
+* $\epsilon \approx 10^{-5}$: Numerical variance stabilizer preventing division by zero.
+* $\gamma, \beta \in \mathbb{R}^D$: Learnable affine scale and shift parameters initialized to $\gamma=1, \beta=0$.
+* $\frac{\partial L}{\partial \gamma}, \frac{\partial L}{\partial \beta}$: Gradients with respect to affine scale and shift parameters.
+* $\mu_{\text{run}}, \sigma_{\text{run}}^2$: Non-differentiable historical tracking buffers used during deployment.
+* $m \in [0.01, 0.1]$: Running average momentum coefficient (in PyTorch convention, $m=0.1$).
+
+تُظهر صيغة التدرج العكسي لـ BatchNorm كيف يقوم الحدان الثاني والثالث بطرح المتوسط والمكون المتعامد للتدرجات، مما يضمن ثبات مقياس التدرجات ومنعها من الانفجار، مما أتاح للباحثين استخدام معدلات تعلم أكبر بعشر مرات وتدريب شبكات بالغة العمق بسلاسة.
 
 ---
 
-## Beat 3: Interactive Python Scratchpad
+## Beat 3: Interactive Python Scratchpad | التحدي البرمجي التفاعلي
 
 Implement the complete `batchnorm_forward` function supporting both training mode (computing batch statistics and updating running buffers) and inference mode (using frozen running buffers).
 
@@ -102,42 +117,70 @@ def batchnorm_forward(x: np.ndarray, gamma: np.ndarray, beta: np.ndarray,
                       training: bool = True, momentum: float = 0.1,
                       eps: float = 1e-5) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Computes forward pass of Batch Normalization.
+    Computes the forward pass of Batch Normalization.
     
     Parameters
     ----------
-    x : np.ndarray of shape (B, D)
-    gamma, beta : np.ndarray of shape (D,)
-    running_mean, running_var : np.ndarray of shape (D,)
-    training : bool
+    x : np.ndarray of shape (B, D) - Input activations
+    gamma : np.ndarray of shape (D,) - Learnable scale parameter
+    beta : np.ndarray of shape (D,) - Learnable shift parameter
+    running_mean : np.ndarray of shape (D,) - Running average mean buffer
+    running_var : np.ndarray of shape (D,) - Running average variance buffer
+    training : bool - Flag indicating training vs. inference mode
+    momentum : float - Running statistics update rate
+    eps : float - Variance epsilon stabilizer
     
     Returns
     -------
-    tuple of (out, running_mean, running_var)
+    tuple of (out: np.ndarray, running_mean: np.ndarray, running_var: np.ndarray)
     """
-    # TODO: If training:
-    #       1. Compute batch mean and variance across axis=0
-    #       2. Standardize x: x_norm = (x - mean) / sqrt(var + eps)
-    #       3. Apply affine transform: out = gamma * x_norm + beta
-    #       4. Update running_mean and running_var using momentum
-    # TODO: If not training:
-    #       1. Standardize using running_mean and running_var
-    #       2. Apply affine transform: out = gamma * x_norm + beta
-    pass
+    if training:
+        # Step 1: Compute empirical batch mean and variance across samples (axis=0)
+        mean = np.mean(x, axis=0)
+        var = np.var(x, axis=0)
+        
+        # Step 2: Standardize activations to zero mean and unit variance
+        x_norm = (x - mean) / np.sqrt(var + eps)
+        
+        # Step 3: Apply learnable affine transformation
+        out = gamma * x_norm + beta
+        
+        # Step 4: Update running statistics buffers using exponential moving average
+        running_mean = (1.0 - momentum) * running_mean + momentum * mean
+        running_var = (1.0 - momentum) * running_var + momentum * var
+    else:
+        # Step 1: Standardize using frozen historical running statistics
+        x_norm = (x - running_mean) / np.sqrt(running_var + eps)
+        
+        # Step 2: Apply learnable affine transformation
+        out = gamma * x_norm + beta
+        
+    return out, running_mean, running_var
 ```
 :::
 
 ---
 
-## Beat 4: Reality Transfer Challenge
+## Beat 4: Reality Transfer Challenge | اختبار الانتقال المعرفي الواقعي
 
 ### Transfer Question / سؤال نقل الأثر المعرفي
 
-Why does Batch Normalization struggle in autoregressive language models (LLMs) and small batch training ($B=1$), motivating the switch to Layer Normalization?
+Why does Batch Normalization struggle in autoregressive large language models (LLMs) and small-batch inference ($B=1$), directly motivating the universal transition to Layer Normalization?
 
-* [x] In autoregressive generation (e.g. streaming tokens), the inference batch size for an active prompt is often $B=1$, making mini-batch variance zero or undefined; furthermore, sequence lengths vary dynamically, and batch statistics artificially couple unrelated sentences together during training.
+* [x] In autoregressive token generation, tokens are emitted sequentially with batch size $B=1$, where sample variance is zero or undefined; furthermore, variable sequence lengths in NLP make batch statistics unstable and artificially couple unrelated text documents together.
 * [ ] Batch Normalization requires more memory than the entire model's parameter footprint.
-* [ ] GPUs cannot compute the mean of a vector along axis 0.
+* [ ] GPUs cannot compute the mean of a tensor along dimension 0.
 * [ ] BatchNorm cannot be differentiated using automatic differentiation.
 
-> **Insight:** In CNNs, images have fixed dimensions and large batches, making BatchNorm very effective. But in modern NLP and Transformers, inputs are variable-length sequences where coupling different sequences in a batch creates destructive dependencies. This led directly to the adoption of Layer Normalization.
+### Pedagogical Explanation & Distractor Analysis | التحليل البيداغوجي وتفكيك البدائل
+
+**Why the correct option is right:**
+Batch Normalization computes statistics *vertically across the batch dimension* ($\text{axis}=0$). In computer vision, images have fixed dimensions ($C \times H \times W$) and batches are large ($B \ge 32$). In contrast, natural language processing involves sequences of variable length. Padding short sentences with zeros severely contaminates batch mean and variance estimates. More critically, during autoregressive LLM decoding, the model generates one token at a time for a single prompt ($B=1$). For a single sample, sample variance is mathematically undefined or zero ($x - \mu = 0$). Furthermore, BatchNorm creates **sample coupling**: what a model predicts for Prompt A depends on which sentences happened to be packaged alongside it in the same mini-batch! Transformers require strict sample independence and zero inference latency, which led to the universal adoption of Layer Normalization.
+
+**Why the distractors are incorrect:**
+1. *BatchNorm requires more memory than the model parameter footprint...*: False. BatchNorm only adds two learnable vectors ($\gamma, \beta$) per normalized layer, adding negligible parameter overhead.
+2. *GPUs cannot compute the mean along dimension 0...*: False. Tensor reduction across axis 0 is a trivial, highly optimized CUDA kernel primitive.
+3. *BatchNorm cannot be differentiated...*: False. BatchNorm is completely differentiable, and its analytical backward pass is standard across all deep learning frameworks.
+
+*الشرح باللغة العربية:*
+تقوم تقنية تطبيع الدفعات بحساب الإحصائيات رأسياً عبر عينات الدفعة ($B$). في النماذج اللغوية التوليدية (LLMs)، يتم توليد الكلمات تتابعياً لطلب واحد في كل مرة ($B=1$)، وتكون حسابات التباين لعينة واحدة صفراً أو غير معرفة رياضياً! كما أن تباين أطوال الجمل يحتم حشو النصوص بأصفار تفسد حسابات المتوسط، فضلاً عن أن BatchNorm تجعل تمثيل الجملة الأولى معتمداً على طبيعة الجمل الأخرى المرافقة لها في نفس الدفعة. فرضت هذه القيود الانتقال الحتمي نحو تطبيع الطبقات (LayerNorm) التي تعامل كل رمز باستقلالية تامة.

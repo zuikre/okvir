@@ -25,6 +25,8 @@ The slope of this simple bivariate regression is **mathematically identical down
 
 Think of active noise-cancelling headphones: to hear a subtle violin solo ($X_1$) inside a noisy airplane cabin ($X_2$), the headphones generate an inverse acoustic wave to cancel the engine drone from the microphone ($Y$) and from the audio stream ($X_1$). Controlling for variables simply means washing the fingerprints of the controls off both the treatment and the outcome before comparing what remains.
 
+However, we must strictly demystify causality here: **partialling out is an algebraic wash, not a magical causal purifier!** While FWL proves how multiple regression extracts the net variation between $X_1$ and $Y$, the decision of *which* variables to place into $X_2$ determines whether your estimate is causal or catastrophic. If $X_2$ is a true confounder (like family wealth), partialling it out removes bias. But if $X_2$ is a mediator on the causal pathway (like job title chosen after college) or a collider, partialling it out actually blocks the true causal mechanism or introduces spurious bias. Prediction cares only about variance explained; causal inference demands knowing whether the noise-cancelling headphones are filtering the engine noise or accidentally silencing the violin.
+
 في أبحاث الاقتصاد القياسي، ستسمع الباحثين يكررون دائمًا: *"نقيس الأثر السببي للتعليم على الأجور، مع التحكم في سنوات الخبرة والقطاع الاقتصادي والمنطقة الجغرافية."* ولكن ما الذي يعنيه "التحكم في المتغيرات" بدقة رياضية؟ هل يمتلك الحاسوب آلة زمنية تجمد الواقع أو تصنع نسخًا بشرية متطابقة في كافة الظروف؟
 
 تكشف **مبرهنة فريش-وو-لوفيل (FWL Theorem)** عن الآلية الحسابية المذهلة لمفهوم "التجريد الجزئي" (Partialling Out):
@@ -35,6 +37,8 @@ Think of active noise-cancelling headphones: to hear a subtle violin solo ($X_1$
 إن ميل هذا الانحدار البسيط **يتطابق رياضيًا وبالفاصلة العشرية** مع معامل الانحدار المتعدد الضخم $\hat{\boldsymbol{\beta}}_1$!
 
 تخيل سماعات إلغاء الضجيج الذكية: لسماع عزف كمان رقيق ($X_1$) داخل مقصورة طائرة صاخبة ($X_2$)، تولد السماعات موجة صوتية معاكسة تلغي هدير المحرك تمامًا من أذنيك ($Y$) ومن جهاز التسجيل ($X_1$). التحكم في المتغيرات يعني ببساطة مسح بصمات عوامل التشويش من كل من المعالجة والنتيجة قبل فحص الرابط السببي المتبقي بينهما.
+
+لكن الحذر السببي هنا جوهري: **التجريد الجزئي هو عملية غسيل جبري وليس عصا سحرية تنتج السببية تلقائيًا!** تبين مبرهنة FWL كيف يعزل الانحدار التباين الصافي، لكن اختيار المتغيرات التي نضعها في $X_2$ هو الذي يحدد صلاحية النموذج. فإذا كان المتغير عاملاً مربكًا حقيقيًا (كثروة الأسرة)، فإن عزله يزيل التحيز. أما إذا كان المتغير وسيطًا على مسار السببية (كنوع الوظيفة التي حصل عليها الفرد بعد تخرجه)، فإن عزله يحجب الأثر السببي الحقيقي للتعليم. التنبؤ يكتفي بتنقية التباين لخفض الخطأ، بينما الاستدلال السببي يشترط معرفة طبيعة المسارات السببية قبل الضغط على زر التجريد.
 
 :::simulation-widget{engine="canvas2d" component="FWLPartiallingOutLab"}
 ---
@@ -51,25 +55,47 @@ $$
 \mathbf{y} = \mathbf{X}_1 \boldsymbol{\beta}_1 + \mathbf{X}_2 \boldsymbol{\beta}_2 + \boldsymbol{\varepsilon}
 $$
 
-Define the orthogonal annihilator matrix for the control subspace:
+The joint Normal Equations in block partitioned form:
 
 $$
-\mathbf{M}_2 \equiv \mathbf{I}_N - \mathbf{X}_2 (\mathbf{X}_2^T \mathbf{X}_2)^{-1} \mathbf{X}_2^T
+\begin{bmatrix} \mathbf{X}_1^T \mathbf{X}_1 & \mathbf{X}_1^T \mathbf{X}_2 \\ \mathbf{X}_2^T \mathbf{X}_1 & \mathbf{X}_2^T \mathbf{X}_2 \end{bmatrix} \begin{bmatrix} \hat{\boldsymbol{\beta}}_1 \\ \hat{\boldsymbol{\beta}}_2 \end{bmatrix} = \begin{bmatrix} \mathbf{X}_1^T \mathbf{y} \\ \mathbf{X}_2^T \mathbf{y} \end{bmatrix}
 $$
 
-Premultiplying the entire structural equation by $\mathbf{M}_2$:
+### Step-by-Step Algebraic Derivation of FWL
+
+From the second row of the partitioned system:
 
 $$
-\mathbf{M}_2 \mathbf{y} = \mathbf{M}_2 \mathbf{X}_1 \boldsymbol{\beta}_1 + \mathbf{M}_2 \mathbf{X}_2 \boldsymbol{\beta}_2 + \mathbf{M}_2 \boldsymbol{\varepsilon}
+\mathbf{X}_2^T \mathbf{X}_1 \hat{\boldsymbol{\beta}}_1 + \mathbf{X}_2^T \mathbf{X}_2 \hat{\boldsymbol{\beta}}_2 = \mathbf{X}_2^T \mathbf{y}
 $$
 
-Because $\mathbf{M}_2 \mathbf{X}_2 = \mathbf{0}$, the control block vanishes entirely:
+Assuming full column rank for $\mathbf{X}_2$, solve for $\hat{\boldsymbol{\beta}}_2$:
 
 $$
-\tilde{\mathbf{y}} = \tilde{\mathbf{X}}_1 \boldsymbol{\beta}_1 + \tilde{\boldsymbol{\varepsilon}}
+\hat{\boldsymbol{\beta}}_2 = (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T \mathbf{y} - (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T \mathbf{X}_1 \hat{\boldsymbol{\beta}}_1
 $$
 
-Applying Ordinary Least Squares to this transformed single-variable equation yields:
+Substitute this solution into the first row of the partitioned system:
+
+$$
+\mathbf{X}_1^T \mathbf{X}_1 \hat{\boldsymbol{\beta}}_1 + \mathbf{X}_1^T \mathbf{X}_2 \left( (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T \mathbf{y} - (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T \mathbf{X}_1 \hat{\boldsymbol{\beta}}_1 \right) = \mathbf{X}_1^T \mathbf{y}
+$$
+
+Group terms involving $\hat{\boldsymbol{\beta}}_1$ on the left-hand side and $\mathbf{y}$ on the right-hand side:
+
+$$
+\mathbf{X}_1^T \left( \mathbf{I}_N - \mathbf{X}_2 (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T \right) \mathbf{X}_1 \hat{\boldsymbol{\beta}}_1 = \mathbf{X}_1^T \left( \mathbf{I}_N - \mathbf{X}_2 (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T \right) \mathbf{y}
+$$
+
+Recognizing the annihilator matrix $\mathbf{M}_2 \equiv \mathbf{I}_N - \mathbf{X}_2 (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T$:
+
+$$
+(\mathbf{X}_1^T \mathbf{M}_2 \mathbf{X}_1) \hat{\boldsymbol{\beta}}_1 = \mathbf{X}_1^T \mathbf{M}_2 \mathbf{y}
+$$
+
+Because $\mathbf{M}_2$ is symmetric and idempotent ($\mathbf{M}_2 = \mathbf{M}_2^T = \mathbf{M}_2^2$), we have $\mathbf{X}_1^T \mathbf{M}_2 \mathbf{X}_1 = (\mathbf{M}_2 \mathbf{X}_1)^T (\mathbf{M}_2 \mathbf{X}_1) = \tilde{\mathbf{X}}_1^T \tilde{\mathbf{X}}_1$, and $\mathbf{X}_1^T \mathbf{M}_2 \mathbf{y} = (\mathbf{M}_2 \mathbf{X}_1)^T (\mathbf{M}_2 \mathbf{y}) = \tilde{\mathbf{X}}_1^T \tilde{\mathbf{y}}$.
+
+Therefore, the estimator from bivariate regression of purified residuals matches the multiple regression coefficient exactly:
 
 $$
 \hat{\boldsymbol{\beta}}_1 = (\tilde{\mathbf{X}}_1^T \tilde{\mathbf{X}}_1)^{-1} \tilde{\mathbf{X}}_1^T \tilde{\mathbf{y}} = (\mathbf{X}_1^T \mathbf{M}_2 \mathbf{X}_1)^{-1} \mathbf{X}_1^T \mathbf{M}_2 \mathbf{y}
@@ -159,3 +185,16 @@ How does the FWL theorem refute or clarify this critique?
 * [x] The FWL theorem proves that the coefficient on the female indicator is estimated strictly using the within-occupation variation that remains after purging occupation and experience differences ($\tilde{\mathbf{X}}_1$); it compares men and women who share the same occupation and experience.
 * [ ] FWL proves that controlling for occupation automatically eliminates all omitted variable bias across the economy.
 * [ ] The critic is correct because partialling out changes the sign of the true causal effect.
+
+### Pedagogical Explanation & Distractor Analysis | التحليل البيداغوجي وتفكيك البدائل
+
+**Why the correct option is right:**
+The FWL theorem provides exact geometric transparency into the mechanics of multiple regression: by partialling out occupation indicators ($\mathbf{X}_2$), any cross-occupation wage differences are completely absorbed by $\mathbf{M}_2 \mathbf{y}$ and $\mathbf{M}_2 \mathbf{X}_1$. What remains in the regressor $\tilde{\mathbf{X}}_1$ is only the variation in gender *within* each occupation. Thus, the slope $\hat{\boldsymbol{\beta}}_1$ compares the wages of men and women working in identical occupational classifications with identical observed experience.
+
+**Why the distractors are incorrect:**
+1. *The critic is correct because OLS cannot handle discrete controls...*: OLS handles categorical variables with complete mathematical rigor via indicator matrices and dummy projections.
+2. *FWL proves that controlling for occupation eliminates all omitted variable bias...*: FWL is an algebraic identity, not an exogeneity guarantee. If unobserved productivity or caregiving responsibilities remain in the error term, the estimate is still confounded. Furthermore, occupation itself is partly a choice influenced by labor market discrimination (a mediator / bad control).
+3. *Partialling out changes the sign of the true causal effect...*: While Simpson's paradox can cause signs to flip when confounding is resolved, FWL does not distort true effects; it isolates the exact conditional linear relationship.
+
+*الشرح باللغة العربية:*
+تبرهن مبرهنة FWL أن التحكم في المهنة يمحو الفروق بين المهن تمامًا عبر مصفوفة الإبادة $\mathbf{M}_2$. وما يتبقى في متغير النوع الاجتماعي $\tilde{\mathbf{X}}_1$ هو التباين *داخل المهنة الواحدة فقط*. وبالتالي، فإن المعامل يقارن بدقة بين أجور الرجال والنساء الذين يشتركون في نفس المهنة وسنوات الخبرة. ومع ذلك، ينبهنا التحليل السببي إلى أن المهنة قد تكون "أداة تحكم سيئة" (Bad Control) لأن التفرقة في التوظيف قد تؤثر على اختيار المهنة نفسه! مبرهنة FWL تصف ميكانيكا الحساب، بينما التفكير السببي يحدد مشروعية النموذج.

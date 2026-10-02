@@ -12,14 +12,19 @@ i18n:
 
 # Scope Resolution & The LEGB Rule
 
-When Python encounters a variable name like `total`, how does it determine which object it points to? It searches outward through concentric circles of vision governed by the **LEGB Rule**:
+When Python executes a statement like `print(total)`, how does the interpreter know which object `total` actually refers to? In a large application, there might be dozens of variables named `total` across different functions, modules, and imported packages. Python resolves this ambiguity by searching outward through concentric rings of visibility governed by the **LEGB Rule**.
 
-1. **L**ocal: Inside the currently executing function's room.
-2. **E**nclosing: In any nesting function's apartment (from innermost to outermost).
-3. **G**lobal: In the current module file's whole building.
-4. **B**uilt-in: In the city library of standard Python functions (`len`, `range`, `print`).
+Picture scope resolution as looking outward through an **apartment complex**:
+1. **L — Local**: First, Python looks around the private room you are currently sitting in (the local execution frame of the active function).
+2. **E — Enclosing**: If not found, it steps out into the private hallway of any parent function wrapped around you (from innermost nesting scope out to outermost enclosing function).
+3. **G — Global**: If still not found, it steps down to the lobby of the entire building (the top-level namespace of the current `.py` module file).
+4. **B — Built-in**: Finally, if nowhere in the building, it checks the city's municipal library across the street—Python's built-in namespace containing universal primitives like `len`, `range`, `dict`, and `print`. If the name tag is absent from all four scopes, Python raises a `NameError`.
 
-The most infamous pitfall in Python is that **locality is determined at compile time**! If a function contains an assignment (`x = ...`) anywhere inside its body, Python marks `x` as Local across the *entire* function. If you try to read `x` before that assignment, Python does not fall back to outer scopes—it raises `UnboundLocalError`!
+However, beneath this intuitive hierarchy lurks the single most infamous trap in the Python language: **locality is determined statically at compile time, not dynamically at runtime!**
+
+When Python compiles a function into bytecode before executing a single line, it inspects every statement. If an assignment operator (`x = ...`, `x += ...`, `for x in ...`, or `import x`) appears *anywhere* inside the function body, the compiler stamps `x` as **strictly Local** across the entire function! It does not matter if the assignment occurs on line 100 and you try to read `x` on line 2. The moment Python sees `x` on line 2, it looks exclusively in the local frame. Finding that local `x` has not yet received a value, it does **not** fall back to outer scopes; it throws `UnboundLocalError: local variable referenced before assignment`!
+
+To override this compile-time behavior, Python provides two explicit keywords: `global` and `nonlocal`. Declaring `global x` instructs the compiler to bypass local creation and bind the tag directly to the module-level dictionary (`LOAD_GLOBAL`). Declaring `nonlocal x` tells the compiler to reach into the enclosing parent function's closure cell (`LOAD_DEREF`). Understanding these mechanics demystifies scope resolution and prevents subtle state corruption bugs.
 
 :::simulation-widget{engine="canvas2d" component="ClosureScopeInspector"}
 ---
@@ -34,18 +39,48 @@ $$
 \text{Lookup}(v) = \text{head}\left([ \mathcal{S}_L(v), \mathcal{S}_E(v), \mathcal{S}_G(v), \mathcal{S}_B(v) ] \setminus \{\bot\}\right)
 $$
 
-عندما يصادف بايثون اسماً برمجياً مثل `total`، كيف يحدد الكائن المعني؟ يبحث المعالج عبر دوائر متحدة المركز تحكمها **قاعدة LEGB**:
+```text
+The Concentric LEGB Search Hierarchy:
++-----------------------------------------------------------+
+| [B] Built-in Scope (sys.modules['builtins'].__dict__)     |
+|   +-----------------------------------------------------+ |
+|   | [G] Global Module Scope (globals() dictionary)      | |
+|   |   +-----------------------------------------------+ | |
+|   |   | [E] Enclosing Closures (cell pointers)        | | |
+|   |   |   +-----------------------------------------+ | | |
+|   |   |   | [L] Local Frame (fastlocals C array)    | | | |
+|   |   |   |     LOOKUP STARTS HERE ---> [x]         | | | |
+|   |   |   +-----------------------------------------+ | | |
+|   |   +-----------------------------------------------+ | |
+|   +-----------------------------------------------------+ |
++-----------------------------------------------------------+
+```
 
-1. **L**ocal (المحلي): داخل غرفة الدالة الحالية التي يجري تنفيذها.
-2. **E**nclosing (المحيط): داخل شقة الدوال الحاضنة (من الأقرب للأبعد).
-3. **G**lobal (العام): في كامل مبنى الملف الحالي (الموديول).
-4. **B**uilt-in (المدمج): في مكتبة المدينة العامة لبايثون (`len`, `range`, `print`).
+عندما ينفذ بايثون سطراً مثل `print(total)`، كيف يحدد المفسر أي كائن يشير إليه الاسم `total` على وجه التحديد؟ في الأنظمة البرمجية الضخمة، قد يوجد العشرات من المتغيرات التي تحمل اسم `total` موزعة بين دوال وملفات وحزم برمجية متعددة. يحل بايثون هذا اللبس عبر البحث من الداخل إلى الخارج عبر دوائر متحدة المركز تحكمها **قاعدة LEGB**.
 
-الفخ الأكثر شهرة وصدمة للمبتدئين هو أن **صفة المحلية تُحدد أثناء الترجمة** (Compile Time)! إن كان هناك سطر تعيين (`x = ...`) في أي مكان داخل الدالة، يُصنف `x` محلياً في كافة أرجائها؛ فإذا حاولت قراءته قبل سطر التعيين، لن يبحث بايثون في النطاقات الخارجية بل يفاجئك بخطأ `UnboundLocalError`!
+تخيل استبانة النطاق كمن يبحث عن شيء وهو داخل **مجمع سكني**:
+1. **L — Local (المحلي)**: يبحث بايثون أولاً داخل الغرفة الخاصة التي تجلس فيها حالياً (إطار التنفيذ المحلي للدالة الحالية).
+2. **E — Enclosing (المحيط)**: فإن لم يجد الاسم، يخرج إلى ردهة الشقة التي تحتضن غرفتك (النطاقات الحاضنة من أقرب دالة محيطة حتى أبعدها).
+3. **G — Global (العام)**: فإن لم يجده، نزل إلى بهو المبنى بأكمله (نطاق ملف الموديول `.py` الحالي كاملاً عبر قاموس `globals()`).
+4. **B — Built-in (المدمج)**: وأخيراً، إن لم يجده في المبنى، خرج إلى المكتبة العامة للمدينة—وهي بيئة دوال بايثون المدمجة الجاهزة كـ `len` و `range` و `print`. فإن لم يجد الاسم في أي من هذه المستويات الأربعة، أطلق استثناء `NameError`.
 
-CPython optimizes local variable lookup into array indexing. Because local variable names are statically known at compile time, reading a local variable emits the lightning-fast `LOAD_FAST` opcode, which directly indexes the frame's `fastlocals` C array in nanoseconds. Enclosing variables emit `LOAD_DEREF` to traverse cell pointers, while Global and Built-in variables require dynamic dictionary hash lookups via `LOAD_GLOBAL`. Declaring `global x` or `nonlocal x` changes compiler opcode emission, directing bindings to module dictionaries or closure cells.
+لكن خلف هذا الترتيب البسيط والبديهي يكمن أشهر فخ برمجي في لغة بايثون: **صفة المحلية تتحدد أثناء الترجمة (Compile Time) وليس أثناء التشغيل!**
 
-يستبدل مفسر CPython البحث عن المتغيرات المحلية بفهرسة مصفوفات مباشرة فائقة السرعة. ولأن أسماء المتغيرات المحلية معروفة مسبقاً أثناء الترجمة، فإن قراءتها تصدر أمر `LOAD_FAST` الذي يصل إلى مصفوفة `fastlocals` في نانوثوانٍ. في حين تصدر المتغيرات المحيطة أمر `LOAD_DEREF`، وتتطلب المتغيرات العامة والمدمجة بحثاً في جداول التجزئة عبر `LOAD_GLOBAL`. استخدام `global` أو `nonlocal` يوجه المترجم لتعديل مسار توليد هذه الأوامر.
+عندما يترجم بايثون الدالة إلى شفرة بايت قبل تشغيلها، يفحص نص الدالة بالكامل. فإذا وجد أي عملية إسناد (`x = ...` أو `x += ...` أو `for x in ...`) في *أي سطر* داخل الدالة، يصنف المترجم المتغير `x` كمتغير **محلي حصرياً** في كامل أرجاء الدالة! ولا يهم إن كان سطر الإسناد يقع في السطر رقم 100 بينما حاولت قراءة `x` في السطر رقم 2. فعندما يصل التنفيذ للسطر 2، ينظر بايثون في الإطار المحلي فقط؛ ولأنه لم يُسند بعد، فإنه **لا يبحث في النطاقات الخارجية إطلاقاً**، بل ينهار فوراً بالخطأ القاتل: `UnboundLocalError: local variable referenced before assignment`!
+
+ولإعادة توجيه سلوك المترجم، توفر لغة بايثون كلمتين مفتاحيتين: الكلمة `global` التي تأمر المترجم بتجاوز النطاق المحلي والارتباط مباشرة بالقاموس العام للملف (`LOAD_GLOBAL`)، والكلمة `nonlocal` التي تأمره بالارتباط بخلية الدالة الحاضنة في الغلاف المعجمي (`LOAD_DEREF`). وفهم هذه الميكانيكا العميقة يجنبك الأخطاء الخفية ويمنحك تحكماً معمارياً تاماً في تدفق البيانات.
+
+#### Architectural Breakdown & Opcode Speed:
+- **`LOAD_FAST`**: When an identifier is local, CPython statically indexes the `fastlocals` array inside the C-level `PyFrameObject`. This avoids dictionary lookups entirely and executes in pure pointer arithmetic (~5-10 ns).
+- **`LOAD_DEREF`**: Emitted for enclosing closure variables, following the `PyCellObject` pointer stored in `f_blockstack`.
+- **`LOAD_GLOBAL`**: Emitted for module-level globals and built-ins. Performs a hash table lookup in `f->f_globals`, falling back to `f->f_builtins`.
+- **Compilation Pass**: Python compilers scan for `STORE_*` instructions in the AST. Any symbol targeted by a store operation is marked local unless declared `global` or `nonlocal`.
+
+#### التحليل المعماري وسرعة أوامر شفرة البايت:
+- **أمر `LOAD_FAST`**: للمتغيرات المحلية، يصل CPython مباشرة إلى مصفوفة `fastlocals` داخل بنية إطار لغة C، متجاوزاً جداول التجزئة تماماً لينفذ في زمن نانوثوانٍ معدودة.
+- **أمر `LOAD_DEREF`**: يصدر للمتغيرات المحيطة في الأغلفة، متتبعاً مؤشر الخلية `PyCellObject`.
+- **أمر `LOAD_GLOBAL`**: يصدر للمتغيرات العامة والمدمجة، ويتطلب بحثاً في جدول تجزئة القاموس `f_globals` ثم `f_builtins`.
+- **مرحلة الترجمة الساكنة**: يفحص مترجم بايثون شجرة الإعراب الساكنة (AST)؛ وأي رمز يتعرض لعملية تخزين أو تعيين يُوسم محلياً ما لم يُستثنَ صراحة بـ `global` أو `nonlocal`.
 
 :::python-challenge{id="py-scope-resolution-legb"}
 ---
@@ -71,16 +106,21 @@ def create_isolated_accumulator(initial_sum: float = 0.0) -> tuple[Any, Any]:
           - add_amount(amount: float) -> float (adds amount to total and returns new total)
           - get_current_total() -> float (returns current accumulated total)
     """
+    # Step 1: Initialize current_total in the enclosing scope
     current_total = initial_sum
 
+    # Step 2: Define mutator function with nonlocal binding
     def add_amount(amount: float) -> float:
+        # Step 3: Inform the compiler not to mark current_total as local
         nonlocal current_total
         current_total += amount
         return current_total
 
+    # Step 4: Define accessor function that reads current_total
     def get_current_total() -> float:
         return current_total
 
+    # Step 5: Return pair of functions capturing the shared lexical cell
     return add_amount, get_current_total
 ```
 :::
@@ -114,12 +154,12 @@ increment()
   *لأن دوال بايثون لا تستطيع قراءة أي متغير خارجي إلا بتمريره كوسيط.*
 
 **Analysis & Architectural Explanation / التحليل والشرح المعماري:**
-**Correct / الإجابة الصحيحة:** Augmented assignment `counter += 1` is syntactic sugar for `counter = counter + 1`. Because 'counter' appears on the left of an assignment, Python tags it local at compile time. During execution, it tries to read the local variable before it has been bound.
-*العملية `counter += 1` تكافئ `counter = counter + 1`. وجود المتغير على يسار المساواة يجعله محلياً أثناء الترجمة، وتفشل محاولة قراءته في الطرف الأيمن قبل تعيينه.*
+**Correct / الإجابة الصحيحة:** Augmented assignment `counter += 1` translates under the hood to `counter = counter + 1`. The presence of the assignment target `counter =` causes Python's compiler to classify `counter` as Local to `increment()`. At runtime, the right-hand side `counter + 1` executes first, attempting to read the local variable before any local binding has occurred. To resolve this, declare `global counter` at the start of the function.
+*العملية المركبة `counter += 1` تُترجم في شفرة البايت إلى `counter = counter + 1`. وجود عملية التعيين على اليسار يجعل مترجم بايثون يوسم `counter` محلياً في جدول الرموز. وعند التشغيل، يُقيَّم الطرف الأيمن `counter + 1` أولاً، فيحاول قراءة المتغير المحلي قبل أن يحصل على قيمة، فيحدث الخطأ. والحل هو كتابة `global counter` في أول سطر بالدالة.*
 
-**Incorrect / مشتت غير صحيح:** Global variables can be modified if explicitly declared with the `global counter` statement.
-*يمكن تعديل المتغيرات العامة بشرط التصريح عنها صراحة باستخدام `global counter`.*
+**Incorrect / مشتت غير صحيح:** Global variables can be mutated in place or rebound by functions if explicitly declared with `global`.
+*المتغيرات العامة ليست للقراءة فقط، بل يمكن تعديلها وإعادة ربطها بحرية تامة عند التصريح عنها صراحة باستخدام `global`.*
 
-**Incorrect / مشتت غير صحيح:** Functions can freely read global variables; the error occurs specifically because the assignment marks it local.
-*الدوال تقرأ المتغيرات العامة بحرية، والخطأ حدث تحديداً بسبب محاولة إعادة الإسناد التي جعلته محلياً.*
+**Incorrect / مشتت غير صحيح:** Python functions can freely read enclosing and global variables; the error occurs exclusively because the assignment statement turned it into an uninitialized local variable.
+*تستطيع الدوال قراءة المتغيرات العامة بحرية تامة، والخطأ نتج حصرياً عن وجود سطر الإسناد الذي حوّله لمتغير محلي غير مهيأ.*
 :::

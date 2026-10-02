@@ -14,16 +14,16 @@ i18n:
 
 ## Beat 1: Intuition & Mental Model
 
-How do statistical and database engines calculate complex group metrics without writing bespoke code for every cohort?
-They use the foundational **Split-Apply-Combine** architecture formalized by Hadley Wickham.
+How do large-scale analytics platforms and statistical machine learning pipelines calculate group-specific metrics without writing bespoke, fragile loops for every cohort?
+They rely on the universal data engineering pattern known as **Split-Apply-Combine**, formalized by statistician Hadley Wickham.
 
-### The Laundry Sorting Analogy
-Imagine you have a giant heap of dirty clothes:
-1. **Split**: You sort the clothes into separate laundry baskets: whites, dark colors, and delicate woolens. You partition the big dataset into smaller, independent group subsets.
-2. **Apply**: You apply a tailored washing program to each basket independently: hot water with bleach for whites, gentle cold cycle for woolens. Mathematically, you run a transformation, aggregation, or filter on each group.
-3. **Combine**: You fold all the clean, dried clothes back together into a single organized wardrobe.
+### The Laundry Sorting Analogy: Bins, Cycles & Folding
+To build an intuitive physical mental model of this architecture, imagine washing a giant, disordered mountain of dirty clothes:
+1. **Split (Partitioning into Bins)**: You do not toss every garment into a single scalding wash. You sort the pile into separate laundry hampers based on fabric properties: whites, dark colors, and delicate woolens. In data engineering, this partitions a massive relation into disjoint, independent sub-tables grouped by key attributes (e.g., job titles, merchant categories, or country codes).
+2. **Apply (Specialized Group Transformations)**: You run a customized washing cycle on each hamper independently: hot water with bleach for whites, cold water for darks, and a gentle hand-wash cycle for woolens. Mathematically, you execute an aggregation (e.g., mean, sum), a transformation (e.g., cohort Z-score standardization), or a filter on each isolated partition.
+3. **Combine (Unified Reintegration)**: Once clean and dried, you fold all garments back together into a single, organized closet. The output preserves the original dataset's row identity while enriching every record with localized group statistics!
 
-When computing cohort Z-score normalization ($z = \frac{x - \mu_k}{\sigma_k}$), you don't compare a software engineer's salary to an intern's salary; you **Split** by job title, **Apply** local mean and standard deviation standardization, and **Combine** the standardized scores back into the main dataset!
+When performing cohort feature engineering—such as calculating employee salary Z-scores ($z = \frac{x - \mu_k}{\sigma_k}$)—you must never compare an executive's compensation directly against an entry-level intern. You **Split** by departmental title, **Apply** local mean and standard deviation scaling, and **Combine** the normalized features back into a unified model-ready dataset!
 
 :::simulation-widget{engine="canvas2d" component="GroupBySplitApplyCombineLab"}
 ---
@@ -32,16 +32,16 @@ highlighted_metric: "loss"
 ---
 :::
 
-كيف تحسب محركات البيانات الإحصائية مقاييس المجموعات المعقدة دون كتابة كود مخصص لكل فئة؟
-تعتمد جميعها على المعمارية القياسية **التقسيم والتطبيق والدمج (Split-Apply-Combine)**.
+كيف تقوم منصات تحليل البيانات الكبرى ونظم التعلم الآلي بحساب المقاييس الإحصائية الخاصة بالفئات دون كتابة حلقات تكرارية معقدة وهشة لكل مجموعة؟
+تعتمد جميعها على النمط المعماري القياسي في هندسة البيانات المعروف باسم **التقسيم والتطبيق والدمج (Split-Apply-Combine)**.
 
-### تشبيه فرز الغسيل
-تخيل أن أمامك كومة ضخمة من الملابس المختلطة:
-1. **التقسيم (Split)**: تفرز الملابس في سلال مستقلة: بيضاء، داكنة، وصوفية. أي أنك تقسم جدول البيانات الضخم إلى مجموعات جزئية مستقلة.
-2. **التطبيق (Apply)**: تطبق برنامج غسيل مخصص لكل سلة على حدة: ماء ساخن للأبيض، وماء بارد ودوران خفيف للصوف. رياضياً، تطبق دالة إحصائية أو تجميعية على كل مجموعة بمفردها.
-3. **الدمج (Combine)**: تجمع الملابس النظيفة والمجففة معاً في خزانة واحدة مرتبة.
+### تشبيه فرز الغسيل: السلال، البرامج، وإعادة الجمع
+لبناء نموذج ذهني فيزيائي لهذه المعمارية، تخيل أن أمامك كوماً ضخماً ومختلطاً من الملابس المتسخة:
+1. **التقسيم (Split - الفرز في السلال)**: لن تضع جميع الأقمشة معاً في غسلة واحدة بدرجة غليان؛ بل تفرز الملابس في سلال مستقلة بحسب خصائصها: ملابس بيضاء، ملابس داكنة، وملابس صوفية حساسة. في هندسة البيانات، يعادل هذا تجزئة جدول البيانات الضخم إلى مجموعات فرعية مستقلة ومفصولة بحسب مفتاح تصنيفي محدد (مثل المسمى الوظيفي، أو فئة المتجر، أو الدولة).
+2. **التطبيق (Apply - المعالجة المخصصة)**: تطبق برنامج غسيل مخصص لكل سلة على حدة: ماء ساخن مع مبيض للأبيض، وماء بارد للألوان الداكنة، وغسيل يدوي رقيق للصوف. رياضياً، تنفذ دالة تجميعية (كالمتوسط أو المجموع)، أو تحويلاً إحصائياً (كالتقييس المعياري Z-score)، أو تصفية على كل فئة بمفردها.
+3. **الدمج (Combine - خزانة الملابس المنظمة)**: بعد جفاف الملابس، تطويها وتجمعها معاً في خزانة واحدة مرتبة. يحافظ هذا الجدول الناتج على هوية صفوف الجدول الأصلي مع تزويد كل صف بالإحصائيات المحلية لفئته!
 
-عند حساب التقييس المعياري Z-Score ($z = \frac{x - \mu_k}{\sigma_k}$)، لا تقارن راتب مهندس خبير براتب متدرب؛ بل **تقسم** حسب المسمى الوظيفي، و**تطبق** حساب المتوسط والانحراف لكل فئة، ثم **تدمج** القيم المعيارية في الجدول الأصلي!
+عند بناء الخصائص الرياضية للنماذج—مثل حساب القيمة المعيارية Z-Score لرواتب الموظفين ($z = \frac{x - \mu_k}{\sigma_k}$)—لا يصح إحصائياً مقارنة راتب مدير تنفيذي براتب متدرب جديد. بل يجب **التقسيم** حسب المنصب الوظيفي، و**تطبيق** حساب المتوسط والانحراف المعياري المحلي، ثم **دمج** النتائج المعيارية في مصفوفة بيانات موحدة وجاهزة للتدريب!
 
 ## Beat 2: Formal Foundations & Mathematical Invariants
 
@@ -51,22 +51,19 @@ $$
 
 ### Mathematical Invariants & Symbol Breakdown
 
-The formal definitions govern the three execution phases:
+| الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
+| :--- | :--- | :--- | :--- |
+| $\mathcal{D}$ | Relation domain $\mathcal{T}^N$ | Full input dataset relation containing $N$ records | جدول البيانات الكامل الذي يضم $N$ من السجلات |
+| $\mathcal{K}$ | $\{ g(r) \mid r \in \mathcal{D} \}$ | Set of distinct partition keys emitted by grouping function $g$ | فضاء المفاتيح الفريدة الناتجة عن دالة التجميع |
+| $\bigsqcup$ | Disjoint union operator | Guarantees non-overlapping partitions: $\mathcal{D}_i \cap \mathcal{D}_j = \emptyset, \forall i \ne j$ | مشغل الاتحاد المنفصل الذي يضمن عدم تداخل المجموعات |
+| $\mathcal{D}_k$ | $\{ r \in \mathcal{D} \mid g(r) = k \}$ | Independent subgroup slice associated with cohort key $k$ | شريحة المجموعة الفرعية المستقلة المرتبطة بالمفتاح $k$ |
+| $\mu_k$ | $\mathbb{R}$ | Conditional group expectation $\mathbb{E}[X \mid g(r) = k]$ | المتوسط الحسابي الشرطي لبيانات المجموعة $k$ |
+| $\sigma_k$ | $\mathbb{R}_{\ge 0}$ | Bessel-corrected sample standard deviation ($N_k - 1$ denominator) | الانحراف المعياري لبيانات العينة مع تصحيح بيسل |
+| $z_i$ | Standardized scalar ($z \in \mathbb{R}$) | Dimensionless standard score relative to cohort distribution | القيمة المعيارية الخالية من الوحدات الدالة على بعد القيمة عن المتوسط |
 
-- **$\mathcal{D}_k = \{ r \in \mathcal{D} \mid g(r) = k \}$**: Partition subset where key projection function $g(r)$ evaluates to cohort label $k$.
-- **$\mathcal{K}$**: Set of distinct group keys, ensuring $\mathcal{D}_i \cap \mathcal{D}_j = \emptyset$ for $i \ne j$ (disjoint partitioning).
-- **$\mu_k, \sigma_k$**: Local cohort sample mean and Bessel-corrected sample standard deviation ($N-1$ denominator).
-- **$z_i$**: Dimensionless standardized score measuring standard deviations from group mean. If $\sigma_k = 0$, $z_i \triangleq 0.0$.
-- **Combine Invariant**: Output preserves the exact row count and ordering of the original input dataset.
+The partition invariant guarantees that the original relation is decomposed into mutually exclusive and collectively exhaustive subsets: $\bigcup_{k \in \mathcal{K}} \mathcal{D}_k = \mathcal{D}$ and $\mathcal{D}_i \cap \mathcal{D}_j = \emptyset$ for $i \ne j$. When applying local transformations, if a cohort has $|\mathcal{D}_k| < 2$ or zero variance ($\sigma_k = 0$), the transformation defaults to the invariant sentinel $z_i \triangleq 0.0$ to prevent numerical division-by-zero exceptions.
 
-### الشرح الرياضي وتفصيل الرموز
-
-تحدد المعادلات الرياضية أطوار التنفيذ الثلاثة:
-- **$\mathcal{D}_k$**: المجموعة الجزئية التي تحقق دالة المفتاح الفئوي $k$.
-- **$\mathcal{K}$**: فضاء المفاتيح الفريدة مع ضمان انفصال المجموعات تماماً وعدم تداخلها.
-- **$\mu_k, \sigma_k$**: المتوسط الحسابي والانحراف المعياري المحلي لكل فئة مع تصحيح بيسل ($N-1$).
-- **$z_i$**: القيمة المعيارية الخالية من الوحدات، وتعين إلى 0 إذا كان الانحراف صفراً.
-- **ثابت الدمج**: يحافظ الجدول الناتج على عدد صفوف وترتيب المدخلات الأصلية تماماً.
+يضمن ثابت التجزئة الرياضي تفكيك الجدول الأصلي إلى مجموعات منفصلة تماماً وشاملة كلياً: $\bigcup_{k \in \mathcal{K}} \mathcal{D}_k = \mathcal{D}$ مع $\mathcal{D}_i \cap \mathcal{D}_j = \emptyset$ عند اختلاف $i$ و $j$. وعند تطبيق التحويلات المحلية، إذا كانت المجموعة تضم أقل من عنصرين أو كان تباينها صفراً ($\sigma_k = 0$)، يُعين الناتج تلقائياً إلى القيمة الثابتة $z_i \triangleq 0.0$ لمنع أخطاء القسمة على الصفر في المعالج.
 
 ## Beat 3: Interactive Code Challenge
 
@@ -111,9 +108,9 @@ def groupby_zscore_normalize(
 ## Beat 4: Real-World Transfer Scenario
 
 ### Industry Problem Context
-In an e-commerce credit card fraud detection system, an engineer trains a classifier with global transaction amounts. Transactions at a convenience store of $300 are rare and fraudulent, but at luxury boutiques $300 is below the 10th percentile. Why does cohort-level Split-Apply-Combine normalization drastically boost fraud precision?
+In an e-commerce credit card fraud detection engine, a machine learning engineer trains a gradient-boosted tree using raw dollar transaction amounts. A $350 purchase at a neighborhood gas station or coffee shop is an extreme outlier and almost certainly fraudulent. However, at a luxury jewelry boutique or high-end electronics store, a $350 purchase is below the 10th percentile. When trained on raw global transaction values, the model misses localized fraud in small retail shops while throwing false alarms on ordinary department store purchases. Why does group-wise Split-Apply-Combine normalization resolve this fatal modeling blindspot?
 
-في نظام رصد الاحتيال المالي، يدرب مهندس نموذجاً باستخدام المبالغ المالية المطلقة. عملية شراء بـ 300 دولار في متجر بقالة تعتبر شاذة واحتيالية جداً، بينما في متجر مجوهرات فاخر تعد عادية جداً. لماذا يؤدي التقييس المعياري بالفئات (Split-Apply-Combine) إلى رفع دقة كشف الاحتيال جذرياً؟
+في نظام آلي لكشف الاحتيال في البطاقات الائتمانية لموقع تجارة إلكترونية، قام مهندس بتدريب نموذج ذكاء اصطناعي باستخدام القيمة المطلقة للمبالغ المالية للمعاملات. تعتبر عملية شراء بمبلغ 350 دولاراً في مقهى أو محطة وقود صغيرة عملية شاذة للغاية وتكاد تكون احتيالية بنسبة 99%. لكن في متجر مجوهرات فاخر أو متجر إلكترونيات كبرى، يُعد مبلغ 350 دولاراً أقل من المئوية العاشرة للمشتريات العادية. وعند تدريب النموذج على المبالغ العامة، عجز عن اكتشاف الاحتيال في المتاجر الصغيرة بينما أطلق إنذارات كاذبة لا حصر لها للمتاجر الكبيرة. كيف تحل خوارزمية Split-Apply-Combine الفئوية هذه النقطة العمياء القاتلة؟
 
 ### Transfer Assessment Question
 - **(A)** *(Correct)* Global normalization masks anomalies within low-variance merchant categories; group-wise Z-scoring standardizes features against their true conditional distribution $P(\text{Amount} \mid \text{MerchantCategory})$, exposing localized deviations.
@@ -128,7 +125,13 @@ In an e-commerce credit card fraud detection system, an engineer trains a classi
 **Correct Answer:** Option (A)
 
 **Deep Engineering Post-Mortem & Explanation:**
-Conditioning on the merchant cohort separates variance caused by merchant type from variance indicating fraud, preventing expensive items from drowning out subtle anomalies.
+- **Why Option (A) is correct:** A transaction amount $X$ cannot be meaningfully evaluated without conditioning on the context: $P(X \mid \text{Category})$. By splitting the data into merchant cohorts, computing the localized parameters $(\mu_k, \sigma_k)$, and standardizing each transaction into $z = \frac{x - \mu_k}{\sigma_k}$, a $350 gas station transaction receives $z = +5.2$ (an extreme red flag), while a $350 jewelry purchase receives $z = -0.8$ (completely routine). The classifier now learns from scale-invariant statistical surprise rather than raw, biased dollars.
+- **Why Option (B) is incorrect:** Split-Apply-Combine is a mathematical data transformation methodology; encryption is handled by cryptographic ciphers (e.g., AES-GCM).
+- **Why Option (C) is incorrect:** Gradient descent requires normalized feature scales to prevent zigzagging, but features do not need to sum to 1.0 (which is a property of probability simplexes).
+- **Why Option (D) is incorrect:** A Z-score of zero indicates an exact average; positive and negative Z-scores are completely normal and expected.
 
-*التفسير الهندسي المعمق:*
-الشرط الفئوي يفصل التباين الطبيعي لنوع المتجر عن التباين الناتج عن الاحتيال، مانعاً المشتريات الفاخرة من حجب الأنشطة المريبة في المتاجر الصغيرة.
+*التفسير الهندسي المعمق وتحليل الخيارات:*
+- **لماذا الخيار (A) صحيح:** لا يمكن تقييم المبلغ المالي $X$ إحصائياً دون ربطه بالسياق الشرطي لنوع المتجر: $P(X \mid \text{Category})$. فعند تقسيم البيانات إلى فئات تجارية وحساب المعلمات المحلية $(\mu_k, \sigma_k)$ وتطبيع كل معاملة إلى $z = \frac{x - \mu_k}{\sigma_k}$، تحصل معاملة محطة الوقود بقيمة 350 دولاراً على $z = +5.2$ (مؤشر احتيال أحمر وشديد الشذوذ)، بينما تحصل معاملة متجر المجوهرات بقيمة 350 دولاراً على $z = -0.8$ (سلوك طبيعي تماماً). وبذلك يتعلم النموذج من درجة "المفاجأة الإحصائية" المستقلة عن المقاييس بدلاً من الانخداع بالأرقام المجردة.
+- **لماذا الخيار (B) خاطئ:** خوارزمية التقسيم والتطبيق والدمج هي منهجية لمعالجة وهندسة البيانات الإحصائية وليست خوارزمية تشفير مصرفي.
+- **لماذا الخيار (C) خاطئ:** خوارزميات التعلم الآلي تتطلب توحيد نطاقات الخصائص لتسريع التقارب، لكنها لا تشترط أبداً أن يكون مجموع الخصائص 1.0.
+- **لماذا الخيار (D) خاطئ:** حصول المعاملة على Z-score بقيمة صفر يعني أنها مطابقة للمتوسط تماماً، والقيم الموجبة والسالبة متوقعة وطبيعية في كل توزيع إحصائي.

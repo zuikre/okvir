@@ -14,16 +14,16 @@ i18n:
 
 ## Beat 1: Intuition & Mental Model
 
-Before SQL existed, querying databases was a nightmare: programmers wrote procedural loops navigating physical pointers on disk. In 1970, Edgar F. Codd revolutionized computing by introducing **Relational Algebra**.
+Before the advent of modern SQL databases, retrieving information from computers was a slow and brittle nightmare: software engineers had to write procedural navigation programs that manually looped through raw byte sectors and chased physical disk pointers. If a database index was modified or a table moved to another track on the magnetic hard drive, every single application query broke!
 
-Relational Algebra models data as mathematical sets of tuples (relations) and provides a declarative algebra to manipulate them.
+In 1970, mathematician and computer scientist Edgar F. Codd revolutionized the software industry by introducing **Relational Algebra**. Codd proved that data could be abstracted away from physical disk hardware and represented mathematically as sets of unordered tuples (relations). This introduced the profound principle of **Declarative Independence**: the software engineer writes a declarative specification of *what* data is desired, and the relational database optimizer determines *how* to physically retrieve it at maximum hardware speed.
 
-### The Airport Security Checkpoint Analogy: WHERE vs. HAVING
-A classic beginner confusion is understanding why SQL has both `WHERE` and `HAVING`:
-- **`WHERE` (The Metal Detector at Terminal Gate)**: Every single passenger is screened individually *before* entering the departure hall. If a person does not have a ticket or carries forbidden items, they are filtered out immediately. In Relational Algebra, this is the **Selection operator** ($\sigma$). It filters individual rows before any grouping occurs.
-- **`HAVING` (The VIP Boarding Inspection)**: Once passengers are inside and grouped by flight, the gate manager inspects the group as a whole: *"Does Flight 402 have at least 10 passengers booked and total luggage weight under 2 tons?"* In Relational Algebra, this filters aggregated cohorts *after* grouping ($\gamma$).
+### The Airport Security Checkpoint: WHERE vs. HAVING
+One of the most persistent confusions among data practitioners is understanding why SQL requires two separate filtering clauses: `WHERE` and `HAVING`.
+- **`WHERE` (The Metal Detector at Terminal Gate)**: Every passenger arriving at the airport must pass through the security scanner individually *before* being allowed into the central concourse. If a passenger lacks a valid boarding pass or carries prohibited items, they are screened out immediately. In Relational Algebra, this is the **Selection Operator ($\sigma$)**. It operates on individual, independent tuples before any grouping or aggregation takes place.
+- **`HAVING` (The Flight Manifest Gate Check)**: Once all approved passengers are inside the concourse and seated at their respective departure gates (`GROUP BY flight_number`), the airline station manager checks the cohort as an aggregated whole: *"Does Flight 402 have at least 50 passengers checked in, and is the total checked luggage weight under 3,000 kilograms?"* In Relational Algebra, this is the **Post-Aggregation Filter ($\sigma_{\text{having}}$)**.
 
-You can never filter an aggregate in `WHERE` because groups do not exist at the gate!
+You can never filter an aggregate function like `SUM()` or `AVG()` inside a `WHERE` clause because groups do not exist when passengers are walking through the airport metal detector!
 
 :::simulation-widget{engine="canvas2d" component="RelationalAlgebraGridLab"}
 ---
@@ -32,16 +32,16 @@ highlighted_metric: "loss"
 ---
 :::
 
-قبل ابتكار لغة SQL، كان استرجاع البيانات كابوساً معقداً: يكتب المبرمجون حلقات تكرارية تبحث في مؤشرات الأقراص الصلبة الفيزيائية. في عام 1970، أحدث إدغار كود (E. F. Codd) ثورة تاريخية بابتكار **الجبر العلائقي (Relational Algebra)**.
+قبل ابتكار قواعد البيانات العلائقية الحديثة ولغة SQL، كان استرجاع المعلومات من الحواسيب كابوساً برمجياً شديد التعقيد والهشاشة: كان على المبرمجين كتابة تعليمات إجرائية تتتبع المؤشرات الفيزيائية على الأقراص المغناطيسية قطاعاً بقطاع. وإذا عُدّل فهرس أو نُقل جدول، تنهار جميع البرمجيات المعتمدة عليه فوراً!
 
-يعامل الجبر العلائقي البيانات كمجموعات رياضية من الصفوف (العلاقات)، ويوفر أدوات جبرية تقريرية لمعالجتها.
+في عام 1970، أحدث عالم الرياضيات والحاسوب إدغار كود (E. F. Codd) ثورة تاريخية كبرى بطرحه نظرية **الجبر العلائقي (Relational Algebra)**. برهن كود أن البيانات يمكن فصلها تماماً عن العتاد الفيزيائي وتمثيلها رياضياً كمجموعات مجردة من الصفوف (العلاقات). وأرسى بذلك مبدأ **الاستقلالية التقريرية (Declarative Independence)**: حيث يكتفي المهندس بتحديد *ما يريد الحصول عليه*، بينما يتولى محرك قواعد البيانات تحديد *كيفية تنفيذه فيزيائياً* بأعلى كفاءة عتادية ممكنة.
 
-### تشبيه بوابات أمن المطار: الفرق بين WHERE و HAVING
-من أكثر الأخطاء شيوعاً لدى المبتدئين الخلط بين شرطي `WHERE` و `HAVING`:
-- **`WHERE` (بوابة التفتيش الأمني عند المدخل)**: يُفحص كل مسافر بمفرده *قبل* دخول صالة الانتظار. من لا يملك تذكرة سارية يُستبعد فوراً. في الجبر العلائقي، هذا هو **مُعامل الاختيار (Selection $\sigma$)**، وهو يصفي الصفوف الفردية قبل أي تجميع.
-- **`HAVING` (فحص الرحلة عند بوابة الطائرة)**: بعد دخول الركاب وتوزيعهم على رحلاتهم، يفحص مدير البوابة شروط المجموعة ككل: *"هل تضم الرحلة 402 أكثر من 10 ركاب وإجمالي أوزانهم أقل من طنين؟"*. هذا يصفي المجموعات *بعد* إجراء التجميع ($\gamma$).
+### تشبيه بوابات تفتيش المطار: الفرق بين WHERE و HAVING
+من أكثر المفاهيم التي تربك المبتدئين في تحليل البيانات هو سبب وجود شرطي تصفية مستقلين في SQL: `WHERE` و `HAVING`.
+- **`WHERE` (بوابة التفتيش الأمني عند مدخل المطار)**: يُفحص كل مسافر يصل إلى المطار بمفرده *قبل* السماح له بدخول صالة السفر الرئيسية. من لا يحمل تذكرة سارية أو يحمل مواد محظورة يُستبعد فوراً. في الجبر العلائقي، هذا هو **مُعامل الاختيار ($\sigma$)**؛ وهو يعمل على مستوى الصفوف الفردية المستقلة قبل إجراء أي تجميع.
+- **`HAVING` (فحص بيان الرحلة عند بوابة الطائرة)**: بعد دخول المسافرين الصالة وتوزيعهم على رحلاتهم (`GROUP BY flight_number`)، يفحص مدير المحطة شروط المجموعة ككل: *"هل تضم الرحلة 402 أكثر من 50 راكباً وإجمالي أوزان حقائبهم أقل من 3000 كجم؟"*. هذا هو **مُعامل تصفية المجموعات ($\sigma_{\text{having}}$)**.
 
-يستحيل استخدام الدوال التجميعية داخل `WHERE` لأن المجموعات لم تكن قد وُجدت أصلاً عند بوابة الدخول!
+يستحيل استخدام الدوال التجميعية مثل `SUM()` أو `AVG()` داخل شرط `WHERE`، لأن المجموعات لم تكن قد وُجدت أصلاً عند بوابة التفتيش الأولى للمطار!
 
 ## Beat 2: Formal Foundations & Mathematical Invariants
 
@@ -51,22 +51,19 @@ $$
 
 ### Mathematical Invariants & Symbol Breakdown
 
-The fundamental operators of Codd's relational algebra underpin the SQL execution pipeline:
+| الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
+| :--- | :--- | :--- | :--- |
+| $R$ | Relation (set of tuples $\mathcal{T}$) | Input database table relation satisfying first normal form (1NF) | جدول البيانات الأساسي المعبر عنه كعلاقة رياضية |
+| $\sigma_\varphi$ | Selection operator | Horizontal tuple filter satisfying boolean predicate $\varphi$ (SQL `WHERE`) | مُعامل الاختيار الأفقي الذي يصفي الصفوف المحققة للشرط $\varphi$ |
+| $\pi_{A_1, \dots, A_k}$ | Projection operator | Vertical attribute filter discarding unselected columns (SQL `SELECT`) | مُعامل الإسقاط الرأسي الذي يستخرج أعمدة محددة ويسقط الباقي |
+| $\gamma_{G, \text{agg}(A)}$ | Aggregation operator | Partitions relation by group attributes $G$ and applies reduction | مُعامل التجميع الذي يقسم العلاقة ويحسب الدوال الإحصائية |
+| $\sigma_{\text{having}}$ | Post-aggregate filter | Discards aggregate group buckets based on aggregated metrics | مُعامل تصفية المجموعات الناتجة بعد حساب المقاييس |
+| $\varphi$ | Propositional formula | First-order logic condition evaluating to {True, False, Unknown} | الشرط المنطقي المطبق على خصائص الصفوف الفردية |
+| $G$ | Attribute grouping set | Subset of relation schema attributes defining partition equivalence | مجموعة الحقول المحددة لتقسيم الفئات في التجميع |
 
-- **$\sigma_\varphi(R)$ (Selection)**: Filters tuples from relation $R$ satisfying propositional formula $\varphi$ (SQL `WHERE`).
-- **$\pi_{A_1, \dots, A_k}(R)$ (Projection)**: Retains specified attribute subset while discarding all unlisted columns (SQL `SELECT`).
-- **$\gamma_{G, \text{agg}(A)}(R)$ (Aggregation)**: Partitions relation by group attributes $G$ and applies scalar reductions (SQL `GROUP BY`).
-- **$\sigma_{\text{having}}$**: Applies post-aggregation selection predicate over computed aggregate values (SQL `HAVING`).
-- **Declarative Independence**: The user specifies *what* relations to produce; the relational engine optimizer chooses *how* to execute them physically.
+The fundamental ordering invariant of Codd's relational algebra dictates that selection $\sigma_\varphi$ is mathematically commutative with cartesian products and projections, enabling query optimizers to execute **Filter Pushdown** (evaluating $\sigma_\varphi$ as early as possible in the query tree to minimize data volumes). Crucially, the aggregation operator $\gamma$ acts as a non-linear boundary: individual tuple identities are permanently collapsed into group metrics, meaning $\sigma_{\text{having}}$ can only evaluate properties of the partition image.
 
-### الشرح الرياضي وتفصيل الرموز
-
-المُعاملات الجبرية الأساسية التي يقوم عليها محرك SQL:
-- **$\sigma_\varphi$ (الاختيار Selection)**: تصفية صفوف العلاقة التي تحقق الشرط المنطقي $\varphi$ (يقابل `WHERE`).
-- **$\pi$ (الإسقاط Projection)**: اختيار أعمدة محددة وإسقاط بقية الأعمدة (يقابل `SELECT`).
-- **$\gamma$ (التجميع Aggregation)**: تقسيم العلاقة بحسب حقول المجموعة $G$ وتطبيق دوال الاختزال (يقابل `GROUP BY`).
-- **$\sigma_{\text{having}}$**: تصفية المجموعات الناتجة بعد حساب المقاييس الإحصائية (يقابل `HAVING`).
-- **الاستقلالية التقريرية**: يحدد المطور *ما يريد الحصول عليه*، ويقرر المحرك *كيفية تنفيذه فيزيائياً* بأعلى كفاءة.
+الثابت الرياضي الأساسي في جبر كود ينص على أن مُعامل الاختيار $\sigma_\varphi$ يمتلك خاصية التبديل مع الجداء والإسقاط، مما يسمح لمحسنات الاستعلامات بتنفيذ **تمرير الشروط لأسفل (Filter Pushdown)** لتصفية البيانات في أبكر نقطة ممكنة وتقليص حجم السجلات في الذاكرة. والأهم من ذلك أن مُعامل التجميع $\gamma$ يشكل حاجزاً لا خطياً: حيث تُدمج تفاصيل الصفوف الفردية نهائياً في مقاييس إحصائية موحدة، مما يجعل $\sigma_{\text{having}}$ قاصراً على تصفية نتائج المجموعات فقط.
 
 ## Beat 3: Interactive Code Challenge
 
@@ -100,9 +97,9 @@ FROM orders
 ## Beat 4: Real-World Transfer Scenario
 
 ### Industry Problem Context
-A junior database developer attempts to optimize a slow query by writing: `SELECT dept_id, AVG(salary) FROM employees WHERE AVG(salary) > 80000 GROUP BY dept_id;`. The engine terminates with `SyntaxError: aggregate functions are not allowed in WHERE`. Why does relational algebra strictly forbid aggregates in WHERE?
+A data engineering intern attempts to optimize an analytical SQL query on a warehouse cluster: `SELECT dept_id, AVG(salary) AS avg_sal FROM employees WHERE AVG(salary) > 80000 GROUP BY dept_id;`. The query fails during parsing with the error: `SyntaxError: aggregate functions are not allowed in WHERE`. The intern is puzzled because the column `avg_sal` is clearly written on the first line. Why does relational algebra strictly forbid aggregate functions in the WHERE clause?
 
-حاول مبرمج تحسين استعلام بطيء فكتب: `SELECT dept_id, AVG(salary) FROM employees WHERE AVG(salary) > 80000 GROUP BY dept_id;`، فأطلق محرك البيانات خطأ يمنع الدوال التجميعية في WHERE. لماذا يحظر الجبر العلائقي وضع الدوال التجميعية داخل شرط WHERE؟
+حاول متدرب في هندسة البيانات تحسين استعلام تحليلي على مستودع بيانات ضخم: `SELECT dept_id, AVG(salary) AS avg_sal FROM employees WHERE AVG(salary) > 80000 GROUP BY dept_id;`. ففشل الاستعلام فوراً أثناء الترجمة بخطأ نحوي: `SyntaxError: aggregate functions are not allowed in WHERE`. احتار المتدرب متسائلاً: كيف لا يسمح المحرك بذلك وقد كُتب متوسط الراتب في أول سطر من الاستعلام؟ لماذا يحظر الجبر العلائقي وضع الدوال التجميعية داخل شرط WHERE؟
 
 ### Transfer Assessment Question
 - **(A)** *(Correct)* The selection operator $\sigma_{\text{WHERE}}$ filters individual tuples prior to the partition operator $\gamma_{\text{GROUP BY}}$; aggregate values do not exist until groups have been materialized, requiring post-filter evaluation in $\sigma_{\text{HAVING}}$.
@@ -117,7 +114,13 @@ A junior database developer attempts to optimize a slow query by writing: `SELEC
 **Correct Answer:** Option (A)
 
 **Deep Engineering Post-Mortem & Explanation:**
-Relational execution strictly processes rows sequentially through the selection filter before hashing or sorting into group buckets. Aggregate metrics like `AVG()` are properties of sets, not individual tuples.
+- **Why Option (A) is correct:** In the relational engine lifecycle, the selection filter $\sigma_{\text{WHERE}}$ streams and evaluates individual tuples one-by-one as they are retrieved from storage. At this early phase, grouping has not occurred, and partition buckets have not been constructed. An aggregate expression like `AVG(salary)` is a property of a mathematical set of tuples, not an individual row. To filter on aggregate values, the query engine must first execute grouping ($\gamma$) and then evaluate the post-aggregate filter ($\sigma_{\text{HAVING}}$).
+- **Why Option (B) is incorrect:** Modern smart NICs do not perform database SQL scalar parsing; WHERE filtering runs on host CPU threads.
+- **Why Option (C) is incorrect:** Relational engines can aggregate any unindexed heap table using temporary hash tables or sorting algorithms.
+- **Why Option (D) is incorrect:** WHERE clauses support rich inequality operators (`<`, `>`, `!=`, `BETWEEN`, `LIKE`, regex) without violating ACID isolation.
 
-*التفسير الهندسي المعمق:*
-تخضع المعالجة العلائقية لتسلسل صارم يصفي الصفوف قبل توزيعها في سلال المجموعات؛ والمتوسط الحسابي خاصية للمجموعة وليس للصف الفردي.
+*التفسير الهندسي المعمق وتحليل الخيارات:*
+- **لماذا الخيار (A) صحيح:** في دورة حياة محرك البيانات العلائقي، يقوم مُعامل الاختيار $\sigma_{\text{WHERE}}$ بفحص الصفوف الفردية واحداً تلو الآخر فور جلبها من وسائط التخزين وقبل تجميعها. في هذه المرحلة المبكرة، لا وجود لأي مجموعات في الذاكرة. والدالة التجميعية مثل `AVG(salary)` هي خاصية لمجموعة رياضية وليست صفة لصف مفرد. ولتصفية المجموعات بناءً على مقاييسها، يجب أولاً تجميع الصفوف في سلال عبر $\gamma$ ثم تصفية السلال الناتجة عبر شرط $\sigma_{\text{HAVING}}$.
+- **لماذا الخيار (B) خاطئ:** بطاقات الشبكة لا تقوم بتنفيذ استعلامات SQL وقسمة الأرقام، بل تتم معالجة شرط WHERE على المعالج المركزي لخادم قواعد البيانات.
+- **لماذا الخيار (C) خاطئ:** تجري محركات البيانات التجميع على أي جدول سواء كان مفهرساً أم لا باستخدام جداول التجزئة أو الفرز في الذاكرة.
+- **لماذا الخيار (D) خاطئ:** يدعم شرط WHERE جميع معاملات المقارنة المنطقية المعقدة كالمجالات والتطابق النصي ولا ينحصر في المساواة.

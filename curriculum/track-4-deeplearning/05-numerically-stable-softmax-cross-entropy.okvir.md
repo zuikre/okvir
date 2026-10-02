@@ -12,19 +12,22 @@ i18n:
 
 # Softmax & Cross-Entropy Loss with Log-Sum-Exp Stability
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
-In multi-class classification and autoregressive language modeling, a neural network produces a raw vector of unconstrained real numbers called **logits** $\mathbf{z} \in (-\infty, \infty)^K$. A logit could be $-15.4$, $+0.2$, or $+104.8$. How do we transform these unbounded scores into a meaningful, coherent probability distribution where every outcome is positive and all outcomes sum to exactly $1.0$?
+In multi-class classification and next-token prediction in large language models, the final linear layer outputs an unconstrained vector of real numbers called **logits** $\mathbf{z} \in (-\infty, \infty)^K$. A logit can be $-42.8$, $+0.1$, or $+950.4$. How do we transform these arbitrary unbounded numbers into a valid, coherent probability distribution where every outcome is non-negative and all outcomes sum to exactly $100\%$ ($1.0$)?
 
-Enter the **Softmax** operator:
-1. It exponentiates every logit ($e^{z_i}$), ensuring all values become strictly positive.
-2. It divides each exponential by the sum of all exponentials ($\sum_j e^{z_j}$), normalizing the vector into a valid probability simplex.
+Why can't we simply divide each logit by their sum? Because raw logits can be negative! Dividing by a sum could yield negative probabilities or cause division by zero if the numbers sum to zero. The **Softmax** operator solves this by exponentiating each logit ($e^{z_i}$). Exponentiation maps any real number—no matter how negative—into a strictly positive value ($e^z > 0$). Then, dividing each exponential by the sum of all exponentials normalizes the vector into a valid probability simplex.
 
-Once we have probabilities, **Cross-Entropy Loss** measures how surprised the model is when told the true class $y^*$: $\mathcal{L} = -\log(p_{y^*})$. If the model assigned a probability of $0.99$ to the correct class, $-\log(0.99) \approx 0.01$ (minimal penalty). If it assigned a probability of $0.001$, $-\log(0.001) \approx 6.9$ (severe penalty).
+Once we have predicted probabilities, **Cross-Entropy Loss** acts as an information-theoretic "surprise meter": $\mathcal{L} = -\log(p_{\text{target}})$. If the model assigns $99\%$ probability ($p = 0.99$) to the correct ground-truth token, $-\log(0.99) \approx 0.01$ (minimal surprise, negligible loss). But if the model assigns only $0.1\%$ probability ($p = 0.001$), $-\log(0.001) \approx 6.9$ (severe surprise, massive loss penalty).
 
-**The Numerical Stability Trap:**
-Computers represent numbers using finite 32-bit floating-point registers. If a logit reaches $+1000$, evaluating $e^{1000}$ triggers floating-point overflow (`inf`). Dividing `inf / inf` yields `NaN`, instantly corrupting all model weights.
-The solution is the elegant **Log-Sum-Exp trick**: we subtract the maximum logit $c = \max(\mathbf{z})$ from every logit before exponentiating. Because $\frac{e^{z_i - c}}{\sum_j e^{z_j - c}} = \frac{e^{-c} e^{z_i}}{e^{-c} \sum_j e^{z_j}} = \frac{e^{z_i}}{\sum_j e^{z_j}}$, the resulting probabilities are mathematically identical, but the highest exponent is now guaranteed to be $e^0 = 1.0$, completely banishing overflow!
+**The Numerical Stability Trap & The Log-Sum-Exp Rescue:**
+Computers represent numbers using finite 32-bit floating-point registers (IEEE 754 float32). The largest number float32 can represent before overflowing is approximately $e^{88.7} \approx 3.4 \times 10^{38}$. If an untrained network outputs a logit of $+1000$, evaluating $e^{1000}$ triggers floating-point overflow to `+inf`. Dividing `inf / inf` produces `NaN` (Not a Number), instantly corrupting every gradient and parameter in the model!
+
+The mathematical salvation is the **Log-Sum-Exp trick**: we subtract the maximum logit $c = \max(\mathbf{z})$ from every logit before exponentiating. Because multiplying the numerator and denominator by $e^{-c}$ cancels out exactly:
+$$
+\frac{e^{z_i - c}}{\sum_j e^{z_j - c}} = \frac{e^{-c} e^{z_i}}{e^{-c} \sum_j e^{z_j}} = \frac{e^{z_i}}{\sum_j e^{z_j}}
+$$
+The probabilities are mathematically identical, but now the largest exponent is guaranteed to be $e^0 = 1.0$. Overflow is banished forever!
 
 :::simulation-widget{engine="canvas2d" component="NeuralActivationCanvas"}
 ---
@@ -33,42 +36,52 @@ highlighted_metric: "loss"
 ---
 :::
 
-في مهام التصنيف وتوليد النصوص، تخرج الشبكة العصبية متجهاً من الأرقام الحقيقية غير المقيدة يُعرف بـ **القيم المنطقية (Logits)**. لتحويل هذه الأرقام العشوائية إلى توزيع احتمالي سليم تتراوح قيمه بين 0 و 1 ومجموعها الكلي يساوي 1.0 تماماً، نلجأ إلى دالة **Softmax**: نقوم أولاً برفع كل قيمة أسياً ($e^{z_i}$) لضمان إيجابيتها، ثم نقسم الناتج على مجموع الأسس.
+في مهام التصنيف متعدد الفئات وتوليد الرموز اللغوية في النماذج التوليدية، تُخرج الطبقة الخطية الأخيرة متجهاً من الأرقام الحقيقية غير المقيدة يُعرف بـ **القيم المنطقية (Logits)**. قد تأخذ هذه القيم أرقاماً مثل $-50.0$ أو $+0.5$ أو $+1000.0$. ولتحويل هذه الأرقام العشوائية إلى نسب مئوية وتوزيع احتمالي سليم تتراوح قيمه بين 0 و 1 ومجموعها الإجمالي يساوي 1.0 (أي 100%)، نلجأ إلى دالة **Softmax**.
 
-تقيس **دالة الخسارة التقاطعية (Cross-Entropy Loss)** كفاءة التنبؤ عبر حساب سالب لوغاريتم احتمال الفئة المستهدفة ($-\log p_{y^*}$). غير أن الحساب المباشر لهذه الدالة على أجهزة الحاسوب ينطوي على فخ رقمي كارثي؛ إذ يؤدي رفع رقم كبير مثل $e^{1000}$ إلى فيضان في سعة الذاكرة (Overflow) وظهور قيمة غير معرفة `NaN`.
+لا يمكننا مجرد قسمة الأرقام على مجموعها، لأن القيم السالبة ستنتج احتمالات سالبة مستحيلة فيزيائياً، أو قد يتلاشى المجموع إلى الصفر. تقوم دالة Softmax برفع كل قيمة أسياً ($e^{z_i}$)، مما يضمن إيجابية كافة القيم مهما كانت سالبة، ثم تقسم كل ناتج على مجموع الأسس لتوزيع كعكة الاحتمال بالتساوي.
 
-تحل **حيلة لوغاريتم مجموع الأسس (Log-Sum-Exp Trick)** هذه المعضلة بطرح القيمة العظمى $\max(\mathbf{z})$ من جميع القيم قبل الرفع الأسي. يثبت هذا التحويل الجبري صحة الاحتمالات رياضياً بنسبة 100% مع ضمان ألا يتجاوز أي أس القيمة صفر ($e^0 = 1.0$)، مما يوفر استقراراً عددياً مطلقاً لتدريب النماذج اللغوية الضخمة.
+تقيس **دالة الخسارة التقاطعية (Cross-Entropy Loss)** مدى صدمة أو مفاجأة النموذج عند إخباره بالإجابة الصحيحة عبر حساب سالب اللوغاريتم: $-\log(p_{\text{target}})$. فإذا توقع النموذج الإجابة الصحيحة باحتمال $0.99$، كانت الخسارة شبه معدومة ($0.01$). أما إذا تنبأ باحتمال ضئيل قدره $0.001$، عاقبته الدالة بقسوة بخسارة هائلة تصل إلى $6.9$.
+
+غير أن الحساب المباشر لهذه الدالة على أجهزة الحاسوب يقع في فخ رقمي كارثي؛ إذ تعجز معالجات الرسوميات (GPUs) عن تمثيل أي رقم أسي يتجاوز $e^{88.7}$، فتتحول القيمة $e^{1000}$ إلى ما لا نهاية (`inf`). وعند قسمة ما لا نهاية على ما لا نهاية في السوفت ماكس، ينتج المعالج قيمة غير معرفة `NaN` تسمم وتدمر جميع أوزان الشبكة في لحظة واحدة! تحل **حيلة لوغاريتم مجموع الأسس (Log-Sum-Exp Trick)** هذه المعضلة بطرح القيمة العظمى $\max(\mathbf{z})$ من جميع القيم المنطقية قبل الرفع الأسي. يضمن هذا التعديل الجبري الدقيق بقاء أعلى أس عند الصفر ($e^0 = 1.0$)، مما يوفر استقراراً عددياً لا يتزعزع.
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
 The numerically shifted Softmax operator and categorical Cross-Entropy loss for $K$ classes are defined as:
 
 $$
-p_i = \frac{e^{z_i - \max(\mathbf{z})}}{\sum_{j=1}^K e^{z_j - \max(\mathbf{z})}}, \quad \mathcal{L}_{\text{CE}} = -\sum_{k=1}^K y_k \log p_k = -\log p_{y^*}
+p_i = \frac{\exp(z_i - \max_k z_k)}{\sum_{j=1}^K \exp(z_j - \max_k z_k)}, \quad \mathcal{L}_{\text{CE}} = -\sum_{k=1}^K y_k \log p_k = -\log p_{y^*}
 $$
 
-The combined analytical gradient with respect to input logits $z_i$ simplifies to the elegant error residual:
+The log-partition function (Log-Sum-Exp) identity demonstrating exact shift invariance:
+
+$$
+\text{LSE}(\mathbf{z} - c) + c = \log\left(\sum_{j=1}^K e^{z_j - c}\right) + c = \log\left(e^{-c} \sum_{j=1}^K e^{z_j}\right) + c = \log\left(\sum_{j=1}^K e^{z_j}\right) = \text{LSE}(\mathbf{z})
+$$
+
+The combined analytical Jacobian-gradient with respect to raw input logits $z_i$ simplifies to the remarkably clean error residual:
 
 $$
 \frac{\partial \mathcal{L}_{\text{CE}}}{\partial z_i} = p_i - y_i
 $$
 
-Where:
-* $\mathbf{z} \in \mathbb{R}^K$: Unnormalized model logits.
-* $\max(\mathbf{z}) \coloneqq \max_{j} z_j$: Normalization shift factor preventing exponential overflow.
-* $p_i \in (0, 1)$: Predicted probability assigned to class $i$ ($\sum_{i=1}^K p_i = 1$).
-* $\mathbf{y} \in \{0, 1\}^K$: One-hot ground truth label vector with target index $y^*$.
-* $p_i - y_i$: The upstream gradient flowing backward into the final network layer.
+### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-تتميز تركيبة دالة الاحتمالات Softmax ودالة الخسارة التقاطعية بأن مشتقتها المشتركة بالنسبة للقيم المنطقية $z_i$ تختزل رياضياً إلى فارق بسيط ومباشر: $\frac{\partial \mathcal{L}}{\partial z_i} = p_i - y_i$. فإذا تنبأ النموذج باحتمال $0.8$ لفئة ما بينما القيمة الحقيقية هي $1.0$، فإن التدرج العكسي يساوي $-0.2$ دافعاً القيمة المنطقية إلى الارتفاع بدقة وتناسب تام.
+* $\mathbf{z} \in \mathbb{R}^K$: Unnormalized model logits (`logits`).
+* $\max_k z_k \in \mathbb{R}$: The maximum logit shift constant $c$ preventing exponential overflow.
+* $p_i \in (0, 1)$: Predicted probability assigned to class $i$, satisfying $\sum_{i=1}^K p_i = 1$.
+* $\mathbf{y} \in \{0, 1\}^K$: One-hot ground truth label vector with target index $y^*$ where $y_{y^*} = 1$ and $y_{k \ne y^*} = 0$.
+* $\mathcal{L}_{\text{CE}} \in [0, \infty)$: The scalar cross-entropy objective.
+* $p_i - y_i$: The upstream gradient flowing backward into the output layer logits (`grad`).
+
+تتميز تركيبة دالة الاحتمالات Softmax ودالة الخسارة التقاطعية بأن مشتقتها المشتركة بالنسبة للقيم المنطقية $z_i$ تختزل جبرياً إلى فارق مباشر وأنيق: $\frac{\partial \mathcal{L}}{\partial z_i} = p_i - y_i$. فإذا تنبأ النموذج باحتمال $0.85$ للفئة المستهدفة ($y = 1$)، فإن التدرج العكسي هو $-0.15$ دافعاً القيمة المنطقية إلى الصعود، وإذا تنبأ باحتمال $0.20$ لفئة خاطئة ($y = 0$)، فإن التدرج هو $+0.20$ دافعاً إياها إلى الهبوط.
 
 ---
 
-## Beat 3: Interactive Python Scratchpad
+## Beat 3: Interactive Python Scratchpad | التحدي البرمجي التفاعلي
 
-Implement the numerically stable `softmax_cross_entropy(logits, target_idx)` function using the max-subtraction trick. Return the scalar loss, probability distribution vector, and the analytical gradient vector $(p - y)$.
+Implement the numerically stable `softmax_cross_entropy(logits, target_idx)` function using the max-subtraction trick. Return the scalar loss, the probability distribution vector, and the analytical gradient vector $(p - y)$.
 
 :::python-challenge{id="py-numerically-stable-softmax-cross-entropy"}
 ---
@@ -95,25 +108,46 @@ def softmax_cross_entropy(logits: np.ndarray, target_idx: int) -> tuple[float, n
     -------
     tuple of (loss: float, probs: np.ndarray, grad: np.ndarray)
     """
-    # TODO: 1. Subtract np.max(logits) for numerical stability
-    # TODO: 2. Compute exponentiated scores and normalize to sum to 1.0
-    # TODO: 3. Compute cross-entropy loss: -log(probs[target_idx] + 1e-15)
-    # TODO: 4. Compute analytical gradient: grad = probs - one_hot
-    pass
+    # Step 1: Subtract max(logits) across the vector to prevent exponential overflow
+    shifted_logits = logits - np.max(logits)
+    
+    # Step 2: Compute exponentiated scores and normalize into probabilities summing to 1.0
+    exp_scores = np.exp(shifted_logits)
+    probs = exp_scores / np.sum(exp_scores)
+    
+    # Step 3: Compute categorical cross-entropy loss: -log(probs[target_idx] + epsilon)
+    loss = float(-np.log(probs[target_idx] + 1e-15))
+    
+    # Step 4: Compute analytical gradient vector: grad = probs - one_hot
+    grad = probs.copy()
+    grad[target_idx] -= 1.0
+    
+    return loss, probs, grad
 ```
 :::
 
 ---
 
-## Beat 4: Reality Transfer Challenge
+## Beat 4: Reality Transfer Challenge | اختبار الانتقال المعرفي الواقعي
 
 ### Transfer Question / سؤال نقل الأثر المعرفي
 
-Why does the analytical gradient of combined Softmax and Cross-Entropy simplify to $(p_i - y_i)$, and what happens to the training dynamics when the model assigns $p_k \approx 0.0001$ to the true class ($y_k = 1$)?
+Why does the analytical gradient of combined Softmax and Cross-Entropy simplify to $(p_i - y_i)$, and what training catastrophic failure occurs if Mean Squared Error (MSE) is used instead of Cross-Entropy for classification?
 
-* [x] The derivative of the logarithm in cross-entropy ($\frac{d}{dp}(-\log p) = -\frac{1}{p}$) cancels the probability denominator in the softmax Jacobian; when the model assigns $p_k \approx 0$ to the true target, the gradient is $p_k - 1 \approx -1.0$, exerting the maximum possible linear restoring force without vanishing or saturating.
+* [x] The derivative of the logarithm in cross-entropy ($\frac{d}{dp}(-\log p) = -\frac{1}{p}$) cancels the probability denominator in the softmax Jacobian, leaving a constant-scale error signal $(p_i - y_i)$. If MSE were used, the gradient would contain an extra factor of $p_i(1 - p_i)$; when the model makes a confident wrong prediction ($p_i \approx 0$), $p_i(1 - p_i) \approx 0$, causing gradients to vanish and permanently freezing learning.
 * [ ] The gradient simplifies because softmax and cross-entropy are linear functions of the parameters.
-* [ ] When $p_k \approx 0$, the gradient vanishes to zero, permanently stalling learning.
-* [ ] The simplification only holds if the logits are strictly normalized between 0 and 1 before entering the function.
+* [ ] Mean Squared Error is mathematically undefined for vectors with more than two elements.
+* [ ] Cross-entropy guarantees that all eigenvalues of the parameter Hessian matrix are strictly negative.
 
-> **Insight:** If you paired Mean Squared Error (MSE) with Softmax instead of Cross-Entropy, the gradient would contain an additional factor of $p(1-p)$. When the model was confidently wrong ($p \approx 0$), $p(1-p) \approx 0$, causing gradients to vanish! Cross-Entropy guarantees a linear error signal $(p - y)$ that drives learning aggressively when the model makes severe errors.
+### Pedagogical Explanation & Distractor Analysis | التحليل البيداغوجي وتفكيك البدائل
+
+**Why the correct option is right:**
+When calculating $\frac{\partial \mathcal{L}_{\text{CE}}}{\partial z_i}$, the chain rule evaluates $\sum_k \frac{\partial \mathcal{L}_{\text{CE}}}{\partial p_k} \frac{\partial p_k}{\partial z_i}$. The softmax Jacobian is $\frac{\partial p_k}{\partial z_i} = p_i(\delta_{ik} - p_k)$. Meanwhile, the derivative of cross-entropy is $-\frac{y_k}{p_k}$. When multiplying them together, the $\frac{1}{p_k}$ term cancels the $p_k$ factor in the Jacobian, collapsing the entire multivariable sum into $p_i - y_i$! Crucially, if the model predicts $p_{\text{target}} \approx 0.0$, the gradient magnitude is $|0 - 1| = 1.0$—the maximum possible restoring force. If MSE were used, the loss would be $\frac{1}{2}(p - y)^2$, and its derivative would retain the Jacobian factor $p_i(1 - p_i)(p_i - y_i)$. When $p_i \approx 0$, $p_i(1 - p_i) \to 0$, causing the gradient to vanish precisely when the model is most grievously mistaken!
+
+**Why the distractors are incorrect:**
+1. *Softmax and cross-entropy are linear functions...*: False. Softmax contains exponentials and divisions, and cross-entropy contains logarithms; both are non-linear operators.
+2. *MSE is mathematically undefined for vectors...*: False. MSE is defined for Euclidean vectors of any arbitrary dimension $K$.
+3. *Cross-entropy guarantees that all eigenvalues of the Hessian are negative...*: False. A negative-definite Hessian would imply maximization rather than minimization.
+
+*الشرح باللغة العربية:*
+عند اشتقاق دالة الخسارة التقاطعية، يقوم حد المشتقة $-\frac{1}{p}$ بإلغاء مقام جاكوبي دالة السوفت ماكس تماماً، ليختزل التدرج في إشارة خطية مباشرة وواضحة: $p_i - y_i$. وإذا ارتكب النموذج خطأً فادحاً وتوقع احتمالاً قريباً من الصفر ($p \approx 0$) للفئة الصحيحة، فإن شدة التدرج تكون في قيمتها القصوى ($|0 - 1| = 1.0$) لتدفع المعاملات نحو التصحيح الفوري. أما لو استخدمنا خطأ المربعات (MSE)، فإن التدرج سيتضمن المعامل $p(1-p)$، مما يجعله يتلاشى إلى الصفر عندما يخطئ النموذج بثقة، مما يؤدي إلى تجميد التدريب واستحالة التعلم.

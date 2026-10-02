@@ -12,9 +12,15 @@ i18n:
 
 # Iteration Protocols, Loop Invariants & State Accumulators
 
-When you write `for item in collection:`, beginners assume Python is running a C-style counter loop (`i = 0; i < len; i++`). Under the hood, Python does something far more elegant: the **Iterator Protocol**.
+When newcomers write a loop like `for item in collection:`, they usually picture Python quietly maintaining a C-style integer index behind the curtain—something like `i = 0; while i < len(collection): item = collection[i]; i += 1`. While this mental model works passably well for indexed arrays, it fails to explain how Python can effortlessly loop over dictionaries, database streams, generator expressions, open files, or infinite mathematical series that have no indices or measurable length whatsoever!
 
-Think of the iterable collection as a **vending machine warehouse**. Calling `iter(collection)` creates a **conveyor belt clerk** (an iterator object). Each turn of the loop presses the dispensing button `next(iterator)`. The clerk hands you the next item and steps forward. Crucially, the clerk possesses internal state and only moves in one direction. When the warehouse is depleted, the clerk raises a `StopIteration` exception. The `for` loop catches this exception behind the scenes and exits gracefully without crashing! Any object that implements `__iter__()` and `__next__()` can participate in this protocol.
+Under the hood, Python achieves this through a universal contract known as the **Iterator Protocol**. Instead of relying on numeric indices, Python cleanly decouples the collection holding the data from the process of walking through that data.
+
+Think of an iterable collection as a **vending machine warehouse**. The warehouse holds the physical merchandise, but it cannot dispense items itself. When you pass the collection to `iter(collection)`, Python hires a specialized **conveyor belt clerk**—an *iterator object*. This clerk is stationed at the warehouse entrance, armed with an internal bookmark pointing to the very beginning.
+
+Each time the loop body demands the next piece of data, it presses the dispensing lever: `next(iterator)`. The clerk reaches into the warehouse, hands you the next item in sequence, and advances its internal bookmark exactly one step forward. The clerk is strictly a one-way, disposable traveler: it has no memory of what came before, and it cannot rewind.
+
+What happens when the warehouse shelves are completely empty? Instead of returning a sentinel value like `None` or `-1` (which might be legitimate data items!), the clerk raises a `StopIteration` exception. The `for` loop catches this signal behind the scenes and terminates cleanly. The caller never sees the exception; the loop simply finishes and control flows onward. Any custom Python object that implements `__iter__()` and `__next__()` can participate in this protocol!
 
 :::simulation-widget{engine="canvas2d" component="ScopeChainInspector"}
 ---
@@ -29,13 +35,41 @@ $$
 \text{Iterable} \xrightarrow{\text{iter()}} \text{Iterator} \xrightarrow{\text{next()}} (x_k, s_{k+1}) \quad \text{until } \text{StopIteration}, \quad \text{acc}_k = \bigoplus_{i=1}^k x_i
 $$
 
-عندما تكتب `for item in collection:`، يظن المبتدئ أن بايثون يعد المؤشرات مثل حلقة C التقليدية (`i = 0; i < len; i++`). لكن ما يحدث فعلياً أعمق وأجمل بكثير: **بروتوكول التكرار** (Iterator Protocol).
+```text
+The Two-Phase Iterator Protocol:
++------------------------+
+|  Iterable Collection   |  (Implements __iter__() -> returns Iterator)
++------------------------+
+            | iter(collection)
+            v
++------------------------+
+|    Iterator Object     |  (Maintains internal cursor state s_k)
++------------------------+
+      |            ^
+next()|            | advances cursor
+      v            |
+  [ Yield x_k ] ---+    --->  When depleted: raises StopIteration (caught by loop)
+```
 
-تخيل الكائن القابل للتكرار كـ **مستودع آلة بيع ذاتية**. استدعاء `iter(collection)` ينشئ **موظف شريط ناقل** (كائن مكرر Iterator). في كل دورة حلقة، نضغط زر الصرف `next(iterator)`، فيسلمنا الموظف العنصر التالي ويخطو خطوة للأمام. يحتفظ الموظف بحالته الداخلية ولا يتحرك إلا للأمام. وعند نفاد البضاعة، يرفع الموظف استثناء `StopIteration`. تلتقط حلقة `for` هذا الاستثناء تلقائياً وتنهي التكرار بسلاسة دون انهيار! أي كائن ينفذ `__iter__()` و `__next__()` ينضم تلقائياً لهذه المنظومة.
+عندما يكتب المبتدئ حلقة تكرار بسيطة مثل `for item in collection:`، يتبادر إلى ذهنه فوراً أن بايثون يعد المؤشرات خلف الكواليس كما تفعل لغة C عبر عداد تزايدي (`i = 0; i < len; i++`). ومع أن هذا التصور يبدو منطقياً في القوائم المرقمة، إلا أنه يعجز تماماً عن تفسير قدرة بايثون الساحرة على التكرار فوق القواميس، أو تدفقات قواعد البيانات، أو أسطر الملفات الضخمة، أو المتتاليات الرياضية اللانهائية التي لا تمتلك فهارس ولا أطوالاً معروفة مسبقاً!
 
-Mathematically, a state accumulator loop maintains a **loop invariant** $\mathcal{I}(k)$ across iterations. If the invariant holds before step $k$, and the transition $\text{acc}_{k} = \text{acc}_{k-1} \oplus x_k$ preserves it, then by mathematical induction $\mathcal{I}(N)$ holds upon termination. At the bytecode layer, CPython issues `GET_ITER` to push the iterator onto the stack, followed by `FOR_ITER <jump_target>`, which invokes the iterator's tp_iternext slot directly in C speed, jumping past the loop body upon `StopIteration`.
+خلف الكواليس، يرتكز بايثون على عقد هندسي موحد فائق الأناقة يُدعى **بروتوكول التكرار** (Iterator Protocol). فبدلاً من الاعتماد على الفهارس الرقمية، يفصل بايثون بذكاء بين الحاوية التي تخزن البيانات وبين عملية المرور على تلك البيانات خطوة بخطوة.
 
-رياضياً، يحافظ تراكم الحالة الحلقي على **لا متغيرة حلقية** (Loop Invariant) $\mathcal{I}(k)$ عبر الدورات. إذا صحت اللامتغيرة قبل الخطوة $k$ وحافظ الانتقال $\text{acc}_{k} = \text{acc}_{k-1} \oplus x_k$ عليها، فإنها تصح بالاستقراء الرياضي عند انتهاء الحلقة. وعلى مستوى شفرة البايت، يصدر CPython الأمر `GET_ITER` لدفع المكرر إلى المكدس، يليه `FOR_ITER` الذي يستدعي فتحة tp_iternext بسرعة لغة C، ويقفز متجاوزاً جسم الحلقة فور إطلاق `StopIteration`.
+تخيل أي كائن قابل للتكرار (Iterable) كـ **مستودع آلة بيع ذاتية**. المستودع يحوي البضائع، لكنه لا يستطيع تسليمها بنفسه. عندما تستدعي الدالة `iter(collection)`، يعين بايثون **موظف شريط ناقل متفرغ**—وهو *كائن المكرر (Iterator)*. يقف الموظف عند باب المستودع ومعه علامة مرجعية داخلية تشير إلى أول عنصر.
+
+في كل دورة من دورات الحلقة، تضغط حلقة التكرار زر الصرف: `next(iterator)`. فيلتقط الموظف العنصر التالي من المستودع، ويسلمه لك باليد، ثم يخطو علامته المرجعية خطوة واحدة للأمام. هذا الموظف يسير في اتجاه واحد فقط: لا يمكنه الرجوع للوراء، ولا يحتفظ بسجل لما تم صرفه سابقاً.
+
+ماذا يحدث حين تنفد بضائع المستودع بالكامل؟ بدلاً من إعادة قيمة وهمية مثل `None` أو `-1` (والتي قد تكون بيانات حقيقية صالحة!)، يطلق الموظف صرخة استثناء منظمة: `StopIteration`. تلتقط حلقة `for` هذا الاستثناء تلقائياً وتغلق الحلقة بسلاسة دون أن ينهار البرنامج أو يظهر أي خطأ للمستخدم. وأي صنف في بايثون ينفذ الدالتين `__iter__()` و `__next__()` ينضم تلقائياً لهذه المنظومة.
+
+#### Architectural Breakdown & State Accumulation:
+- **Loop Invariant ($\mathcal{I}(k)$)**: A formal mathematical property that is true before loop entry, preserved across every transition step $\text{acc}_k = \text{acc}_{k-1} \oplus x_k$, and guaranteed to hold true upon termination.
+- **`GET_ITER` Bytecode**: Pushes a new iterator onto the virtual evaluation stack by calling the object's `tp_iter` slot in C.
+- **`FOR_ITER <target>`**: Calls the C-level `tp_iternext` function pointer. If an item is produced, it is pushed onto the stack. If `StopIteration` is raised, it clears the exception and jumps directly to `target`, exiting the loop in zero Python overhead.
+
+#### التحليل المعماري وتراكم الحالة:
+- **اللامتغيرة الحلقية ($\mathcal{I}(k)$)**: خاصية رياضية تصدق قبل دخول الحلقة، وتظل صالحة عند كل انتقال لتراكم الحالة $\text{acc}_k = \text{acc}_{k-1} \oplus x_k$، وتضمن برهان صحة النتيجة عند النهاية.
+- **أمر البايت كود `GET_ITER`**: يستدعي فتحة `tp_iter` في بنية C للكائن لدفع المكرر إلى قمة مكدس التقييم.
+- **أمر البايت كود `FOR_ITER`**: يستدعي مؤشر الدالة `tp_iternext` بسرعة C الفائقة، ويجلب العنصر التالي؛ وحين يُرفع `StopIteration` يقفز فوراً إلى نهاية الحلقة.
 
 :::python-challenge{id="py-iteration-state-accumulation"}
 ---
@@ -68,7 +102,7 @@ def manual_reduce(
     Returns:
         The final accumulated value.
     """
-    # Step 1: Obtain the iterator object from the iterable
+    # Step 1: Obtain the iterator object from the iterable collection
     it = iter(iterable)
 
     # Step 2: Determine initial accumulator value
@@ -88,6 +122,7 @@ def manual_reduce(
         except StopIteration:
             break
 
+    # Step 4: Return the accumulated result
     return accumulator
 ```
 :::
@@ -117,12 +152,12 @@ second_sum = sum(g)
   *يحدث خطأ RuntimeError لأن المولد المستنفد لا يجوز تمريره للدوال المدمجة.*
 
 **Analysis & Architectural Explanation / التحليل والشرح المعماري:**
-**Correct / الإجابة الصحيحة:** Iterators and generators are disposable forward-only streams. Once consumed, their internal pointer sits at the end and they cannot be rewound or reset without re-creating the generator.
-*المكررات والمولدات هي مجاري بيانات ذات اتجاه واحد للأمام فقط. بعد استهلاكها، يبقى المؤشر في النهاية ولا يمكن إعادة تدويرها إلا بإنشاء مولد جديد.*
+**Correct / الإجابة الصحيحة:** Iterators and generators maintain forward-only cursor state. When `sum(g)` runs the first time, it pulls elements until `next(g)` raises `StopIteration`. The generator is now officially exhausted. Calling `sum(g)` a second time asks the depleted iterator for its next element, which immediately raises `StopIteration`. The `sum()` built-in catches this immediately and returns its initial identity accumulator (which defaults to `0`).
+*المكررات والمولدات هي مجاري بيانات ذات اتجاه واحد للأمام فقط. بعد استهلاكها في `first_sum`، يبقى المؤشر في النهاية. عند استدعاء `sum(g)` مرة ثانية، يطلب العنصر الأول فيطلق المولد `StopIteration` فوراً. تلتقط الدالة الاستثناء وتعيد القيمة الابتدائية للمحايد الجمعي وهي 0.*
 
-**Incorrect / مشتت غير صحيح:** Iterables like `list` can be iterated multiple times because calling `iter(lst)` creates a new iterator each time; but a generator is already its own iterator.
-*القوائم يمكن تكرارها عدة مرات لأن `iter(lst)` تصنع مكرراً جديداً في كل مرة، لكن المولد هو نفسه كائن مكرر وحيد.*
+**Incorrect / مشتت غير صحيح:** Unlike container iterables (like lists or sets) which instantiate a brand-new iterator each time `iter()` is called, a generator *is its own iterator* (`iter(g) is g`). It cannot rewind or reset.
+*على خلاف الحاويات كالقوائم التي تنشئ مكرراً جديداً عند كل دورة، فإن المولد هو نفسه كائن مكرر وحيد لا يمكن إرجاع عقاربه إلى الوراء.*
 
-**Incorrect / مشتت غير صحيح:** Passing an exhausted iterator to `sum()` is completely legal; `sum()` simply sees an empty stream and returns its default start value 0.
-*تمرير مكرر مستنفد لدالة `sum()` أمر نظامي تماماً، وتعتبره الدالة مجرى فارغاً فتعيد القيمة 0.*
+**Incorrect / مشتت غير صحيح:** Passing an exhausted iterator to built-in functions like `sum()`, `list()`, or `for` loops is valid syntax and common practice; it simply behaves as an empty sequence.
+*تمرير مكرر مستنفد للدوال المدمجة ممارسة قياسية مسموحة تماماً، ويتعامل معها بايثون كتسلسل فارغ دون أي أخطاء.*
 :::

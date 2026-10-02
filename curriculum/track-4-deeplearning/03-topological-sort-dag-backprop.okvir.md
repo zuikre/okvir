@@ -12,18 +12,18 @@ i18n:
 
 # Topological Sort DAG Execution & Full Backpropagation
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
-In our factory assembly line, imagine Worker X supplies sub-assemblies to both Worker Y and Worker Z, who both contribute to the final product delivered to the customer. When a defect is discovered at the factory exit (the scalar loss $L$), in what order should we interrogate the workers?
+Imagine our computational assembly line has grown into an intricate, branching network. Worker X machines a foundational component and supplies copies of it to both Worker Y and Worker Z. Both Y and Z incorporate this component into their own sub-assemblies, which eventually merge into the final finished product delivered at the end of the line. When a final defect is measured at the factory exit—the scalar loss $L$—in what order should we interrogate the workers to assign blame?
 
-If we interrogate Worker X first, Worker X has only received partial feedback—perhaps from Worker Y, but not yet from Worker Z! If Worker X calculates their blame prematurely, their backward contribution will be incomplete and corrupt.
+Suppose we interrogate Worker X first. At this moment, Worker X has received partial feedback from Worker Y, but Worker Z has not yet completed their calculations. If Worker X calculates their blame right now and passes it back to their own suppliers, Worker X's assessment is fundamentally incomplete and corrupted.
 
-You cannot determine a worker's total blame until **every single downstream customer** who used that worker's output has finished calculating their blame and pushed it back upstream!
+A worker cannot determine their total blame until **every single downstream customer** who consumed their output has completely finished calculating blame and pushed it back upstream!
 
-This ordering principle is called **Topological Sort**. By performing a Depth-First Search (DFS) post-order traversal starting from the final loss node $L$, we build a linear ordering of nodes such that every edge points in the same direction. When we reverse this list, we get the exact sequence needed for backpropagation:
-1. Start at the root loss node $L$ and set its gradient to the base seed $\frac{\partial L}{\partial L} = 1.0$.
-2. Step through each node in reverse topological order, calling its local `_backward()` closure.
-3. Every node is guaranteed to have accumulated 100% of its incoming gradients from all downstream consumers before it ever fires its own backward closure!
+This fundamental scheduling constraint is solved by **Topological Sorting**. A computational graph is a Directed Acyclic Graph (DAG). By performing a Depth-First Search (DFS) post-order traversal starting from the terminal loss node $L$, we build a linear ordering of nodes. When we reverse this ordering, we obtain the exact sequence required for full backpropagation:
+1. Seed the root loss node with its base sensitivity: $\frac{\partial L}{\partial L} = 1.0$.
+2. Traverse the list in reverse topological order, calling each node's local `_backward()` closure.
+3. Every node is mathematically guaranteed to have accumulated 100% of its incoming gradients from all downstream consumers before it ever fires its own backward closure!
 
 :::simulation-widget{engine="canvas2d" component="AutogradGraphLab"}
 ---
@@ -32,40 +32,57 @@ highlighted_metric: "loss"
 ---
 :::
 
-في خط الإنتاج المتشعب، تخيل أن العامل $X$ يوزع مخرجاته على عاملين لاحقين: $Y$ و $Z$، وكلاهما يساهم في تشكيل المنتج النهائي. عند اكتشاف خلل في مخرج المصنع (قيمة الخسارة $L$)، بأي ترتيب يجب أن نحاسب العمال ونمرر التدرجات العكسية؟
+في خط الإنتاج المتشعب، تخيل أن العامل $X$ يصنع قطعة أساسية ويوزع نسخاً منها على عاملين لاحقين: $Y$ و $Z$. يقوم كل منهما بدمج هذه القطعة في أجزاء فرعية تساهم في تكوين المنتج النهائي. عند رصد خطأ في نهاية الخط (قيمة دالة الخسارة $L$)، بأي ترتيب دقيق يجب أن نحاسب العمال ونمرر التدرجات العكسية؟
 
-إذا قمنا بمحاسبة العامل $X$ قبل أن ينتهي العاملان $Y$ و $Z$ من حساب نصيبهما من اللوم، فإن العامل $X$ سيمرر تدرجاً جزئياً ناقصاً إلى العمال السابقين له، مما يفسد حسابات الشبكة برمتها. القاعدة الحتمية هي: لا يمكن لعقدة أن تمرر تدرجها للخلف حتى تجمع كل التدرجات القادمة من جميع العقد التي استهلكت مخرجاتها.
+إذا تعجلنا وحاسبنا العامل $X$ أولاً، فإن العامل $X$ يكون قد تلقى تدرجاً جزئياً فقط من العامل $Y$، بينما لم ينته العامل $Z$ من حساب نصيبه بعد. وإذا قام العامل $X$ بتمرير مسؤوليته إلى العمال السابقين له في هذه اللحظة، فإنه سيمرر أرقاماً مشوهة وناقصة تفسد مسار التحسين بالكامل.
 
-يُعرف هذا الترتيب المحكم بـ **الترتيب الطوبولوجي (Topological Sort)**. عبر خوارزمية البحث بالعمق أولاً (DFS)، نرتب عقد الرسم البياني بحيث تأتي العقد اللاحقة دائماً قبل العقد السابقة في المسار العكسي. نبدأ بوضع بذرة التدرج لدالة الخسارة $\frac{\partial L}{\partial L} = 1.0$، ثم نستدعي الدوال العكسية بالتتابع العكسي، مما يضمن كمال ودقة التدرجات الرياضية المتراكمة.
+القاعدة الحتمية التي لا تقبل الاستثناء هي: **لا يجوز لأي عقدة أن تفعل دالتها العكسية وتمرر تدرجها للخلف حتى تجمع كافة التدرجات القادمة من جميع العقد اللاحقة التي استهلكت مخرجاتها**.
+
+يتحقق هذا الترتيب المحكم عبر خوارزمية **الترتيب الطوبولوجي (Topological Sort)**. فبما أن الرسم البياني الحسابي هو رسم موجه غير دائري (DAG)، فإن تنفيذ مسح متعمق (DFS) انطلاقاً من عقدة الخسارة $L$ وبناء ترتيب ما بعدي (Post-Order) ثم عكس هذا الترتيب، يفرز العقد في خط مستقيم نضمن فيه وصول جميع إشارات اللوم إلى العقدة قبل معالجتها. نبدأ بوضع بذرة التدرج $\frac{\partial L}{\partial L} = 1.0$، ثم نستدعي الدوال العكسية بالتتابع لنحصل على تدرجات دقيقة لكافة معاملات الشبكة في مسار زمني خطي فائق الكفاءة.
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
-The total derivative of the scalar loss $L$ with respect to an intermediate vertex $v_i$ is given by the multivariate chain rule across all its direct consumers (children):
+The total derivative of the scalar loss $L$ with respect to an intermediate vertex $v_i$ is given by the multivariate chain rule across the complete set of its direct downstream consumers:
 
 $$
-\frac{\partial L}{\partial v_i} = \sum_{j \in \text{Children}(v_i)} \frac{\partial L}{\partial v_j} \frac{\partial v_j}{\partial v_i}
+\frac{\partial L}{\partial v_i} = \sum_{j \in \text{Children}(v_i)} \frac{\partial L}{\partial v_j} \cdot \frac{\partial v_j}{\partial v_i}
 $$
 
-A topological sort of a directed acyclic graph $\mathcal{G} = (\mathcal{V}, \mathcal{E})$ is a linear ordering $\pi = (u_1, u_2, \dots, u_N)$ of its vertices such that:
+A topological sort of a directed acyclic graph $\mathcal{G} = (\mathcal{V}, \mathcal{E})$ is a permutation $\pi = (u_1, u_2, \dots, u_N)$ of its vertices such that every directed dependency edge points forward:
 
 $$
 \forall (u_j, u_k) \in \mathcal{E} \implies j < k
 $$
 
-The full backpropagation algorithm executes the reverse permutation $\pi^{\text{rev}} = (u_N, u_{N-1}, \dots, u_1)$:
-1. **Initialize Seed:** $\bar{u}_N \leftarrow 1.0$, and $\bar{u}_i \leftarrow 0.0$ for all $i < N$.
-2. **Reverse Sweep:** For $i = N$ down to $1$:
-   $$\forall p \in \text{Parents}(u_i): \quad \bar{p} \mathrel{+}= \bar{u}_i \cdot \frac{\partial u_i}{\partial p}$$
+The full backpropagation sweep executes along the reversed topological permutation $\pi^{\text{rev}} = (u_N, u_{N-1}, \dots, u_1)$:
 
-حيث يمثل $\text{Children}(v_i)$ مجموعة العقد التي تعتمد مباشرة على $v_i$. يضمن الترتيب الطوبولوجي $\pi$ ألا يتم تقييم المشتقة الجزئية لعقدة أبوية إلا بعد أن تستقر المشتقات الإجمالية لجميع أبنائها. بفضل هذه الخاصية الطوبولوجية، يتم حساب تدرجات جميع معاملات النموذج بتعقيد زمني خطي $O(|\mathcal{V}| + |\mathcal{E}|)$ في مسار عكسي واحد.
+1. **Seed Initialization:** Set the seed derivative at the terminal loss node:
+   $$
+   \bar{u}_N \leftarrow 1.0, \quad \text{and} \quad \bar{u}_i \leftarrow 0.0 \quad \forall i \in \{1, 2, \dots, N-1\}
+   $$
+2. **Reverse Topological Sweep:** For index $i = N$ down to $1$:
+   $$
+   \forall p \in \text{Parents}(u_i): \quad \bar{p} \mathrel{+}= \bar{u}_i \cdot \frac{\partial u_i}{\partial p}
+   $$
+
+### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
+
+* $\text{Children}(v_i) \subset \mathcal{V}$: The set of downstream nodes that take $v_i$ as an input.
+* $\text{Parents}(u_i) \subset \mathcal{V}$: The set of antecedent nodes that produced $u_i$.
+* $\pi = (u_1, \dots, u_N)$: The forward topological ordering ensuring no node appears before its prerequisites.
+* $\pi^{\text{rev}}$: The reverse topological ordering guaranteeing that all incoming gradients $\bar{u}_j$ from children are fully accumulated before $u_i$ distributes blame to its parents.
+* $\bar{u}_N \leftarrow 1.0$: The identity seed $\frac{\partial L}{\partial L} = 1.0$ that initiates the chain rule.
+* Complexity: Both the forward evaluation and reverse-mode traversal execute in linear time $O(|\mathcal{V}| + |\mathcal{E}|)$.
+
+يضمن الترتيب الطوبولوجي $\pi$ ألا يتم تقييم المشتقة الجزئية لعقدة أبوية إلا بعد أن تستقر وتكتمل المشتقات الإجمالية لجميع العقد الأبناء. بفضل هذه الهندسة الرياضية المحكمة، يتم حساب تدرجات جميع أوزان وانحيازات النموذج العصبي بتعقيد زمني خطي $O(|\mathcal{V}| + |\mathcal{E}|)$ في مسار عكسي واحد متكامل.
 
 ---
 
-## Beat 3: Interactive Python Scratchpad
+## Beat 3: Interactive Python Scratchpad | التحدي البرمجي التفاعلي
 
-Complete the `backward()` method on the `Value` node. Construct the topological order using a post-order DFS traversal, initialize `self.grad = 1.0`, and iterate through the reversed list calling each node's `_backward()`.
+Complete the `backward()` method on the `Value` node. Construct the topological ordering using a recursive post-order DFS traversal, initialize the seed gradient `self.grad = 1.0`, and iterate through the reversed list calling each node's `_backward()` closure.
 
 :::python-challenge{id="py-topological-sort-dag-backprop"}
 ---
@@ -90,8 +107,8 @@ class Value:
         other = other if isinstance(other, Value) else Value(other)
         out = Value(self.data + other.data, (self, other), '+')
         def _backward():
-            self.grad += out.grad
-            other.grad += out.grad
+            self.grad += 1.0 * out.grad
+            other.grad += 1.0 * out.grad
         out._backward = _backward
         return out
 
@@ -105,24 +122,50 @@ class Value:
         return out
 
     def backward(self):
-        # TODO: 1. Build topological order list using recursive DFS post-order traversal
-        # TODO: 2. Initialize self.grad = 1.0
-        # TODO: 3. Iterate through reversed topological list and execute node._backward()
-        pass
+        # Step 1: Build topological ordering using recursive DFS post-order traversal
+        topo = []
+        visited = set()
+        
+        def build_topo(v):
+            if v not in visited:
+                visited.add(v)
+                for child in v._prev:
+                    build_topo(child)
+                topo.append(v)
+                
+        build_topo(self)
+
+        # Step 2: Seed the root gradient (dL/dL = 1.0)
+        self.grad = 1.0
+
+        # Step 3: Iterate through reversed topological list and execute node._backward()
+        for node in reversed(topo):
+            node._backward()
 ```
 :::
 
 ---
 
-## Beat 4: Reality Transfer Challenge
+## Beat 4: Reality Transfer Challenge | اختبار الانتقال المعرفي الواقعي
 
 ### Transfer Question / سؤال نقل الأثر المعرفي
 
-What fatal issue arises if a programmer introduces a cycle into a computational graph (e.g. $A \to B \to A$) and calls `.backward()`?
+What fatal issue arises if a programmer introduces a cycle into a computational graph (e.g., $A \to B \to A$) and calls `.backward()`?
 
-* [x] A directed cycle violates the Directed Acyclic Graph (DAG) requirement, causing DFS topological sorting to enter an infinite recursion loop or fail to find a valid linear order; cyclic dependencies (such as in RNNs) must first be unrolled across discrete time steps.
+* [x] A directed cycle violates the Directed Acyclic Graph (DAG) requirement, causing DFS topological sorting to enter an infinite recursion loop or fail to find a valid linear order; cyclic dependencies (such as in Recurrent Neural Networks) must first be unrolled across discrete time steps into an acyclic spatial graph.
 * [ ] The floating-point values in the forward pass immediately overflow to `+inf`.
 * [ ] Gradients in cyclic graphs automatically cancel each other out to exactly zero.
 * [ ] Python's garbage collector automatically deletes all cyclical nodes before `.backward()` can execute.
 
-> **Insight:** Neural networks with internal recurrence (like RNNs or LSTMs) circumvent this by "unrolling through time" (Backpropagation Through Time, BPTT). Each time step creates a new copy of the hidden state vertex, transforming a cyclic temporal system into an acyclic spatial DAG.
+### Pedagogical Explanation & Distractor Analysis | التحليل البيداغوجي وتفكيك البدائل
+
+**Why the correct option is right:**
+Topological sorting is mathematically defined *only* on Directed Acyclic Graphs (DAGs). If a directed cycle exists ($A \to B \to A$), there is no well-defined starting point or valid permutation where every dependency precedes its consumer: $A$ depends on $B$, which depends on $A$. In software, a recursive DFS traversal will either recurse infinitely until triggering a Python `RecursionError` or fail to produce an order where all gradient contributions are finalized before passing. In recurrent neural architectures (RNNs, LSTMs), recurrence across time is handled by **Backpropagation Through Time (BPTT)**: the network is explicitly unrolled across discrete time steps $t = 1, \dots, T$, transforming temporal cycles into a strictly acyclic feedforward DAG.
+
+**Why the distractors are incorrect:**
+1. *The floating-point values in the forward pass immediately overflow...*: False. Cycles cause infinite graph recursion in the topological sorter, not an immediate numeric overflow during forward floating-point multiplication.
+2. *Gradients in cyclic graphs automatically cancel each other out...*: False. Gradients do not magically sum to zero; the algorithm cannot even establish an order to accumulate them.
+3. *Python's garbage collector automatically deletes all cyclical nodes...*: False. Modern Python uses a cyclic garbage collector that specifically handles reference cycles; it does not delete live objects in active use.
+
+*الشرح باللغة العربية:*
+يشترط الترتيب الطوبولوجي انعدام الحلقات الدائرية في الرسم البياني (DAG). فإذا وُجدت حلقة دائرية مثل $A \to B \to A$، يستحيل تحديد أي العقدتين يجب تقييمها أولاً، وستدخل خوارزمية البحث بالعمق في حلقة تكرار لا نهائية تفيض بسعة مكدس الاستدعاءات (`RecursionError`). لحل هذه المعضلة في الشبكات العصبية العودية (RNNs)، نقوم بفرد الشبكة عبر الزمن (Unrolling through time)، محولين التكرار الزمني إلى شبكة مكانية غير دائرية ومستقيمة تماماً.
