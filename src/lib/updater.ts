@@ -32,7 +32,7 @@ export interface GitHubReleaseInfo {
 
 declare const __APP_VERSION__: string | undefined;
 export const CURRENT_APP_VERSION: string =
-  typeof __APP_VERSION__ !== 'undefined' && __APP_VERSION__ ? __APP_VERSION__ : '1.0.2';
+  typeof __APP_VERSION__ !== 'undefined' && __APP_VERSION__ ? __APP_VERSION__ : '1.0.3';
 const GITHUB_REPO = 'zuikre/okvir';
 
 /**

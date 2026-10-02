@@ -6,8 +6,32 @@
 
 [CmdletBinding()]
 param (
-    [string]$Version = "latest"
+    [string]$Version = "latest",
+    [switch]$Help,
+    [switch]$h
 )
+
+if ($Help -or $h) {
+    Write-Host "
+OKVIR Official PowerShell Installer (Windows 10/11)
+The Framework for AI Education: Zero Setup • Pure Intuition • 100% Local
+
+USAGE:
+  irm https://raw.githubusercontent.com/zuikre/okvir/main/install.ps1 | iex
+  .\install.ps1 [-Version <version>] [-Help]
+
+PARAMETERS:
+  -Version <string>   Install a specific release version (default: 'latest')
+  -Help, -h           Show this installer help guide and exit
+
+AFTER INSTALLATION:
+  Run 'okvir --help' in your terminal for full CLI commands, authoring tools, and diagnostics.
+
+Repository: https://github.com/zuikre/okvir
+Author:     Zakarya Roubhi <roubhizakarya@gmail.com>
+" -ForegroundColor Cyan
+    exit 0
+}
 
 $ErrorActionPreference = "Stop"
 
@@ -25,32 +49,40 @@ $ExePath = "$BinDir\okvir.exe"
 
 # 1. Detect Architecture
 $Arch = if ([System.Environment]::Is64BitOperatingSystem) { "x64" } else { "x86" }
-Write-Host "==> Detected Architecture: Windows $Arch" -ForegroundColor Gray
+Write-Host "==> [1/5] Verifying Windows Architecture & Environment..." -ForegroundColor Cyan
+Write-Host "    • Architecture: Windows $Arch (64-bit)" -ForegroundColor Gray
+Write-Host "    • Install Mode: Current-User (Zero UAC/Admin Privileges Required)" -ForegroundColor Gray
 
 # 2. Prepare Installation Directory
+Write-Host ""
+Write-Host "==> [2/5] Preparing Target Directories..." -ForegroundColor Cyan
+Write-Host "    • Application:  $InstallDir" -ForegroundColor Gray
+Write-Host "    • Binaries:     $BinDir" -ForegroundColor Gray
+Write-Host "    • Cache:        $env:USERPROFILE\.okvir\cache" -ForegroundColor Gray
 New-Item -ItemType Directory -Path $BinDir -Force | Out-Null
 New-Item -ItemType Directory -Path "$env:USERPROFILE\.okvir\cache" -Force | Out-Null
 
-Write-Host "==> Installation Target: $InstallDir" -ForegroundColor Gray
-
 # 3. Resolve GitHub Release Version
+Write-Host ""
+Write-Host "==> [3/5] Resolving Latest Release Version from GitHub ($Repo)..." -ForegroundColor Cyan
 $ResolvedVersion = $Version.TrimStart("v")
 if ($Version -eq "latest") {
     try {
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        Write-Host "==> Resolving latest release version from GitHub ($Repo)..." -ForegroundColor Gray
         $LatestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases/latest" -UseBasicParsing -TimeoutSec 10
         if ($LatestRelease.tag_name) {
             $ResolvedVersion = $LatestRelease.tag_name.TrimStart("v")
         } else {
-            $ResolvedVersion = "1.0.1"
+            $ResolvedVersion = "1.0.3"
         }
     } catch {
-        $ResolvedVersion = "1.0.1"
+        $ResolvedVersion = "1.0.3"
     }
 }
+Write-Host "    • Resolved Target Version: v$ResolvedVersion" -ForegroundColor Gray
 
-Write-Host "==> Fetching Okvir Native Desktop Application (v$ResolvedVersion)..." -ForegroundColor Gray
+Write-Host ""
+Write-Host "==> [4/5] Downloading Native Okvir Desktop Engine (v$ResolvedVersion)..." -ForegroundColor Cyan
 
 # 4. Resolve Download URL
 $PossibleAssets = @(
@@ -114,16 +146,82 @@ if (-not $DownloadSuccess) {
     exit 1
 }
 
-# 4. Ensure BinDir is in User PATH
-$UserPath = [System.Environment]::GetEnvironmentVariable("PATH", "User")
-if ($UserPath -notlike "*$BinDir*") {
-    Write-Host "==> Appending $BinDir to User PATH environment variable..." -ForegroundColor Gray
-    [System.Environment]::SetEnvironmentVariable("PATH", "$UserPath;$BinDir", "User")
-    $env:PATH = "$env:PATH;$BinDir"
+# 5. Locate Installed Desktop Executable & Create Terminal Launchers
+Write-Host ""
+Write-Host "==> [5/5] Integrating Start Menu Shortcuts & Terminal Command..." -ForegroundColor Cyan
+
+$PotentialExes = @(
+    "$env:LOCALAPPDATA\Programs\OKVIR\OKVIR.exe",
+    "$env:LOCALAPPDATA\Programs\okvir\OKVIR.exe",
+    "$env:LOCALAPPDATA\Programs\OKVIR\okvir.exe",
+    "$env:LOCALAPPDATA\Programs\okvir\okvir.exe",
+    "$InstallDir\OKVIR.exe",
+    "$InstallDir\okvir.exe",
+    "$env:ProgramFiles\OKVIR\OKVIR.exe",
+    "$env:ProgramFiles\okvir\okvir.exe",
+    "${env:ProgramFiles(x86)}\OKVIR\OKVIR.exe",
+    "${env:ProgramFiles(x86)}\okvir\okvir.exe"
+)
+
+$InstalledExe = $null
+foreach ($p in $PotentialExes) {
+    if (Test-Path $p) {
+        $InstalledExe = $p
+        break
+    }
 }
 
+if ($InstalledExe) {
+    # Generate batch wrapper so 'okvir' works in CMD, PowerShell, and Run dialog without admin rights
+    $CmdWrapper = "@echo off`r`nstart `"`" `"$InstalledExe`" %*`r`n"
+    [System.IO.File]::WriteAllText("$BinDir\okvir.cmd", $CmdWrapper, [System.Text.Encoding]::ASCII)
+
+    # Generate PowerShell wrapper
+    $Ps1Wrapper = "& `"$InstalledExe`" `$args`r`n"
+    [System.IO.File]::WriteAllText("$BinDir\okvir.ps1", $Ps1Wrapper, [System.Text.Encoding]::UTF8)
+
+    Write-Host "    • Desktop Executable: $InstalledExe" -ForegroundColor Gray
+    Write-Host "    • Terminal Launcher:  $BinDir\okvir.cmd" -ForegroundColor Gray
+}
+
+# 6. Ensure BinDir is in User PATH
+$UserPath = [System.Environment]::GetEnvironmentVariable("PATH", "User")
+if ($UserPath -notlike "*$BinDir*") {
+    Write-Host "    • Registering User PATH environment variable..." -ForegroundColor Gray
+    [System.Environment]::SetEnvironmentVariable("PATH", "$UserPath;$BinDir", "User")
+}
+$env:PATH = "$env:PATH;$BinDir"
+Write-Host "    • Terminal command 'okvir' successfully registered" -ForegroundColor Gray
+
 Write-Host "
-✔ Okvir installation complete!
-Launch Okvir by opening a new terminal and running:
-  okvir
+  ╔══════════════════════════════════════════════════════╗
+  ║       ✔ Okvir Desktop Installed Successfully!        ║
+  ╚══════════════════════════════════════════════════════╝
+
+  🚀 How to Launch Okvir:
+
+  1. Start Menu & Search (Super / Windows Key):
+     • Press the ⊞ Windows key and search for `"Okvir`"
+     • Or click the Okvir shortcut on your Desktop or Start Menu
+
+  2. Fast Run Dialog (Win + R):
+     • Press Win + R, type `"okvir`", and press Enter to launch anytime from anywhere!
+
+  3. Terminal / Command Line (PowerShell, CMD, Windows Terminal):
+     • Run: okvir
+
+     * Note for currently open terminal windows:
+       Restart your terminal window to reload PATH, or run:
+       `$env:PATH = [System.Environment]::GetEnvironmentVariable('PATH','User') + ';' + `$env:PATH
+
+  4. Explore Commands, CLI & Authoring Tools:
+     • Run: okvir --help (view complete command palette and usage guide)
+     • Run: okvir doctor (system & environment health check)
+     • Run: okvir version (inspect version and check for updates)
+
+  ────────────────────────────────────────────────────────
+  ⭐ Star the repository:    https://github.com/$Repo
+  🐛 Report issues / bugs:   https://github.com/$Repo/issues
+  ✉  Author / Inquiries:     Zakarya Roubhi <roubhizakarya@gmail.com>
+  ────────────────────────────────────────────────────────
 " -ForegroundColor Green

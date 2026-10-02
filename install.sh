@@ -12,6 +12,53 @@ OKVIR_VERSION="${OKVIR_VERSION:-latest}"
 INSTALL_DIR="${INSTALL_DIR:-${HOME}/.local/bin}"
 APP_DIR="${APP_DIR:-${HOME}/.okvir}"
 
+show_help() {
+  cat << EOF
+OKVIR Official Installer (Linux & macOS)
+The Framework for AI Education: Zero Setup • Pure Intuition • 100% Local
+
+USAGE:
+  curl -fsSL https://raw.githubusercontent.com/zuikre/okvir/main/install.sh | bash [options]
+  ./install.sh [options]
+
+OPTIONS:
+  -v, --version <version>   Install a specific release version (e.g. 1.0.2, default: latest)
+  -d, --dir <directory>     Custom binary install directory (default: ~/.local/bin)
+  -h, --help                Show this installer help guide and exit
+
+ENVIRONMENT VARIABLES:
+  OKVIR_VERSION             Target version (default: latest)
+  INSTALL_DIR               Target binary installation directory (default: ~/.local/bin)
+  APP_DIR                   Application data directory (default: ~/.okvir)
+
+AFTER INSTALLATION:
+  Run 'okvir --help' in your terminal for full CLI commands, authoring tools, and diagnostics.
+
+Repository: https://github.com/zuikre/okvir
+Author:     Zakarya Roubhi <roubhizakarya@gmail.com>
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    -v|--version)
+      OKVIR_VERSION="$2"
+      shift 2
+      ;;
+    -d|--dir)
+      INSTALL_DIR="$2"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
 # Text Styling
 BOLD="$(tput bold 2>/dev/null || echo '')"
 RESET="$(tput sgr0 2>/dev/null || echo '')"
@@ -60,8 +107,6 @@ case "${ARCH}" in
     ;;
 esac
 
-echo "${BOLD}==> Detected Environment:${RESET} ${PLATFORM} (${TARGET_ARCH})"
-
 # 2. Check for required downloader
 if command -v curl >/dev/null 2>&1; then
   DOWNLOADER="curl"
@@ -82,16 +127,24 @@ download_file() {
   fi
 }
 
+echo "${CYAN}${BOLD}==> [1/5] Verifying System Architecture & Downloader...${RESET}"
+echo "    • Operating System: ${PLATFORM}"
+echo "    • Architecture:     ${TARGET_ARCH}"
+echo "    • Downloader:       ${DOWNLOADER}"
+
 # 3. Create Installation Directories
+echo ""
+echo "${CYAN}${BOLD}==> [2/5] Preparing Target Directories...${RESET}"
+echo "    • Binary Directory: ${INSTALL_DIR}"
+echo "    • Cache Directory:  ${APP_DIR}/cache"
 mkdir -p "${INSTALL_DIR}"
 mkdir -p "${APP_DIR}/cache"
 
-echo "${BOLD}==> Preparing Target Directory:${RESET} ${INSTALL_DIR}"
-
 # 4. Resolve GitHub Release Version
+echo ""
+echo "${CYAN}${BOLD}==> [3/5] Resolving Latest Release Version from GitHub (${OKVIR_REPO})...${RESET}"
 RESOLVED_VERSION=""
 if [ "${OKVIR_VERSION}" = "latest" ]; then
-  echo "${BOLD}==> Resolving latest release version from GitHub (${OKVIR_REPO})...${RESET}"
   LATEST_API_JSON="$(curl -fsSL -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/${OKVIR_REPO}/releases/latest" 2>/dev/null || true)"
   if [ -n "${LATEST_API_JSON}" ]; then
     RESOLVED_TAG="$(echo "${LATEST_API_JSON}" | grep '"tag_name":' | head -n1 | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')"
@@ -99,13 +152,15 @@ if [ "${OKVIR_VERSION}" = "latest" ]; then
   fi
   # Fallback to current repository package version if rate-limited or offline
   if [ -z "${RESOLVED_VERSION}" ]; then
-    RESOLVED_VERSION="1.0.1"
+    RESOLVED_VERSION="1.0.3"
   fi
 else
   RESOLVED_VERSION="${OKVIR_VERSION#v}"
 fi
+echo "    • Resolved Target Version: v${RESOLVED_VERSION}"
 
-echo "${BOLD}==> Fetching Okvir Native Desktop Application (v${RESOLVED_VERSION})...${RESET}"
+echo ""
+echo "${CYAN}${BOLD}==> [4/5] Downloading Native Okvir Desktop Engine (v${RESOLVED_VERSION})...${RESET}"
 
 INSTALLED=false
 
@@ -115,7 +170,7 @@ if [ "${PLATFORM}" = "linux" ]; then
 
   TMP_DIR="$(mktemp -d)"
 
-  echo "Downloading Linux desktop application..."
+  echo "    • Fetching Linux bundle for ${ARCH_SUFFIX}..."
   if download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${INSTALL_DIR}/okvir" 2>/dev/null || \
      download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${INSTALL_DIR}/okvir" 2>/dev/null || \
      download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" 2>/dev/null || \
@@ -128,6 +183,12 @@ if [ "${PLATFORM}" = "linux" ]; then
       mv "${TMP_DIR}/okvir" "${INSTALL_DIR}/okvir"
     fi
     chmod +x "${INSTALL_DIR}/okvir"
+
+    echo ""
+    echo "${CYAN}${BOLD}==> [5/5] Integrating System Launcher & Application Shortcuts...${RESET}"
+    echo "    • Installing FreeDesktop desktop entry (.desktop)"
+    echo "    • Installing high-resolution SVG and PNG icons"
+    echo "    • Configuring CLI terminal launcher at ${INSTALL_DIR}/okvir"
 
     # Install FreeDesktop Application Shortcut & Icons
     mkdir -p "${HOME}/.local/share/applications"
@@ -152,6 +213,7 @@ if [ "${PLATFORM}" = "linux" ]; then
     echo "${RESOLVED_VERSION}" > "${APP_DIR}/version"
 
     update-desktop-database "${HOME}/.local/share/applications" >/dev/null 2>&1 || true
+    echo "    • Refreshing system application database (Super key search ready)"
     rm -rf "${TMP_DIR}"
     INSTALLED=true
     echo "${GREEN}✔ Installed Native Desktop Executable (v${RESOLVED_VERSION}) to ${INSTALL_DIR}/okvir${RESET}"
@@ -194,8 +256,36 @@ if [[ ":${PATH}:" != *":${INSTALL_DIR}:"* ]]; then
 fi
 
 echo ""
-echo "${GREEN}${BOLD}✔ Okvir installation complete!${RESET}"
-echo "Launch Okvir by running:"
-echo "  ${CYAN}${BOLD}okvir${RESET}"
+echo "${GREEN}${BOLD}  ╔══════════════════════════════════════════════════════╗${RESET}"
+echo "${GREEN}${BOLD}  ║       ✔ Okvir Desktop Installed Successfully!        ║${RESET}"
+echo "${GREEN}${BOLD}  ╚══════════════════════════════════════════════════════╝${RESET}"
 echo ""
-echo "Star the project on GitHub: https://github.com/${OKVIR_REPO}"
+echo "${BOLD}  🚀 How to Launch Okvir:${RESET}"
+echo ""
+if [ "${PLATFORM}" = "macos" ]; then
+  echo "  ${CYAN}${BOLD}1. Spotlight & Applications (GUI):${RESET}"
+  echo "     • Press ${BOLD}⌘ Space${RESET} and type ${BOLD}\"Okvir\"${RESET}"
+  echo "     • Or open ${BOLD}/Applications/Okvir.app${RESET} directly from Finder or Launchpad"
+  echo ""
+  echo "  ${CYAN}${BOLD}2. Terminal / Command Line:${RESET}"
+  echo "     • Run: ${BOLD}okvir${RESET}"
+else
+  echo "  ${CYAN}${BOLD}1. Application Launcher (Super Key / Desktop):${RESET}"
+  echo "     • Press the ${BOLD}Super${RESET} (Windows) key and search for ${BOLD}\"Okvir\"${RESET}"
+  echo "     • Or open Okvir from your Applications menu under ${BOLD}Education${RESET} / ${BOLD}Science${RESET}"
+  echo ""
+  echo "  ${CYAN}${BOLD}2. Terminal / Command Line:${RESET}"
+  echo "     • Run: ${BOLD}okvir${RESET}"
+fi
+echo ""
+echo "  ${CYAN}${BOLD}3. Explore Commands, CLI & Authoring Tools:${RESET}"
+echo "     • Run ${BOLD}okvir --help${RESET} for the complete command palette and usage guide"
+echo "     • Run ${BOLD}okvir doctor${RESET} to verify system and curriculum health"
+echo "     • Run ${BOLD}okvir version${RESET} to inspect version and check for updates"
+echo ""
+echo "  ────────────────────────────────────────────────────────"
+echo "  ⭐ ${BOLD}Star the repository:${RESET}    https://github.com/${OKVIR_REPO}"
+echo "  🐛 ${BOLD}Report issues / bugs:${RESET}   https://github.com/${OKVIR_REPO}/issues"
+echo "  ✉  ${BOLD}Author / Inquiries:${RESET}     Zakarya Roubhi <roubhizakarya@gmail.com>"
+echo "  ────────────────────────────────────────────────────────"
+echo ""

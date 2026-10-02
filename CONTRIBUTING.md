@@ -22,7 +22,7 @@ We believe that mastering STEM concepts should be driven by **geometric intuitio
 
 ## Code of Conduct
 
-All contributors and community participants are expected to uphold our [Code of Conduct](CODE_OF_CONDUCT.md). Please report unacceptable behavior to **contact@okvir.dev**.
+All contributors and community participants are expected to uphold our [Code of Conduct](CODE_OF_CONDUCT.md). Please report unacceptable behavior to **roubhizakarya@gmail.com**.
 
 ---
 

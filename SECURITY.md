@@ -18,7 +18,7 @@ The Okvir development team takes the security and integrity of our interactive d
 If you discover a potential security vulnerability in Okvir (including the desktop shell, WebAssembly Python sandbox, SQLite storage layer, or packaging pipeline), please **do not open a public issue**. Instead, report it privately:
 
 1. **Email:** Send full details, reproduction steps, and proof-of-concept code to:  
-   **`security@okvir.dev`** (or `contact@okvir.dev`)
+   **`roubhizakarya@gmail.com`**
 2. **PGP / Sensitive Details:** If you wish to encrypt your communication, please request our security team's PGP key via email before transmitting sensitive exploits.
 3. **Response Timeline:**
    * **Acknowledgment:** Within **24 hours**.

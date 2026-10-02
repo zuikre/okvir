@@ -4,7 +4,7 @@
 ### The Open-Source, Interactive Desktop Framework for Learning Data Science, Econometrics & AI from the Ground Up
 
 [![CI / CD Status](https://img.shields.io/badge/CI%2FCD-Passing-10b981.svg?style=flat-square&logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
-[![Release](https://img.shields.io/badge/release-v1.0.1-emerald.svg?style=flat-square)](https://github.com/zuikre/okvir/releases)
+[![Release](https://img.shields.io/badge/release-v1.0.3-emerald.svg?style=flat-square)](https://github.com/zuikre/okvir/releases)
 [![Sponsor](https://img.shields.io/badge/Sponsor-Card%20%7C%20Crypto-26a17b.svg?style=flat-square&logo=githubsponsors&logoColor=white)](https://nowpayments.io/donation/okvir)
 [![License: MIT or Apache-2.0](https://img.shields.io/badge/Engine-MIT%20%7C%20Apache--2.0-3b82f6.svg?style=flat-square)](LICENSE-MIT)
 [![Curriculum: CC-BY-SA 4.0](https://img.shields.io/badge/Curriculum-CC--BY--SA%204.0-f59e0b.svg?style=flat-square)](https://creativecommons.org/licenses/by-sa/4.0/)
@@ -330,6 +330,17 @@ okvir verify ./dist/course.okvir
 
 # 6. Explore decentralized community curriculum packs
 okvir registry [query]
+
+# 7. System health check & environment diagnostics
+okvir doctor
+
+# 8. Check version & update desktop engine & CLI
+okvir version
+okvir update
+
+# 9. Launch native desktop application or star repository
+okvir open
+okvir rate
 ```
 
 For authoring guidelines, see our [Curriculum Authoring Specification](CURRICULUM_SPEC.md).
@@ -357,7 +368,11 @@ For vulnerability reporting, see [SECURITY.md](SECURITY.md).
 
 **Zakarya Roubhi (روبحي زكرياء)**  
 *Data Scientist • Valedictorian MSc Data Science (ESE Oran) • Co-Founder & CTO of Podacium*  
-*Founder & Benevolent Dictator for Life (BDFL) of Okvir*
+*Founder & Benevolent Dictator for Life (BDFL) of Okvir*  
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Zakarya%20Roubhi-0077b5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/zakaryaroubhi/?locale=ar)
+[![GitHub](https://img.shields.io/badge/GitHub-zuikre-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/zuikre)
+[![Email](https://img.shields.io/badge/Email-roubhizakarya%40gmail.com-ea4335?style=flat-square&logo=gmail&logoColor=white)](mailto:roubhizakarya@gmail.com)
 
 > *"Let’s build the next generation of data scientists on intuition, not memorization."*
 

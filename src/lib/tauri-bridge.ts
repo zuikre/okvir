@@ -106,7 +106,7 @@ class TauriBridge {
         }
       }
     }
-    return '1.0.2';
+    return '1.0.3';
   }
 
   async getUserProfile(): Promise<UserProfileDTO> {

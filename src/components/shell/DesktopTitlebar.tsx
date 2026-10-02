@@ -147,7 +147,7 @@ export const DesktopTitlebar: React.FC = () => {
               OKVIR
             </span>
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-[var(--text-secondary)] border border-[var(--border-strong)]">
-              v{appVersion || '1.0.2'}
+              v{appVersion || '1.0.3'}
             </span>
             {availableUpdate && (
               <button

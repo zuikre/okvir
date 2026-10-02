@@ -1,9 +1,18 @@
 {
   "name": "okvir",
   "private": true,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "OKVIR: The Open-Source Desktop Framework for Learning Data Science, Econometrics & AI",
-  "author": "Zakarya Roubhi <contact@okvir.dev>",
+  "author": "Zakarya Roubhi <roubhizakarya@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zuikre/okvir.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zuikre/okvir/issues",
+    "email": "roubhizakarya@gmail.com"
+  },
+  "homepage": "https://github.com/zuikre/okvir#readme",
   "license": "MIT OR Apache-2.0",
   "type": "module",
   "bin": {

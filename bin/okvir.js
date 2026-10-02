@@ -26,7 +26,7 @@ function resolveVersion() {
       }
     }
   } catch (_) {}
-  return '1.0.2';
+  return '1.0.3';
 }
 
 const VERSION = resolveVersion();
@@ -38,22 +38,38 @@ const HELP_TEXT = `
   USAGE:
     okvir <command> [options]
 
-  COMMANDS:
-    init <course-name>        Scaffold a new interactive curriculum repository
+  CORE COMMANDS:
+    open, launch              Launch the Okvir Native Desktop Application
     dev                       Launch live-reload lesson previewer server
     test [dir]                Run AST validation and test cases on .okvir.md lessons
+    init <course-name>        Scaffold a new interactive curriculum repository
     pack [dir] [output.okvir] Compile lesson assets into seekable .okvir container
     verify <file.okvir>       Cryptographically inspect and verify .okvir binary package
     registry [query]          Explore decentralized community curriculum packs
-    help                      Show this help message
-    version                   Print okvir CLI version
+
+  MAINTENANCE & DIAGNOSTICS:
+    version, -v, --version    Show version info, environment diagnostics & update status
+    doctor, info              Run comprehensive system diagnostic & environment audit
+    update, --update          Check for updates & upgrade Okvir desktop app and CLI
+    clean                     Clean local package caches and temporary build artifacts
+
+  COMMUNITY & LINKS:
+    rate, star                Open GitHub repository to star and rate Okvir
+    docs                      Open official documentation and curriculum specifications
+    issue, bug                Report a bug or submit a feature request on GitHub
+    sponsor, donate           Support independent open-source development
+    help, -h, --help          Show this help message
 
   EXAMPLES:
+    $ okvir open
+    $ okvir version
+    $ okvir rate
+    $ okvir doctor
+    $ okvir update
     $ okvir init econometrics-masterclass
     $ okvir dev
     $ okvir test ./curriculum
     $ okvir pack ./curriculum ./dist/econometrics.okvir
-    $ okvir verify ./dist/econometrics.okvir
     $ okvir registry causal
 `;
 
@@ -424,7 +440,7 @@ async function runVerify(filePath) {
 
 async function runRegistry(query = '') {
   logBanner();
-  console.log(`\x1b[36mQuerying Decentralized Community Registry (github.com/okvir-org/registry)...\x1b[0m\n`);
+  console.log(`\x1b[36mQuerying Decentralized Community Registry (github.com/zuikre/okvir)...\x1b[0m\n`);
 
   const PACKS = [
     {
@@ -480,7 +496,416 @@ async function runRegistry(query = '') {
     console.log(`    Install:     okvir pack install ${pack.id}\n`);
   });
 
-  console.log(`To publish your own course, submit a Pull Request to https://github.com/okvir-org/registry\n`);
+  console.log(`To publish your own course, submit a Pull Request to https://github.com/zuikre/okvir\n`);
+}
+
+function logLaunchHelp(ver = VERSION) {
+  const isMac = process.platform === 'darwin';
+  const isWin = process.platform === 'win32';
+
+  console.log(`\x1b[32m  ╔══════════════════════════════════════════════════════╗\x1b[0m`);
+  console.log(`\x1b[32m  ║       ✔ Okvir Desktop Engine (v${ver}) Ready!          ║\x1b[0m`);
+  console.log(`\x1b[32m  ╚══════════════════════════════════════════════════════╝\x1b[0m\n`);
+
+  console.log(`  \x1b[1m🚀 How to Launch Okvir:\x1b[0m\n`);
+  if (isMac) {
+    console.log(`  \x1b[36m\x1b[1m1. Spotlight & Applications (GUI):\x1b[0m`);
+    console.log(`     • Press \x1b[1m⌘ Space\x1b[0m and type \x1b[1m"Okvir"\x1b[0m`);
+    console.log(`     • Or open \x1b[1m/Applications/Okvir.app\x1b[0m directly from Finder\n`);
+  } else if (isWin) {
+    console.log(`  \x1b[36m\x1b[1m1. Start Menu & Search (Super / Windows Key):\x1b[0m`);
+    console.log(`     • Press the \x1b[1m⊞ Windows\x1b[0m key and search for \x1b[1m"Okvir"\x1b[0m`);
+    console.log(`     • Or click the Okvir shortcut on your Desktop or Start Menu\n`);
+    console.log(`  \x1b[36m\x1b[1m2. Fast Run Dialog (Win + R):\x1b[0m`);
+    console.log(`     • Press \x1b[1mWin + R\x1b[0m, type \x1b[1m"okvir"\x1b[0m, and press Enter to launch instantly!\n`);
+  } else {
+    console.log(`  \x1b[36m\x1b[1m1. Application Launcher (Super Key / Desktop):\x1b[0m`);
+    console.log(`     • Press the \x1b[1mSuper\x1b[0m (Windows) key and search for \x1b[1m"Okvir"\x1b[0m`);
+    console.log(`     • Or open Okvir from your Applications menu under \x1b[1mEducation\x1b[0m / \x1b[1mScience\x1b[0m\n`);
+  }
+
+  console.log(`  \x1b[36m\x1b[1m${isWin ? '3' : '2'}. Terminal / Command Line:\x1b[0m`);
+  console.log(`     • Run: \x1b[1mokvir\x1b[0m\n`);
+
+  console.log(`  \x1b[36m\x1b[1m${isWin ? '4' : '3'}. Developer & Authoring CLI:\x1b[0m`);
+  console.log(`     • Test lesson modules:     \x1b[1mokvir test [curriculum-dir]\x1b[0m`);
+  console.log(`     • Browse course registry:  \x1b[1mokvir registry\x1b[0m\n`);
+
+  console.log(`  ────────────────────────────────────────────────────────`);
+  console.log(`  ⭐ \x1b[1mStar the repository:\x1b[0m    https://github.com/zuikre/okvir`);
+  console.log(`  🐛 \x1b[1mReport issues / bugs:\x1b[0m   https://github.com/zuikre/okvir/issues`);
+  console.log(`  ✉  \x1b[1mAuthor / Inquiries:\x1b[0m     Zakarya Roubhi <roubhizakarya@gmail.com>`);
+  console.log(`  ────────────────────────────────────────────────────────\n`);
+}
+
+async function runUpdate(force = false) {
+  logBanner();
+  console.log(`\x1b[36m==> Checking for latest Okvir release from GitHub (zuikre/okvir)...\x1b[0m`);
+  console.log(`    Current installed version: v${VERSION}\n`);
+
+  let latestVersion = VERSION;
+  let hasUpdate = false;
+
+  try {
+    const res = await fetch('https://api.github.com/repos/zuikre/okvir/releases/latest', {
+      headers: { 'User-Agent': 'okvir-cli' },
+    });
+    if (res.ok) {
+      const releaseData = await res.json();
+      if (releaseData.tag_name) {
+        latestVersion = releaseData.tag_name.replace(/^v/, '').trim();
+      }
+    }
+  } catch (err) {
+    console.log(`\x1b[33mNotice: Could not connect to GitHub API (${err.message}). Proceeding with update check...\x1b[0m\n`);
+  }
+
+  const vCurrParts = VERSION.split('.').map((n) => parseInt(n, 10) || 0);
+  const vLateParts = latestVersion.split('.').map((n) => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(vCurrParts.length, vLateParts.length); i++) {
+    const c = vCurrParts[i] || 0;
+    const l = vLateParts[i] || 0;
+    if (l > c) {
+      hasUpdate = true;
+      break;
+    }
+    if (l < c) break;
+  }
+
+  if (!hasUpdate && !force) {
+    console.log(`\x1b[32m✔ You are already running the latest version of Okvir (v${VERSION})!\x1b[0m\n`);
+    logLaunchHelp(VERSION);
+    console.log(`  (To force a re-installation or repair, run: okvir update --force)\n`);
+    return;
+  }
+
+  if (hasUpdate) {
+    console.log(`\x1b[32m🎉 A new version of Okvir is available: v${VERSION} ➔ v${latestVersion}!\x1b[0m\n`);
+  } else {
+    console.log(`\x1b[36m==> Forcing re-installation of Okvir v${VERSION}...\x1b[0m\n`);
+  }
+
+  console.log(`\x1b[36m==> Running official platform installer to upgrade Okvir...\x1b[0m\n`);
+
+  return new Promise((resolve, reject) => {
+    if (process.platform === 'win32') {
+      const psScript = 'irm https://raw.githubusercontent.com/zuikre/okvir/main/install.ps1 | iex';
+      const child = spawn('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', psScript], {
+        stdio: 'inherit',
+      });
+      child.on('close', (code) => {
+        if (code === 0) resolve();
+        else reject(new Error(`Update exited with code ${code}`));
+      });
+    } else {
+      const shScript = 'curl -fsSL https://raw.githubusercontent.com/zuikre/okvir/main/install.sh | bash';
+      const child = spawn('bash', ['-c', shScript], {
+        stdio: 'inherit',
+      });
+      child.on('close', (code) => {
+        if (code === 0) resolve();
+        else reject(new Error(`Update exited with code ${code}`));
+      });
+    }
+  });
+}
+
+function openUrl(url) {
+  let cmd;
+  let args;
+  if (process.platform === 'win32') {
+    cmd = 'cmd.exe';
+    args = ['/c', 'start', '""', url];
+  } else if (process.platform === 'darwin') {
+    cmd = 'open';
+    args = [url];
+  } else {
+    cmd = 'xdg-open';
+    args = [url];
+  }
+  try {
+    const p = spawn(cmd, args, { stdio: 'ignore', detached: true });
+    p.unref();
+  } catch (_) {}
+}
+
+function findDesktopApp() {
+  const home = process.env.HOME || process.env.USERPROFILE || '';
+  if (process.platform === 'win32') {
+    const localAppData = process.env.LOCALAPPDATA || path.join(home, 'AppData', 'Local');
+    const progFiles = process.env.ProgramFiles || 'C:\\Program Files';
+    const progFilesX86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)';
+    const candidates = [
+      path.join(localAppData, 'Programs', 'OKVIR', 'OKVIR.exe'),
+      path.join(localAppData, 'Programs', 'okvir', 'OKVIR.exe'),
+      path.join(localAppData, 'Programs', 'OKVIR', 'okvir.exe'),
+      path.join(localAppData, 'Programs', 'okvir', 'okvir.exe'),
+      path.join(progFiles, 'OKVIR', 'OKVIR.exe'),
+      path.join(progFiles, 'okvir', 'OKVIR.exe'),
+      path.join(progFilesX86, 'OKVIR', 'OKVIR.exe'),
+    ];
+    for (const c of candidates) {
+      if (fs.existsSync(c)) return c;
+    }
+  } else if (process.platform === 'darwin') {
+    const candidates = [
+      '/Applications/Okvir.app/Contents/MacOS/okvir',
+      path.join(home, 'Applications', 'Okvir.app', 'Contents', 'MacOS', 'okvir'),
+    ];
+    for (const c of candidates) {
+      if (fs.existsSync(c)) return c;
+    }
+  } else {
+    // Linux
+    const candidates = [
+      path.join(home, '.local', 'bin', 'okvir'),
+      '/usr/local/bin/okvir',
+      '/usr/bin/okvir',
+    ];
+    for (const c of candidates) {
+      if (fs.existsSync(c)) {
+        try {
+          const stat = fs.statSync(c);
+          if (stat.isFile() && (stat.mode & 0o111)) {
+            const buf = Buffer.alloc(4);
+            const fd = fs.openSync(c, 'r');
+            fs.readSync(fd, buf, 0, 4, 0);
+            fs.closeSync(fd);
+            // Check for ELF executable binary header
+            if (buf[0] === 0x7f && buf[1] === 0x45 && buf[2] === 0x4c && buf[3] === 0x46) {
+              return c;
+            }
+          }
+        } catch (_) {}
+      }
+    }
+  }
+  return null;
+}
+
+async function runOpen() {
+  const appPath = findDesktopApp();
+  if (appPath) {
+    console.log(`\x1b[32m✔ Launching Okvir Desktop Application...\x1b[0m`);
+    console.log(`  Binary: ${appPath}\n`);
+    try {
+      const child = spawn(appPath, [], { detached: true, stdio: 'ignore' });
+      child.unref();
+      process.exit(0);
+    } catch (err) {
+      console.error(`\x1b[31mFailed to launch executable (${err.message}).\x1b[0m`);
+    }
+  } else {
+    logBanner();
+    console.log(`\x1b[33mNotice: Okvir Native Desktop Application binary was not found.\x1b[0m\n`);
+    console.log(`To install or update the desktop application, run:`);
+    console.log(`  \x1b[36mokvir update\x1b[0m\n`);
+    console.log(`Or download the latest release installer directly from:`);
+    console.log(`  \x1b[4mhttps://github.com/zuikre/okvir/releases\x1b[0m\n`);
+  }
+}
+
+async function runVersion(short = false) {
+  if (short) {
+    console.log(VERSION);
+    return;
+  }
+
+  logBanner();
+  console.log(`  \x1b[1mOKVIR CLI:\x1b[0m        v${VERSION}`);
+  console.log(`  \x1b[1mNode.js Runtime:\x1b[0m  ${process.version}`);
+  console.log(`  \x1b[1mArchitecture:\x1b[0m     ${process.platform} (${process.arch})`);
+  console.log(`  \x1b[1mRepository:\x1b[0m       https://github.com/zuikre/okvir`);
+  console.log(`  \x1b[1mAuthor:\x1b[0m           Zakarya Roubhi <roubhizakarya@gmail.com>`);
+
+  const desktopApp = findDesktopApp();
+  if (desktopApp) {
+    console.log(`  \x1b[1mDesktop App:\x1b[0m      ${desktopApp} (\x1b[32minstalled\x1b[0m)`);
+  } else {
+    console.log(`  \x1b[1mDesktop App:\x1b[0m      \x1b[33mNot found (run 'okvir update' to install)\x1b[0m`);
+  }
+  console.log('');
+
+  process.stdout.write(`  Checking for updates from GitHub... `);
+  try {
+    const res = await fetch('https://api.github.com/repos/zuikre/okvir/releases/latest', {
+      headers: { 'User-Agent': 'okvir-cli' },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const latest = (data.tag_name || '').replace(/^v/, '').trim();
+      const vCurrParts = VERSION.split('.').map((n) => parseInt(n, 10) || 0);
+      const vLateParts = latest.split('.').map((n) => parseInt(n, 10) || 0);
+      let isNewer = false;
+      for (let i = 0; i < Math.max(vCurrParts.length, vLateParts.length); i++) {
+        const c = vCurrParts[i] || 0;
+        const l = vLateParts[i] || 0;
+        if (l > c) { isNewer = true; break; }
+        if (l < c) break;
+      }
+      if (isNewer) {
+        console.log(`\x1b[33m\x1b[1m⬆ Update available: v${VERSION} ➔ v${latest}!\x1b[0m`);
+        console.log(`  Run \x1b[36mokvir update\x1b[0m to install the latest release.\n`);
+      } else {
+        console.log(`\x1b[32m✔ You are using the latest version of Okvir!\x1b[0m\n`);
+      }
+    } else {
+      console.log(`\x1b[90m(release status: ${res.status})\x1b[0m\n`);
+    }
+  } catch (_) {
+    console.log(`\x1b[90m(offline / could not query GitHub)\x1b[0m\n`);
+  }
+}
+
+function runRate() {
+  const repoUrl = 'https://github.com/zuikre/okvir';
+  logBanner();
+  console.log(`  \x1b[33m\x1b[1m⭐ Thank you for using and supporting OKVIR!\x1b[0m\n`);
+  console.log(`  Opening repository in your browser:`);
+  console.log(`  \x1b[36m\x1b[4m${repoUrl}\x1b[0m\n`);
+  console.log(`  Please leave a star on GitHub — it helps more students, researchers,`);
+  console.log(`  and engineers discover free, high-performance, intuition-first AI education!\n`);
+  openUrl(repoUrl);
+}
+
+function runDocs() {
+  const docsUrl = 'https://github.com/zuikre/okvir#readme';
+  logBanner();
+  console.log(`  \x1b[36mOpening OKVIR documentation in your browser...\x1b[0m\n`);
+  console.log(`  URL: \x1b[4m${docsUrl}\x1b[0m\n`);
+  openUrl(docsUrl);
+}
+
+function runIssue() {
+  const issueUrl = 'https://github.com/zuikre/okvir/issues/new';
+  logBanner();
+  console.log(`  \x1b[36mOpening GitHub Issue submission page in your browser...\x1b[0m\n`);
+  console.log(`  URL: \x1b[4m${issueUrl}\x1b[0m\n`);
+  console.log(`  Please include reproduction steps, environment info, and log output.\n`);
+  openUrl(issueUrl);
+}
+
+function runSponsor() {
+  const sponsorUrl = 'https://nowpayments.io/donation/okvir';
+  logBanner();
+  console.log(`  \x1b[32m\x1b[1m❤️  Support OKVIR Independent Open-Source Development\x1b[0m\n`);
+  console.log(`  Donation Portal (Credit Card, Apple Pay, & 100+ Cryptocurrencies):`);
+  console.log(`  \x1b[36m\x1b[4m${sponsorUrl}\x1b[0m\n`);
+  console.log(`  Direct Crypto Wallets:`);
+  console.log(`  • BSC (BNB/USDT): 0x46Bd31f58Da6E5D68cFE135FcD55BDfF8F1Dc1E8`);
+  console.log(`  • TRON (USDT):    TPT7y8iGjArHS7PtwpgT7F13umzxFriUWB\n`);
+  openUrl(sponsorUrl);
+}
+
+async function runDoctor() {
+  logBanner();
+  console.log(`  \x1b[36m\x1b[1m==> OKVIR System & Environment Diagnostics\x1b[0m\n`);
+
+  // 1. OS & Node
+  console.log(`  [✔] Operating System:   ${process.platform} (${process.arch})`);
+  console.log(`  [✔] Node.js Runtime:    ${process.version}`);
+
+  // 2. Desktop app
+  const appPath = findDesktopApp();
+  if (appPath) {
+    console.log(`  [✔] Desktop Engine:     ${appPath}`);
+  } else {
+    console.log(`  \x1b[33m[!] Desktop Engine:     Not detected in standard locations (run 'okvir update')\x1b[0m`);
+  }
+
+  // 3. User Cache
+  const home = process.env.HOME || process.env.USERPROFILE || '';
+  const cacheDir = path.join(home, '.okvir', 'cache');
+  if (fs.existsSync(cacheDir)) {
+    try {
+      const files = fs.readdirSync(cacheDir);
+      console.log(`  [✔] Local Cache:        ${cacheDir} (${files.length} cached files)`);
+    } catch (_) {
+      console.log(`  [✔] Local Cache:        ${cacheDir}`);
+    }
+  } else {
+    console.log(`  \x1b[90m[-] Local Cache:        ${cacheDir} (will be created automatically)\x1b[0m`);
+  }
+
+  // 4. Curriculum
+  const currDir = path.join(process.cwd(), 'curriculum');
+  if (fs.existsSync(currDir)) {
+    const countLessons = (dir) => {
+      let count = 0;
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (entry.isDirectory()) count += countLessons(path.join(dir, entry.name));
+        else if (entry.name.endsWith('.okvir.md')) count++;
+      }
+      return count;
+    };
+    try {
+      const total = countLessons(currDir);
+      console.log(`  [✔] Curriculum Context: ${currDir} (${total} active .okvir.md lessons)`);
+    } catch (_) {
+      console.log(`  [✔] Curriculum Context: ${currDir}`);
+    }
+  } else {
+    console.log(`  \x1b[90m[-] Curriculum Context: Current directory is not an Okvir course repo\x1b[0m`);
+  }
+
+  // 5. PATH check
+  const pathEnv = process.env.PATH || '';
+  const targetBin = process.platform === 'win32'
+    ? path.join(home, 'AppData', 'Local', 'Programs', 'Okvir', 'bin')
+    : path.join(home, '.local', 'bin');
+  if (pathEnv.includes(targetBin) || pathEnv.includes('.local/bin') || pathEnv.includes('Okvir\\bin')) {
+    console.log(`  [✔] PATH Configuration: Target binary directory is present in PATH`);
+  } else {
+    console.log(`  \x1b[33m[!] PATH Configuration: ${targetBin} is not in current PATH\x1b[0m`);
+  }
+
+  // 6. Network connectivity
+  process.stdout.write(`  Checking GitHub Connectivity... `);
+  try {
+    const res = await fetch('https://api.github.com/repos/zuikre/okvir/releases/latest', {
+      headers: { 'User-Agent': 'okvir-cli' },
+    });
+    if (res.ok) {
+      console.log(`\x1b[32m[✔] Connected (GitHub API reachable)\x1b[0m\n`);
+    } else {
+      console.log(`\x1b[33m[!] HTTP Status ${res.status}\x1b[0m\n`);
+    }
+  } catch (err) {
+    console.log(`\x1b[31m[!] Offline (${err.message})\x1b[0m\n`);
+  }
+
+  console.log(`  All diagnostics complete! For assistance, email Zakarya Roubhi <roubhizakarya@gmail.com>\n`);
+}
+
+function runClean() {
+  logBanner();
+  console.log(`  \x1b[36m==> Cleaning OKVIR temporary build artifacts & caches...\x1b[0m\n`);
+  const home = process.env.HOME || process.env.USERPROFILE || '';
+  const cacheDir = path.join(home, '.okvir', 'cache');
+  let cleaned = 0;
+
+  if (fs.existsSync(cacheDir)) {
+    try {
+      const files = fs.readdirSync(cacheDir);
+      for (const f of files) {
+        fs.rmSync(path.join(cacheDir, f), { recursive: true, force: true });
+        cleaned++;
+      }
+      console.log(`  ✔ Cleaned ${cleaned} file(s) from ${cacheDir}`);
+    } catch (e) {
+      console.log(`  ! Warning cleaning cache: ${e.message}`);
+    }
+  }
+
+  const distDir = path.join(process.cwd(), 'dist');
+  if (fs.existsSync(distDir)) {
+    try {
+      fs.rmSync(distDir, { recursive: true, force: true });
+      console.log(`  ✔ Removed local build directory: ${distDir}`);
+    } catch (_) {}
+  }
+
+  console.log(`\n\x1b[32m✔ Cleanup completed successfully!\x1b[0m\n`);
 }
 
 async function main() {
@@ -488,6 +913,11 @@ async function main() {
   const cmd = args[0] || 'help';
 
   switch (cmd) {
+    case 'open':
+    case 'launch':
+    case 'app':
+      await runOpen();
+      break;
     case 'init':
       logBanner();
       await runInit(args[1]);
@@ -510,10 +940,37 @@ async function main() {
     case 'dev':
       await runDev();
       break;
+    case 'update':
+    case '--update':
+    case 'upgrade':
+      await runUpdate(args.includes('--force'));
+      break;
+    case 'rate':
+    case 'star':
+      runRate();
+      break;
+    case 'docs':
+      runDocs();
+      break;
+    case 'issue':
+    case 'bug':
+      runIssue();
+      break;
+    case 'sponsor':
+    case 'donate':
+      runSponsor();
+      break;
+    case 'doctor':
+    case 'info':
+      await runDoctor();
+      break;
+    case 'clean':
+      runClean();
+      break;
     case 'version':
     case '-v':
     case '--version':
-      console.log(`okvir-cli v${VERSION}`);
+      await runVersion(args.includes('--short') || args.includes('-s'));
       break;
     case 'help':
     case '-h':
