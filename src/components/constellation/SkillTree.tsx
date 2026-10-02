@@ -432,7 +432,7 @@ export const SkillTree: React.FC = () => {
 
             // Container dimensions for analytical SVG mapping
             const ROW_HEIGHT = 140;
-            const CONTAINER_WIDTH = 440;
+            const CONTAINER_WIDTH = 480;
             const TOTAL_HEIGHT = unit.modules.length * ROW_HEIGHT + 50;
 
             // Multi-harmonic terrain curve producing an authentic, organic winding road
@@ -443,12 +443,13 @@ export const SkillTree: React.FC = () => {
               const h2 = Math.sin(i * 1.55 + 1.1 + u * 0.95) * 30;
               const h3 = Math.cos(i * 0.38 + u * 0.75) * 16;
               const raw = h1 + h2 + h3;
-              // Smooth hyperbolic tangent collar strictly bounds within ±88px
-              const boundedOffset = 88 * Math.tanh(raw / 78);
+              // Smooth hyperbolic tangent collar strictly bounds within ±85px
+              const boundedOffset = 85 * Math.tanh(raw / 78);
               const xOffset = boundedOffset * (language === 'ar' ? -1 : 1);
               return {
                 x: CONTAINER_WIDTH / 2 + xOffset,
                 y: 70 + i * ROW_HEIGHT,
+                xOffset,
               };
             });
 
@@ -523,7 +524,7 @@ export const SkillTree: React.FC = () => {
 
                 {/* 2. Unified Serpentine Winding Canvas with Exact Mathematical Links */}
                 <div
-                  className="relative w-[440px] max-w-full mx-auto select-none overflow-visible"
+                  className="relative w-[480px] max-w-full mx-auto select-none overflow-visible"
                   style={{ height: `${TOTAL_HEIGHT}px` }}
                 >
                   {/* Single Unified Full-Unit SVG Overlay connecting all nodes */}
@@ -645,6 +646,16 @@ export const SkillTree: React.FC = () => {
                       progress?.status ||
                       (modIdx === 0 && unit.unitNumber === 1 ? 'available' : 'locked');
 
+                    // Compute inward-facing signpost placement
+                    let labelPosition: 'left' | 'right' | 'bottom' = 'bottom';
+                    if (coord.xOffset > 18) {
+                      labelPosition = 'left';
+                    } else if (coord.xOffset < -18) {
+                      labelPosition = 'right';
+                    } else {
+                      labelPosition = 'bottom';
+                    }
+
                     return (
                       <div
                         key={mod.id}
@@ -662,6 +673,7 @@ export const SkillTree: React.FC = () => {
                           mode="roadmap"
                           language={language}
                           accentColor={unit.color}
+                          labelPosition={labelPosition}
                           isHovered={hoveredModuleId === mod.id}
                           isSelected={selectedModule?.id === mod.id}
                           onClick={() => handleNodeClick(mod)}
