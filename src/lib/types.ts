@@ -34,7 +34,7 @@ export interface SocraticHints {
   tier3: { en: string; ar: string };
 }
 
-export type ArabicFontFamily = 'noto' | 'kufi' | 'sans' | 'ibm';
+export type ArabicFontFamily = 'ibm' | 'readex' | 'cairo' | 'alexandria' | 'noto' | 'kufi' | 'sans';
 
 export interface LocalConfig {
   username: string;

@@ -222,7 +222,7 @@ export const useOkvirStore = create<OkvirState>()(
         powerGovernorEnabled: true,
         pythonTimeoutMs: 5000,
         soundEnabled: true,
-        arabicFont: 'noto',
+        arabicFont: 'ibm',
       },
 
       recordActivityToday: () => {

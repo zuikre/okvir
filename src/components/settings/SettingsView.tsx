@@ -146,7 +146,7 @@ export const SettingsView: React.FC = () => {
 
   const localStateDigest = useMemo(() => {
     // Deterministic state fingerprint for zero-telemetry proof
-    const str = `${config.username}-${xp}-${streakDays}-${config.arabicFont || 'noto'}`;
+    const str = `${config.username}-${xp}-${streakDays}-${config.arabicFont || 'ibm'}`;
     let hash = 0x811c9dc5;
     for (let i = 0; i < str.length; i++) {
       hash ^= str.charCodeAt(i);
@@ -680,66 +680,66 @@ export const SettingsView: React.FC = () => {
                   <span>{isRtl ? 'محرك الخطوط العربية ونظام التنضيد' : 'Arabic Typography Engine & Font Architecture'}</span>
                 </div>
                 <span className="text-[10px] font-mono text-[var(--math-vector)] bg-[var(--math-vector)]/10 px-2 py-0.5 rounded border border-[var(--math-vector)]/20 font-bold">
-                  {config.arabicFont === 'kufi'
-                    ? 'Noto Kufi Arabic'
-                    : config.arabicFont === 'sans'
-                    ? 'Noto Sans Arabic'
-                    : config.arabicFont === 'ibm'
-                    ? 'IBM Plex Sans'
-                    : 'Noto Sans UI (Active)'}
+                  {config.arabicFont === 'readex'
+                    ? 'Readex Pro'
+                    : config.arabicFont === 'cairo'
+                    ? 'Cairo'
+                    : config.arabicFont === 'alexandria'
+                    ? 'Alexandria'
+                    : 'IBM Plex Sans Arabic (Active)'}
                 </span>
               </div>
 
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                 {isRtl
-                  ? 'خطوط عربية محلية مدمجة بالكامل (100% Offline) مصممة للحفاظ على خط الأساس الأفقي والانسجام التام مع رموز معادلات KaTeX الرياضية.'
-                  : 'Engineered local typography pipeline bundled with zero remote CDN dependencies. Perfectly calibrated for horizontal baseline alignment with KaTeX math symbols.'}
+                  ? 'خطوط عربية مدمجة بالكامل ومحسنة خصيصاً للمنصات التعليمية (EdTech) والعلوم الدقيقة للحفاظ على خط الأساس الأفقي والانسجام التام مع رموز معادلات KaTeX الرياضية.'
+                  : 'Engineered typography pipeline calibrated specifically for EdTech and mathematical pedagogy. Bundled 100% offline with zero remote CDN dependencies.'}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {[
                   {
-                    id: 'noto' as ArabicFontFamily,
-                    name: 'Noto Sans Arabic UI',
-                    nameAr: 'نوتو سانز واجهة المستخدم (الافتراضي)',
-                    tag: 'Modern UI • Default',
-                    desc: 'Clean, proportional sans-serif optimized for UI labels, dense data cards, and mathematical tree nodes.',
-                    descAr: 'خط دقيق ومتناسب مخصص لعناوين الواجهات وبطاقات البيانات وشقوق أشجار القرار.',
-                    preview: 'أُوكْفِير: بيئة تفاعلية للمفاهيم الرياضية والذكاء الاصطناعي',
-                    fontFamily: "'Noto Sans Arabic UI', sans-serif",
-                  },
-                  {
-                    id: 'kufi' as ArabicFontFamily,
-                    name: 'Noto Kufi Arabic',
-                    nameAr: 'كوفي هندسي حديث',
-                    tag: 'Architectural Geometric',
-                    desc: 'Geometric modern Kufic design with architectural horizontal baselines for rigorous proofs.',
-                    descAr: 'خط كوفي هندسي متناسق للملصقات والعناوين الهندسية الصارمة وفضاءات المتجهات.',
-                    preview: 'أُوكْفِير: بيئة تفاعلية للمفاهيم الرياضية والذكاء الاصطناعي',
-                    fontFamily: "'Noto Kufi Arabic', sans-serif",
-                  },
-                  {
-                    id: 'sans' as ArabicFontFamily,
-                    name: 'Noto Sans Arabic',
-                    nameAr: 'نسخي تقني معاصر',
-                    tag: 'Longform Legibility',
-                    desc: 'Balanced, highly legible Arabic sans suitable for long explanatory texts and proofs.',
-                    descAr: 'خط عربي حديث مخصص للنصوص الطويلة والشروحات الفكرية المستفيضة.',
-                    preview: 'أُوكْفِير: بيئة تفاعلية للمفاهيم الرياضية والذكاء الاصطناعي',
-                    fontFamily: "'Noto Sans Arabic', sans-serif",
-                  },
-                  {
                     id: 'ibm' as ArabicFontFamily,
                     name: 'IBM Plex Sans Arabic',
-                    nameAr: 'آي بي إم بلكس العربي',
-                    tag: 'Mechanical / Grotesque',
-                    desc: 'Engineered mechanical grotesque typeface with technical proportions and typewriter feel.',
-                    descAr: 'طابع ميكانيكي هندسي للأنظمة التقنية الكلاسيكية وبيئات البرمجة التحليلية.',
+                    nameAr: 'آي بي إم بلكس العربي (الافتراضي)',
+                    tag: 'STEM & AI • Instrument-Grade',
+                    desc: 'Engineered for scientific precision, programming, and mathematical formulas with crisp, rhythmic letterforms.',
+                    descAr: 'خط علمي تقني فائق الدقة، مصمم خصيصاً للرياضيات والبرمجة وبيئات الذكاء الاصطناعي.',
                     preview: 'أُوكْفِير: بيئة تفاعلية للمفاهيم الرياضية والذكاء الاصطناعي',
-                    fontFamily: "'IBM Plex Sans Arabic', 'Noto Sans Arabic UI', sans-serif",
+                    fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                  },
+                  {
+                    id: 'readex' as ArabicFontFamily,
+                    name: 'Readex Pro',
+                    nameAr: 'ريدكس برو التعليمي',
+                    tag: 'EdTech • Reading Research',
+                    desc: 'Designed specifically for reading comprehension, educational platforms, and reduced cognitive load.',
+                    descAr: 'صُمم خصيصاً لأبحاث القراءة والمنصات التعليمية لتسهيل الاستيعاب البصري وتقليل إجهاد العين.',
+                    preview: 'أُوكْفِير: بيئة تفاعلية للمفاهيم الرياضية والذكاء الاصطناعي',
+                    fontFamily: "'Readex Pro', sans-serif",
+                  },
+                  {
+                    id: 'cairo' as ArabicFontFamily,
+                    name: 'Cairo',
+                    nameAr: 'كايرو الهندسي المعاصر',
+                    tag: 'Modern Geometric UI',
+                    desc: 'Contemporary geometric typeface blending modern Kufic proportions with UI clarity and balance.',
+                    descAr: 'خط كوفي هندسي معاصر يجمع بين جمالية النسب وتناسق واجهات المستخدم التفاعلية.',
+                    preview: 'أُوكْفِير: بيئة تفاعلية للمفاهيم الرياضية والذكاء الاصطناعي',
+                    fontFamily: "'Cairo', sans-serif",
+                  },
+                  {
+                    id: 'alexandria' as ArabicFontFamily,
+                    name: 'Alexandria',
+                    nameAr: 'الإسكندرية المعاصر',
+                    tag: 'Editorial & Dashboard',
+                    desc: 'Ultra-clean contemporary Arabic grotesque font with wide rhythm, balanced weights, and clear counters.',
+                    descAr: 'خط عربي عصري متوازن ذو إيقاع بصري رحب ومثالي للوحات التحكم والمختبرات البرمجية.',
+                    preview: 'أُوكْفِير: بيئة تفاعلية للمفاهيم الرياضية والذكاء الاصطناعي',
+                    fontFamily: "'Alexandria', sans-serif",
                   },
                 ].map((f) => {
-                  const active = (config.arabicFont || 'noto') === f.id;
+                  const active = (config.arabicFont || 'ibm') === f.id || (f.id === 'ibm' && (config.arabicFont === 'noto' || !config.arabicFont));
                   return (
                     <button
                       key={f.id}
@@ -834,13 +834,13 @@ export const SettingsView: React.FC = () => {
                   style={{
                     fontSize: `${sandboxFontSize}px`,
                     fontFamily:
-                      config.arabicFont === 'kufi'
-                        ? "'Noto Kufi Arabic', sans-serif"
-                        : config.arabicFont === 'sans'
-                        ? "'Noto Sans Arabic', sans-serif"
-                        : config.arabicFont === 'ibm'
-                        ? "'IBM Plex Sans Arabic', sans-serif"
-                        : "'Noto Sans Arabic UI', sans-serif",
+                      config.arabicFont === 'readex'
+                        ? "'Readex Pro', sans-serif"
+                        : config.arabicFont === 'cairo'
+                        ? "'Cairo', sans-serif"
+                        : config.arabicFont === 'alexandria'
+                        ? "'Alexandria', sans-serif"
+                        : "'IBM Plex Sans Arabic', sans-serif",
                   }}
                   dir="rtl"
                 >
