@@ -26,7 +26,7 @@
 
 ---
 
-## ⚡ The Zero DevOps Manifesto
+## The Zero DevOps Manifesto
 
 Most people don’t quit Machine Learning because the mathematics is too difficult.
 
@@ -105,7 +105,7 @@ Every lesson in Okvir strictly adheres to Cognitive Load Theory ($4 \pm 1$ worki
 
 ```
 [Beat 1: Tactile Simulation] ──> [Beat 2: Reactive Math] ──> [Beat 3: Faded Code Lab] ──> [Beat 4: Transfer Quiz]
-  "Touch the physics"          "Bret Victor KaTeX Pills"      "3-Tier Faded Scaffolding"    "Authentic Diagnostic"
+  "Touch the physics"          "Bret Victor KaTeX Pills"      "2-Tier Faded Scaffolding"    "Authentic Diagnostic"
 ```
 
 1. **Beat 1: Tactile Intuition Simulation:** Explore geometry, distributions, and dynamics with real-time goal invariant tracking (`TargetedGoalManipulator` with $\Delta$ error feedback and audio celebration harmonics) *before* seeing formal notation.
@@ -241,7 +241,7 @@ Okvir rejects the generic "AI Slop" aesthetic (purple gradients, glowing blobs, 
 
 ---
 
-## ⚙️ Architecture & Technical Specifications
+## Architecture & Technical Specifications
 
 ```
 OKVIR DESKTOP CLIENT
@@ -285,7 +285,7 @@ For exhaustive technical blueprints, read our [System Architecture Guide](ARCHIT
 
 ---
 
-## ⌨️ Instrument-Grade Keyboard Navigation & Vim Bindings
+## Instrument-Grade Keyboard Navigation & Vim Bindings
 
 Okvir features a keyboard-first ergonomics system inspired by Linear, Raycast, and Zed:
 

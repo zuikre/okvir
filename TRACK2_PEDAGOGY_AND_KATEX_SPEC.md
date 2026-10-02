@@ -1,7 +1,7 @@
 # Track 2: Computer Science, Python & Data Engineering
 ## Pedagogical Core & Formal KaTeX Architecture Specification
 
-> **Platform:** OKVIR (إطار) — The Interactive Pedagogical Engine  
+> **Platform:** OKVIR — The Interactive Pedagogical Engine  
 > **Curriculum Track:** Track 2 — Computer Science, Python Programming & Modern Data Engineering  
 > **Scope:** 30 Comprehensive Lessons across 10 Modules (MOD-08 through MOD-17)  
 > **Specification Version:** 1.0.0-PROD  
@@ -32,7 +32,7 @@ Track 2 serves as the computational backbone of the OKVIR platform. When student
 
 Track 2 bridges this divide through five non-negotiable structural pillars for every lesson:
 1. **First-Principles Natural Grounding:** We deconstruct every programming construct down to physical transistors, memory addresses, or set-theoretic transformations before showing syntax. Accessible to a student on day zero.
-2. **Bilingual Narrative (English & Arabic / إطار):** Deep, authentic technical Arabic paired alongside precise English engineering terminology.
+2. **Bilingual Narrative (English & Arabic):** Deep, authentic technical Arabic paired alongside precise English engineering terminology.
 3. **Formal KaTeX Mathematical Anchors:** Rigorous notation treating environments, scopes, memory strides, relational projections, and asymptotic runtimes with mathematical exactitude.
 4. **Concrete Physical Analogies:** Real-world tactile metaphors that permanently anchor elusive mental models.
 5. **Cognitive Misconceptions:** Explicit diagnosis of novice cognitive traps, detailing why they occur and how the mental model corrects them.
@@ -2810,7 +2810,7 @@ The standard intermodal shipping container changed the world: a sealed metal con
 ## Pedagogical Validation Checklist Across All 30 Lessons
 Every lesson in Track 2 conforms to the **Five OKVIR Non-Negotiable Pedagogical Standards**:
 1. [x] **Zero-Barrier Intuition:** Explains the physical or computational reality before showing syntax.
-2. [x] **Bilingual Parity:** Authentic, dignified Arabic technical terminology (إطار) alongside English terms.
+2. [x] **Bilingual Parity:** Authentic, dignified Arabic technical terminology alongside English terms.
 3. [x] **KaTeX Anchor Rigor:** Complete formal equations with every variable, domain, and operator defined.
 4. [x] **Deep Analogies:** Memorable physical metaphors (luggage tags, railway switches, vending machines, backpacks, Russian dolls, mailboxes, sliding glass train cameras, shipping containers).
 5. [x] **Cognitive Diagnostic:** Dissecting false mental models, explaining why they occur, and presenting code corrections.

@@ -67,21 +67,46 @@ export const FadedScaffoldCodeEditor: React.FC<FadedScaffoldCodeEditorProps> = (
 
   const [activeTier, setActiveTier] = useState<'skeleton' | 'autonomous'>('autonomous');
   const [skeletonAnswers, setSkeletonAnswers] = useState<Record<string, string>>({});
+  const [holeValidation, setHoleValidation] = useState<Record<string, 'correct' | 'incorrect'>>({});
+  const [revealedHints, setRevealedHints] = useState<Record<string, boolean>>({});
+  const [assembledStarter, setAssembledStarter] = useState<string | null>(null);
 
   const handleSkeletonChange = (holeId: string, value: string) => {
-    setSkeletonAnswers(prev => ({ ...prev, [holeId]: value }));
+    setSkeletonAnswers((prev) => ({ ...prev, [holeId]: value }));
+    setHoleValidation((prev) => {
+      const copy = { ...prev };
+      delete copy[holeId];
+      return copy;
+    });
+  };
+
+  const toggleHint = (holeId: string) => {
+    setRevealedHints((prev) => ({ ...prev, [holeId]: !prev[holeId] }));
   };
 
   const verifySkeleton = () => {
-    let correct = true;
+    let allCorrect = true;
+    const newValidation: Record<string, 'correct' | 'incorrect'> = {};
+
     for (const [holeId, expected] of Object.entries(generatedSkeleton.holes)) {
-      if (skeletonAnswers[holeId]?.trim() !== expected.trim()) {
-        correct = false;
-        break;
+      const userVal = skeletonAnswers[holeId]?.trim() || '';
+      if (userVal === expected.trim()) {
+        newValidation[holeId] = 'correct';
+      } else {
+        newValidation[holeId] = 'incorrect';
+        allCorrect = false;
       }
     }
-    if (correct) {
+
+    setHoleValidation(newValidation);
+
+    if (allCorrect) {
       if (config.soundEnabled) audio.playSuccessChime();
+      let completedCode = generatedSkeleton.template;
+      for (const [holeId, expected] of Object.entries(generatedSkeleton.holes)) {
+        completedCode = completedCode.replace('___', skeletonAnswers[holeId]?.trim() || expected.trim());
+      }
+      setAssembledStarter(completedCode);
       setActiveTier('autonomous');
     } else {
       if (config.soundEnabled) audio.playErrorDissonance();
@@ -93,21 +118,61 @@ export const FadedScaffoldCodeEditor: React.FC<FadedScaffoldCodeEditorProps> = (
     const holeKeys = Object.keys(generatedSkeleton.holes);
 
     return (
-      <pre className="font-mono text-sm p-4 text-[var(--text-primary)] overflow-x-auto">
-        {parts.map((part, i) => (
-          <React.Fragment key={i}>
-            {part}
-            {i < parts.length - 1 && (
-              <input
-                type="text"
-                className="bg-[var(--bg-surface-active)] border border-[var(--border-strong)] rounded px-1.5 py-0.5 w-24 text-center font-mono text-[var(--math-vector)] focus:outline-none focus:border-[var(--math-vector)] inline-block mx-1"
-                value={skeletonAnswers[holeKeys[i]] || ''}
-                onChange={(e) => handleSkeletonChange(holeKeys[i], e.target.value)}
-              />
-            )}
-          </React.Fragment>
-        ))}
-      </pre>
+      <div className="p-4 space-y-2">
+        <pre className="font-mono text-sm text-[var(--text-primary)] overflow-x-auto leading-relaxed">
+          {parts.map((part, i) => {
+            const holeId = holeKeys[i];
+            const status = holeValidation[holeId];
+            const expected = generatedSkeleton.holes[holeId];
+            const isHintRevealed = revealedHints[holeId];
+
+            return (
+              <React.Fragment key={i}>
+                <span>{part}</span>
+                {i < parts.length - 1 && (
+                  <span className="inline-flex flex-col items-center mx-1 align-middle">
+                    <input
+                      type="text"
+                      className={`bg-[var(--bg-surface-active)] border rounded px-2 py-0.5 min-w-[5rem] text-center font-mono text-sm transition-all focus:outline-none ${
+                        status === 'correct'
+                          ? 'border-emerald-500 text-emerald-400 bg-emerald-950/20'
+                          : status === 'incorrect'
+                          ? 'border-rose-500 text-rose-400 bg-rose-950/20'
+                          : 'border-[var(--border-strong)] text-[var(--math-vector)] focus:border-[var(--math-vector)]'
+                      }`}
+                      placeholder={isHintRevealed ? expected : '___'}
+                      value={skeletonAnswers[holeId] || ''}
+                      onChange={(e) => handleSkeletonChange(holeId, e.target.value)}
+                    />
+                    {isHintRevealed && (
+                      <span className="text-[10px] text-emerald-400 font-mono mt-0.5">
+                        {isAr ? `الحل: ${expected}` : `Target: ${expected}`}
+                      </span>
+                    )}
+                  </span>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </pre>
+
+        {holeKeys.length > 0 && (
+          <div className="flex flex-wrap gap-2 pt-2 border-t border-[var(--border-subtle)] text-[11px]">
+            <span className="text-[var(--text-tertiary)] self-center">
+              {isAr ? 'تلميحات الفراغات:' : 'Blank hints:'}
+            </span>
+            {holeKeys.map((holeId, idx) => (
+              <button
+                key={holeId}
+                onClick={() => toggleHint(holeId)}
+                className="px-2 py-0.5 rounded bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors cursor-pointer"
+              >
+                {isAr ? `تلميح الفراغ #${idx + 1}` : `Hint #${idx + 1}`}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -192,7 +257,7 @@ export const FadedScaffoldCodeEditor: React.FC<FadedScaffoldCodeEditorProps> = (
           <CodeChallengeEditor
             challenge={{
               id: challengeId,
-              starterCode: scaffold.autonomousStarter,
+              starterCode: assembledStarter || scaffold.autonomousStarter,
               testCases: scaffold.testCases,
               expectedOutput: '',
             }}

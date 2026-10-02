@@ -274,13 +274,13 @@ Pinned directly in the title bar is an instrument-grade Hardware Telemetry monit
 
 ### 5.8 2-Tier Adaptive Faded Scaffolding & Code Challenge Engine
 Beat 3 integrates an adaptive, distraction-free code editor (`FadedScaffoldCodeEditor.tsx`):
-* **Tier 1: Guided Skeleton (`Guided Skeleton / القالب التوجيهي`):** Fill-in-the-blank critical algorithmic expressions and parameters with structural guardrails and immediate visual feedback. Includes an instant *"Skip to full editor ➔"* bypass.
+* **Tier 1: Guided Skeleton (`Guided Skeleton / القالب التوجيهي`):** Fill-in-the-blank critical algorithmic expressions and parameters with structural guardrails, per-blank validation (emerald/rose visual cues), and toggleable blank-level hints. Includes an instant *"Skip to full editor ➔"* bypass. Once verified, the completed code automatically pre-populates Tier 2.
 * **Tier 2: Autonomous Lab (`Autonomous Lab / المختبر المستقل`):** Full Monaco/CodeMirror editor running user code directly against automated unit test assertions in client-side Pyodide or DuckDB WASM.
 * **Streamlined Focus:** Parsons reordering has been deliberately eliminated to minimize syntactic manipulation friction and guide learners directly into writing and executing vectorized code.
 
-### 5.9 Bret Victor Live Reactive Math & Targeted Goal Feedback
-* **`<ReactiveFormulaAnnotator />` (Beat 2):** Mathematical equations feature live reactive symbol pills. Hovering or clicking decomposes symbols into functional classes (`parameter`, `observation`, `loss`, `hyperparameter`), linked to the reactive store (`useFormulaAnchorStore`).
-* **`<TargetedGoalManipulator />` (Beat 1 / Section 3):** Real-time goal-directed invariant challenges (e.g. Gauss-Markov BLUE error orthogonality, KNN bias-variance tradeoff calibration, Lipschitz step-size bounds) featuring an interactive proximity gauge ($\Delta$ error delta) and celebratory procedural audio harmonics.
+### 5.9 Bret Victor Live Reactive Math & Universal Invariant Goal Engine
+* **Bidirectional `<KaTeXMath />` & `<ReactiveFormulaAnnotator />` (Beat 2):** Mathematical equations feature live reactive symbol pills and automatic DOM token tagging. Hovering or clicking decomposes symbols into functional classes (`parameter`, `observation`, `loss`, `hyperparameter`), linked to the reactive store (`useFormulaAnchorStore`), which simultaneously triggers glowing blooming halos on matching 2D/3D simulation canvas entities. Conversely, hovering over simulation model tokens highlights the corresponding equation symbol.
+* **Universal 125-Lesson `<TargetedGoalManipulator />` (Beat 1 / Section 3):** Real-time goal-directed invariant challenges across all 125 lessons (e.g. Gauss-Markov BLUE error orthogonality, KNN bias-variance tradeoff calibration, Lipschitz step-size bounds, Pythagorean norms, unit determinants, and attention temperature) featuring an interactive tactile slider scrubber, real-time proximity gauge ($\Delta$ error delta), and celebratory procedural audio harmonics.
 
 ### 5.10 100% Acyclic Prerequisite DAG Topology
 * **166 Validated Acyclic Directed Edges:** The 125-node global dependency graph is strictly acyclic with 0 cycles.

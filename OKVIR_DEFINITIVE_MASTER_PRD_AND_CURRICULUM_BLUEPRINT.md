@@ -1,4 +1,4 @@
-# OKVIR (إطار): THE DEFINITIVE MASTER PRD AND CURRICULUM BLUEPRINT
+# OKVIR: THE DEFINITIVE MASTER PRD AND CURRICULUM BLUEPRINT
 > **System Document ID:** `OKVIR-PRD-CURRICULUM-2026-V1`  
 > **Status:** Ratified Production Blueprint & Pedagogical Architecture  
 > **Classification:** Public Technical Specification / Open-Source Sovereign Standard  
@@ -10,7 +10,7 @@
 ## 1. Executive Summary & Vision
 
 ### 1.1 Mission Philosophy
-**OKVIR (إطار)** is an open-source, sovereign, local-first interactive desktop learning framework designed to take learners from **absolute elementary first principles** (no prior programming knowledge, basic arithmetic only) to **frontier artificial intelligence, econometrics, and quantitative research mastery**.
+**OKVIR** is an open-source, sovereign, local-first interactive desktop learning framework designed to take learners from **absolute elementary first principles** (no prior programming knowledge, basic arithmetic only) to **frontier artificial intelligence, econometrics, and quantitative research mastery**.
 
 The framework is founded on four foundational pedagogical and technical invariants:
 1. **Zero Unearned Cognitive Jumps:** Every abstraction must be earned through prior physical or spatial intuition. If an equation introduces a partial derivative, earlier lessons must have physically grounded slopes, secant lines, limits, and directional slicing. If a model introduces multi-head self-attention, previous lessons must have grounded dot-product projections, query-key routing, and causal masking.
@@ -49,7 +49,7 @@ The framework is founded on four foundational pedagogical and technical invarian
 
 ### 1.3 Competitive Teardowns & Strategic Positioning
 
-| Capability / Dimension | Brilliant.org | Khan Academy | Coursera / edX | DataCamp | OKVIR (إطار) |
+| Capability / Dimension | Brilliant.org | Khan Academy | Coursera / edX | DataCamp | OKVIR |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Architectural Model** | Cloud SaaS (Subscription) | Cloud Web (Free non-profit) | Cloud Video LMS | Cloud Web In-Browser | **Local-First Native App (Tauri v2 + Rust)** |
 | **Data Privacy & Telemetry** | High telemetry, user tracking | Cloud database tracking | High corporate tracking | Heavy corporate telemetry | **100% Sovereign, Zero Telemetry, Local SQLite** |
@@ -710,4 +710,4 @@ Phase 3: Frontier Deep Learning & Transformers (Weeks 9–12)
 
 ---
 
-*This document serves as the authoritative, definitive architectural blueprint for OKVIR (إطار).*
+*This document serves as the authoritative, definitive architectural blueprint for OKVIR.*

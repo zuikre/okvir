@@ -8,6 +8,10 @@ interface TargetedGoalManipulatorProps {
   goal: TargetedMicroGoal;
   currentValue: number;
   onGoalAchieved?: () => void;
+  onValueChange?: (val: number) => void;
+  min?: number;
+  max?: number;
+  step?: number;
   className?: string;
 }
 
@@ -15,6 +19,10 @@ export const TargetedGoalManipulator: React.FC<TargetedGoalManipulatorProps> = (
   goal,
   currentValue,
   onGoalAchieved,
+  onValueChange,
+  min,
+  max,
+  step,
   className = '',
 }) => {
   const { language, config } = useOkvirStore();
@@ -96,6 +104,23 @@ export const TargetedGoalManipulator: React.FC<TargetedGoalManipulatorProps> = (
             style={{ width: `${proximityPercent}%` }}
           />
         </div>
+
+        {onValueChange && (
+          <div className="flex items-center gap-3 pt-2">
+            <input
+              type="range"
+              min={min ?? (goal.targetValue > 0 ? 0 : goal.targetValue * 2 - 1)}
+              max={max ?? (goal.targetValue > 0 ? Math.max(goal.targetValue * 2, 5) : 5)}
+              step={step ?? (goal.tolerance > 0.08 ? 0.05 : 0.01)}
+              value={currentValue}
+              onChange={(e) => onValueChange(parseFloat(e.target.value))}
+              className="w-full accent-[var(--math-prediction)] h-1.5 bg-[var(--bg-app)] rounded-lg cursor-pointer"
+            />
+            <span className="font-mono text-xs font-bold text-[var(--math-prediction)] min-w-[3.5rem] text-right tabular-nums">
+              {currentValue.toFixed(2)}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Success Celebration Callout */}

@@ -4,7 +4,7 @@
 > **Document Class:** Pedagogical Master Specification  
 > **Track:** Track 1 — Mathematical Foundations (الأسس الرياضية)  
 > **Scope:** 29 Comprehensive Lessons across Modules MOD-01 through MOD-07  
-> **Platform:** OKVIR Interactive Learning Engine (إطار)  
+> **Platform:** OKVIR Interactive Learning Engine  
 > **Design Axiom:** *"No unearned cognitive leaps; geometry before algebra; intuition before notation; rigorous typing for all symbols."*
 
 ---
@@ -75,7 +75,7 @@ Once coordinates exist, distance between any two locations is not arbitrary; it 
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The Cartesian coordinate system embeds numbers into geometry by establishing a bijective mapping between points in an affine flat space $\mathbb{E}^n$ and ordered tuples of real numbers in $\mathbb{R}^n$. The fundamental metric governing this continuum is the Euclidean distance ($L_2$ norm of the difference vector). It satisfies three non-negotiable axioms: non-negativity ($d(\mathbf{p},\mathbf{q}) \ge 0$, with equality iff $\mathbf{p}=\mathbf{q}$), symmetry ($d(\mathbf{p},\mathbf{q}) = d(\mathbf{q},\mathbf{p})$), and the triangle inequality ($d(\mathbf{p},\mathbf{r}) \le d(\mathbf{p},\mathbf{q}) + d(\mathbf{q},\mathbf{r})$).
-* **العربية (إطار):** يُنشئ نظام الإحداثيات الديكارتية جسراً بين الأرقام والهندسة، حيث يربط كل نقطة في الفضاء التآلفي المستوي $\mathbb{E}^n$ بمركبات رقمية في $\mathbb{R}^n$. المسافة الإقليدية هي المقياس الطبيعي الذي يقيس "طول الوتر" المستقيم الفاصل بين نقطتين عبر تعميم مبرهنة فيثاغورس على أي عدد من الأبعاد. تحقق هذه المسافة بديهيات المقياس الأساسية: اللامعقولية السالبة، التناظر، ومتباينة المثلث الحاكمة لأقصر مسار بين نقطتين.
+* **العربية:** يُنشئ نظام الإحداثيات الديكارتية جسراً بين الأرقام والهندسة، حيث يربط كل نقطة في الفضاء التآلفي المستوي $\mathbb{E}^n$ بمركبات رقمية في $\mathbb{R}^n$. المسافة الإقليدية هي المقياس الطبيعي الذي يقيس "طول الوتر" المستقيم الفاصل بين نقطتين عبر تعميم مبرهنة فيثاغورس على أي عدد من الأبعاد. تحقق هذه المسافة بديهيات المقياس الأساسية: اللامعقولية السالبة، التناظر، ومتباينة المثلث الحاكمة لأقصر مسار بين نقطتين.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$d_2(\mathbf{p}, \mathbf{q}) \coloneqq \|\mathbf{p} - \mathbf{q}\|_2 = \sqrt{\sum_{i=1}^n (p_i - q_i)^2} = \sqrt{(\mathbf{p} - \mathbf{q})^T (\mathbf{p} - \mathbf{q})}$$
@@ -109,7 +109,7 @@ When a line is horizontal, walking forward costs zero vertical climb (slope $= 0
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** Slope measures the directional sensitivity of a linear relationship. Geometrically, it represents the tangent of the inclination angle $\theta$ made by the line with the positive horizontal axis. In affine 2D geometry, the slope $m$ governs the scaling factor between horizontal input displacement $\Delta x$ and vertical output response $\Delta y$.
-* **العربية (إطار):** الميل هو المقياس الهندسي لشدة انحدار الخط المستقيم، وهو يُعبر عن ظل زاوية الميلان ($\tan \theta$) بالنسبة للمحور الأفقي الموجب. يعكس الميل النسبة الصارمة بين التغير الرأسي والتغير الأفقي؛ فكل خطوة نخطوها إلى اليمين بمقدار وحدة واحدة تقابلها إزاحة رأسية بمقدار $m$.
+* **العربية:** الميل هو المقياس الهندسي لشدة انحدار الخط المستقيم، وهو يُعبر عن ظل زاوية الميلان ($\tan \theta$) بالنسبة للمحور الأفقي الموجب. يعكس الميل النسبة الصارمة بين التغير الرأسي والتغير الأفقي؛ فكل خطوة نخطوها إلى اليمين بمقدار وحدة واحدة تقابلها إزاحة رأسية بمقدار $m$.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$m \coloneqq \frac{\Delta y}{\Delta x} = \frac{y_2 - y_1}{x_2 - x_1} = \tan(\theta), \quad \text{where } \theta \in \left(-\frac{\pi}{2}, \frac{\pi}{2}\right), \; \Delta x \ne 0$$
@@ -144,7 +144,7 @@ A vector is a quantity endowed with both magnitude (how far) and direction (whic
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** A vector in an affine Euclidean space is an equivalence class of directed line segments characterized by length and orientation, invariant under parallel translation. In the vector space $\mathbb{R}^n$, we represent vectors algebraically as column tuples measuring displacement along orthogonal coordinate axes from an arbitrary reference tail.
-* **العربية (إطار):** المتجه ليس مجرد عمود من الأرقام، بل هو إزاحة مكانية موجهة تمتلك مقداراً (طولاً) واتجاهاً محدداً. المتجهات كائنات طليقة حرة في الفضاء؛ نقل المتجه موازياً لنفسه لا يغير من هويته الرياضية شيئاً. نُمثل المتجه جبرياً كعمود إحداثيات يصف مقدار القفز على طول المحاور.
+* **العربية:** المتجه ليس مجرد عمود من الأرقام، بل هو إزاحة مكانية موجهة تمتلك مقداراً (طولاً) واتجاهاً محدداً. المتجهات كائنات طليقة حرة في الفضاء؛ نقل المتجه موازياً لنفسه لا يغير من هويته الرياضية شيئاً. نُمثل المتجه جبرياً كعمود إحداثيات يصف مقدار القفز على طول المحاور.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{v} \coloneqq \begin{bmatrix} v_1 \\ v_2 \\ \vdots \\ v_n \end{bmatrix} \in \mathbb{R}^n, \quad \|\mathbf{v}\| \coloneqq \sqrt{\mathbf{v}^T \mathbf{v}} = \sqrt{\sum_{i=1}^n v_i^2}, \quad \hat{\mathbf{v}} = \frac{\mathbf{v}}{\|\mathbf{v}\|}$$
@@ -181,7 +181,7 @@ Yes, because the two directions are not redundant. The set of all locations you 
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** A linear combination scales a set of vectors by scalar weights and sums them. The span of a set of vectors is the complete subspace of all reachable points via linear combinations. A set of vectors is linearly independent if no vector in the set can be formed as a linear combination of the others—meaning the only combination yielding the zero vector is the trivial all-zero weighting.
-* **العربية (إطار):** التركيب الخطي هو عملية وزن المتجهات بمقاييس عددية ثم جمعها معاً. فضاء التوليد (Span) هو كامل الفضاء الجزئي المتشكل من كل النقاط الممكن الوصول إليها عبر تلك التراكيب. تكون المتجهات "مستقلة خطياً" إذا لم يكن أحدها مكرراً أو ناتجاً عن دمج الآخرين؛ أي أن الوصول إلى نقطة الصفر لا يتحقق إلا بتصفير جميع المعاملات العددية.
+* **العربية:** التركيب الخطي هو عملية وزن المتجهات بمقاييس عددية ثم جمعها معاً. فضاء التوليد (Span) هو كامل الفضاء الجزئي المتشكل من كل النقاط الممكن الوصول إليها عبر تلك التراكيب. تكون المتجهات "مستقلة خطياً" إذا لم يكن أحدها مكرراً أو ناتجاً عن دمج الآخرين؛ أي أن الوصول إلى نقطة الصفر لا يتحقق إلا بتصفير جميع المعاملات العددية.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{w} = \sum_{j=1}^k c_j \mathbf{v}_j = \mathbf{V} \mathbf{c}, \quad \text{Span}(\{\mathbf{v}_1, \dots, \mathbf{v}_k\}) \coloneqq \left\{ \sum_{j=1}^k c_j \mathbf{v}_j \;\middle|\; c_j \in \mathbb{R} \right\}$$
@@ -216,7 +216,7 @@ If you multiply that shadow's length by the length of the ruler $\mathbf{u}$, yo
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The dot product is an inner product on $\mathbb{R}^n$ that bridges coordinate algebra and Euclidean geometry. It maps two vectors to a scalar measuring their directional alignment. Mechanically, it projects one vector orthogonally onto the span of the other and scales the resulting signed shadow length by the target's magnitude.
-* **العربية (إطار):** الضرب النقطي هو الجسر السحري بين الحساب الجبري والهندسة المكانية؛ إذ يختزل متجهين في رقم قياسي واحد يُعبر عن مدى توافقهما الاتجاهي. هندسياً، يعادل الضرب النقطي قياس طول "الظل" الذي يسقطه أحد المتجهين عمودياً على الآخر، مضروباً في طول المتجه المُستقبل. إذا تعامد المتجهان تضاءل الظل إلى نقطة وانعدم الناتج.
+* **العربية:** الضرب النقطي هو الجسر السحري بين الحساب الجبري والهندسة المكانية؛ إذ يختزل متجهين في رقم قياسي واحد يُعبر عن مدى توافقهما الاتجاهي. هندسياً، يعادل الضرب النقطي قياس طول "الظل" الذي يسقطه أحد المتجهين عمودياً على الآخر، مضروباً في طول المتجه المُستقبل. إذا تعامد المتجهان تضاءل الظل إلى نقطة وانعدم الناتج.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{u} \cdot \mathbf{v} = \mathbf{u}^T \mathbf{v} = \sum_{i=1}^n u_i v_i = \|\mathbf{u}\|_2 \|\mathbf{v}\|_2 \cos(\theta)$$
@@ -251,7 +251,7 @@ And how long should that perpendicular pencil be? The cross product $\mathbf{u} 
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** Unlike the dot product, the cross product is an exterior operation defined strictly in $\mathbb{R}^3$ (and algebraically in $\mathbb{R}^7$). It takes two vectors and outputs a third vector strictly orthogonal to the plane spanned by the inputs. Its magnitude encodes the oriented area of the parallelogram formed by the pair, and its direction satisfies the right-handed orientation of space.
-* **العربية (إطار):** الضرب الاتجاهي (الخارجي) هو عملية فريدة خاصة بالفضاء ثلاثي الأبعاد $\mathbb{R}^3$؛ يأخذ متجهين ويُنتج متجهاً ثالثاً عمودياً تماماً على المستوي الذي يحتويهما. مقدار هذا المتجه الناتج يُساوي هندسياً مساحة متوازي الأضلاع المحصور بينهما، بينما يتحدد اتجاهه الصارم بقاعدة اليد اليمنى، وهو مضاد للتناظر ($\mathbf{u} \times \mathbf{v} = -\mathbf{v} \times \mathbf{u}$).
+* **العربية:** الضرب الاتجاهي (الخارجي) هو عملية فريدة خاصة بالفضاء ثلاثي الأبعاد $\mathbb{R}^3$؛ يأخذ متجهين ويُنتج متجهاً ثالثاً عمودياً تماماً على المستوي الذي يحتويهما. مقدار هذا المتجه الناتج يُساوي هندسياً مساحة متوازي الأضلاع المحصور بينهما، بينما يتحدد اتجاهه الصارم بقاعدة اليد اليمنى، وهو مضاد للتناظر ($\mathbf{u} \times \mathbf{v} = -\mathbf{v} \times \mathbf{u}$).
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{u} \times \mathbf{v} \coloneqq \begin{bmatrix} u_2 v_3 - u_3 v_2 \\ u_3 v_1 - u_1 v_3 \\ u_1 v_2 - u_2 v_1 \end{bmatrix} = \det \begin{bmatrix} \hat{\mathbf{i}} & \hat{\mathbf{j}} & \hat{\mathbf{k}} \\ u_1 & u_2 & u_3 \\ v_1 & v_2 & v_3 \end{bmatrix} \in \mathbb{R}^3$$
@@ -293,7 +293,7 @@ You may stretch the sheet, rotate it, reflect it, or shear it sideways into a di
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** A linear transformation $T: V \to W$ is a structure-preserving map between vector spaces that respects vector addition and scalar multiplication ($T(c\mathbf{u} + d\mathbf{v}) = cT(\mathbf{u}) + dT(\mathbf{v})$). Geometrically, this requires that lines remain lines and the origin remains fixed. Every such map between finite-dimensional spaces can be represented uniquely by a matrix whose columns are the transformed images of the canonical basis vectors.
-* **العربية (إطار):** التحويل الخطي هو دالة تنقل متجهات الفضاء مع الحفاظ الصارم على بنيته الأساسية؛ فلا ينحني خط مستقيم، ولا تتفاوت المسافات بين خطوط الشبكة، وتبقى نقطة الأصل راسخة في مكانها. تتلخص العبقرية الرياضية في أن معرفة مصير متجهات الأساس المعيارية $\hat{\mathbf{i}}$ و $\hat{\mathbf{j}}$ تكفي تماماً للتنبؤ بمصير أي نقطة أخرى في الكون، حيث تُشكل مواقع هبوطهما أعمدة مصفوفة التحويل.
+* **العربية:** التحويل الخطي هو دالة تنقل متجهات الفضاء مع الحفاظ الصارم على بنيته الأساسية؛ فلا ينحني خط مستقيم، ولا تتفاوت المسافات بين خطوط الشبكة، وتبقى نقطة الأصل راسخة في مكانها. تتلخص العبقرية الرياضية في أن معرفة مصير متجهات الأساس المعيارية $\hat{\mathbf{i}}$ و $\hat{\mathbf{j}}$ تكفي تماماً للتنبؤ بمصير أي نقطة أخرى في الكون، حيث تُشكل مواقع هبوطهما أعمدة مصفوفة التحويل.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$T: \mathbb{R}^n \to \mathbb{R}^m, \quad T(c\mathbf{u} + d\mathbf{v}) = c T(\mathbf{u}) + d T(\mathbf{v}) \quad \forall \mathbf{u}, \mathbf{v} \in \mathbb{R}^n, \; c, d \in \mathbb{R}$$
@@ -328,7 +328,7 @@ That single compound transformation is the composition $B \circ A$. Matrix multi
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** Matrix multiplication is fundamentally functional composition, not element-wise multiplication. When a linear map $A: \mathbb{R}^p \to \mathbb{R}^n$ is followed by map $B: \mathbb{R}^n \to \mathbb{R}^m$, their composite map $(B \circ A): \mathbb{R}^p \to \mathbb{R}^m$ is represented by the matrix product $\mathbf{C} = \mathbf{B}\mathbf{A}$. The $(i, j)$-th entry of $\mathbf{C}$ is the dot product of the $i$-th row of $\mathbf{B}$ with the $j$-th column of $\mathbf{A}$.
-* **العربية (إطار):** ليس ضرب المصفوفات مجرد عملية حسابية للأرقام، بل هو تجسيد هندسي لـ "تركيب التحويلات" المتتابعة. إذا قمنا بتدوير الفضاء عبر مصفوفة $A$ ثم تمديده عبر مصفوفة $B$، فإن حاصل الضرب $BA$ يُمثل التحويل الإجمالي الموحد. ولأن ترتيب العمليات الهندسية يُحدث فارقاً جذرياً في الشكل النهائي، فإن ضرب المصفوفات غير تبادلي ($BA \ne AB$).
+* **العربية:** ليس ضرب المصفوفات مجرد عملية حسابية للأرقام، بل هو تجسيد هندسي لـ "تركيب التحويلات" المتتابعة. إذا قمنا بتدوير الفضاء عبر مصفوفة $A$ ثم تمديده عبر مصفوفة $B$، فإن حاصل الضرب $BA$ يُمثل التحويل الإجمالي الموحد. ولأن ترتيب العمليات الهندسية يُحدث فارقاً جذرياً في الشكل النهائي، فإن ضرب المصفوفات غير تبادلي ($BA \ne AB$).
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{B} \in \mathbb{R}^{m \times n}, \quad \mathbf{A} \in \mathbb{R}^{n \times p} \implies \mathbf{C} = \mathbf{B}\mathbf{A} \in \mathbb{R}^{m \times p}$$
@@ -364,7 +364,7 @@ What is the area of this new parallelogram? It is precisely the **determinant** 
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The determinant is an alternating multilinear functional that measures the factor by which a linear transformation scales $n$-dimensional volumes. For a $2 \times 2$ matrix, it calculates the signed area of the parallelogram formed by the transformed basis vectors. A non-zero determinant guarantees that the map is bijective and invertible; a zero determinant indicates dimensional collapse and non-invertibility.
-* **العربية (إطار):** المحدد ليس مجرد صيغة حسابية معقدة للأقطار، بل هو المعامل الفيزيائي لتمدد أو انكماش الحجوم المكانية. يُعبر محدد المصفوفة $2 \times 2$ عن المساحة الموجهة لمتوازي الأضلاع الناتج عن تشويه المربع المعياري. إذا كان المحدد سالباً، فهذا يعني أن الفضاء قد قُلب ظهراً لبطن (انعكاس التوجيه). أما إذا بلغ المحدد صفراً، فهذا يعني أن الفضاء قد سُحق وضُغط في بعد أقل، مما يجعل استرجاع المعلومات الأصلية مستحيلاً (مصفوفة غير قابلة للعكس).
+* **العربية:** المحدد ليس مجرد صيغة حسابية معقدة للأقطار، بل هو المعامل الفيزيائي لتمدد أو انكماش الحجوم المكانية. يُعبر محدد المصفوفة $2 \times 2$ عن المساحة الموجهة لمتوازي الأضلاع الناتج عن تشويه المربع المعياري. إذا كان المحدد سالباً، فهذا يعني أن الفضاء قد قُلب ظهراً لبطن (انعكاس التوجيه). أما إذا بلغ المحدد صفراً، فهذا يعني أن الفضاء قد سُحق وضُغط في بعد أقل، مما يجعل استرجاع المعلومات الأصلية مستحيلاً (مصفوفة غير قابلة للعكس).
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{A} = \begin{bmatrix} a & b \\ c & d \end{bmatrix} \in \mathbb{R}^{2 \times 2} \implies \det(\mathbf{A}) = ad - bc$$
@@ -404,7 +404,7 @@ By systematically using the first clue to cancel out the first suspect from all 
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** Gaussian elimination is an algorithmic procedure that transforms an arbitrary linear system $\mathbf{A}\mathbf{x} = \mathbf{b}$ into row echelon form via elementary row operations. Geometrically, each equation represents a hyperplane; finding the solution corresponds to locating the intersection of these hyperplanes. Row operations preserve the solution set because they correspond to multiplying the system on the left by invertible elementary matrices.
-* **العربية (إطار):** الحذف الغاوسي هو خوارزمية منهجية لتحويل منظومة معادلات خطية متداخلة $\mathbf{A}\mathbf{x} = \mathbf{b}$ إلى شكل درجِي بسيط يسهل حله بالتعويض الخلفي. هندسياً، تُمثل كل معادلة مستوياً فائقاً في الفضاء، وحل المنظومة هو نقطة تقاطع تلك المستويات جميعاً. العمليات الصفية الأولية (التبديل، الضرب بمقياس، والإضافة) لا تغير نقطة التقاطع الهندسية أبداً، بل تُبسط المحاور الحسابية كاشفة عن الحل الصريح.
+* **العربية:** الحذف الغاوسي هو خوارزمية منهجية لتحويل منظومة معادلات خطية متداخلة $\mathbf{A}\mathbf{x} = \mathbf{b}$ إلى شكل درجِي بسيط يسهل حله بالتعويض الخلفي. هندسياً، تُمثل كل معادلة مستوياً فائقاً في الفضاء، وحل المنظومة هو نقطة تقاطع تلك المستويات جميعاً. العمليات الصفية الأولية (التبديل، الضرب بمقياس، والإضافة) لا تغير نقطة التقاطع الهندسية أبداً، بل تُبسط المحاور الحسابية كاشفة عن الحل الصريح.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$[\mathbf{A} \mid \mathbf{b}] = \begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} & \mid & b_1 \\ a_{21} & a_{22} & \cdots & a_{2n} & \mid & b_2 \\ \vdots & \vdots & \ddots & \vdots & \mid & \vdots \\ a_{m1} & a_{m2} & \cdots & a_{mn} & \mid & b_m \end{bmatrix} \xrightarrow{\text{Row Operations}} \begin{bmatrix} p_1 & * & \cdots & * & \mid & \tilde{b}_1 \\ 0 & p_2 & \cdots & * & \mid & \tilde{b}_2 \\ \vdots & \vdots & \ddots & \vdots & \mid & \vdots \\ 0 & 0 & \cdots & p_r & \mid & \tilde{b}_r \end{bmatrix}$$
@@ -449,7 +449,7 @@ Meanwhile, in the output world $\mathbb{R}^m$:
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** Any matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$ decomposes its domain $\mathbb{R}^n$ and codomain $\mathbb{R}^m$ into two pairs of mutually orthogonal complementary subspaces: $\mathbb{R}^n = \mathcal{C}(\mathbf{A}^T) \oplus \mathcal{N}(\mathbf{A})$ and $\mathbb{R}^m = \mathcal{C}(\mathbf{A}) \oplus \mathcal{N}(\mathbf{A}^T)$. The dimension of the row space equals the dimension of the column space; this shared integer $r$ is the rank of the matrix.
-* **العربية (إطار):** تُقسّم أي مصفوفة $A \in \mathbb{R}^{m \times n}$ فضاء المنطلق $\mathbb{R}^n$ وفضاء المستقر $\mathbb{R}^m$ إلى أربعة فضاءات جزئية أساسية متعامدة مثنى مثنى. فضاء الصفوف وفضاء النواة يتعامدان تماماً داخل المنطلق، بينما يتعامد فضاء الأعمدة مع النواة اليسرى داخل المستقر. المعجزة الكبرى هي أن بعد فضاء الصفوف يساوي دوماً بعد فضاء الأعمدة، ويسمى هذا البعد المشترك "رتبة المصفوفة" ($r$).
+* **العربية:** تُقسّم أي مصفوفة $A \in \mathbb{R}^{m \times n}$ فضاء المنطلق $\mathbb{R}^n$ وفضاء المستقر $\mathbb{R}^m$ إلى أربعة فضاءات جزئية أساسية متعامدة مثنى مثنى. فضاء الصفوف وفضاء النواة يتعامدان تماماً داخل المنطلق، بينما يتعامد فضاء الأعمدة مع النواة اليسرى داخل المستقر. المعجزة الكبرى هي أن بعد فضاء الصفوف يساوي دوماً بعد فضاء الأعمدة، ويسمى هذا البعد المشترك "رتبة المصفوفة" ($r$).
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{A} \in \mathbb{R}^{m \times n}, \quad \operatorname{rank}(\mathbf{A}) = r$$
@@ -486,7 +486,7 @@ What is the most honest, optimal compromise? Drop an orthogonal perpendicular pl
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** When an overdetermined linear system $\mathbf{A}\mathbf{x} = \mathbf{b}$ has no exact solution because $\mathbf{b} \notin \mathcal{C}(\mathbf{A})$, the method of least squares seeks the vector $\hat{\mathbf{x}}$ that minimizes the squared Euclidean residual norm $\|\mathbf{b} - \mathbf{A}\mathbf{x}\|_2^2$. Geometrically, this occurs when the residual error vector $\mathbf{b} - \mathbf{A}\hat{\mathbf{x}}$ is orthogonal to the column space of $\mathbf{A}$, leading directly to the normal equations $\mathbf{A}^T \mathbf{A} \hat{\mathbf{x}} = \mathbf{A}^T \mathbf{b}$.
-* **العربية (إطار):** عندما تكون منظومة المعادلات الخطية فوق المُحددة مستحيلة الحل بسبب وجود ضوضاء تجريبية تجعل الهدف $\mathbf{b}$ خارج فضاء الأعمدة، فإننا نلجأ إلى حل المربعات الصغرى. هندسياً، نسقط المتجه $\mathbf{b}$ عمودياً على فضاء الأعمدة للحصول على أفضل تقريب ممكن $\mathbf{p}$. يكون متجه الخطأ $\mathbf{e} = \mathbf{b} - \mathbf{p}$ متعامداً بالكامل مع فضاء الأعمدة، مما يولد المعادلات الطبيعية الشهيرة $\mathbf{A}^T \mathbf{A} \hat{\mathbf{x}} = \mathbf{A}^T \mathbf{b}$.
+* **العربية:** عندما تكون منظومة المعادلات الخطية فوق المُحددة مستحيلة الحل بسبب وجود ضوضاء تجريبية تجعل الهدف $\mathbf{b}$ خارج فضاء الأعمدة، فإننا نلجأ إلى حل المربعات الصغرى. هندسياً، نسقط المتجه $\mathbf{b}$ عمودياً على فضاء الأعمدة للحصول على أفضل تقريب ممكن $\mathbf{p}$. يكون متجه الخطأ $\mathbf{e} = \mathbf{b} - \mathbf{p}$ متعامداً بالكامل مع فضاء الأعمدة، مما يولد المعادلات الطبيعية الشهيرة $\mathbf{A}^T \mathbf{A} \hat{\mathbf{x}} = \mathbf{A}^T \mathbf{b}$.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\hat{\mathbf{x}} = \arg\min_{\mathbf{x} \in \mathbb{R}^n} \|\mathbf{b} - \mathbf{A}\mathbf{x}\|_2^2 \implies \mathbf{A}^T (\mathbf{b} - \mathbf{A}\hat{\mathbf{x}}) = \mathbf{0}$$
@@ -522,7 +522,7 @@ However, for almost every transformation, there exist a few special, magical dir
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** For an operator $\mathbf{A} \in \mathbb{R}^{n \times n}$, an eigenvector is a non-zero vector $\mathbf{v}$ whose spatial direction is preserved under the transformation, satisfying $\mathbf{A}\mathbf{v} = \lambda \mathbf{v}$. The scalar $\lambda$ is its corresponding eigenvalue. Geometrically, the eigenvectors identify the intrinsic axes of stretch, and solving for them requires finding the roots of the characteristic polynomial $\det(\mathbf{A} - \lambda \mathbf{I}) = 0$.
-* **العربية (إطار):** عندما تُغير المصفوفة معالم الفضاء، فإن معظم المتجهات تنحرف عن مسارها الأصلي وتدور. لكن ثمة متجهات استثنائية تحافظ على اتجاهها الأصلي تماماً ولا تدور؛ تكتفي المصفوفة بمدّها أو تقليصها بمقدار مقياس عددي $\lambda$. تُسمى هذه المحاور الصامدة "المتجهات الذاتية"، ويُسمى معامل التمدد "القيمة الذاتية". هذه المتجهات تفضح البنية الجوهرية للتحويل وتكشف عن محاوره الطبيعية.
+* **العربية:** عندما تُغير المصفوفة معالم الفضاء، فإن معظم المتجهات تنحرف عن مسارها الأصلي وتدور. لكن ثمة متجهات استثنائية تحافظ على اتجاهها الأصلي تماماً ولا تدور؛ تكتفي المصفوفة بمدّها أو تقليصها بمقدار مقياس عددي $\lambda$. تُسمى هذه المحاور الصامدة "المتجهات الذاتية"، ويُسمى معامل التمدد "القيمة الذاتية". هذه المتجهات تفضح البنية الجوهرية للتحويل وتكشف عن محاوره الطبيعية.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{A}\mathbf{v} = \lambda \mathbf{v} \iff (\mathbf{A} - \lambda \mathbf{I})\mathbf{v} = \mathbf{0}, \quad \mathbf{v} \ne \mathbf{0}$$
@@ -561,7 +561,7 @@ Geometrically, this means a symmetric transformation does not shear space or twi
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The Spectral Theorem asserts that any real symmetric matrix $\mathbf{A} = \mathbf{A}^T \in \mathbb{R}^{n \times n}$ is orthogonally diagonalizable: $\mathbf{A} = \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^T$, where $\mathbf{Q}$ is an orthogonal matrix ($\mathbf{Q}^T \mathbf{Q} = \mathbf{I}$) and $\mathbf{\Lambda}$ is real diagonal. Geometrically, this decomposes the transformation into a pure rotation into the eigen-frame, an independent coordinate stretching along perpendicular axes, and a rotation back.
-* **العربية (إطار):** تُمثل المبرهنة الطيفية ذروة الجمال في الجبر الخطي؛ إذ تؤكد أن أي مصفوفة متناظرة حقيقية ($\mathbf{A} = \mathbf{A}^T$) تمتلك قيماً ذاتية حقيقية تماماً، وتتحلل إلى متجهات ذاتية متعامدة مثنى مثنى. هندسياً، يعني هذا أن أي تشويه متناظر للفضاء هو في حقيقته مجرد دوران للإحداثيات، يليه شد أو تقليص على طول محاور متعامدة، ثم دوران معاكس، دون أي انحراف غير متناسق.
+* **العربية:** تُمثل المبرهنة الطيفية ذروة الجمال في الجبر الخطي؛ إذ تؤكد أن أي مصفوفة متناظرة حقيقية ($\mathbf{A} = \mathbf{A}^T$) تمتلك قيماً ذاتية حقيقية تماماً، وتتحلل إلى متجهات ذاتية متعامدة مثنى مثنى. هندسياً، يعني هذا أن أي تشويه متناظر للفضاء هو في حقيقته مجرد دوران للإحداثيات، يليه شد أو تقليص على طول محاور متعامدة، ثم دوران معاكس، دون أي انحراف غير متناسق.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{A} \in \mathbb{R}^{n \times n}, \quad \mathbf{A} = \mathbf{A}^T \implies \mathbf{A} = \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^T = \sum_{i=1}^n \lambda_i \mathbf{q}_i \mathbf{q}_i^T$$
@@ -601,7 +601,7 @@ Geometrically, imagine taking a unit sphere in your input space. When any linear
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The Singular Value Decomposition factors any arbitrary real matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$ into the product of three geometric operations: $\mathbf{A} = \mathbf{U} \mathbf{\Sigma} \mathbf{V}^T$. $\mathbf{V}$ rotates the input space, $\mathbf{\Sigma}$ stretches along orthogonal coordinates by non-negative singular values $\sigma_1 \ge \sigma_2 \ge \dots \ge 0$, and $\mathbf{U}$ rotates the result into the codomain. By the Eckart-Young-Mirsky theorem, truncating this sum to the top $k$ terms provides the optimal low-rank matrix approximation under both Frobenius and spectral norms.
-* **العربية (إطار):** تفكيك القيم المفردة (SVD) هو قمة الجبر الخطي وأقوى أداة في علم البيانات؛ إذ يفكك أي مصفوفة مستطيلة أو مربعة دون استثناء إلى ثلاثة أطوار هندسية متتالية: دوران في فضاء المدخلات ($\mathbf{V}^T$)، يليه شد وتمديد إحداثي بقيم موجبة مرتبة تنازلياً تُدعى "القيم المفردة" ($\mathbf{\Sigma}$)، يليه دوران في فضاء المخرجات ($\mathbf{U}$). تُثبت مبرهنة إيكارت-يونغ أن أخذ أول $k$ حداً من هذا التفكيك يمنحنا أفضل تمثيل مضغوط للمصفوفة بأقل قدر ممكن من فقدان البيانات.
+* **العربية:** تفكيك القيم المفردة (SVD) هو قمة الجبر الخطي وأقوى أداة في علم البيانات؛ إذ يفكك أي مصفوفة مستطيلة أو مربعة دون استثناء إلى ثلاثة أطوار هندسية متتالية: دوران في فضاء المدخلات ($\mathbf{V}^T$)، يليه شد وتمديد إحداثي بقيم موجبة مرتبة تنازلياً تُدعى "القيم المفردة" ($\mathbf{\Sigma}$)، يليه دوران في فضاء المخرجات ($\mathbf{U}$). تُثبت مبرهنة إيكارت-يونغ أن أخذ أول $k$ حداً من هذا التفكيك يمنحنا أفضل تمثيل مضغوط للمصفوفة بأقل قدر ممكن من فقدان البيانات.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{A} \in \mathbb{R}^{m \times n}, \quad \mathbf{A} = \mathbf{U} \mathbf{\Sigma} \mathbf{V}^T = \sum_{i=1}^r \sigma_i \mathbf{u}_i \mathbf{v}_i^T$$
@@ -642,7 +642,7 @@ Continuity simply means: when you arrive at the spot, there is no sudden trapdoo
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The formal $(\epsilon, \delta)$-definition of a limit establishes the rigorous foundation of mathematical analysis. It asserts that $f(x)$ approaches $L$ as $x$ approaches $c$ if, for any arbitrarily small tolerance band $\epsilon > 0$ around $L$, there exists a corresponding neighborhood radius $\delta > 0$ around $c$ such that whenever $x$ is within $\delta$ of $c$ (excluding $x = c$), $f(x)$ is guaranteed to be within $\epsilon$ of $L$. Continuity requires the limit to exist and coincide with the function's value.
-* **العربية (إطار):** تضع نهاية الدالة حجر الأساس للتحليل الرياضي عبر تعريف $(\epsilon, \delta)$ الصارم لغوتفريد لايبنتز وأوغستين كوشي. لا تهتم النهاية بما يحدث "عند" النقطة تحديداً، بل بسلوك الدالة عند الاقتراب اللانهائي منها. إذا استطعنا حصر قيم الدالة ضمن أي هامش خطأ ضئيل $\epsilon$ بمجرد الاقتراب من النقطة بمسافة $\delta$، فإن النهاية موجودة. أما "الاتصال" فيعني سلاسة المنحنى وخلوه من أي قفزات مفاجئة أو فجوات ممزقة.
+* **العربية:** تضع نهاية الدالة حجر الأساس للتحليل الرياضي عبر تعريف $(\epsilon, \delta)$ الصارم لغوتفريد لايبنتز وأوغستين كوشي. لا تهتم النهاية بما يحدث "عند" النقطة تحديداً، بل بسلوك الدالة عند الاقتراب اللانهائي منها. إذا استطعنا حصر قيم الدالة ضمن أي هامش خطأ ضئيل $\epsilon$ بمجرد الاقتراب من النقطة بمسافة $\delta$، فإن النهاية موجودة. أما "الاتصال" فيعني سلاسة المنحنى وخلوه من أي قفزات مفاجئة أو فجوات ممزقة.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\lim_{x \to c} f(x) = L \iff \forall \epsilon > 0, \; \exists \delta > 0 \; \text{s.t.} \; 0 < |x - c| < \delta \implies |f(x) - L| < \epsilon$$
@@ -677,7 +677,7 @@ The **derivative** is the mathematical realization of this miracle: it is the sl
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The derivative of a function $f: \mathbb{R} \to \mathbb{R}$ at point $x$ is the instantaneous rate of change, defined as the limit of the difference quotient as the interval step $h \to 0$. Geometrically, it defines the slope of the unique tangent line that kisses the curve at $(x, f(x))$. Conceptually, it serves as the local linearizer: near $x$, the non-linear response $\Delta f$ is approximated by $f'(x) \cdot \Delta x$.
-* **العربية (إطار):** المشتقة هي أداة التكبير الرياضية العظمى؛ فمهما بلغ المنحنى من تعقيد والتواء، فإنك إذا قمت بتكبيره مجهرياً عند نقطة ما، فإنه سيفقد انحناءه ويتحول تدريجياً إلى خط مستقيم. ميل هذا الخط المستقيم الملامس هو "المشتقة". تُعبر المشتقة عن معدل التغير اللحظي، وتوفر "التقريب الخطي المحلي" الذي يتيح لنا استبدال المعادلات غير الخطية الصعبة بخطوط مستقيمة سهلة الحساب.
+* **العربية:** المشتقة هي أداة التكبير الرياضية العظمى؛ فمهما بلغ المنحنى من تعقيد والتواء، فإنك إذا قمت بتكبيره مجهرياً عند نقطة ما، فإنه سيفقد انحناءه ويتحول تدريجياً إلى خط مستقيم. ميل هذا الخط المستقيم الملامس هو "المشتقة". تُعبر المشتقة عن معدل التغير اللحظي، وتوفر "التقريب الخطي المحلي" الذي يتيح لنا استبدال المعادلات غير الخطية الصعبة بخطوط مستقيمة سهلة الحساب.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$f'(x) \coloneqq \frac{df}{dx} = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}$$
@@ -717,7 +717,7 @@ The **Chain Rule** is nothing more than this gear-ratio multiplication applied t
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The chain rule computes the derivative of a composite function $F(x) = (f \circ g)(x) = f(g(x))$. It states that the total sensitivity of the output to the input is the product of the local sensitivity of the outer function evaluated at the intermediate state, multiplied by the sensitivity of the inner function. This multiplicative propagation of local linearizations forms the bedrock of backpropagation in deep neural networks.
-* **العربية (إطار):** قاعدة السلسلة هي قانون التروس الرياضي الحاكم لدوال التركيب المتسلسلة $f(g(x))$. تنص القاعدة على أن الحساسية الكلية للمخرج بالنسبة للمدخل هي حاصل ضرب الحساسيات الوسيطة عبر المسار. إذا كانت الدالة الداخلية تتغير بمعدل معين، والدالة الخارجية تتأثر بمخرجاتها بمعدل آخر، فإن الأثر الإجمالي ينتقل بضرب المعدلات معاً. هذه العملية هي الأساس الحسابي الدقيق لخوارزمية "الانتشار الخلفي للخطأ" (Backpropagation) في الشبكات العصبية العميقة.
+* **العربية:** قاعدة السلسلة هي قانون التروس الرياضي الحاكم لدوال التركيب المتسلسلة $f(g(x))$. تنص القاعدة على أن الحساسية الكلية للمخرج بالنسبة للمدخل هي حاصل ضرب الحساسيات الوسيطة عبر المسار. إذا كانت الدالة الداخلية تتغير بمعدل معين، والدالة الخارجية تتأثر بمخرجاتها بمعدل آخر، فإن الأثر الإجمالي ينتقل بضرب المعدلات معاً. هذه العملية هي الأساس الحسابي الدقيق لخوارزمية "الانتشار الخلفي للخطأ" (Backpropagation) في الشبكات العصبية العميقة.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$(f \circ g)'(x) = f'(g(x)) \cdot g'(x) \iff \frac{dy}{dx} = \frac{dy}{du} \cdot \frac{du}{dx}$$
@@ -756,7 +756,7 @@ Geometrically, if the second derivative is positive ($f''(x) > 0$), the slope is
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The second derivative $f''(x)$ is the rate of change of the rate of change, quantifying the geometric curvature of the graph. When $f''(x) > 0$, the slope is strictly increasing, the tangent lines lie entirely below the graph, and the function is strictly concave up (convex). Points where the second derivative changes sign ($f''(x) = 0$ with an actual sign transition) are inflection points, where the curve transitions between bowl-like and dome-like geometry.
-* **العربية (إطار):** إذا كانت المشتقة الأولى تُخبرنا باتجاه الحركة صعوداً أو هبوطاً، فإن المشتقة الثانية $f''(x)$ تقيس "انحناء" المنحنى وتسارع تغير الميل. عندما تكون المشتقة الثانية موجبة، يتجه المنحنى إلى الأعلى كالإناء المفتوح (مقعر لأعلى / محدب)، وتستقر فيه المماسات أسفل المنحنى دائماً، مما يضمن وجود قاع مستقر (نهاية صغرى). أما نقطة الانقلاب (Inflection point) فهي النقطة المحورية التي ينقلب عندها المنحنى من التقعر إلى التحدب.
+* **العربية:** إذا كانت المشتقة الأولى تُخبرنا باتجاه الحركة صعوداً أو هبوطاً، فإن المشتقة الثانية $f''(x)$ تقيس "انحناء" المنحنى وتسارع تغير الميل. عندما تكون المشتقة الثانية موجبة، يتجه المنحنى إلى الأعلى كالإناء المفتوح (مقعر لأعلى / محدب)، وتستقر فيه المماسات أسفل المنحنى دائماً، مما يضمن وجود قاع مستقر (نهاية صغرى). أما نقطة الانقلاب (Inflection point) فهي النقطة المحورية التي ينقلب عندها المنحنى من التقعر إلى التحدب.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$f''(x) \coloneqq \frac{d^2 f}{dx^2} = \lim_{h \to 0} \frac{f'(x + h) - f'(x)}{h} = \lim_{h \to 0} \frac{f(x+h) - 2f(x) + f(x-h)}{h^2}$$
@@ -796,7 +796,7 @@ With each higher derivative you match, your polynomial hugs the true curve over 
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** A Taylor series represents an infinitely differentiable function $f(x)$ near an anchor point $a$ as an infinite power series whose coefficients are determined by the function's higher-order derivatives: $\frac{f^{(k)}(a)}{k!}$. By matching height, slope, curvature, jerk, and all subsequent rates of change, Taylor polynomials provide increasingly tight polynomial approximations. Taylor's theorem with Lagrange remainder provides a rigorous bound on the truncation error.
-* **العربية (إطار):** متسلسلة تايلور هي أعظم مصنع للتقريب في الرياضيات؛ إذ تتيح استبدال الدوال المعقدة والمتسامية (مثل الدوال المثلثية والأسية) بمتعددات حدود بسيطة لا تتطلب سوى الجمع والضرب. تبدأ المتسلسلة بمطابقة ارتفاع النقطة، ثم ميلها عبر المشتقة الأولى، ثم انحناءها عبر المشتقة الثانية، وهكذا دواليك. كل حد إضافي يمنح المنحنى التصاقاً أشد بالدالة الأصلية، مما يجعلها الأداة الأساسية للمحاكاة الرقمية والتحليل الفيزيائي.
+* **العربية:** متسلسلة تايلور هي أعظم مصنع للتقريب في الرياضيات؛ إذ تتيح استبدال الدوال المعقدة والمتسامية (مثل الدوال المثلثية والأسية) بمتعددات حدود بسيطة لا تتطلب سوى الجمع والضرب. تبدأ المتسلسلة بمطابقة ارتفاع النقطة، ثم ميلها عبر المشتقة الأولى، ثم انحناءها عبر المشتقة الثانية، وهكذا دواليك. كل حد إضافي يمنح المنحنى التصاقاً أشد بالدالة الأصلية، مما يجعلها الأداة الأساسية للمحاكاة الرقمية والتحليل الفيزيائي.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$f(x) = \sum_{k=0}^\infty \frac{f^{(k)}(a)}{k!} (x - a)^k = f(a) + f'(a)(x-a) + \frac{f''(a)}{2!}(x-a)^2 + \frac{f'''(a)}{3!}(x-a)^3 + \cdots$$
@@ -836,7 +836,7 @@ This is a **scalar field**: an assignment of a single scalar number to every poi
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** A multivariable scalar field is a mapping $f: \mathbb{R}^n \to \mathbb{R}$ assigning a single real value to every spatial vector. In $\mathbb{R}^2$, its graph forms a 2D surface manifold embedded in $\mathbb{R}^3$. Level sets (contour lines in 2D, isosurfaces in 3D) are the preimages $f^{-1}(c) = \{\mathbf{x} \in \mathbb{R}^n \mid f(\mathbf{x}) = c\}$. The spacing and geometry of level sets visually encode the magnitude and behavior of directional variation across the landscape.
-* **العربية (إطار):** الحقل العددي متعدد المتغيرات هو دالة تربط كل نقطة في فضاء متعدد الأبعاد برقم قياسي واحد، مثل تعيين درجة الحرارة أو الارتفاع الطبوغرافي عند كل نقطة جغرافية $(x, y)$. لتصور هذا السطح ثلاثي الأبعاد على شاشة مستوية، نستخدم "خطوط الكنتور" (خطوط التسوية) التي تصل بين النقاط ذات القيمة المتطابقة. تقارب خطوط الكنتور يشير إلى جرف شديد الانحدار، بينما تباعدها يعكس تضاريس منبسطة هادئة.
+* **العربية:** الحقل العددي متعدد المتغيرات هو دالة تربط كل نقطة في فضاء متعدد الأبعاد برقم قياسي واحد، مثل تعيين درجة الحرارة أو الارتفاع الطبوغرافي عند كل نقطة جغرافية $(x, y)$. لتصور هذا السطح ثلاثي الأبعاد على شاشة مستوية، نستخدم "خطوط الكنتور" (خطوط التسوية) التي تصل بين النقاط ذات القيمة المتطابقة. تقارب خطوط الكنتور يشير إلى جرف شديد الانحدار، بينما تباعدها يعكس تضاريس منبسطة هادئة.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$f: \mathbb{R}^n \to \mathbb{R}, \quad \mathbf{x} = \begin{bmatrix} x_1 \\ \vdots \\ x_n \end{bmatrix} \mapsto f(\mathbf{x}) \in \mathbb{R}$$
@@ -875,7 +875,7 @@ To calculate $\frac{\partial f}{\partial x}$, you treat $y$ as if it were a soli
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** A partial derivative measures the rate of change of a multivariable function $f(x_1, \dots, x_n)$ with respect to one single chosen variable $x_i$, holding all other remaining variables strictly constant. Geometrically, this corresponds to slicing the 3D surface with a vertical plane parallel to the chosen coordinate axis and evaluating the ordinary 1D derivative of the resulting planar intersection curve.
-* **العربية (إطار):** المشتقة الجزئية هي الإجابة عن سؤال: "كيف تتغير الدالة إذا تحركنا على طول محور واحد فقط مع تجميد جميع المحاور الأخرى كلياً؟" هندسياً، يعادل حساب المشتقة الجزئية $\frac{\partial f}{\partial x}$ قطع السطح الجبلي ثلاثي الأبعاد بشريحة رأسية موازية لمحور $X$، ثم قياس ميل منحنى التقاطع الناتج. عند الاشتقاق بالنسبة لـ $x$، نُعامل المتغير $y$ وكأنه رقم ثابت لا يتحرك.
+* **العربية:** المشتقة الجزئية هي الإجابة عن سؤال: "كيف تتغير الدالة إذا تحركنا على طول محور واحد فقط مع تجميد جميع المحاور الأخرى كلياً؟" هندسياً، يعادل حساب المشتقة الجزئية $\frac{\partial f}{\partial x}$ قطع السطح الجبلي ثلاثي الأبعاد بشريحة رأسية موازية لمحور $X$، ثم قياس ميل منحنى التقاطع الناتج. عند الاشتقاق بالنسبة لـ $x$، نُعامل المتغير $y$ وكأنه رقم ثابت لا يتحرك.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\frac{\partial f}{\partial x_i}(\mathbf{x}) \coloneqq \lim_{h \to 0} \frac{f(\mathbf{x} + h \mathbf{e}_i) - f(\mathbf{x})}{h} = \left. \frac{d}{dh} f(\mathbf{x} + h \mathbf{e}_i) \right|_{h=0}$$
@@ -914,7 +914,7 @@ To find the slope in *any* arbitrary direction $\hat{\mathbf{u}}$, you simply ta
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The gradient vector $\nabla f(\mathbf{x}) \in \mathbb{R}^n$ collects all $n$ first-order partial derivatives into a single vector field. By the Cauchy-Schwarz inequality, the directional derivative $D_{\hat{\mathbf{u}}} f = \nabla f \cdot \hat{\mathbf{u}} = \|\nabla f\| \|\hat{\mathbf{u}}\| \cos\theta$ is maximized when the unit direction $\hat{\mathbf{u}}$ aligns perfectly with $\nabla f$ ($\theta = 0$). Consequently, the gradient points in the direction of greatest instantaneous rate of increase, and is everywhere orthogonal to the level sets of the scalar field.
-* **العربية (إطار):** متجه التدرج $\nabla f$ هو البوصلة الرياضية الكبرى في الفضاء متعدد الأبعاد؛ إذ يجمع كل المشتقات الجزئية في متجه واحد ذي خصائص هندسية مذهلة. يُشير متجه التدرج دوماً نحو "الاتجاه الأشد صعوداً" على السطح، بينما يُعبر طوله عن أقصى معدل صعود ممكن. ولأن التحرك على طول خط الكنتور لا يُحدث أي تغير في الارتفاع، فإن متجه التدرج يتعامد دوماً وبشكل صارم مع خطوط الكنتور.
+* **العربية:** متجه التدرج $\nabla f$ هو البوصلة الرياضية الكبرى في الفضاء متعدد الأبعاد؛ إذ يجمع كل المشتقات الجزئية في متجه واحد ذي خصائص هندسية مذهلة. يُشير متجه التدرج دوماً نحو "الاتجاه الأشد صعوداً" على السطح، بينما يُعبر طوله عن أقصى معدل صعود ممكن. ولأن التحرك على طول خط الكنتور لا يُحدث أي تغير في الارتفاع، فإن متجه التدرج يتعامد دوماً وبشكل صارم مع خطوط الكنتور.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\nabla f(\mathbf{x}) \coloneqq \begin{bmatrix} \frac{\partial f}{\partial x_1}(\mathbf{x}) \\ \frac{\partial f}{\partial x_2}(\mathbf{x}) \\ \vdots \\ \frac{\partial f}{\partial x_n}(\mathbf{x}) \end{bmatrix} \in \mathbb{R}^n \times 1, \quad D_{\hat{\mathbf{u}}} f(\mathbf{x}) \coloneqq \lim_{h \to 0} \frac{f(\mathbf{x} + h\hat{\mathbf{u}}) - f(\mathbf{x})}{h} = \nabla f(\mathbf{x})^T \hat{\mathbf{u}}$$
@@ -953,7 +953,7 @@ To distinguish between these shapes, you need the **Hessian Matrix** $\mathbf{H}
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The Hessian matrix $\mathbf{H} \in \mathbb{R}^{n \times n}$ is the square matrix of second-order partial derivatives of a scalar field. By Schwarz's theorem on mixed partials, if $f$ is twice continuously differentiable ($C^2$), the Hessian is symmetric ($\mathbf{H} = \mathbf{H}^T$). The Hessian provides the quadratic curvature term in the multivariable Taylor expansion, and its spectral properties (eigenvalues) classify critical points into local minima, local maxima, or saddle points.
-* **العربية (إطار):** مصفوفة هيسي $\mathbf{H}$ هي المعيار الحاكم لانحناء وتحدب الفضاء متعدد الأبعاد؛ إذ تجمع كافة المشتقات الجزئية من الدرجة الثانية في مصفوفة مربعة متناظرة. في النقاط الحرجة التي ينعدم عندها التدرج، تقوم مصفوفة هيسي بفك لغز التضاريس عبر قيمها الذاتية: فإذا كانت جميع القيم الذاتية موجبة (مصفوفة موجبة المعرّفة)، فإننا في قاع وادٍ مستقر (نهاية صغرى). وإذا كانت سالبة، فنحن فوق قمة جبل (نهاية عظمى). أما إذا تباينت إشاراتها، فنحن نقف على "نقطة سرجية" (Saddle point) تتأرجح بين الصعود والهبوط.
+* **العربية:** مصفوفة هيسي $\mathbf{H}$ هي المعيار الحاكم لانحناء وتحدب الفضاء متعدد الأبعاد؛ إذ تجمع كافة المشتقات الجزئية من الدرجة الثانية في مصفوفة مربعة متناظرة. في النقاط الحرجة التي ينعدم عندها التدرج، تقوم مصفوفة هيسي بفك لغز التضاريس عبر قيمها الذاتية: فإذا كانت جميع القيم الذاتية موجبة (مصفوفة موجبة المعرّفة)، فإننا في قاع وادٍ مستقر (نهاية صغرى). وإذا كانت سالبة، فنحن فوق قمة جبل (نهاية عظمى). أما إذا تباينت إشاراتها، فنحن نقف على "نقطة سرجية" (Saddle point) تتأرجح بين الصعود والهبوط.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{H} = \nabla^2 f(\mathbf{x}) \coloneqq \begin{bmatrix} \frac{\partial^2 f}{\partial x_1^2} & \frac{\partial^2 f}{\partial x_1 \partial x_2} & \cdots & \frac{\partial^2 f}{\partial x_1 \partial x_n} \\ \frac{\partial^2 f}{\partial x_2 \partial x_1} & \frac{\partial^2 f}{\partial x_2^2} & \cdots & \frac{\partial^2 f}{\partial x_2 \partial x_n} \\ \vdots & \vdots & \ddots & \vdots \\ \frac{\partial^2 f}{\partial x_n \partial x_1} & \frac{\partial^2 f}{\partial x_n \partial x_2} & \cdots & \frac{\partial^2 f}{\partial x_n^2} \end{bmatrix} \in \mathbb{R}^{n \times n}$$
@@ -994,7 +994,7 @@ Geometrically, the Jacobian is the ultimate local linear transformation: if you 
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The Jacobian matrix $\mathbf{J} \in \mathbb{R}^{m \times n}$ is the complete collection of all first-order partial derivatives of a vector-valued function $\mathbf{f}: \mathbb{R}^n \to \mathbb{R}^m$. It represents the best local linear approximation of the mapping near an operating point: $\mathbf{f}(\mathbf{x} + \Delta \mathbf{x}) \approx \mathbf{f}(\mathbf{x}) + \mathbf{J}(\mathbf{x}) \Delta \mathbf{x}$. The absolute determinant of the square Jacobian $|\det \mathbf{J}|$ represents the local volume expansion factor under change of variables.
-* **العربية (إطار):** مصفوفة جاكوبي $\mathbf{J}$ هي التوسيع الشامل لمفهوم المشتقة ليشمل الدوال التي تأخذ متجهات وتُنتج متجهات أخرى ($\mathbf{f}: \mathbb{R}^n \to \mathbb{R}^m$). تجمع مصفوفة جاكوبي تدرجات جميع دوال المخرجات في صفوف منظمة. هندسياً، تُمثل مصفوفة جاكوبي التحويل الخطي المحلي الدقيق الذي يصف كيف يتشوه مكعب متناهي الصغر في فضاء المدخلات ويتحول إلى متوازي سطوح في فضاء المخرجات، ويُعبر محددها $|\det \mathbf{J}|$ عن معامل تمدد الحجوم في تكاملات تغيير المتغيرات.
+* **العربية:** مصفوفة جاكوبي $\mathbf{J}$ هي التوسيع الشامل لمفهوم المشتقة ليشمل الدوال التي تأخذ متجهات وتُنتج متجهات أخرى ($\mathbf{f}: \mathbb{R}^n \to \mathbb{R}^m$). تجمع مصفوفة جاكوبي تدرجات جميع دوال المخرجات في صفوف منظمة. هندسياً، تُمثل مصفوفة جاكوبي التحويل الخطي المحلي الدقيق الذي يصف كيف يتشوه مكعب متناهي الصغر في فضاء المدخلات ويتحول إلى متوازي سطوح في فضاء المخرجات، ويُعبر محددها $|\det \mathbf{J}|$ عن معامل تمدد الحجوم في تكاملات تغيير المتغيرات.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{f}: \mathbb{R}^n \to \mathbb{R}^m, \quad \mathbf{f}(\mathbf{x}) = \begin{bmatrix} f_1(\mathbf{x}) \\ f_2(\mathbf{x}) \\ \vdots \\ f_m(\mathbf{x}) \end{bmatrix}, \quad \mathbf{J} = \frac{\partial \mathbf{f}}{\partial \mathbf{x}} \coloneqq \begin{bmatrix} \frac{\partial f_1}{\partial x_1} & \cdots & \frac{\partial f_1}{\partial x_n} \\ \vdots & \ddots & \vdots \\ \frac{\partial f_m}{\partial x_1} & \cdots & \frac{\partial f_m}{\partial x_n} \end{bmatrix} = \begin{bmatrix} \nabla f_1^T \\ \vdots \\ \nabla f_m^T \end{bmatrix} \in \mathbb{R}^{m \times n}$$
@@ -1036,7 +1036,7 @@ Why is convexity the holy grail of modern optimization? Because on a convex bowl
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** A set $C \subseteq \mathbb{R}^n$ is convex if for all $\mathbf{x}, \mathbf{y} \in C$ and $\alpha \in [0, 1]$, the convex combination $\alpha \mathbf{x} + (1-\alpha)\mathbf{y} \in C$. A function $f: C \to \mathbb{R}$ is convex if its epigraph $\operatorname{epi}(f) \coloneqq \{(\mathbf{x}, t) \mid t \ge f(\mathbf{x})\}$ is a convex set, which is equivalent to Jensen's inequality: $f(\alpha \mathbf{x} + (1-\alpha)\mathbf{y}) \le \alpha f(\mathbf{x}) + (1-\alpha)f(\mathbf{y})$. For convex functions, any local minimum is unconditionally a global minimum.
-* **العربية (إطار):** التحدب هو الكأس المقدسة في علم التحسين الرياضي؛ فالمجموعة المحدبة هي تلك التي إذا وصلت بين أي نقطتين بداخلها بقطعة مستقيمة، ظلت تلك القطعة بكاملها محتواة داخل المجموعة دون أن تخرج منها. وتكون الدالة محدبة إذا كان "مخططها الفوقي" (المنطقة الواقعة فوق سطح المنحنى) يشكل مجموعة محدبة. الأهمية الاستثنائية للدوال المحدبة في تعلم الآلة تكمن في استحالة الوقوع في فخاخ النهايات الصغرى المحلية الخادعة؛ فكل قاع محلي هو حتماً القاع الشامل المطلق للدالة بأسرها.
+* **العربية:** التحدب هو الكأس المقدسة في علم التحسين الرياضي؛ فالمجموعة المحدبة هي تلك التي إذا وصلت بين أي نقطتين بداخلها بقطعة مستقيمة، ظلت تلك القطعة بكاملها محتواة داخل المجموعة دون أن تخرج منها. وتكون الدالة محدبة إذا كان "مخططها الفوقي" (المنطقة الواقعة فوق سطح المنحنى) يشكل مجموعة محدبة. الأهمية الاستثنائية للدوال المحدبة في تعلم الآلة تكمن في استحالة الوقوع في فخاخ النهايات الصغرى المحلية الخادعة؛ فكل قاع محلي هو حتماً القاع الشامل المطلق للدالة بأسرها.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$f(\alpha \mathbf{x} + (1-\alpha)\mathbf{y}) \le \alpha f(\mathbf{x}) + (1-\alpha)f(\mathbf{y}) \quad \forall \mathbf{x}, \mathbf{y} \in \operatorname{dom}(f), \; \alpha \in [0, 1]$$
@@ -1077,7 +1077,7 @@ You take a step downhill, feel the new slope, take another step downhill, and re
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** Gradient Descent is an iterative first-order optimization algorithm that seeks a local minimum of a differentiable function by taking successive steps proportional to the negative gradient: $\mathbf{x}_{t+1} = \mathbf{x}_t - \eta \nabla f(\mathbf{x}_t)$. The learning rate hyperparameter $\eta > 0$ dictates step size. Under $L$-Lipschitz gradient smoothness, convergence is guaranteed when $\eta < 2/L$. In ill-conditioned valleys, gradient descent exhibits severe zig-zagging oscillations due to disparate curvature across orthogonal eigen-directions.
-* **العربية (إطار):** خوارزمية الانحدار التدريجي هي العمود الفقري لتدريب كافة نماذج الذكاء الاصطناعي؛ إذ تُحاكي متسلقاً أعمى يهبط جبلاً غارقاً في الضباب عبر التحسس المستمر لدرجة ميل الأرض تحت قدميه والمشي في عكس اتجاه الصعود ($-\nabla f$). يُحدد "معدل التعلم" $\eta$ حجم الخطوة: فالخطوات المتناهية الصغر تؤدي لبطء شديد وتجمد، بينما الخطوات المفرطة تؤدي للقفز العنيف فوق الوادي وتشتت النموذج. وفي الأودية الضيقة ذات الانحناء غير المتناسق، تعاني الخوارزمية من تذبذبات متعرجة حادة.
+* **العربية:** خوارزمية الانحدار التدريجي هي العمود الفقري لتدريب كافة نماذج الذكاء الاصطناعي؛ إذ تُحاكي متسلقاً أعمى يهبط جبلاً غارقاً في الضباب عبر التحسس المستمر لدرجة ميل الأرض تحت قدميه والمشي في عكس اتجاه الصعود ($-\nabla f$). يُحدد "معدل التعلم" $\eta$ حجم الخطوة: فالخطوات المتناهية الصغر تؤدي لبطء شديد وتجمد، بينما الخطوات المفرطة تؤدي للقفز العنيف فوق الوادي وتشتت النموذج. وفي الأودية الضيقة ذات الانحناء غير المتناسق، تعاني الخوارزمية من تذبذبات متعرجة حادة.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\mathbf{x}_{t+1} = \mathbf{x}_t - \eta_t \nabla f(\mathbf{x}_t), \quad t = 0, 1, 2, \dots$$
@@ -1114,7 +1114,7 @@ At that exact tangency point, the trail does not cross the contour line; it graz
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** Constrained optimization seeks to maximize or minimize an objective function $f(\mathbf{x})$ subject to equality constraints $g_i(\mathbf{x}) = 0$. The method of Lagrange multipliers observes that at any constrained extremum, the objective function's contour manifold must be tangent to the constraint manifold; otherwise, one could move along the constraint to improve the objective. This geometric tangency translates to the collinearity of gradients: $\nabla f = \sum \lambda_i \nabla g_i$. The multiplier $\lambda_i$ quantifies the sensitivity ("shadow price") of the optimal value to perturbations in the constraint threshold.
-* **العربية (إطار):** تحل طريقة مضروبات لاغرانج معضلة تحسين الدوال الخاضعة لقيود إجبارية؛ كأن تبحث عن أعلى نقطة في جبل مع الالتزام الصارم بالسير على مسار سياحي محدد $g(x,y)=0$. هندسياً، لا يمكن بلوغ القمة المقيدة إلا عند النقطة التي يمس فيها مسار القيد خطوط كنتور الدالة المستهدفة؛ إذ يعني عدم التماس استمرار إمكانية الصعود على المسار. هذا التماس الهندسي يتكافأ مع توازي متجهات التدرج: $\nabla f = \lambda \nabla g$. ويُعبر المضروب $\lambda$ عن الحساسية الهامشية أو "السعر الخفي" لتعديل القيد.
+* **العربية:** تحل طريقة مضروبات لاغرانج معضلة تحسين الدوال الخاضعة لقيود إجبارية؛ كأن تبحث عن أعلى نقطة في جبل مع الالتزام الصارم بالسير على مسار سياحي محدد $g(x,y)=0$. هندسياً، لا يمكن بلوغ القمة المقيدة إلا عند النقطة التي يمس فيها مسار القيد خطوط كنتور الدالة المستهدفة؛ إذ يعني عدم التماس استمرار إمكانية الصعود على المسار. هذا التماس الهندسي يتكافأ مع توازي متجهات التدرج: $\nabla f = \lambda \nabla g$. ويُعبر المضروب $\lambda$ عن الحساسية الهامشية أو "السعر الخفي" لتعديل القيد.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$\min_{\mathbf{x} \in \mathbb{R}^n} f(\mathbf{x}) \quad \text{subject to} \quad g_i(\mathbf{x}) = 0, \quad i = 1, \dots, m \quad (m < n)$$
@@ -1153,7 +1153,7 @@ Even if you started with a bizarre, lopsided distribution (like coin flips, radi
 
 #### 2. Bilingual Narrative (EN / AR)
 * **English:** The Central Limit Theorem establishes that the normalized sum of $N$ independent and identically distributed (i.i.d.) random variables with finite mean $\mu$ and variance $\sigma^2$ converges in distribution to the standard normal distribution $\mathcal{N}(0, 1)$ as $N \to \infty$, regardless of the underlying distribution's shape. Geometrically, in an $N$-dimensional sample space, the probability measure of independent random coordinates concentrates in a thin spherical shell (the Gaussian annulus theorem), whose projection onto any 1D measurement axis yields the classic Gaussian density.
-* **العربية (إطار):** مبرهنة النهاية المركزية هي التاج الملكي لنظرية الاحتمالات والهندسة الإحصائية؛ إذ تُثبت أن مجموع عدد كبير من المتغيرات العشوائية المستقلة والمتطابقة التوزيع، مهما كان شكل توزيعها الأصلي غريباً أو مشوهاً أو غير متماثل، يقترب بالضرورة وبشكل حتمي من "التوزيع الطبيعي الغاوسي" الأملس متى ما كان التباين محدوداً. هندسياً، يعكس هذا المبدأ ظاهرة تركز الحجم في الفضاءات عالية الأبعاد؛ حيث تتركز الاحتمالات في قشرة كروية رقيقة يتخذ مسقطها الأحادي شكل منحنى الجرس الشهير.
+* **العربية:** مبرهنة النهاية المركزية هي التاج الملكي لنظرية الاحتمالات والهندسة الإحصائية؛ إذ تُثبت أن مجموع عدد كبير من المتغيرات العشوائية المستقلة والمتطابقة التوزيع، مهما كان شكل توزيعها الأصلي غريباً أو مشوهاً أو غير متماثل، يقترب بالضرورة وبشكل حتمي من "التوزيع الطبيعي الغاوسي" الأملس متى ما كان التباين محدوداً. هندسياً، يعكس هذا المبدأ ظاهرة تركز الحجم في الفضاءات عالية الأبعاد؛ حيث تتركز الاحتمالات في قشرة كروية رقيقة يتخذ مسقطها الأحادي شكل منحنى الجرس الشهير.
 
 #### 3. Rigorous KaTeX Anchor & Dimensional Typing
 $$S_N \coloneqq \sum_{i=1}^N X_i, \quad \bar{X}_N \coloneqq \frac{1}{N} S_N, \quad X_i \overset{\text{i.i.d.}}{\sim} \mathcal{D}(\mu, \sigma^2 < \infty)$$
@@ -1184,7 +1184,7 @@ $$\lim_{N \to \infty} P(Z_N \le z) = \Phi(z) \coloneqq \frac{1}{\sqrt{2\pi}} \in
 
 Each of the 29 lessons above has been rigorously authored to meet OKVIR's full pedagogical criteria:
 - [x] **First-Principles Intuition:** Zero unearned jargon; built from physical baseline up.
-- [x] **Bilingual Dual-Track Narrative:** Authentic English alongside culturally rooted Arabized mathematical terminology (إطار).
+- [x] **Bilingual Dual-Track Narrative:** Authentic English alongside culturally rooted Arabized mathematical terminology (Okvir).
 - [x] **Rigorous KaTeX Anchor with Dimensional Typing:** Full LaTeX notation with exact space memberships ($\mathbb{R}^n, \mathbb{R}^{m \times n}$) and four-column variable breakdown tables.
 - [x] **Physical Grounding:** Real-world tactile metaphors (levers, shadows, springs, compasses, circuits, clouds).
 - [x] **Cognitive Misconceptions Debunked:** Systematic dismantling of historical and student mental traps.

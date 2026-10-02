@@ -81,7 +81,7 @@ fn print_banner(version: &str) {
 ██▄  ▄██  ██  ██     ██  ██      ██    ██   ██
  ▀████▀   ██   ██     ▀██▀     ██████  ██    ██
  ─────────────────────────────────────────────\x1b[0m
-  \x1b[1mOKVIR (إطار)\x1b[0m \x1b[90mv{}\x1b[0m — Interactive AI & Econometrics Framework", version);
+  \x1b[1mOKVIR\x1b[0m \x1b[90mv{}\x1b[0m — Interactive AI & Econometrics Framework", version);
 }
 
 fn print_help(version: &str) {

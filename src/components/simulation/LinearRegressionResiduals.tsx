@@ -797,24 +797,38 @@ export const LinearRegressionResiduals: React.FC<{
           <div className="flex items-center gap-1.5 text-sm">
             <span>ŷ =</span>
             <button
-              onMouseEnter={() => setActiveMathToken('slope')}
-              onMouseLeave={() => setActiveMathToken(null)}
-              className={`px-1.5 py-0.5 rounded transition-all font-bold tabular-nums ${
-                activeMathToken === 'slope'
-                  ? 'bg-[var(--math-data)]/20 text-[var(--math-data)] ring-1 ring-[var(--math-data)]'
-                  : 'text-[var(--math-data)]'
+              onMouseEnter={() => {
+                setActiveMathToken('slope');
+                setGlobalActiveToken('slope', 'canvas');
+              }}
+              onMouseLeave={() => {
+                setActiveMathToken(null);
+                setGlobalActiveToken(null);
+              }}
+              onClick={() => setGlobalActiveToken(globalActiveToken === 'slope' ? null : 'slope', 'canvas')}
+              className={`px-1.5 py-0.5 rounded transition-all font-bold tabular-nums cursor-pointer ${
+                effectiveMathToken === 'slope'
+                  ? 'bg-[var(--math-data)]/20 text-[var(--math-data)] ring-1 ring-[var(--math-data)] shadow-xs'
+                  : 'text-[var(--math-data)] hover:bg-[var(--math-data)]/10'
               }`}
             >
               {slope.toFixed(2)}x
             </button>
             <span>+</span>
             <button
-              onMouseEnter={() => setActiveMathToken('intercept')}
-              onMouseLeave={() => setActiveMathToken(null)}
-              className={`px-1.5 py-0.5 rounded transition-all font-bold tabular-nums ${
-                activeMathToken === 'intercept'
-                  ? 'bg-[var(--math-data)]/20 text-[var(--math-data)] ring-1 ring-[var(--math-data)]'
-                  : 'text-[var(--math-data)]'
+              onMouseEnter={() => {
+                setActiveMathToken('intercept');
+                setGlobalActiveToken('intercept', 'canvas');
+              }}
+              onMouseLeave={() => {
+                setActiveMathToken(null);
+                setGlobalActiveToken(null);
+              }}
+              onClick={() => setGlobalActiveToken(globalActiveToken === 'intercept' ? null : 'intercept', 'canvas')}
+              className={`px-1.5 py-0.5 rounded transition-all font-bold tabular-nums cursor-pointer ${
+                effectiveMathToken === 'intercept'
+                  ? 'bg-[var(--math-data)]/20 text-[var(--math-data)] ring-1 ring-[var(--math-data)] shadow-xs'
+                  : 'text-[var(--math-data)] hover:bg-[var(--math-data)]/10'
               }`}
             >
               {intercept.toFixed(2)}
@@ -825,12 +839,19 @@ export const LinearRegressionResiduals: React.FC<{
         {/* Hover Residual Badge */}
         <div className="flex items-center gap-2">
           <button
-            onMouseEnter={() => setActiveMathToken('residual')}
-            onMouseLeave={() => setActiveMathToken(null)}
-            className={`px-2 py-0.5 rounded transition-all text-xs font-mono ${
-              activeMathToken === 'residual'
-                ? 'bg-rose-500/20 text-rose-300 ring-1 ring-rose-400'
-                : 'text-rose-400'
+            onMouseEnter={() => {
+              setActiveMathToken('residual');
+              setGlobalActiveToken('residual', 'canvas');
+            }}
+            onMouseLeave={() => {
+              setActiveMathToken(null);
+              setGlobalActiveToken(null);
+            }}
+            onClick={() => setGlobalActiveToken(globalActiveToken === 'residual' ? null : 'residual', 'canvas')}
+            className={`px-2 py-0.5 rounded transition-all text-xs font-mono cursor-pointer ${
+              effectiveMathToken === 'residual'
+                ? 'bg-rose-500/20 text-rose-300 ring-1 ring-rose-400 shadow-xs'
+                : 'text-rose-400 hover:bg-rose-500/10'
             }`}
           >
             Σ(y - ŷ)² = {currentLoss.toFixed(2)} (R² = {currentR2.toFixed(3)})
