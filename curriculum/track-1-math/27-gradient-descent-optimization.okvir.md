@@ -26,7 +26,31 @@ Furthermore, real-world mountain landscapes (and neural loss surfaces) are rarel
 
 How do physicists and engineers solve this? By rolling a heavy object: **Polyak Momentum**. Imagine releasing a heavy, dense iron bowling ball down the canyon. As the ball rolls, its sideways bounces across the walls cancel each other out, while its forward momentum along the gentle floor compounds exponentially. Momentum gives our optimization algorithm physical inertia, smoothing out chaotic zig-zags and accelerating our journey down the valley.
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Gradient Descent | Rolling a ball down a hill step-by-step to find the lowest valley of a loss function | الانحدار التدريجي | دحرجة كرة نحو أسفل المنحدر خطوة بخطوة لبلوغ أدنى وادٍ لدالة الخسارة |
+| Learning Rate ($\eta$) | The stride length: how large a step you take downhill in each update | معدل التعلم ($\eta$) | طول الخطوة: المسافة التي تقطعها هبوطاً في كل تحديث حسابي |
+| Overshooting | Taking steps so huge that you leap over the bottom and land higher up the opposite cliff | القفز المفرط (Overshooting) | أخذ خطوة عملاقة تقفز بك فوق الوادي لتهبط في موضع أعلى على الجرف المقابل |
+| Convergence | Settling smoothly into the flat floor of the valley where the gradient shrinks to zero | التقارب (Convergence) | الاستقرار السلس في قاع الوادي حيث يتلاشى الميل ويقترب التدرج من الصفر |
+| Momentum | Adding physical inertia so the ball powers through flat plateaus and ignores small ripples | الزخم (Momentum) | إضافة قصور ذاتي حركي يساعد الكرة على تجاوز التموجات السطحية الخادعة |
+
+#### Geometric & Visual Flow
+
+```
+        Loss
+          ▲
+          │  * x0 (Start)
+          │   \
+          │    * x1 (Step -η*grad)
+          │     \
+          │      * x2
+          │       \____* x* (Minimum reached! Gradient = 0)
+          └────────────────────────► Parameter w
+```
+
+### الحدس الفيزيائي والهندسي
 
 تخيل أنك معصوب العينين وتقف على سفح جبل صخري وعر يلفه ضباب كثيف لا ترى فيه يدك. لا يمكنك رؤية أي معالم حولك، ولا يمكنك تحديد موقع المخيم الدافئ الذي ينتظرك بأمان في أسفل الوادي. كيف يمكنك شق طريقك نحو النجاة دون أن تهوي من فوق جرف شاهق؟
 
@@ -39,6 +63,30 @@ How do physicists and engineers solve this? By rolling a heavy object: **Polyak 
 وفضلاً عن ذلك، نادراً ما تكون التضاريس الجبلية الحقيقية (أو أسطح خسارة النماذج العصبية) أواني متناظرة مثالية. بل هي في الغالب **أخاديد سيئة التكيف**: وديان ضيقة جداً تكون جدرانها الجانبية شديدة الانحدار كالسكين، بينما ينحدر قاعها الرئيسي برفق شديد نحو الأمام. هنا تقع خوارزمية الانحدار التقليدية في ورطة؛ حيث تقضي وقتها في التذبذب العنيف بين الجدران الجانبية المتقابلة بينما تزحف كالسلحفاة على طول القاع.
 
 كيف يحل المهندسون والفيزيائيون هذه المعضلة؟ بدحرجة جسم ثقيل: **زخم بولياك** (Polyak Momentum). تخيل أنك أطلقت كرة بولينغ فولاذية ثقيلة داخل الأخدود. أثناء تدحرج الكرة، تلغي الارتطامات الجانبية بعضها بعضاً، بينما يتراكم القصور الذاتي والسرعة الحركية على طول مسار القاع الهادئ. يمنح الزخم خوارزميات التحسين عزم قصور ذاتي فيزيائي يخمد التعرجات المزعجة ويسرع الوصول إلى قاع الوادي.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| الانحدار التدريجي | Rolling a ball down a hill step-by-step to find the lowest valley of a loss function | الانحدار التدريجي | دحرجة كرة نحو أسفل المنحدر خطوة بخطوة لبلوغ أدنى وادٍ لدالة الخسارة |
+| معدل التعلم ($\eta$) | The stride length: how large a step you take downhill in each update | معدل التعلم ($\eta$) | طول الخطوة: المسافة التي تقطعها هبوطاً في كل تحديث حسابي |
+| القفز المفرط (Overshooting) | Taking steps so huge that you leap over the bottom and land higher up the opposite cliff | القفز المفرط (Overshooting) | أخذ خطوة عملاقة تقفز بك فوق الوادي لتهبط في موضع أعلى على الجرف المقابل |
+| التقارب (Convergence) | Settling smoothly into the flat floor of the valley where the gradient shrinks to zero | التقارب (Convergence) | الاستقرار السلس في قاع الوادي حيث يتلاشى الميل ويقترب التدرج من الصفر |
+| الزخم (Momentum) | Adding physical inertia so the ball powers through flat plateaus and ignores small ripples | الزخم (Momentum) | إضافة قصور ذاتي حركي يساعد الكرة على تجاوز التموجات السطحية الخادعة |
+
+#### المخطط البصري الهندسي
+
+```
+        دالة الخسارة
+          ▲
+          │  * x0 (نقطة البداية)
+          │   \
+          │    * x1 (خطوة هبوط -η*grad)
+          │     \
+          │      * x2
+          │       \____* x* (الوصول للقاع! التدرج = 0)
+          └────────────────────────► الوزن العصبي w
+```
 
 :::simulation-widget{engine="canvas2d" component="GradientDescentDynamicsLab"}
 ---

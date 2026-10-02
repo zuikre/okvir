@@ -29,6 +29,28 @@ This is what a **matrix** actually is. A matrix is not a dry spreadsheet of numb
 
 ---
 
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Linear Transformation | Warping space like stretchy rubber: keeping grid lines straight and parallel | التحويل الخطي | تشويه الفضاء كمطاط مرن مع بقاء خطوط الشبكة مستقيمة ومتوازية |
+| Fixed Origin | The anchor pin at $(0,0)$ remains strictly motionless forever: $T(\mathbf{0}) = \mathbf{0}$ | ثبات نقطة الأصل | مسمار المركز $(0,0)$ يظل ثابتاً في مكانه ولا يتحرك إطلاقاً: $T(\mathbf{0}) = \mathbf{0}$ |
+| Matrix ($A$) | A compact tracking sheet recording where the standard unit arrows $\hat{i}$ and $\hat{j}$ landed | المصفوفة ($A$) | دفتر توثيق يسجل الإحداثيات الجديدة التي هبطت عندها أسهم الأساس المرجعية |
+| Shear | Sliding parallel layers of space sideways, like beveling a deck of cards | القص (Shear) | إزاحة طبقات الفضاء أفقياً أو رأسياً كإمالة حافة رزمة أوراق اللعب |
+| Rotation | Swiveling every arrow around the fixed origin by an angle $\theta$ without stretching | الدوران (Rotation) | تدوير كافة أسهم الفضاء حول نقطة الأصل بزاوية منتظمة دون تمديد |
+
+#### Geometric & Visual Flow
+
+```
+        Original Grid                 Warped Grid (Matrix A)
+           ▲                             ▲         * T(i+j)
+         j *───* i+j                   T(j)*      /
+           │   │                         │  \    /
+           └───*───►                     └───*──┴──►
+         Origin i                      Origin T(i)
+        Unit Square                   Tilted Parallelogram
+```
+
 ### الحدس الفيزيائي والهندسي
 
 تخيل أنك رسمت شبكة مربعات منتظمة على غشاء شفاف من المطاط المرن. عند نقطة تقاطع المحورين الرئيسيين، قمت بغرس دبوس معدني حاد يثبت نقطة الأصل $(0, 0)$ بإحكام في سطح طاولة خشبية. الآن، امسك بأطراف الغشاء المطاطي وحركه لتشويه شكله. ما هي التشويهات الفيزيائية المسموح بها لكي يظل هذا التحويل "خطياً"؟ يفرض الجبر الخطي قاعدتين صارمتين لا حياد عنهما: أولاً، يجب أن تظل جميع خطوط الشبكة مستقيمة تماماً دون أي انحناء؛ ثانياً، يجب أن تظل الخطوط المتوازية متوازية ومنتظمة التباعد. يمكنك شد الغشاء أفقياً، أو ضغطه رأسياً، أو تدويره بسلاسة حول الدبوس، أو إمالته جانبياً (قص هندسي Shear)—لكنك لا تستطيع أبداً تجعيد الغشاء، أو ثني خطوطه إلى منحنيات، أو اقتلاع دبوس نقطة الأصل من مكانه.
@@ -43,6 +65,28 @@ This is what a **matrix** actually is. A matrix is not a dry spreadsheet of numb
 1. **التعلم العميق وطبقات الشبكات العصبية:** العملية المركزية داخل كل طبقة في الشبكات العصبية هي $y = \sigma(\mathbf{W}\mathbf{x} + \mathbf{b})$. مصفوفة الأوزان $\mathbf{W}$ هي تحويل خطي يقوم بتدوير ومط الفضاء عالي الأبعاد للبيانات، مما يتيح لدوال التنشيط غير الخطية فصل وتصنيف الأنماط المعقدة.
 2. **الرسوم ثلاثية الأبعاد وكاميرات ألعاب الفيديو:** لعرض عالم اللعبة ثلاثي الأبعاد على شاشتك المسطحة ثنائية الأبعاد، تطبق كروت الشاشة سلسلة من مصفوفات التحويل $4 \times 4$ (مصفوفات النموذج، والكاميرا، والإسقاط المنظوري). يتم تحويل كل نقطة في مجسمات اللعبة عبر ضرب المصفوفات عشرات المرات في كل ثانية.
 3. **الروبوتات وحسابات الحركة العكسية:** عندما تحرك ذراع آلية مفاصلها للوصول إلى هدف ما، يُحسب الموقع النهائي لقبضة الروبوت بضرب مصفوفات التحويل الخطي التي تصف تدوير وتمديد كل مفصل على حدة.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| التحويل الخطي | Warping space like stretchy rubber: keeping grid lines straight and parallel | التحويل الخطي | تشويه الفضاء كمطاط مرن مع بقاء خطوط الشبكة مستقيمة ومتوازية |
+| ثبات نقطة الأصل | The anchor pin at $(0,0)$ remains strictly motionless forever: $T(\mathbf{0}) = \mathbf{0}$ | ثبات نقطة الأصل | مسمار المركز $(0,0)$ يظل ثابتاً في مكانه ولا يتحرك إطلاقاً: $T(\mathbf{0}) = \mathbf{0}$ |
+| المصفوفة ($A$) | A compact tracking sheet recording where the standard unit arrows $\hat{i}$ and $\hat{j}$ landed | المصفوفة ($A$) | دفتر توثيق يسجل الإحداثيات الجديدة التي هبطت عندها أسهم الأساس المرجعية |
+| القص (Shear) | Sliding parallel layers of space sideways, like beveling a deck of cards | القص (Shear) | إزاحة طبقات الفضاء أفقياً أو رأسياً كإمالة حافة رزمة أوراق اللعب |
+| الدوران (Rotation) | Swiveling every arrow around the fixed origin by an angle $\theta$ without stretching | الدوران (Rotation) | تدوير كافة أسهم الفضاء حول نقطة الأصل بزاوية منتظمة دون تمديد |
+
+#### المخطط البصري الهندسي
+
+```
+        الشبكة الأصلية                 الشبكة بعد التحويل بالمصفوفة A
+           ▲                             ▲         * T(i+j)
+         j *───* i+j                   T(j)*      /
+           │   │                         │  \    /
+           └───*───►                     └───*──┴──►
+        الأصل  i                       الأصل  T(i)
+        مربع الوحدة                   متوازي أضلاع مائل وممتد
+```
 
 :::simulation-widget{engine="canvas2d" component="LinearTransformMorphCanvas"}
 ---

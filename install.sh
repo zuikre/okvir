@@ -121,6 +121,15 @@ if [ "${PLATFORM}" = "linux" ]; then
     [ -f "${TMP_DIR}/okvir.png" ] && cp -f "${TMP_DIR}/okvir.png" "${HOME}/.local/share/pixmaps/okvir.png"
     [ -f "${TMP_DIR}/okvir.desktop" ] && cp -f "${TMP_DIR}/okvir.desktop" "${HOME}/.local/share/applications/okvir.desktop"
 
+    # Install Framework CLI script to ~/.okvir/bin
+    mkdir -p "${APP_DIR}/bin"
+    if [ -f "${TMP_DIR}/okvir.js" ]; then
+      cp -f "${TMP_DIR}/okvir.js" "${APP_DIR}/bin/okvir.js"
+    else
+      download_file "https://raw.githubusercontent.com/${OKVIR_REPO}/main/bin/okvir.js" "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
+    fi
+    chmod +x "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
+
     update-desktop-database "${HOME}/.local/share/applications" >/dev/null 2>&1 || true
     rm -rf "${TMP_DIR}"
     INSTALLED=true

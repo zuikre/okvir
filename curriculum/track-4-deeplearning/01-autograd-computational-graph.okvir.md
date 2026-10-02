@@ -25,6 +25,32 @@ When a final defect or performance metric is measured at the end of the factory 
 
 Without an explicit computational graph, a neural network is blind to its own internal machinery. By linking parent nodes to children through arithmetic operations, autograd weaves a Directed Acyclic Graph (DAG) during the normal forward execution. Every forward mathematical step lays down a breadcrumb trail that will serve as a backward highway during gradient backpropagation.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Autograd Node** (عقدة التفاضل التلقائي) | A "smart container" that stores a number, remembers its parent inputs, and knows what math operation created it. | "حاوية ذكية" تحتفظ بالقيمة العددية، وتتذكر مدخلاتها الأبوية والعملية الحسابية التي أنشأتها. |
+| **Computational Graph (DAG)** (الرسم البياني الحسابي) | A one-way assembly line blueprint tracing how raw inputs combine step-by-step into the final loss output. | مخطط خط الإنتاج باتجاه واحد: يتتبع مسار دمج المدخلات خطوة بخطوة حتى الناتج النهائي دون حلقات مفرغة. |
+| **Forward Pass** (المسار الأمامي) | Calculating outputs from inputs, leaving a trail of arithmetic breadcrumbs in memory. | حساب المخرجات انطلاقاً من المدخلات، مع ترك سجل محاسبي دقيق لكل عملية في الذاكرة. |
+| **Backward Pass** (المسار العكسي / الارتجاع) | Replaying the assembly line backwards to distribute blame (gradients) to each worker. | تتبع خط الإنتاج بالاتجاه المعاكس لتحديد مسؤولية كل مدخل عن الخطأ النهائي بدقة. |
+| **Gradient / Adjoint ($\bar{v}_i$)** (التدرج / الحساسية) | A sensitivity dial: "If I nudge this value up by $+1$, how much does the final loss move?" | مقياس الحساسية: "إذا حركنا هذا المقبض بمقدار طفيف، كم سيتغير الخطأ الكلي في النهاية؟" |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+FORWARD EVALUATION: Values flow left-to-right (Data Lineage DAG)
+========================================================================
+[Input: a=2.0] ---\
+                   (+) ---> [Node: c=5.0] ---\
+[Input: b=3.0] ---/                           (*) ---> [Scalar Loss: L=20.0]
+                     [Weight: w=4.0] --------/
+========================================================================
+REVERSE SENSITIVITY SWEEP: Gradients flow right-to-left (Chain Rule)
+[dL/da = +4.0] <--- (dL/dc = +4.0) <--- [Seed: dL/dL = 1.0]
+[dL/db = +4.0] <---
+                     [dL/dw = +5.0] <---
+```
+
 :::simulation-widget{engine="canvas2d" component="AutogradGraphLab"}
 ---
 interactive: true
@@ -56,15 +82,21 @@ $$
 \bar{v}_i = \sum_{j \in \text{Children}(v_i)} \bar{v}_j \cdot \frac{\partial f_j}{\partial v_i}
 $$
 
-### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-* $v_i \in \mathbb{R}$: The scalar value computed at vertex $i$ (`node.data`).
-* $f_i: \mathbb{R}^k \to \mathbb{R}$: An elementary differentiable primitive operation ($+, -, \times, \div, (\cdot)^k, \exp, \log$).
-* $\text{Parents}(v_i) \subset \mathcal{V}$: The set of antecedent nodes whose values serve as direct arguments to $f_i$ (`node._prev`).
-* $\text{Children}(v_i) \subset \mathcal{V}$: The set of downstream nodes that consume $v_i$ as an input.
-* $\bar{v}_i \coloneqq \frac{\partial L}{\partial v_i}$: The adjoint variable or sensitivity gradient of the loss with respect to $v_i$ (`node.grad`).
-* $\mathcal{V} = \{v_1, v_2, \dots, v_N\}$: Topological ordering of all generated computational nodes.
-* $\mathcal{E}$: Directed edges encoding data lineage, flowing forward during forward evaluation and backward during reverse-mode sensitivity accumulation.
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $v_i \in \mathbb{R}$ | Scalar Vertex State / قيمة العقدة | The concrete floating-point number produced at step $i$ (`node.data`). |
+| $f_i(\cdot)$ | Differentiable Primitive / العملية الأولية | The atomic arithmetic operator applied ($+, -, \times, \div, (\cdot)^k$). |
+| $\text{Parents}(v_i)$ | Antecedent Operands / المدخلات الأبوية | The exact immediate parent nodes fed into operator $f_i$ (`node._prev`). |
+| $\text{Children}(v_i)$ | Downstream Consumers / العقد المستهلكة | Every subsequent operation that used $v_i$ as an input argument. |
+| $\bar{v}_i \coloneqq \frac{\partial L}{\partial v_i}$ | Adjoint Variable / المتغير المرافق | The marginal sensitivity of terminal loss $L$ to perturbations in $v_i$ (`node.grad`). |
+| $\sum_{j \in \text{Children}}$ | Multivariate Accumulator / مجمع المسارات | Multivariable chain rule sum collecting blame from all branches consuming $v_i$. |
+
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **Dynamic DAG Construction**: As each forward operation $v_i = f_i(\{v_j\})$ executes, it instantiates an active vertex capturing direct parent references $\text{Parents}(v_i)$, weaving an auditable directed acyclic graph in memory.
+2. **Reverse Chain Rule Traversal**: Because downstream loss $L$ depends on $v_i$ through all its immediate consumers $j \in \text{Children}(v_i)$, total derivative calculus dictates summing the product of upstream adjoint $\bar{v}_j$ and local partial derivative $\frac{\partial f_j}{\partial v_i}$.
+3. **Memory vs. Compute Trade-off**: Storing parent pointers and forward activations preserves the exact operating point needed to evaluate local derivatives during reverse accumulation, enabling linear-time gradient computation for millions of parameters.
 
 في الصياغة الرياضية الدقيقة، يُعرَّف الرسم البياني الحسابي كفضاء طوبولوجي موجه غير دائري $\mathcal{G} = (\mathcal{V}, \mathcal{E})$. تمثل كل عقدة $v_i$ قيمة سلمية حقيقية ناتجة عن تطبيق دالة أولية قابلة للاشتقاق $f_i$ على مخرجات العقد الأبوية السابقة $\text{Parents}(v_i)$. تشكل الحواف الموجهة $\mathcal{E}$ مسارات تدفق البيانات للأمام، ومسارات رجوع تدرجات الحساسية الرياضية $\bar{v}_i$ في الاتجاه المعاكس وفق قاعدة السلسلة متعددة المتغيرات.
 
@@ -87,9 +119,13 @@ test_cases:
 class Value:
     """Scalar autograd node for dynamic computational graph tracking."""
     def __init__(self, data: float | int, _children: tuple = (), _op: str = ''):
+        # Step 1: Store raw numerical scalar as float
         self.data = float(data)
+        # Step 2: Initialize gradient sensitivity to zero
         self.grad = 0.0
+        # Step 3: Record set of direct parent dependencies for backward graph traversal
         self._prev = set(_children)
+        # Step 4: Record string identifier of operator for debugging and visualization
         self._op = _op
 
     def __add__(self, other):

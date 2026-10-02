@@ -34,6 +34,40 @@ Once every head has gathered its unique perspective in parallel, their resulting
 
 > **Frontier Analogy:** Imagine an orchestra conductor who wants to hear every nuance of a symphony. Instead of listening with a single microphone that blends all instruments together into mono sound, the conductor sets up an 8-channel recording console: one mic on the violins, one on the cellos, one on the brass, and one on the percussion. The sound engineer mixes the distinct audio stems back into a rich, spatial master track ($\mathbf{W}_O$).
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Multi-Head Attention (MHA)** (الانتباه متعدد الرؤوس) | A committee of specialized analysts: splits attention across $h$ parallel heads so each head can track a different linguistic relationship. | لجنة من المحللين المتخصصين: تقسم الانتباه إلى عدة مسارات مستقلة ليتتبع كل رأس نمطاً لغوياً أو دلالياً مختلفاً. |
+| **Head Dimension ($d_k = d / h$)** (بُعد الرأس المستقل) | The slice width: dividing the total model width (e.g. 4096) among $h=32$ heads gives each head a nimble subspace of $128$ dimensions. | عرض الشريحة التحليلية: تقسيم البعد الإجمالي (مثل 4096) على 32 رأساً يمنح كل رأس فضاءً فرعياً رشيقاً بحجم 128 بعداً. |
+| **Subspace Projection** (إسقاط الفضاءات الفرعية) | Specialized lenses: learned weight matrices that project the full representation into dedicated subspaces (syntax, grammar, chronology). | عدسات تخصصية: مصفوفات إسقاط خطية توجه الإشارات نحو فضاءات فرعية تركز على النحو أو الضمائر أو السياق الزمني. |
+| **Concatenation ($\text{Concat}$)** (الدمج المتتالي للرؤوس) | Reassembling the committee: gluing the outputs of all $h$ heads side-by-side to restore the original full embedding width. | إعادة جمع تقارير اللجنة: رصف مخرجات كافة الرؤوس جنباً إلى جنب لاستعادة العرض الأصلي للنموذج. |
+| **Output Projection ($W_O$)** (مصفوفة الإسقاط التجميعية) | The chief editor: a final linear transformation that blends the diverse perspectives of all heads into a coherent updated representation. | رئيس التحرير: طبقة خطية ختامية تدمج رؤى كافة المحللين في سياق معرفي موحد ومتناغم. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+MULTI-HEAD ATTENTION ARCHITECTURE:
+=============================================================================
+Input Tensor: X  [Shape: (Batch B, Sequence S, Model_Dim d)]
+      |
+      +---> [Linear W_Q] ---> Split into h heads ---> Q_1, Q_2, ..., Q_h  [Shape each: (S, d_k)]
+      +---> [Linear W_K] ---> Split into h heads ---> K_1, K_2, ..., K_h  [Shape each: (S, d_k)]
+      +---> [Linear W_V] ---> Split into h heads ---> V_1, V_2, ..., V_h  [Shape each: (S, d_v)]
+      |
+Parallel Attention Computation:
+      Head 1 = Attention(Q_1, K_1, V_1)  ---> [Syntactic Subject-Verb Agreement]
+      Head 2 = Attention(Q_2, K_2, V_2)  ---> [Coreference: "it" -> "animal"]
+      ...
+      Head h = Attention(Q_h, K_h, V_h)  ---> [Positional / Temporal Sequence]
+      |
+Concatenation:
+      Merged = Concat(Head 1, Head 2, ..., Head h)  [Shape: (B, S, h * d_v) = (B, S, d)]
+      |
+Final Linear Projection:
+      Output = Merged * W_O                         [Shape: (B, S, d)]
+```
+
 :::simulation-widget{engine="canvas2d" component="AttentionHeatmapCanvas"}
 ---
 interactive: true
@@ -75,13 +109,22 @@ $$
 \text{head}_i = \text{Attention}\left(\mathbf{Q}\mathbf{W}_i^Q, \; \mathbf{K}\mathbf{W}_i^K, \; \mathbf{V}\mathbf{W}_i^V\right) = \text{softmax}\left(\frac{(\mathbf{Q}\mathbf{W}_i^Q)(\mathbf{K}\mathbf{W}_i^K)^T}{\sqrt{d_k}}\right) (\mathbf{V}\mathbf{W}_i^V)
 $$
 
-### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-* $\mathbf{X} \in \mathbb{R}^{B \times N \times d_{\text{model}}}$: Input token representation tensor across batch size $B$, sequence length $N$, and hidden dimension $d_{\text{model}}$.
-* $h$: Number of parallel attention heads (e.g., $h = 32$ in LLaMA-3-8B).
-* $d_k = d_v = \frac{d_{\text{model}}}{h}$: Dimension of each individual subspace per head (e.g., $4096 / 32 = 128$).
-* $\mathbf{W}_i^Q, \mathbf{W}_i^K, \mathbf{W}_i^V \in \mathbb{R}^{d_{\text{model}} \times d_k}$: Learned linear subspace projection matrices for head $i$.
-* $\mathbf{W}_O \in \mathbb{R}^{(h \cdot d_v) \times d_{\text{model}}} = \mathbb{R}^{d_{\text{model}} \times d_{\text{model}}}$: Final multi-head blending projection matrix.
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $h$ | Number of Attention Heads / عدد رؤوس الانتباه | Count of parallel subspaces computed simultaneously (e.g. 32 heads). |
+| $d_k = d_{\text{model}} / h$ | Subspace Dimension / بُعد الفضاء الفرعي | Dimensionality of queries and keys per head (e.g. $4096 / 32 = 128$). |
+| $\mathbf{W}_i^Q, \mathbf{W}_i^K \in \mathbb{R}^{d \times d_k}$ | Per-Head Input Projections / مصفوفات الإسقاط | Parameter matrices projecting full token embeddings into head $i$'s query and key spaces. |
+| $\mathbf{W}_i^V \in \mathbb{R}^{d \times d_v}$ | Per-Head Value Projection / مصفوفة إسقاط القيم | Parameter matrix projecting full token embeddings into head $i$'s value space. |
+| $\mathbf{W}^O \in \mathbb{R}^{h d_v \times d}$ | Multi-Head Output Projection / مصفوفة الإسقاط النهائي | Parameter matrix synthesizing combined head outputs back into the residual stream. |
+| $\text{Concat}(\cdot)$ | Concatenation Operator / مؤثر الربط المتتالي | Horizontal stacking operator assembling head outputs into a unified tensor. |
+
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **Overcoming Single-Head Averaging**: A single attention head can only produce one probability distribution per word, forcing it to average over conflicting priorities. Multi-head attention allows word $i$ to attend simultaneously to its antecedent pronoun, its governing verb, and its adjectives.
+2. **Computational Invariance**: Running $h$ heads with dimension $d/h$ costs exactly the same total floating-point operations ($O(S^2 d)$) as running a single giant head with dimension $d$. You get multi-perspective representations for free!
+3. **Linear Subspace Disentanglement**: The projection matrices $W_i^Q, W_i^K$ allow the model to isolate distinct subspaces of the hidden representation, isolating semantic topics from syntactic markers.
+
 
 ### Complexity & Computational Invariance Proof:
 For a single giant head with dimension $d_{\text{model}}$, the dot product $(\mathbf{Q}\mathbf{K}^T)$ requires $\mathcal{O}(N^2 \cdot d_{\text{model}})$ operations.

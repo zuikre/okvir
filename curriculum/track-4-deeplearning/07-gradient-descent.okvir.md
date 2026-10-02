@@ -23,6 +23,43 @@ In machine learning, how we measure this downhill slope defines the three classi
 2. **Stochastic Gradient Descent (SGD, $B = 1$):** You inspect a single randomly selected pebble and immediately leap in its downhill direction. Each step is lightning fast, but the gradient estimate is noisy and erratic—the optimizer bounces wildly in jagged, random zigzags across the landscape.
 3. **Mini-Batch Gradient Descent ($1 < B < N$):** The gold standard of modern deep learning. You sample a squad of 32, 64, or 256 pebbles. This strikes the ideal sweet spot: it saturates GPU parallel tensor cores with efficient matrix multiplications, while preserving just enough stochastic gradient noise to physically shake the parameters out of narrow, sharp local crevices into broad, flat valleys that generalize robustly to unseen data.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Loss Landscape** (تضاريس دالة الخسارة) | A vast high-dimensional mountain range where altitude represents error and low valleys represent intelligent models. | سلسلة جبال في فضاء عالي الأبعاد: يمثل الارتفاع نسبة الخطأ، بينما تمثل الوديان المنخفضة النماذج الذكية. |
+| **Gradient ($\nabla_\theta L$)** (متجه التدرج) | The local uphill compass: an arrow pointing directly toward the steepest ascent; we step in the exact opposite direction ($-\nabla$). | بوصلة الصعود: سهم يشير إلى الاتجاه الأكثر ارتفاعاً، ونتحرك عكسه تماماً لنهبط نحو الوادي. |
+| **Learning Rate ($\eta$)** (معدل التعلم / خطوة الهبوط) | The mountaineer's stride length: take tiny steps and you will freeze before reaching bottom; take giant leaps and you fly off cliffs. | طول خطوة المتسلق: الخطوات البطيئة تضيع الوقت، والقفزات الهائلة تؤدي للسقوط من فوق حواف الجبل. |
+| **Mini-Batch SGD** (الانحدار العشوائي بالدفعات) | Consulting a random squad of 32 scouts to estimate the slope, rather than polling all 10 million citizens on Earth. | استشارة فرقة استطلاع عشوائية مكونة من 32 فرداً لتقدير انحدار الأرض بدلاً من استطلاع ملايين البيانات. |
+| **Ill-Conditioned Curvature** (الانحناء المتباين / الوديان الضيقة) | A canyon with steep cliff walls and a very gentle floor slope, causing standard algorithms to bounce wildly between walls. | أخدود جبلي حوافه شديدة الانحدار بينما قاعه منبسط بلطف، مما يجعل الخوارزمية تتخبط بين الجدران. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+GRADIENT DESCENT OPTIMIZATION CYCLE:
+=============================================================================
+Current Weights: \theta_t
+       |
+       v
+Sample Mini-Batch: B ~ Uniform(Dataset)  [Size: |B| samples]
+       |
+       v
+Forward Pass: Compute predictions \hat{y} and batch loss L_B(\theta_t)
+       |
+       v
+Backward Pass: Compute stochastic gradient g_t = (1 / |B|) \sum \nabla \ell_i(\theta_t)
+       |
+       v
+Parameter Update: \theta_{t+1} = \theta_t - \eta * g_t
+       |
+       +---> [Repeat for next mini-batch until loss converges!]
+=============================================================================
+TRAJECTORY COMPARISON ON LOSS SURFACE:
+Full Batch GD:    Smooth, deterministic path, but computationally prohibitive on big data.
+Pure SGD (B=1):   Extremely noisy zigzag, escapes shallow minima, but high variance.
+Mini-Batch (B=32): Ideal balance! GPU-parallelized, steady downward trajectory.
+```
+
 :::simulation-widget{engine="canvas2d" component="GradientDescentCanvas"}
 ---
 interactive: true

@@ -25,6 +25,17 @@ One of the most persistent confusions among data practitioners is understanding 
 
 You can never filter an aggregate function like `SUM()` or `AVG()` inside a `WHERE` clause because groups do not exist when passengers are walking through the airport metal detector!
 
+### Jargon Decoder / قاموس المصطلحات المعمارية
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Relational Algebra** / الجبر العلائقي | Mathematical formal system of operations ($\sigma, \pi, \times, \bowtie, \gamma$) defining queries over relations. Analogy: High school algebra for database tables. | نظام رياضي صارم من المعاملات يحدد كيفية استرجاع ومعالجة الجداول العلائقية. التشبيه: علم الجبر المدرسي مطبقاً على قواعد البيانات. |
+| **Selection ($\sigma$)** / مُعامل الاختيار الأفقي | Filtering rows that satisfy a boolean predicate (`WHERE` clause). Analogy: Sifting flour through a mesh screen to remove coarse grains. | تصفية أفقية للصفوف التي تحقق شرطاً منطقياً معيناً (يقابل `WHERE`). التشبيه: نخل الدقيق بالغربال للتخلص من الشوائب والكتل الخشنة. |
+| **Projection ($\pi$)** / مُعامل الإسقاط الرأسي | Selecting a subset of columns and discarding the rest (`SELECT col1, col2`). Analogy: Shading out unneeded columns on a printed spreadsheet with a stencil. | استخراج أعمدة رأسية محددة وإسقاط باقي الأعمدة (يقابل `SELECT`). التشبيه: استخدام لوح ورقي مفرغ لإخفاء الأعمدة غير المطلوبة في تقرير مطبوع. |
+| **Aggregation ($\gamma$)** / مُعامل التجميع | Collapsing cohorts of rows into summary statistics (`GROUP BY`). Analogy: Dumping individual coins into counting jars by denomination. | دمج صفوف المجموعات في إحصائيات تجميعية ملخصة (يقابل `GROUP BY`). التشبيه: فرز العملات المعدنية في برطمانات حسب قيمتها لحساب مجموع كل فئة. |
+| **Filter Pushdown** / تمرير الشروط لأسفل | Optimization heuristic evaluating selections ($\sigma$) as close to disk storage as possible. Analogy: Throwing away junk mail before carrying the stack into your house. | استراتيجية تحسين استعلامات تعجل تصفية البيانات عند أدنى مستوى ممكن لتقليل حجم الذاكرة. التشبيه: إلقاء الرسائل الإعلانية في سلة المهملات قبل دخول المنزل. |
+| **Predicate Selectivity** / انتقائية الشرط المنطقي | The fraction of rows that pass a filter condition ($\alpha = |\sigma(R)| / |R|$). Analogy: Acceptance rate of a university admissions office. | نسبة الصفوف التي تنجح في اجتياز شرط التصفية من إجمالي صفوف الجدول. التشبيه: نسبة قبول المتقدمين في كلية ذات شروط صارمة. |
+
 :::simulation-widget{engine="canvas2d" component="RelationalAlgebraGridLab"}
 ---
 interactive: true
@@ -49,6 +60,34 @@ $$
 \sigma_\varphi(R) = \{ t \in R \mid \varphi(t) = \text{true} \}, \quad \pi_{A_1, \dots, A_k}(R) = \{ (t.A_1, \dots, t.A_k) \mid t \in R \} \implies \sigma_{\text{having}} \Big( \gamma_{G, \text{agg}(A)}(\sigma_\varphi(R)) \Big)
 $$
 
+```text
+Visual ASCII Transformation: Relational Operator Lifecycle Pipeline:
+
+Input Relation: orders(order_id, region, status, revenue)
+[ (1, 'North', 'COMPLETED', 300.0), 
+  (2, 'North', 'CANCELLED', 100.0), 
+  (3, 'North', 'COMPLETED', 250.0), 
+  (4, 'South', 'COMPLETED', 400.0) ]
+
+Phase 1: Selection σ_WHERE (status = 'COMPLETED') - Evaluated per individual row:
+  Row 1: 'COMPLETED' -> PASS (Enter concourse)
+  Row 2: 'CANCELLED' -> DROPPED (Eliminated before any group buckets exist!)
+  Row 3: 'COMPLETED' -> PASS (Enter concourse)
+  Row 4: 'COMPLETED' -> PASS (Enter concourse)
+Filtered: [ (1, 'North', 300.0), (3, 'North', 250.0), (4, 'South', 400.0) ]
+
+Phase 2: Partitioning & Aggregation γ (GROUP BY region, SUM(revenue), COUNT(*)):
+  Partition 'North' -> [ 300.0, 250.0 ] -> { total_rev: 550.0, order_count: 2 }
+  Partition 'South' -> [ 400.0 ]        -> { total_rev: 400.0, order_count: 1 }
+
+Phase 3: Post-Aggregate Filter σ_HAVING (order_count >= 2):
+  'North' ({ order_count: 2 }) >= 2 -> PASS
+  'South' ({ order_count: 1 }) <  2 -> DROPPED (Group rejected at flight gate!)
+
+Phase 4: Projection π (SELECT region, total_revenue):
+  Output: [ ('North', 550.0) ]
+```
+
 ### Mathematical Invariants & Symbol Breakdown
 
 | الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
@@ -61,9 +100,14 @@ $$
 | $\varphi$ | Propositional formula | First-order logic condition evaluating to {True, False, Unknown} | الشرط المنطقي المطبق على خصائص الصفوف الفردية |
 | $G$ | Attribute grouping set | Subset of relation schema attributes defining partition equivalence | مجموعة الحقول المحددة لتقسيم الفئات في التجميع |
 
-The fundamental ordering invariant of Codd's relational algebra dictates that selection $\sigma_\varphi$ is mathematically commutative with cartesian products and projections, enabling query optimizers to execute **Filter Pushdown** (evaluating $\sigma_\varphi$ as early as possible in the query tree to minimize data volumes). Crucially, the aggregation operator $\gamma$ acts as a non-linear boundary: individual tuple identities are permanently collapsed into group metrics, meaning $\sigma_{\text{having}}$ can only evaluate properties of the partition image.
-
-الثابت الرياضي الأساسي في جبر كود ينص على أن مُعامل الاختيار $\sigma_\varphi$ يمتلك خاصية التبديل مع الجداء والإسقاط، مما يسمح لمحسنات الاستعلامات بتنفيذ **تمرير الشروط لأسفل (Filter Pushdown)** لتصفية البيانات في أبكر نقطة ممكنة وتقليص حجم السجلات في الذاكرة. والأهم من ذلك أن مُعامل التجميع $\gamma$ يشكل حاجزاً لا خطياً: حيث تُدمج تفاصيل الصفوف الفردية نهائياً في مقاييس إحصائية موحدة، مما يجعل $\sigma_{\text{having}}$ قاصراً على تصفية نتائج المجموعات فقط.
+#### Step-by-Step Arithmetic Cost & Invariant Breakdown:
+1. **Predicate Selectivity Factor**:
+   $$\alpha = \frac{|\sigma_\varphi(R)|}{|R|}, \quad 0 \le \alpha \le 1$$
+   If $\alpha = 0.05$, the `WHERE` filter discards $95\%$ of all tuples before grouping.
+2. **Filter Pushdown Memory Savings**:
+   Executing $\gamma(\sigma(R))$ requires allocating a hash table for only $\alpha |R|$ records, cutting peak memory from $\mathcal{O}(|R|)$ down to $\mathcal{O}(\alpha |R|)$.
+3. **The HAVING Clause Non-Linear Boundary**:
+   $\sigma_{\text{having}}$ requires pre-evaluating the full group partition image $\gamma_{G}(R)$. It filters $|\mathcal{K}|$ group summaries rather than $|R|$ individual rows.
 
 ## Beat 3: Interactive Code Challenge
 
@@ -82,15 +126,15 @@ test_cases:
 -- Schema: orders(order_id, region, product_category, status, revenue)
 
 SELECT
-    -- Step 1: Project grouping dimensions region and product_category
-    -- Step 2: Compute ROUND(SUM(revenue), 2) AS total_revenue
-    -- Step 3: Compute COUNT(*) AS order_count
+    region,
+    product_category,
+    ROUND(SUM(revenue), 2) AS total_revenue,
+    COUNT(*) AS order_count
 FROM orders
--- Step 4: Filter individual rows WHERE status = 'COMPLETED'
--- Step 5: GROUP BY region, product_category
--- Step 6: Filter groups HAVING COUNT(*) >= 2 AND SUM(revenue) >= 500.0
--- Step 7: ORDER BY total_revenue DESC, region ASC
-;
+WHERE status = 'COMPLETED'
+GROUP BY region, product_category
+HAVING COUNT(*) >= 2 AND SUM(revenue) >= 500.0
+ORDER BY total_revenue DESC, region ASC;
 ```
 :::
 

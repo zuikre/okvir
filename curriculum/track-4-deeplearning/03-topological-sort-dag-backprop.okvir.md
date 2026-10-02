@@ -25,6 +25,39 @@ This fundamental scheduling constraint is solved by **Topological Sorting**. A c
 2. Traverse the list in reverse topological order, calling each node's local `_backward()` closure.
 3. Every node is mathematically guaranteed to have accumulated 100% of its incoming gradients from all downstream consumers before it ever fires its own backward closure!
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Directed Acyclic Graph (DAG)** (الرسم البياني الموجه غير الدائري) | A computational pipeline that flows strictly forward from inputs to outputs with zero loops or circular traps. | شبكة مسارات تتدفق للأمام فقط من المدخلات إلى المخرجات دون أي حلقات دائرية مغلقة. |
+| **Topological Sort** (الترتيب الطوبولوجي) | A schedule where every dependency finishes before any task that needs it begins; in reverse, every consumer complains before a supplier acts. | جدول زمني صارم: لا تبدأ أي مهمة حتى تكتمل متطلباتها، وعكسياً: لا يُحاسب أي مزود حتى ينتهي جميع مستهلكيه. |
+| **Post-Order DFS** (البحث المتعمق اللاحق) | A graph crawler that visits all child branches completely before stamping the parent node as "ready to process". | خوارزمية استكشاف تغوص في كافة الفروع الأبوية وتنهيها بالكامل قبل إدراج العقدة في قائمة المعالجة. |
+| **Seed Gradient ($1.0$)** (بذرة التدرج الابتدائية) | The spark that starts backpropagation: since $\frac{\partial L}{\partial L} = 1.0$, the loss node seeds itself with $1.0$ blame. | شرارة البداية للمسار العكسي: بما أن مشتقة الشيء بالنسبة لنفسه تساوي 1، تبدأ عقدة الخسارة بحساسية 1.0. |
+| **Reverse Topological Sweep** (المسح الطوبولوجي المعكوس) | Walking backwards down the scheduled line so each node is guaranteed to have received 100% of its gradients before firing. | السير في الاتجاه المعاكس للترتيب لضمان استلام كل عقدة لكامل تدرجاتها قبل توزيع المسؤولية للخلف. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+COMPUTATIONAL GRAPH (DAG): Forward Construction
+=============================================================================
+[x] ----------------------------\
+ \                               (*) ---> [y = x * x] ---\
+  \---- (Branching usage) ------/                         (+) ---> [L = y + x]
+                                                         /
+[x] ----------------------------------------------------/
+=============================================================================
+DEPTH-FIRST SEARCH (DFS): Post-Order Linearization
+1. Explore x (leaf)      --> Added to topo: [x]
+2. Explore y = x * x     --> Added to topo: [x, y]
+3. Explore L = y + x     --> Added to topo: [x, y, L]
+=============================================================================
+REVERSE-MODE EXECUTION ORDER: (Reversed Topo = [L, y, x])
+Step 1: Seed L.grad = 1.0
+Step 2: Execute L._backward() --> y.grad += 1.0,  x.grad += 1.0
+Step 3: Execute y._backward() --> x.grad += 2*x.data * 1.0 (accumulates on x!)
+Step 4: Execute x._backward() --> Done! Total x.grad = 1.0 + 4.0 = 5.0
+```
+
 :::simulation-widget{engine="canvas2d" component="AutogradGraphLab"}
 ---
 interactive: true
@@ -67,14 +100,22 @@ The full backpropagation sweep executes along the reversed topological permutati
    \forall p \in \text{Parents}(u_i): \quad \bar{p} \mathrel{+}= \bar{u}_i \cdot \frac{\partial u_i}{\partial p}
    $$
 
-### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-* $\text{Children}(v_i) \subset \mathcal{V}$: The set of downstream nodes that take $v_i$ as an input.
-* $\text{Parents}(u_i) \subset \mathcal{V}$: The set of antecedent nodes that produced $u_i$.
-* $\pi = (u_1, \dots, u_N)$: The forward topological ordering ensuring no node appears before its prerequisites.
-* $\pi^{\text{rev}}$: The reverse topological ordering guaranteeing that all incoming gradients $\bar{u}_j$ from children are fully accumulated before $u_i$ distributes blame to its parents.
-* $\bar{u}_N \leftarrow 1.0$: The identity seed $\frac{\partial L}{\partial L} = 1.0$ that initiates the chain rule.
-* Complexity: Both the forward evaluation and reverse-mode traversal execute in linear time $O(|\mathcal{V}| + |\mathcal{E}|)$.
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $\pi = (u_1, \dots, u_N)$ | Forward Topological Order / الترتيب الأمامي | Permutation ensuring every directed edge $(u_j, u_k)$ satisfies $j < k$. |
+| $\pi^{\text{rev}} = (u_N, \dots, u_1)$ | Reversed Evaluation Order / الترتيب العكسي | The strict execution sequence for calling `_backward()` closures from loss to inputs. |
+| $\bar{u}_N \leftarrow 1.0$ | Terminal Seed / بذرة البداية | Base condition setting $\frac{\partial L}{\partial L} = 1.0$ to initiate the backward chain. |
+| $\text{Children}(v_i)$ | Consumer Set / مجموعة المستهلكين | All nodes that take $v_i$ as input; their adjoints must be final before $v_i$ fires. |
+| $\text{Parents}(u_i)$ | Supplier Set / مجموعة المزودين | The antecedent nodes that receive accumulated gradients from $u_i$. |
+| $O(|\mathcal{V}| + |\mathcal{E}|)$ | Linear Graph Complexity / التعقيد الخطي | Time complexity of both the forward evaluation and the backward sweep. |
+
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **The Causal Guarantee**: A node cannot know its total derivative $\frac{\partial L}{\partial v_i} = \sum \bar{v}_j \frac{\partial v_j}{\partial v_i}$ until every downstream consumer $j$ has finished sending its share. Reversing the topological sort provides a causal execution guarantee.
+2. **Post-Order DFS Construction**: By visiting all unvisited dependencies recursively before appending the current node to the ordered list, DFS post-order naturally guarantees that dependencies appear earlier in the list than the node itself.
+3. **Single Sweep Efficiency**: Reversing this list allows backpropagation to evaluate gradients for all variables and parameters in a single linear-time sweep $O(V + E)$ without redundant re-traversals.
+
 
 يضمن الترتيب الطوبولوجي $\pi$ ألا يتم تقييم المشتقة الجزئية لعقدة أبوية إلا بعد أن تستقر وتكتمل المشتقات الإجمالية لجميع العقد الأبناء. بفضل هذه الهندسة الرياضية المحكمة، يتم حساب تدرجات جميع أوزان وانحيازات النموذج العصبي بتعقيد زمني خطي $O(|\mathcal{V}| + |\mathcal{E}|)$ في مسار عكسي واحد متكامل.
 

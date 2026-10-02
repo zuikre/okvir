@@ -22,7 +22,30 @@ Think of it like a speedometer on a high-speed train. When you glance at the dis
 
 In modern artificial intelligence and deep learning, this local linearization is the foundation of everything. A deep neural network navigating a loss function with 70 billion parameters does not try to solve the entire cosmic non-linear landscape at once. Instead, at every training step, it places an imaginary flat tangent plane beneath its feet, feels the tilt of that plane, takes a confident step in the downhill direction, and recalculates the new tangent orientation. Complex global optimization is accomplished through a sequence of simple, linear local steps.
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Derivative ($f'(x)$) | The instantaneous speedometer reading: exact rate of change at a frozen instant | المشتقة ($f'(x)$) | عداد السرعة اللحظي: معدل التغير الدقيق عند لحظة مجمدة من الزمن |
+| Secant Line | A straight bridge connecting two separated points on a curve | القاطع (Secant Line) | جسر مستقيم يصل بين نقطتين متباعدتين على منحنى الدالة |
+| Tangent Line | A ruler balanced delicately touching the curve at exactly one single point | المماس (Tangent Line) | مسطرة ترتكز برقة فائقة ملامسة المنحنى عند نقطة تماس وحيدة |
+| Local Linearization | Zooming in so close to a smooth curve that it looks completely like a straight line | التقريب الخطي المحلي | تكبير المنحنى بالمجهر حتى يبدو للمشاهد كخط مستقيم تماماً |
+| Difference Quotient | The average rise-over-run slope between two points: $\frac{f(x+h) - f(x)}{h}$ | نسبة الفروق | الميل المتوسط للصعود على الامتداد بين نقطتين تفصل بينهما خطوة h |
+
+#### Geometric & Visual Flow
+
+```
+        f(x)
+          ▲              * Secant line across gap h
+          │             /│
+          │     Tangent/ │
+          │     Line  /  │ f(x+h) - f(x)
+          │      \   *───┴─────
+          │       \ /    h (Shrink h -> 0 to pivot secant into tangent!)
+          └────────┴─────────────► x
+```
+
+### الحدس الفيزيائي والهندسي
 
 تأمل صور كوكب الأرض الملتقطة من مدار القمر: كوكبنا بلا شك كرة زرقاء عملاقة تسبح في ظلمات الفضاء. ومع ذلك، عندما تخطو بقدميك على عشب ملعب كرة القدم في حيك، تشعر بأن الأرض تحت حذائك منبسطة ومسطحة تماماً دون أي تقوس ملحوظ. لماذا؟ لأنك إذا قمت بتكبير أي منحنى أملس وقابل للاشتقاق بدرجة كافية، فإن **الانحناء يتلاشى تدريجياً ويصبح المنحنى مماثلاً لخط مستقيم تماماً**. ما يبدو منحنياً من منظور كوني شاسع، يبدو مستوياً وبسيطاً للنملة التي تدب على السطح.
 
@@ -31,6 +54,29 @@ In modern artificial intelligence and deep learning, this local linearization is
 تخيل الأمر كعداد السرعة في قطار فائق السرعة. عندما تنظر إلى الشاشة وتراها تسجل $240\text{ كم/س}$، فإن هذا الرقم لا يصف أين كان القطار قبل خمس دقائق، ولا يضمن أين سيكون بعد ساعة كاملة. إنه يخبرك فقط بمعدل التقدم اللحظي: لو استمرت حركة القطار بالسرعة ذاتها التي يتحرك بها في هذا الجزء من الثانية، لقطع 240 كيلومتراً في الساعة التالية. المشتقة في جوهرها ليست سوى عداد سرعة يقيس مدى سرعة تغير الظاهرة في هذا الجزء من الثانية تحديداً.
 
 وفي الذكاء الاصطناعي المعاصر والشبكات العصبية العميقة، يمثل هذا التقريب الخطي حجر الزاوية لكل شيء. فالنموذج اللغوي الضخم الذي يحتوي على 70 مليار معامل لا يحاول فهم سطح دالة الخسارة المعقدة دفعة واحدة. بل في كل خطوة تدريب، يستبدل السطح فائق الأبعاد بمستوٍ مماس محلي منبسط، ويستشعر انحدار ذلك المستوي، ويخطو خطوة واثقة في اتجاه الهبوط، ثم يعيد حساب المماس عند النقطة الجديدة. هكذا تُحل أعقد المعضلات غير الخطية بسلسلة من الخطوات الخطية البسيطة.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| المشتقة ($f'(x)$) | The instantaneous speedometer reading: exact rate of change at a frozen instant | المشتقة ($f'(x)$) | عداد السرعة اللحظي: معدل التغير الدقيق عند لحظة مجمدة من الزمن |
+| القاطع (Secant Line) | A straight bridge connecting two separated points on a curve | القاطع (Secant Line) | جسر مستقيم يصل بين نقطتين متباعدتين على منحنى الدالة |
+| المماس (Tangent Line) | A ruler balanced delicately touching the curve at exactly one single point | المماس (Tangent Line) | مسطرة ترتكز برقة فائقة ملامسة المنحنى عند نقطة تماس وحيدة |
+| التقريب الخطي المحلي | Zooming in so close to a smooth curve that it looks completely like a straight line | التقريب الخطي المحلي | تكبير المنحنى بالمجهر حتى يبدو للمشاهد كخط مستقيم تماماً |
+| نسبة الفروق | The average rise-over-run slope between two points: $\frac{f(x+h) - f(x)}{h}$ | نسبة الفروق | الميل المتوسط للصعود على الامتداد بين نقطتين تفصل بينهما خطوة h |
+
+#### المخطط البصري الهندسي
+
+```
+        f(x)
+          ▲              * خط القاطع عبر الفجوة h
+          │             /│
+          │       خط  /  │
+          │     المماس/  │ f(x+h) - f(x)
+          │      \   *───┴─────
+          │       \ /    h (عند تقليص h نحو الصفر يدور القاطع ليصبح مماساً!)
+          └────────┴─────────────► x
+```
 
 :::simulation-widget{engine="canvas2d" component="ChainRuleGearsCanvas"}
 ---

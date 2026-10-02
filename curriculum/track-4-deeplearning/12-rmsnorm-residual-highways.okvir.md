@@ -24,6 +24,46 @@ When paired with a **Pre-Norm Residual Highway** ($\mathbf{x}_{l+1} = \mathbf{x}
 
 > **Frontier Analogy:** Imagine an express bullet train track (the residual highway) running from Tokyo to Osaka. In older architectures, the train was forced to stop at every single rural station, unload every passenger, and weigh them all together to calculate an average weight (LayerNorm). In modern Pre-RMSNorm architectures, the bullet train cruises non-stop at 300 km/h along the main steel rails, while passengers board and disembark via synchronized side ramps calibrated solely by an automatic weight limiter (RMSNorm).
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Root Mean Square (RMS)** (جذر متوسط المربعات) | The pure energy gauge: measures how far numbers spread from zero ($\sqrt{\text{avg}(x^2)}$) without centering them. | مقياس الطاقة الصافي: يقيس شدة انتشار الأرقام عن الصفر دون إضاعة الوقت في حساب المتوسط وطرحه. |
+| **RMSNorm** (معايرة جذر متوسط المربعات) | Stripped-down racing suspension: cuts computational overhead by $30\%$ compared to LayerNorm by skipping mean-centering. | معيار سيارات السباق الخفيفة: يوفر 30% من الحسابات مقارنة بـ LayerNorm عبر إلغاء طرح المتوسط دون أي فقد في الدقة. |
+| **Residual Highway** (طريق الانحدار السريع عبر البواقي) | An 80-lane expressway: direct additive connections ($x + f(x)$) allowing signals to cruise across 100 layers without attenuation. | طريق سريع حر: مسار جمع مباشر يتيح للمعلومات والتدرجات عبور مئات الطبقات دون أدنى تلاشٍ أو توهين. |
+| **Pre-LN / Pre-RMSNorm** (المعايرة القبلية للطبقات) | Showering before entering the studio: normalizing inputs before attention blocks, keeping the main residual highway clean. | الاستعداد المسبق: معايرة المدخلات قبل دخول كتل الانتباه للحفاظ على نظافة واستقرار المسار السريع الرئيسي. |
+| **Zero-Mean Hypothesis** (فرضية المتوسط الصفري الطبيعي) | The proven discovery that neural activations naturally float near zero, making explicit mean subtraction redundant. | الاكتشاف المثبت بأن تفعيلات الشبكات العميقة تتمركز طبيعياً حول الصفر، مما يجعل طرح المتوسط جهداً حسابياً مهدوراً. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+RMSNORM AND THE MODERN PRE-NORM RESIDUAL HIGHWAY:
+=============================================================================
+Input from Residual Stream: x  [Shape: (B, S, D)]
+   |
+   +--------------------------------------------------------\ (Identity Highway)
+   |                                                        |
+   v                                                        |
+Compute Root Mean Square: RMS(x) = \sqrt{(1/D) \sum x_i^2 + \epsilon} |
+   |                                                        |
+   v                                                        |
+Scale Invariance: \bar{x} = x / RMS(x)                     |
+   |                                                        |
+   v                                                        |
+Learnable Gain:   x_norm = \bar{x} * \gamma                |
+   |                                                        |
+   v                                                        |
+Sub-Layer (e.g., Multi-Head Attention or SwiGLU FFN)        |
+   |                                                        |
+   v                                                        |
+Output: f(x_norm)                                           |
+   |                                                        |
+   +--------------------------------------------------------+
+   |
+   v (Addition onto the Highway)
+Next Residual State: x_{l+1} = x_l + f(x_norm)
+```
+
 :::simulation-widget{engine="canvas2d" component="NeuralActivationCanvas"}
 ---
 interactive: true

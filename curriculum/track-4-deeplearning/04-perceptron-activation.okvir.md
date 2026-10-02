@@ -25,6 +25,39 @@ The three historical milestones of activation design reflect this evolution:
 2. **Rectified Linear Unit ($\text{ReLU}(z) = \max(0, z)$):** The breakthrough of modern deep learning. For positive inputs, its derivative is a rock-solid constant $1.0$, allowing gradients to flow backwards through dozens of layers without vanishing. Its weakness is the "dying ReLU" failure mode: if weights update such that a neuron outputs negative values for all dataset samples, its derivative freezes at 0 forever.
 3. **Gaussian Error Linear Unit ($\text{GELU}(z) = z \Phi(z)$):** The gold standard across frontier generative models (LLaMA, GPT-4, Mistral). GELU weights inputs by their probability under a Gaussian distribution, creating a smooth, non-monotonic curve with slight negative leakage that eliminates dead neurons while providing superior optimization curvature.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Artificial Neuron (Perceptron)** (العصبون الاصطناعي) | A dimmer switch: sums multiple incoming signals, adjusts baseline sensitivity, and decides how much to fire. | مفتاح إضاءة ذكي: يجمع الإشارات الواردة، ويوازن حساسيتها، ويقرر شدة الإضاءة الناتجة. |
+| **Synaptic Weight ($w_i$)** (الوزن المشبكي) | An importance dial: multiplies an input feature to amplify or dampen its voice in the decision. | قرص الأهمية: يضاعف أثر المدخل أو يقلصه ليحدد وزنه في اتخاذ القرار. |
+| **Bias ($b$)** (الانحياز الثابت) | A baseline trigger threshold: shifts the activation boundary so the neuron can fire even when inputs are zero. | عتبة الاستثارة الأساسية: تزيح نقطة البداية ليتمكن العصبون من العمل حتى عند انعدام المدخلات. |
+| **Pre-activation Logit ($z$)** (الجهد القبلي / اللوجيت) | The raw linear combination $\mathbf{w}^T \mathbf{x} + b$ before it hits any non-linear bending hinge. | التجميع الخطي الأولي للإشارات قبل دخولها في مفاصل الانحناء غير الخطية. |
+| **Activation Function ($\phi$)** (دالة التنشيط غير الخطية) | A mechanical bending joint: warps flat geometric space so the network can fit curved, intricate patterns. | مفصل انحناء ميكانيكي: يثني الفضاء الرياضي المسطح لتمكين الشبكة من الالتفاف حول الأنماط المعقدة. |
+| **Dying ReLU** (العصبون الميت في ريلو) | A frozen state where a neuron consistently outputs negative values, permanently zeroing its gradient. | حالة تجمد: عندما يستقر مخرج العصبون في النصف السالب فيصبح تدرجه صفراً ويتوقف عن التعلم للأبد. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+FORWARD PASS: Affine Transformation -> Non-Linear Hinge
+=============================================================================
+Input Vector x       Synaptic Dials w
+  [x_1] -----------> (x_1 * w_1) ---\
+  [x_2] -----------> (x_2 * w_2) -----> [Sum: \sum w_i x_i + b] ---> [z]
+  [x_3] -----------> (x_3 * w_3) ---/       (Pre-activation Logit)     |
+                                                                       v
+                                                              [Activation \phi(z)]
+                                                                  (ReLU / GELU)
+                                                                       |
+                                                                       v
+                                                               [Post-activation a]
+=============================================================================
+BACKWARD PASS: Local Sensitivity Gating by \phi'(z)
+[dL/da] ---> (*) \phi'(z) ---> [dL/dz] ---\---> [dL/dw_i = dL/dz * x_i]
+                                           \---> [dL/db   = dL/dz]
+                                            \--> [dL/dx_i = dL/dz * w_i]
+```
+
 :::simulation-widget{engine="canvas2d" component="NeuralActivationCanvas"}
 ---
 interactive: true
@@ -69,16 +102,23 @@ $$
 \end{aligned}
 $$
 
-### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-* $\mathbf{x} \in \mathbb{R}^d$: The input feature vector.
-* $\mathbf{w} \in \mathbb{R}^d$: Learnable synaptic weight parameters controlling directional sensitivity.
-* $b \in \mathbb{R}$: Learnable scalar bias parameter controlling the threshold offset.
-* $z \in \mathbb{R}$: The pre-activation linear potential (logit).
-* $a = \phi(z) \in \mathbb{R}$: The post-activation output scalar.
-* $\phi'(z)$: The local derivative governing how freely backward gradients propagate through the neuron.
-* $\Phi(z) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^z e^{-t^2/2} dt$: The standard normal cumulative distribution function (CDF).
-* $\text{erf}(u) = \frac{2}{\sqrt{\pi}} \int_0^u e^{-t^2} dt$: The Gauss error function.
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $\mathbf{x} \in \mathbb{R}^d$ | Feature Vector / متجه المدخلات | The raw sensory measurements or upstream activations fed into the neuron. |
+| $\mathbf{w} \in \mathbb{R}^d$ | Synaptic Weights / متجه الأوزان | Directional orientation vector defining the normal to the separating hyperplane. |
+| $b \in \mathbb{R}$ | Scalar Bias / الانحياز السلمي | Perpendicular distance offset of the decision hyperplane from the origin. |
+| $z = \mathbf{w}^T \mathbf{x} + b$ | Pre-activation Logit / الجهد القبلي | The signed scalar distance of input point $\mathbf{x}$ from the decision boundary. |
+| $a = \phi(z)$ | Post-activation Output / المخرج المنشط | The squashed or rectified scalar signal transmitted to downstream layers. |
+| $\phi'(z)$ | Gatekeeper Derivative / مشتقة دالة التنشيط | Governs how freely backward gradient signals pass through the neuron without vanishing. |
+| $\Phi(z)$ | Gaussian CDF / دالة التوزيع التراكمي | Standard normal probability integral used by GELU to smoothly gate input values. |
+
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **Affine Decision Boundary**: The linear term $\mathbf{w}^T \mathbf{x} + b = 0$ defines a flat $(d-1)$-dimensional hyperplane partitioning the input space into two half-spaces.
+2. **Non-Linear Breaking of Equivalence**: Without $\phi(\cdot)$, a stack of $L$ linear layers collapses algebraically into a single matrix $\mathbf{W}_{\text{eff}} = \prod \mathbf{W}_l$. Non-linear activations break this collapse, unlocking hierarchical representation learning.
+3. **Gradient Gating**: Because $\frac{\partial L}{\partial \mathbf{w}} = \frac{\partial L}{\partial a} \cdot \phi'(z) \cdot \mathbf{x}^T$, if the derivative $\phi'(z)$ approaches zero (saturation in Sigmoid or negative regime in ReLU), gradient flow halts and the weights stop updating.
+
 
 يُظهر التحليل الرياضي أن تدرج دالة الخسارة بالنسبة للأوزان والمدخلات يخضع بصورة مباشرة لعامل الضرب $\phi'(z)$. فإذا كانت المشتقة $\phi'(z) \approx 0$ (كما يحدث في دالة Sigmoid عند القيم الكبيرة أو في دالة ReLU عند القيم السالبة)، ينقطع تدفق التدرج وتتجمد الأوزان المشبكية، في حين تضمن الدوال المستمرة الحديثة بقاء نوافذ التدفق مفتوحة باستمرار.
 

@@ -14,33 +14,63 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Moving from simple bivariate regression to multiple regression transforms econometrics from basic line-drawing into a multidimensional **ceteris paribus machine** (evaluating the effect of one factor while holding everything else constant). In real economies, variables never change in a vacuum: schooling is deeply intertwined with natural talent, family wealth, geographical location, and work history.
+### Intuition & Real-World Story
 
-Matrix calculus allows us to optimize across all $K$ dimensions simultaneously in a single stroke. Instead of writing out pages of tedious summations and $K$ separate partial derivatives, matrix algebra collapses the problem into an elegant quadratic loss surface:
+Suppose an HR department wants to predict employee salary using two features simultaneously: **Years of Education** ($X_1$) and **Years of Work Experience** ($X_2$).
 
-$$
-S(\boldsymbol{\beta}) = (\mathbf{y} - \mathbf{X}\boldsymbol{\beta})^T (\mathbf{y} - \mathbf{X}\boldsymbol{\beta})
-$$
+If you look at education alone, you might notice that older workers with 20 years of experience often have master's degrees and earn high salaries. Does the master's degree cause the higher salary, or does the 20 years of experience explain it? To answer this, you cannot simply look at one feature in isolation; you must hold experience constant while adjusting the education dial.
 
-Two geometric operators govern the entire algebraic structure:
-1. **The Hat / Projection Matrix ($\mathbf{P}_X$):** The "synthesizer" that takes any vector in the universe and snaps it onto the closest point within the regressor hyperplane: $\hat{\mathbf{y}} = \mathbf{P}_X \mathbf{y}$.
-2. **The Annihilator Matrix ($\mathbf{M}_X = \mathbf{I}_N - \mathbf{P}_X$):** The "residual maker" that completely wipes out and obliterates any vector lying in the subspace of $\mathbf{X}$ ($\mathbf{M}_X \mathbf{X} = \mathbf{0}$). When applied to the outcome, it purges every trace of the regressors to isolate the pure residual vector: $\mathbf{e} = \mathbf{M}_X \mathbf{y}$.
+This is the power of **Multiple Linear Regression**. Instead of fitting a 2D line on a flat sheet of paper, your regression fits a **2D flat plane suspended in 3D space**.
 
-Here we encounter the critical boundary between prediction and causal inference in multiple regression. In machine learning, adding regressors serves solely to improve the predictive conditional expectation function $\mathbb{E}[y \mid \mathbf{x}]$. If two features are correlated, an algorithm like a neural net or tree ensemble gladly blends them together to produce the best prediction. But in econometrics, our goal is structural: we want the partial derivative $\beta_j = \frac{\partial \mathbb{E}[y \mid do(x_j), \mathbf{x}_{-j}]}{\partial x_j}$—the ceteris paribus causal effect of changing policy $x_j$ while keeping all other variables strictly frozen. Multiple regression mathematically partials out the linear fingerprints of the other included variables, allowing us to approximate this hypothetical policy intervention—provided no unobserved confounders remain in the error term!
+Under the hood, multiple regression relies on two magical geometric matrices:
+1. **The Hat Matrix ($\mathbf{P}$)**: Like putting a hat on $\mathbf{y}$, it projects high-dimensional outcomes onto the flat plane spanned by all your features ($\hat{\mathbf{y}} = \mathbf{P}\mathbf{y}$). It is the camera that takes a snapshot of reality and flattens it onto your model's plane.
+2. **The Annihilator Matrix ($\mathbf{M}$)**: The residual maker ($\mathbf{M} = \mathbf{I} - \mathbf{P}$). It completely annihilates and wipes out any feature already in the model ($\mathbf{M}\mathbf{X} = \mathbf{0}$), leaving behind only the pure, orthogonal residual noise ($\mathbf{e} = \mathbf{M}\mathbf{y}$).
 
-إن الانتقال من الانحدار البسيط إلى الانحدار المتعدد ينقل القياس الاقتصادي من مجرد مطابقة منحنيات إلى **آلة جبارة لتطبيق مبدأ ثبات العوامل الأخرى (Ceteris Paribus)**. في الواقع الاقتصادي الحي، لا تتحرك المتغيرات بمعزل عن بعضها: فالتعليم مرتبط ارتباطًا وثيقًا بالذكاء الفطري، وثروة الوالدين، والبيئة الجغرافية، والخبرة العملية.
+Geometrically, the Annihilator Matrix strips away everything your existing features can explain, isolating the clean, uncontaminated variation needed to test new hypotheses.
 
-يتيح حسبان المصفوفات صياغة الاستمثال عبر جميع الأبعاد الـ $K$ بضربة واحدة أنيقة. فبدلاً من كتابة صفحات لا تنتهي من علامات الجمع والاشتقاقات الجزئية المنفصلة، يختزل جبر المصفوفات المسألة في سطح خسارة تربيعي متناسق:
+#### Jargon Decoder
 
-$$
-S(\boldsymbol{\beta}) = (\mathbf{y} - \mathbf{X}\boldsymbol{\beta})^T (\mathbf{y} - \mathbf{X}\boldsymbol{\beta})
-$$
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Multiple Regression** | Fitting a plane or hyperplane to explain an outcome using multiple features at once. |
+| **Hat Matrix ($\mathbf{P}$)** | The projection lens: transforms raw outcomes $\mathbf{y}$ into model predictions $\hat{\mathbf{y}}$. |
+| **Annihilator Matrix ($\mathbf{M}$)** | The residual maker: completely erases the influence of existing features ($\mathbf{M}\mathbf{X} = \mathbf{0}$). |
+| **Idempotence** | Repeating the projection changes nothing: $\mathbf{P}\mathbf{P} = \mathbf{P}$ and $\mathbf{M}\mathbf{M} = \mathbf{M}$. |
+| **Ceteris Paribus** | 'All else held equal': interpreting one coefficient while holding all other features fixed. |
 
-ويحكم هذا البناء الرياضي عاملان هندسيان جوهريان:
-1. **مصفوفة الإسقاط ($\mathbf{P}_X$):** "المُجمِّع" الذي يلتقط أي متجه في الفضاء ويُسقطه عموديًا على أقرب نقطة داخل المستوي الفائق للمتغيرات: $\hat{\mathbf{y}} = \mathbf{P}_X \mathbf{y}$.
-2. **مصفوفة الإبادة والتلاشي ($\mathbf{M}_X = \mathbf{I}_N - \mathbf{P}_X$):** "صانع البواقي" الذي يمحو ويسحق تمامًا أي متجه يقع ضمن الفضاء الفرعي لـ $\mathbf{X}$ ($\mathbf{M}_X \mathbf{X} = \mathbf{0}$). وعند تطبيقها على متجه النتائج، فإنها تطهره من كل أثر للمتغيرات المستقلة لتعزل البواقي النقية: $\mathbf{e} = \mathbf{M}_X \mathbf{y}$.
+```text
+       y (Actual Salary Vector)
+       ^
+       |          |    \  e = M y (Perpendicular Residual Pole, 90 deg to plane)
+       |            |      v
+       +-------+--------------------------->
+      /       / y_hat = P y (Fitted Shadow on the Plane)
+     /       /
+    / col(X) Plane (Education and Experience Subspace)
+   +--------------------------------------->
+```
 
-وهنا يتجلى الفارق الجوهري بين التنبؤ والاستدلال السببي: في نماذج تعلم الآلة، تُضاف المتغيرات بهدف تحسين دقة التنبؤ بالنتيجة $\mathbb{E}[y \mid \mathbf{x}]$ فقط، ولا يكترث النموذج بتداخل المتغيرات طالما أن التوقع دقيق. أما في الاقتصاد القياسي، فإن غايتنا هي عزل الأثر السببي الصافي لسياسة معينة مع تثبيت باقي العوامل رياضيًا ($\beta_j$). تقوم مصفوفات الانحدار المتعدد بتطهير المتغير المستهدف من بصمات المتغيرات الأخرى المدرجة، مما يحاكي تجربة معملية منضبطة—شريطة ألا تكون هناك متغيرات سببية مضللة محذوفة في حد الخطأ.
+### الحدس والقصة الواقعية
+
+تخيل أن قسم الموارد البشرية في شركة يسعى للتنبؤ برواتب الموظفين بالاعتماد على ميزتين معًا: **سنوات التعليم** ($X_1$) و**سنوات الخبرة العملية** ($X_2$).
+
+إذا نظرت إلى التعليم بمفرده، ستجد أن الموظفين الأكبر سنًا الذين يملكون 20 عامًا من الخبرة يحملون غالبًا شهادات عليا ويتقاضون رواتب مرتفعة. فهل الشهادة العليا هي سبب الراتب المرتفع، أم أن خبرة الـ 20 عامًا هي المحرك الأساسي؟ لعزل الأثر الحقيقي، لا يمكنك فحص كل ميزة بمعزل عن الأخرى، بل يجب تثبيت الخبرة تمامًا عند تحريك مؤشر التعليم.
+
+هذه هي القوة الجوهرية لـ **الانحدار الخطي المتعدد (Multiple Regression)**؛ فبدلاً من رسم خط على ورقة ثنائية الأبعاد، يقوم النموذج بمد **مستوى مائل ثنائي الأبعاد داخل فضاء ثلاثي الأبعاد**.
+
+ويعتمد هذا الإسقاط على مصفوفتين هندسيتين أساسيتين:
+1. **مصفوفة القبعة (Hat Matrix - $\mathbf{P}$):** تسقط المتجه الحقيقي $\mathbf{y}$ مباشرة على المستوى الذي تشكله الميزات ($\hat{\mathbf{y}} = \mathbf{P}\mathbf{y}$).
+2. **مصفوفة الإبادة والتصفية (Annihilator Matrix - $\mathbf{M}$):** صانعة البواقي ($\mathbf{M} = \mathbf{I} - \mathbf{P}$)؛ حيث تقوم بإبادة ومحو أي أثر للميزات القديمة تمامًا ($\mathbf{M}\mathbf{X} = \mathbf{0}$)، عازلةً بواقي الأخطاء النقية المتعامدة.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **الانحدار المتعدد** | تركيب مستوى أو فضاء فائق لتفسير ظاهرة باستخدام عدة متغيرات في آن واحد. |
+| **مصفوفة القبعة ($\mathbf{P}$)** | عدسة الإسقاط: تحول القيم الفعلية للهدف $\mathbf{y}$ إلى قيم مقدرة $\hat{\mathbf{y}}$. |
+| **مصفوفة الإبادة ($\mathbf{M}$)** | صانعة البواقي: تمحو تمامًا أثر المتغيرات السابقة من أي متجه ($\mathbf{M}\mathbf{X} = \mathbf{0}$). |
+| **الصمود التكراري (Idempotence)** | خاصية رياضية تعني أن تكرار الإسقاط لا يغير النتيجة: $\mathbf{P}^2 = \mathbf{P}$. |
+| **مع بقاء العوامل الأخرى ثابتة** | المبدأ التفسيري لعزل أثر متغير واحد مع تثبيت كافة المتغيرات الأخرى. |
 
 :::simulation-widget{engine="canvas2d" component="MultivariatePlaneVifLab"}
 ---
@@ -51,56 +81,55 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-Expanding the sum of squared residuals scalar objective:
+The multiple linear regression model in matrix form expresses the outcome as a linear combination of $K$ regressors:
 
 $$
-S(\boldsymbol{\beta}) = \mathbf{y}^T\mathbf{y} - 2\boldsymbol{\beta}^T \mathbf{X}^T \mathbf{y} + \boldsymbol{\beta}^T (\mathbf{X}^T \mathbf{X}) \boldsymbol{\beta}
+\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}
 $$
 
-Using matrix calculus derivative rules ($\nabla_{\mathbf{b}} (\mathbf{a}^T \mathbf{b}) = \mathbf{a}$ and $\nabla_{\mathbf{b}} (\mathbf{b}^T \mathbf{A} \mathbf{b}) = 2\mathbf{A}\mathbf{b}$ for symmetric $\mathbf{A}$):
+The OLS projection (Hat) matrix $\mathbf{P}_X$ and residual maker (Annihilator) matrix $\mathbf{M}_X$ are defined as:
 
 $$
-\nabla_{\boldsymbol{\beta}} S(\boldsymbol{\beta}) = -2\mathbf{X}^T \mathbf{y} + 2(\mathbf{X}^T \mathbf{X})\boldsymbol{\beta} = \mathbf{0}
+\mathbf{P}_X = \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T, \quad \mathbf{M}_X = \mathbf{I}_N - \mathbf{P}_X = \mathbf{I}_N - \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T
 $$
 
-When $\text{rank}(\mathbf{X}) = K < N$, $\mathbf{X}^T \mathbf{X}$ is strictly invertible:
+Fitted values and residual vectors are pure linear transformations of $\mathbf{y}$:
 
 $$
-\hat{\boldsymbol{\beta}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y}
+\hat{\mathbf{y}} = \mathbf{P}_X \mathbf{y}, \quad \mathbf{e} = \mathbf{M}_X \mathbf{y}
 $$
 
-The Hessian matrix verifies global convexity:
+### Why the Math Works Step-by-Step
 
-$$
-\nabla_{\boldsymbol{\beta}}^2 S(\boldsymbol{\beta}) = 2\mathbf{X}^T \mathbf{X} \succ \mathbf{0} \quad (\text{strictly positive definite})
-$$
-
-### Fundamental Algebraic Properties of Projection Matrices
-
-The projection operators are defined as:
-
-$$
-\mathbf{P}_X \equiv \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T, \quad \mathbf{M}_X \equiv \mathbf{I}_N - \mathbf{P}_X
-$$
-
-1. **Symmetry:**
-   $$\mathbf{P}_X^T = (\mathbf{X}^T)^T ((\mathbf{X}^T \mathbf{X})^{-1})^T \mathbf{X}^T = \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T = \mathbf{P}_X$$
-2. **Idempotency:**
-   $$\mathbf{P}_X \mathbf{P}_X = \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1}(\mathbf{X}^T \mathbf{X})(\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T = \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T = \mathbf{P}_X$$
-3. **Trace and Rank via Cyclic Trace Property:**
-   Using the cyclic property $\text{tr}(\mathbf{A}\mathbf{B}\mathbf{C}) = \text{tr}(\mathbf{C}\mathbf{A}\mathbf{B})$:
-   $$\text{tr}(\mathbf{P}_X) = \text{tr}\left(\mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T\right) = \text{tr}\left((\mathbf{X}^T \mathbf{X})^{-1}(\mathbf{X}^T \mathbf{X})\right) = \text{tr}(\mathbf{I}_K) = K$$
-   $$\text{tr}(\mathbf{M}_X) = \text{tr}(\mathbf{I}_N - \mathbf{P}_X) = \text{tr}(\mathbf{I}_N) - \text{tr}(\mathbf{P}_X) = N - K$$
-4. **Annihilation of Column Space:**
-   $$\mathbf{M}_X \mathbf{X} = (\mathbf{I}_N - \mathbf{P}_X)\mathbf{X} = \mathbf{X} - \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T \mathbf{X} = \mathbf{X} - \mathbf{X} = \mathbf{0}_{N \times K}$$
+1. **Why is $\mathbf{M}_X \mathbf{X} = \mathbf{0}$ called the Annihilator?**
+   Expanding the product:
+   $$
+   \mathbf{M}_X \mathbf{X} = (\mathbf{I}_N - \mathbf{P}_X)\mathbf{X} = \mathbf{X} - \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{X} = \mathbf{X} - \mathbf{X} \mathbf{I}_K = \mathbf{0}
+   $$
+   The Annihilator matrix literally destroys any vector that lives in the column space of $\mathbf{X}$!
+2. **Why are $\mathbf{P}_X$ and $\mathbf{M}_X$ idempotent ($\mathbf{P}^2 = \mathbf{P}$)?**
+   Once you drop a plumb line from a point in space onto the floor, the point is already on the floor. Dropping a second plumb line from that floor position does not move it anywhere:
+   $$
+   \mathbf{P}_X \mathbf{P}_X = \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1} (\mathbf{X}^T \mathbf{X}) (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T = \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T = \mathbf{P}_X
+   $$
+3. **Trace and Degrees of Freedom:**
+   The rank and trace of $\mathbf{P}_X$ equal the number of parameters $K$. The rank and trace of $\mathbf{M}_X$ equal $N - K$, proving that the residual subspace has dimension $N - K$.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $S(\boldsymbol{\beta})$: Scalar sum of squared residuals quadratic loss function.
-* $\nabla_{\boldsymbol{\beta}} S(\boldsymbol{\beta}) \in \mathbb{R}^{K \times 1}$: Gradient vector of partial derivatives with respect to each $\beta_j$.
-* $\nabla_{\boldsymbol{\beta}}^2 S(\boldsymbol{\beta}) \in \mathbb{R}^{K \times K}$: Hessian matrix of second-order partial derivatives.
-* $\mathbf{P}_X \in \mathbb{R}^{N \times N}$: Symmetric idempotent projection matrix with trace equal to column dimension $K$.
-* $\mathbf{M}_X \in \mathbb{R}^{N \times N}$: Symmetric idempotent annihilator matrix satisfying $\mathbf{M}_X \mathbf{X} = \mathbf{0}$ with trace equal to degrees of freedom $N - K$.
+* $\mathbf{P}_X \in \mathbb{R}^{N \times N}$: Symmetric, idempotent projection matrix of rank $K$.
+* $\mathbf{M}_X \in \mathbb{R}^{N \times N}$: Symmetric, idempotent annihilator matrix of rank $N - K$.
+* $\hat{\mathbf{y}} = \mathbf{P}_X \mathbf{y} \in \text{col}(\mathbf{X})$: Orthogonal projection of outcome vector onto feature space.
+* $\mathbf{e} = \mathbf{M}_X \mathbf{y} \in \text{col}(\mathbf{X})^\perp$: Residual vector residing in the orthogonal complement space.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\mathbf{P}_X$ | مصفوفة القبعة | مصفوفة متماثلة وذات صمود تكراري تسقط البيانات على فضاء أعمدة $\mathbf{X}$. |
+| $\mathbf{M}_X$ | مصفوفة الإبادة | مصفوفة تحذف كل ما يمكن للميزات تفسيره لتستخرج بواقي الأخطاء النقية. |
+| $\text{tr}(\mathbf{P}_X)$ | أثر مصفوفة الإسقاط | يساوي رتبتها الهندسية $K$، وهو عدد المعالم المقدرة في النموذج. |
+| $\text{tr}(\mathbf{M}_X)$ | أثر مصفوفة الإبادة | يساوي $N - K$، وهو عدد درجات الحرية المتبقية لتقدير تباين الأخطاء. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -122,32 +151,32 @@ import numpy as np
 
 def compute_projection_and_annihilator(X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
-    Computes the hat matrix P_X and residual annihilator matrix M_X.
-    
+    Computes the Hat (Projection) Matrix P and Annihilator Matrix M.
+
     Parameters
     ----------
     X : np.ndarray of shape (N, K)
-        Design matrix (must have full column rank).
-        
+        Design matrix of regressors with full column rank.
+
     Returns
     -------
-    tuple[np.ndarray, np.ndarray]
-        P: Projection matrix (N, N)
-        M: Annihilator matrix (N, N)
+    tuple of (P, M) where:
+        P : np.ndarray of shape (N, N) is the projection matrix
+        M : np.ndarray of shape (N, N) is the annihilator matrix
     """
-    N, K = X.shape
-    
-    # Step 1: Compute (X^T X)^(-1)
-    XtX = X.T @ X
-    XtX_inv = np.linalg.inv(XtX)
-    
-    # Step 2: Form projection matrix P = X (X^T X)^(-1) X^T
-    P = X @ XtX_inv @ X.T
-    
-    # Step 3: Form annihilator matrix M = I - P
-    I_N = np.eye(N)
-    M = I_N - P
-    
+    n, k = X.shape
+
+    # Step 1: Compute the Gram matrix X^T X and its inverse
+    gram_matrix = X.T @ X
+    gram_inv = np.linalg.inv(gram_matrix)
+
+    # Step 2: Form the Hat (Projection) matrix P = X (X^T X)^(-1) X^T
+    P = X @ gram_inv @ X.T
+
+    # Step 3: Form the Annihilator matrix M = I_N - P
+    identity_n = np.eye(n)
+    M = identity_n - P
+
     return P, M
 ```
 :::

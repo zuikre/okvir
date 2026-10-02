@@ -29,6 +29,30 @@ In the realm of modern data science and Artificial Intelligence, vectors do not 
 
 ---
 
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Dot Product ($\mathbf{u} \cdot \mathbf{v}$) | A single number scoring how much two arrows push in the same direction | الجداء النقطي ($\mathbf{u} \cdot \mathbf{v}$) | رقم يقيس مدى تكاتف سهمين ودفع أحدهما في اتجاه الآخر |
+| Orthogonality | Meeting at a strict 90-degree right angle (zero shared push, dot product = 0) | التعامد (Orthogonality) | الالتقاء في زاوية قائمة 90 درجة؛ انعدام التوافق الاتجاهي والجداء = 0 |
+| Orthogonal Projection | The crisp shadow cast straight down by one arrow onto the line of another | المسقط المتعامد | الظل الهندسي الساقط عمودياً من سهم على خط سهم آخر |
+| Cosine Similarity | Directional harmony score between -1 and +1, ignoring arrow lengths | تشابه جيب التمام | مقياس نقاء التوافق الاتجاهي بين -1 و +1 بمعزل عن أطوال الأسهم |
+| Norm (Length) | The straight ruler length of the vector, computed as $\sqrt{\mathbf{v} \cdot \mathbf{v}}$ | المعيار / الطول | طول السهم بالمسطرة والمحسوب كجذر تربيعي لجدائه النقطي مع نفسه |
+
+#### Geometric & Visual Flow
+
+```
+                 u
+                *
+               /│
+              / │  Perpendicular drop (shadow)
+             /  │
+            *───┴──────────► v
+          Origin ◄── Projection ──►
+             Shadow length = ||u|| * cos(θ)
+             u · v = ||u|| * ||v|| * cos(θ)
+```
+
 ### الحدس الفيزيائي والهندسي
 
 تخيل أنك تسحب حقيبة سفر ذات عجلات في صالة المطار. مقبض الحقيبة يرتفع مائلاً بزاوية $45^\circ$، وأنت تبذل قوة عضلية كبيرة لسحب المقبض في هذا الاتجاه المائل. لكن عجلات الحقيبة مقيدة بالأرض بفعل الجاذبية، ولا يمكنها التحرك إلا أفقياً إلى الأمام. هل تترجم كل طاقتك المبذولة إلى دفع الحقيبة للأمام؟ بالتأكيد لا! فالمركبة الأفقية وحدها—أي **الظل** الأفقي لقوة سحبك المسقط على أرضية الصالة—هي التي تنجز الشغل الحركي وتدفع الحقيبة للأمام، بينما يضيع الجزء الرأسي من السحب في مقاومة الجاذبية للأعلى.
@@ -43,6 +67,30 @@ In the realm of modern data science and Artificial Intelligence, vectors do not 
 1. **آلية الانتباه في محولات الذكاء الاصطناعي (Transformers):** في قلب النماذج اللغوية مثل ChatGPT، تقوم آلية الانتباه بالضرب النقطي المقاس: $\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V$. الجداء النقطي بين متجه الاستعلام (Query) ومتجه المفتاح (Key) هو الميزان الرياضي الدقيق الذي يحدد مدى تركيز كل كلمة في النص على الكلمات الأخرى!
 2. **قواعد البيانات الشعاعية والبحث الدلالي (RAG):** عندما تطرح سؤالاً على مساعد الذكاء الاصطناعي، يتحول سؤالك إلى متجه تضمين يضم أكثر من ألف بُعد. تبحث قاعدة البيانات بين ملايين النصوص عبر حساب تشابه جيب التمام (الجداء النقطي للمتجهات الموحدة) في أجزاء من الألف من الثانية لاسترجاع أدق الإجابات.
 3. **الرسوم ثلاثية الأبعاد والإضاءة في ألعاب الفيديو:** تُحسب إضاءة المجسمات الواقعية عبر قانون لامبرت لجيب التمام؛ حيث يحسب كارت الشاشة الجداء النقطي بين المتجه العمودي على السطح $\mathbf{N}$ ومتجه شعاع الضوء $\mathbf{L}$: $\text{السطوع} = \max(0, \mathbf{N} \cdot \mathbf{L})$.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| الجداء النقطي ($\mathbf{u} \cdot \mathbf{v}$) | A single number scoring how much two arrows push in the same direction | الجداء النقطي ($\mathbf{u} \cdot \mathbf{v}$) | رقم يقيس مدى تكاتف سهمين ودفع أحدهما في اتجاه الآخر |
+| التعامد (Orthogonality) | Meeting at a strict 90-degree right angle (zero shared push, dot product = 0) | التعامد (Orthogonality) | الالتقاء في زاوية قائمة 90 درجة؛ انعدام التوافق الاتجاهي والجداء = 0 |
+| المسقط المتعامد | The crisp shadow cast straight down by one arrow onto the line of another | المسقط المتعامد | الظل الهندسي الساقط عمودياً من سهم على خط سهم آخر |
+| تشابه جيب التمام | Directional harmony score between -1 and +1, ignoring arrow lengths | تشابه جيب التمام | مقياس نقاء التوافق الاتجاهي بين -1 و +1 بمعزل عن أطوال الأسهم |
+| المعيار / الطول | The straight ruler length of the vector, computed as $\sqrt{\mathbf{v} \cdot \mathbf{v}}$ | المعيار / الطول | طول السهم بالمسطرة والمحسوب كجذر تربيعي لجدائه النقطي مع نفسه |
+
+#### المخطط البصري الهندسي
+
+```
+                 u
+                *
+               /│
+              / │  إسقاط عمودي (الظل)
+             /  │
+            *───┴──────────► v
+          نقطة الأصل ◄── طول المسقط ──►
+             طول الظل = ||u|| * cos(θ)
+             u · v = ||u|| * ||v|| * cos(θ)
+```
 
 :::simulation-widget{engine="canvas2d" component="DotProductProjectionCanvas"}
 ---

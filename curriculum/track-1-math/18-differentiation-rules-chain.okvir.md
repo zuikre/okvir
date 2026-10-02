@@ -24,7 +24,25 @@ The **Chain Rule** is nothing more than this exact mechanical gear-ratio multipl
 
 In deep learning and neural network training, this principle is the undisputed king of algorithms. Every deep neural network—from ChatGPT to vision models—is nothing more than a giant chain of hundreds of nested functions. Raw tokens or pixels pass into layer 1, whose activations pass into layer 2, which pass through layer 3, ultimately outputting a prediction that is compared to ground truth to yield a single loss number. When we train the network, the backward pass (backpropagation) is simply the chain rule in reverse: it walks backwards through the gear train, multiplying local derivative ratios to tell every single neuron precisely how much blame it carries for the final error.
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Chain Rule | Multiplying speed ratios along an assembly line: $\frac{dy}{dx} = \frac{dy}{du} \cdot \frac{du}{dx}$ | قاعدة السلسلة | ضرب نسب سرعات التروس المتعاقبة: dy/dx = (dy/du) * (du/dx) |
+| Product Rule | The expanding area of a rectangle when both width and length grow simultaneously | قاعدة ضرب دالتين | معدل اتساع مساحة مستطيل ينمو طوله وعرضه في نفس اللحظة |
+| Composite Function ($f(g(x))$) | Nesting machines inside one another: output of machine $g$ enters machine $f$ | الدالة المركبة | آلات معالجة متتالية: مخرجات الآلة الأولى تصبح مدخلات للآلة التالية |
+| Backpropagation | Using the chain rule backwards to tell each neural network weight how to improve | الانتشار العكسي | تطبيق قاعدة السلسلة إلى الوراء لإبلاغ أوزان الشبكة بمقدار الخطأ |
+| Local Sensitivity | How much a tiny wiggle at one stage magnifies or shrinks down the line | الحساسية المحلية | مقدار تضخم أو تضاؤل اهتزازة طفيفة عند انتقالها عبر خط المعالجة |
+
+#### Geometric & Visual Flow
+
+```
+       Nudge dx ──► [ Gear g ] ──► Nudge du = g'*dx ──► [ Gear f ] ──► Nudge dy = f'*du
+                                                                       dy = f' * g' * dx
+       Total Sensitivity Ratio = dy/dx = f'(g(x)) * g'(x) (Gear multiplication!)
+```
+
+### الحدس الفيزيائي والهندسي
 
 تخيل ثلاثة تروس نحاسية مصقولة تتعشق بعناية داخل ساعة يد ميكانيكية عريقة. الترس $A$ يدير الترس $B$، والذي يدير بدوره الترس $C$.
 - عندما تدير الترس $A$ دورة واحدة كاملة، يدور الترس $B$ بمقدار 3 دورات كاملة (نسبة الحساسية الميكانيكية هي $\frac{dB}{dA} = 3$).
@@ -35,6 +53,24 @@ In deep learning and neural network training, this principle is the undisputed k
 **قاعدة السلسلة** (Chain Rule) في الحسبان والتفاضل ليست سوى هذا المبدأ الميكانيكي البسيط مطبقاً على الدوال الرياضية المركبة والمتتالية في سلسلة معالجة. تخيل أنك تنظر إلى نص دقيق عبر عدستين مكبرتين متتاليتين: إذا كانت العدسة الأولى تضاعف حجم الكلمات مرتين ($2\times$)، وكانت العدسة الثانية تضاعف الصورة الناتجة عن الأولى ثلاث مرات ($3\times$)، فإن الصورة الإجمالية التي تستقبلها عينك ستكون مكبرة بمقدار ست مرات ($2 \times 3 = 6\times$). يتضاعف معدل التمدد الهندسي عبر ضرب معاملات التكبير في كل محطة.
 
 وفي هندسة الذكاء الاصطناعي الحديثة، تمثل قاعدة السلسلة المحرك الخفي لكل نماذج التعلم العميق. فالنماذج اللغوية الكبرى والرؤية الحاسوبية ليست إلا سلاسل هائلة من مئات الدوال الرياضية المتداخلة. تدخل مصفوفات البكسلات أو الكلمات إلى الطبقة الأولى، فتنتقل مخرجاتها إلى الطبقة الثانية، ومنها إلى الثالثة، حتى نصل إلى دالة الخسارة النهائية. وعند تدريب النموذج، تمثل خوارزمية الانتشار الخلفي (Backpropagation) تطبيقاً مباشراً لقاعدة السلسلة: حيث تعود الخوارزمية بالزمن إلى الوراء عبر شبكة التروس الرياضية، ضاربةً المشتقات المحلية ببعضها لتبلغ كل وزن في الشبكة بحصته الدقيقة من المسؤولية عن الخطأ النهائي.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| قاعدة السلسلة | Multiplying speed ratios along an assembly line: $\frac{dy}{dx} = \frac{dy}{du} \cdot \frac{du}{dx}$ | قاعدة السلسلة | ضرب نسب سرعات التروس المتعاقبة: dy/dx = (dy/du) * (du/dx) |
+| قاعدة ضرب دالتين | The expanding area of a rectangle when both width and length grow simultaneously | قاعدة ضرب دالتين | معدل اتساع مساحة مستطيل ينمو طوله وعرضه في نفس اللحظة |
+| الدالة المركبة | Nesting machines inside one another: output of machine $g$ enters machine $f$ | الدالة المركبة | آلات معالجة متتالية: مخرجات الآلة الأولى تصبح مدخلات للآلة التالية |
+| الانتشار العكسي | Using the chain rule backwards to tell each neural network weight how to improve | الانتشار العكسي | تطبيق قاعدة السلسلة إلى الوراء لإبلاغ أوزان الشبكة بمقدار الخطأ |
+| الحساسية المحلية | How much a tiny wiggle at one stage magnifies or shrinks down the line | الحساسية المحلية | مقدار تضخم أو تضاؤل اهتزازة طفيفة عند انتقالها عبر خط المعالجة |
+
+#### المخطط البصري الهندسي
+
+```
+       دفعة dx ──► [ الترس g ] ──► أثر du = g'*dx ──► [ الترس f ] ──► أثر dy = f'*du
+                                                                       dy = f' * g' * dx
+       نسبة الحساسية الكلية = dy/dx = f'(g(x)) * g'(x) (ضرب نسب التروس!)
+```
 
 :::simulation-widget{engine="canvas2d" component="CurvatureOsculatingCanvas"}
 ---

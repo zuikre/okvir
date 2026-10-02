@@ -3,6 +3,8 @@ import { useOkvirStore } from '../../lib/store';
 import { audio } from '../../lib/audio';
 import type { AppNotificationRecord } from '../../lib/types';
 
+import { Flame, Brain, Award, Zap, Bell, CheckCheck, Trash2 } from 'lucide-react';
+
 interface NotificationCenterPopoverProps {
   className?: string;
 }
@@ -52,18 +54,18 @@ export const NotificationCenterPopover: React.FC<NotificationCenterPopoverProps>
     }
   };
 
-  const getCategoryIcon = (category: AppNotificationRecord['category']) => {
+  const renderCategoryIcon = (category: AppNotificationRecord['category']) => {
     switch (category) {
       case 'daily_streak':
-        return '🔥';
+        return <Flame size={16} className="text-amber-400 shrink-0" />;
       case 'fsrs_reviews':
-        return '🧠';
+        return <Brain size={16} className="text-sky-400 shrink-0" />;
       case 'milestone':
-        return '🏆';
+        return <Award size={16} className="text-emerald-400 shrink-0" />;
       case 'updater':
-        return '⚡';
+        return <Zap size={16} className="text-purple-400 shrink-0" />;
       default:
-        return '🔔';
+        return <Bell size={16} className="text-zinc-400 shrink-0" />;
     }
   };
 
@@ -165,7 +167,7 @@ export const NotificationCenterPopover: React.FC<NotificationCenterPopoverProps>
           <div className="overflow-y-auto flex-1 divide-y divide-zinc-900/80">
             {notificationsHistory.length === 0 ? (
               <div className="p-8 text-center flex flex-col items-center justify-center gap-2">
-                <span className="text-3xl opacity-30">🔔</span>
+                <Bell size={28} className="text-zinc-600/60" />
                 <p className="text-xs text-zinc-400 font-medium">
                   {isRtl ? 'لا توجد إشعارات حالياً' : 'No notifications yet'}
                 </p>
@@ -186,7 +188,9 @@ export const NotificationCenterPopover: React.FC<NotificationCenterPopoverProps>
                       : 'bg-emerald-500/5 hover:bg-emerald-500/10 text-zinc-200 border-s-2 border-emerald-500'
                   }`}
                 >
-                  <span className="text-xl shrink-0 mt-0.5">{getCategoryIcon(item.category)}</span>
+                  <div className="mt-0.5 p-1.5 rounded-lg bg-zinc-900/80 border border-zinc-800">
+                    {renderCategoryIcon(item.category)}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <h4

@@ -32,6 +32,42 @@ Frequent words like `"the"`, `"cat"`, and `"learning"` merge all the way into si
 
 > **Frontier Analogy:** Think of building structures with LEGO blocks. Word-level tokenization is like demanding a custom-molded plastic piece for every imaginable spaceship and castle. Character-level tokenization is using microscopic dust particles. Subword BPE is the true LEGO system: a standard set of versatile bricks (subwords) that snap together to build anything, with pre-assembled components for things you build every day.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Token (Subword)** (الرمز / التوكن) | A LEGO brick of language: the atomic chunk (word, prefix, suffix, or single character) processed by the AI model. | لبنة لغوية أساسية: قطعة معيارية (كلمة كاملة، سابقة، لاحقة، أو حرف) يتعامل معها النموذج كوحدة بناء واحدة. |
+| **Byte Pair Encoding (BPE)** (ترميز أزواج البايت) | The recursive brick compactor: an algorithm that starts with single letters and repeatedly glues the most common pairs together. | ضاغط اللبنات التكراري: خوارزمية تبدأ بحروف منفصلة وتدمج الأزواج الأكثر تكراراً تدريجياً لصناعة مفردات غنية. |
+| **Merge Rule** (قاعدة الدمج) | The fusion recipe: a permanent instruction stating that symbol pair `('t', 'h')` must always be united into `'th'`. | وصفة الاندماج: قاعدة ثابتة تسجل أن الحرفين 't' و 'h' يتم دمجهما معاً ليشكلا رمزاً جديداً موحداً 'th'. |
+| **OOV (Out-Of-Vocabulary) Immunity** (القضاء على الكلمات المجهولة) | Never hitting a dead end: by anchoring the base alphabet in all 256 byte values, any possible string on Earth can be tokenized. | اختفاء الأخطاء المجهولة: بالاعتماد على البايتات الـ 256 كحد أدنى، يستحيل أن تواجه الشبكة أي نص تعجز عن قراءته. |
+| **Compression Ratio** (نسبة الضغط النصي) | Language efficiency: the ratio of raw text bytes to emitted tokens (typically $\approx 4:1$ for English). | كفاءة التشفير: النسبة بين حجم النص الخام بالبايتات وعدد الرموز الناتجة (حوالي 4 بايتات لكل رمز بالإنجليزية). |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+BYTE PAIR ENCODING (BPE) ITERATIVE MERGING:
+=============================================================================
+Training Corpus Words:  {"low": 5, "lower": 2, "newest": 6, "widest": 3}
+
+Step 0: Initial Base Characters (Split into spaced letters + end-of-word tag '_')
+        "l o w _" (5)    "l o w e r _" (2)    "n e w e s t _" (6)    "w i d e s t _" (3)
+        Count all adjacent pairs: ('e', 's'): 9, ('s', 't'): 9, ('l', 'o'): 7, ...
+        
+Step 1: Merge most frequent pair: ('e', 's') -> 'es' (Frequency = 9)
+        Vocabulary gains: 'es'
+        Updated corpus: "n e w es t _" (6), "w i d es t _" (3)
+
+Step 2: Merge most frequent pair: ('es', 't') -> 'est' (Frequency = 9)
+        Vocabulary gains: 'est'
+        Updated corpus: "n e w est _" (6), "w i d est _" (3)
+
+Step 3: Merge: ('l', 'o') -> 'lo', then ('lo', 'w') -> 'low'
+        Vocabulary grows until target size V is reached!
+=============================================================================
+INFERENCE TOKENIZATION:
+Input: "lowest" ---> Lookup merges ---> Output Token IDs: [ ID("low"), ID("est") ]
+```
+
 :::simulation-widget{engine="canvas2d" component="BpeTokenizerLab"}
 ---
 interactive: true

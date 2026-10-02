@@ -25,7 +25,28 @@ The gradient vector possesses three breathtaking physical and geometric properti
 
 Picture pouring a canteen of water onto a steep mountain slope. Where does the water flow? Water does not care about grid coordinates or human axes. Obeying gravity, every liquid droplet immediately accelerates along the path of least resistance: directly opposite the gradient vector, along the direction of **steepest descent** ($-\nabla f$). In machine learning, gradient descent is simply this natural physics: releasing our parameters like water droplets down the loss mountain so they pool at the lowest possible basin.
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Gradient ($\nabla f$) | A compass arrow pointing in the direction of steepest uphill climb on the landscape | متجه التدرج ($\nabla f$) | سهم بوصلة يشير بدقة إلى اتجاه أقصى صعود ممكن على تضاريس الدالة |
+| Steepest Ascent | The direction that gives the highest possible elevation gain per single pace forward | أقصى صعود | المسار الذي يمنحك أكبر مكسب في الارتفاع مقابل كل خطوة للأمام |
+| Directional Derivative ($D_u f$) | The slope you experience when hiking in ANY chosen compass heading $\mathbf{u}$ | المشتقة الاتجاهية | معدل الصعود أو الهبوط الذي تشعر به عند السير في أي زاوية بوصلة تختارها |
+| Contour Orthogonality | The gradient arrow always cuts across elevation contour rings at a crisp 90 degrees | التعامد مع خطوط الكنتور | سهم التدرج يقطع مسارات الارتفاع الثابت بزاوية قائمة 90 درجة دائماً |
+
+#### Geometric & Visual Flow
+
+```
+            Contour Rings with Gradient Vectors
+                    (100)
+                  /   ▲   \
+                 │  ▲ │ ▲  │   Grad f points straight UPHILL,
+                 │  │ │ │  │   strictly perpendicular to the
+                  \ ─ ┼ ─ /    contour rings!
+                    ( 50 )
+```
+
+### الحدس الفيزيائي والهندسي
 
 في الدرس السابق، قمنا بقياس انحدار الجبل على طول المحاور الشبكية الصارمة للخريطة: شرقاً وغرباً ($\frac{\partial f}{\partial x}$) وشمالاً وجنوباً ($\frac{\partial f}{\partial y}$). لكن في الطبيعة المفتوحة، نادراً ما يقيد المتسلق خطواته بالاتجاهات الأربعة الأصلية للبوصلة. ماذا لو قررت السير في اتجاه مائل عشوائي—مثلاً $37^\circ$ شمال الشرق، متوجهاً مباشرة نحو قمة جليدية بارزة على طول متجه وحدة $\hat{\mathbf{u}}$؟
 
@@ -37,6 +58,27 @@ Picture pouring a canteen of water onto a steep mountain slope. Where does the w
 3. **التعامد مع خطوط الكنتور:** بما أن السير على طول خط الكنتور المتساوي لا يُحدث أي تغير في الارتفاع ($0\text{ متر}$ صعوداً أو هبوطاً)، فإن متجه التدرج يكون دوماً **متعامداً تماماً ($90^\circ$) مع خطوط الكنتور**.
 
 تخيل أنك سكبت وعاء ماء على سفح جبل صخري منحدر. أين سيتدفق الماء؟ قطرات الماء لا تكترث بمحاور الإحداثيات التي رسمها البشر. بل استجابةً للجاذبية، تتدحرج القطرات فوراً على طول مسار الهبوط الأشد والأسرع: في الاتجاه المعاكس تماماً لمتجه التدرج ($-\nabla f$). وفي الذكاء الاصطناعي، تمثل خوارزمية الانحدار التدريجي هذه الظاهرة الطبيعية ذاتها: حيث نترك معاملات النموذج تتدفق كقطرات الماء نحو قاع وادي الخسارة لتستقر في أعمق نقطة ممكنة.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| متجه التدرج ($\nabla f$) | A compass arrow pointing in the direction of steepest uphill climb on the landscape | متجه التدرج ($\nabla f$) | سهم بوصلة يشير بدقة إلى اتجاه أقصى صعود ممكن على تضاريس الدالة |
+| أقصى صعود | The direction that gives the highest possible elevation gain per single pace forward | أقصى صعود | المسار الذي يمنحك أكبر مكسب في الارتفاع مقابل كل خطوة للأمام |
+| المشتقة الاتجاهية | The slope you experience when hiking in ANY chosen compass heading $\mathbf{u}$ | المشتقة الاتجاهية | معدل الصعود أو الهبوط الذي تشعر به عند السير في أي زاوية بوصلة تختارها |
+| التعامد مع خطوط الكنتور | The gradient arrow always cuts across elevation contour rings at a crisp 90 degrees | التعامد مع خطوط الكنتور | سهم التدرج يقطع مسارات الارتفاع الثابت بزاوية قائمة 90 درجة دائماً |
+
+#### المخطط البصري الهندسي
+
+```
+            حلقات الكنتور مع متجهات التدرج
+                    (100)
+                  /   ▲   \
+                 │  ▲ │ ▲  │   متجه التدرج يشير للأعلى مباشرة نحو القمة،
+                 │  │ │ │  │   ويتعامد تماماً وبزاوية 90 درجة مع حلقات الكنتور!
+                  \ ─ ┼ ─ /
+                    ( 50 )
+```
 
 :::simulation-widget{engine="canvas2d" component="GradientAscentVectorCanvas"}
 ---

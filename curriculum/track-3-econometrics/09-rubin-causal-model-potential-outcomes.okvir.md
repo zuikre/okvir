@@ -14,41 +14,71 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Before Jerzy Neyman and Donald Rubin formalized the **Potential Outcomes Framework**, causal claims in science were trapped in vague philosophical debates. Rubin demystified causality by anchoring it to a single, concrete question: **"What if?"**
+### Intuition & Real-World Story
 
-For every individual person $i$, imagine two parallel universes:
-* Universe 1: You take an experimental headache pill ($D_i = 1$). Your headache severity is $Y_i(1)$.
-* Universe 0: You do not take the pill ($D_i = 0$). Your headache severity is $Y_i(0)$.
+You wake up on a Tuesday morning with a pounding migraine. You open your medicine cabinet, take a newly developed painkiller, and go back to bed. Two hours later, your headache is completely gone.
 
-The true causal effect of the pill for *you specifically* is the difference between these two parallel realities:
+Did the painkiller cure your headache?
 
-$$
-\tau_i = Y_i(1) - Y_i(0)
-$$
+It seems obvious to say 'yes'. But consider what would have happened if you had just drunk a glass of water and taken a nap without the pill: *would your headache have cleared up on its own anyway?*
 
-Here lies **The Fundamental Problem of Causal Inference**: in the real physical universe, time moves in only one direction! You either swallow the pill or you don't. You can never observe both potential outcomes for the same person at the same moment. One outcome is factual (realized and recorded); the other is a **missing counterfactual**.
+To know the **true causal effect** of the pill on you, we need to compare two parallel realities for the exact same person at the exact same moment:
+1. Reality 1: Your health outcome having taken the pill, written as $Y_i(1)$.
+2. Reality 2: Your health outcome without the pill, written as $Y_i(0)$.
 
-Therefore, causal inference is fundamentally a **missing data problem**. We can never know an individual's personal causal effect $\tau_i$ with certainty. The entire enterprise of empirical science is designing clever ways to replace the missing counterfactual with a credible group-level substitute.
+The causal effect is the difference between these two parallel universes: $\tau_i = Y_i(1) - Y_i(0)$. 
 
-This framework exposes the sharp division between machine learning prediction and causal decision-making. Predictive algorithms predict conditional expectations in the observed world: $\mathbb{E}[Y \mid D = 1]$. For an emergency room triage model, predicting that ICU patients have a high mortality rate is mathematically accurate and clinically useful for allocating palliative resources. But mistaking this predictive risk score for a causal effect leads to the horrifying conclusion that ICUs kill patients! Machine learning asks: *"What is the expected outcome of people who choose treatment?"* Causal inference asks: *"What would be the outcome if we actively assigned treatment to someone who otherwise would not have received it?"* Prediction looks at passive realization; causality evaluates counterfactual intervention.
+Here is the tragedy of science, known as the **Fundamental Problem of Causal Inference**: we can only ever observe one reality for any individual! Once you swallow the pill, the universe where you didn't swallow it becomes a ghost—a **counterfactual** forever hidden from observation.
 
-قبل أن يصوغ جيرزي نيمان ودونالد روبين **إطار النتائج المحتملة (Potential Outcomes Framework)**، كانت مناقشات السببية حبيسة جدالات فلسفية ولغوية غامضة. أزال روبين الغموض عن السببية بربطها بسؤال واحد دقيق ومحدد: **"ماذا لو حدث العكس؟"**
+The **Rubin Causal Model** formalizes this intuition. Because individual causal effects cannot be seen directly, econometrics shifts its focus to estimating the **Average Treatment Effect (ATE)** across a population: $\mathbb{E}[Y(1) - Y(0)]$.
 
-لكل شخص $i$ في المجتمع، تخيل وجود عالمين متوازيين:
-* العالم 1: تتناول قرص دواء تجريبي للصداع ($D_i = 1$). وتكون شدة الصداع الناتجة $Y_i(1)$.
-* العالم 0: لا تتناول الدواء إطلاقًا ($D_i = 0$). وتكون شدة الصداع $Y_i(0)$.
+#### Jargon Decoder
 
-الأثر السببي الحقيقي للدواء *بالنسبة لك أنت تحديدًا* هو الفارق بين هذين المسارين المتوازيين:
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Potential Outcomes ($Y(1), Y(0)$)** | The two parallel futures: outcome with treatment vs outcome without treatment. |
+| **Counterfactual** | The unobserved path not taken: what would have happened in the alternate universe. |
+| **Fundamental Problem of Causal Inference** | You can only live one reality; the counterfactual is always missing data. |
+| **Average Treatment Effect (ATE)** | The average payoff across the entire population: $\mathbb{E}[Y(1) - Y(0)]$. |
+| **SUTVA** | No interference: one person's treatment doesn't spill over to change someone else's outcome. |
 
-$$
-\tau_i = Y_i(1) - Y_i(0)
-$$
+```text
+    THE SPLIT PARALLEL UNIVERSES:
 
-وهنا تصطدم بالحقيقة التي لا مفر منها: **المشكلة الجوهرية للاستدلال السببي (The Fundamental Problem of Causal Inference)**: في الكون الفيزيائي الواقعي، يسير الوقت في اتجاه واحد! إما أن تبتلع القرص أو تتركه. يستحيل رصد كلتا النتيجتين المحتملتين للشخص نفسه في اللحظة الزمنية ذاتها. إحدى النتيجتين تتحقق وتصبح واقعًا مرصودًا، بينما تظل النتيجة الأخرى **بديلاً مقابلاً للواقع مفقودًا إلى الأبد (Missing Counterfactual)**.
+                     +---> [ Universe 1: Took Pill ] ---> Y_i(1) = Headache Gone (Observed!)
+                     |
+    [ Patient Alice ]
+                     |
+                     +---> [ Universe 0: No Pill ]   ---> Y_i(0) = ??? (Counterfactual Ghost!)
+```
 
-لهذا السبب، فإن الاستدلال السببي هو في جوهره **مسألة بيانات مفقودة**. لا يمكننا أبدًا معرفة الأثر الفردي $\tau_i$ بدقة مطلقة لأي شخص بمفرده. وغاية العلم التجريبي برمته هي ابتكار طرق منهجية ذكية لاستبدال المسار المفقود ببديل جماعي موثوق ومكافئ للواقع.
+### الحدس والقصة الواقعية
 
-يوضح هذا الإطار بدقة بالغة الحد الفاصل بين التنبؤ والقرار السببي: نماذج تعلم الآلة التنبؤية تحسب التوقع الشرطي في الواقع المرصود $\mathbb{E}[Y \mid D = 1]$. فلو تنبأ نموذج في قسم الطوارئ بأن المرضى الذين يدخلون العناية المركزة ترتفع احتمالية وفاتهم، فهذا تنبؤ إحصائي دقيق ومفيد لفرز الحالات الحرجة. لكن الخلط بين هذا التنبؤ والسببية يقود إلى نتيجة كارثية تدعي أن العناية المركزة تقتل المرضى! تعلم الآلة يسأل: *"ما هي النتيجة المتوقعة لمن اختاروا العلاج في الواقع؟"* بينما الاستدلال السببي يسأل: *"ماذا كان سيحدث لهذا المريض تحديدًا لو تدخلنا ومنحناه العلاج بدلاً من تركه دون علاج؟"* التنبؤ يرصد الواقع القائم، بينما السببية تفحص التدخل المقابل للواقع.
+تستيقظ صباح يوم الثلاثاء بصداع نصفي حاد. تفتح خزانة الأدوية وتتناول مسكنًا جديدًا وتعود للنوم. بعد ساعتين، يختفي الصداع تمامًا.
+
+هل كان الدواء هو السبب الحقيقي لشفائك؟
+
+يبدو الجواب البديهي "نعم". ولكن فكر فيما كان سيحدث لو شربت كوب ماء وأخذت قسطًا من الراحة دون تناول الحبة: *ألم يكن الصداع ليزول تلقائيًا بمفرده؟*
+
+لمعرفة **الأثر السببي الحقيقي** للدواء عليك، نحتاج إلى مقارنة عالمين متوازيين للشخص نفسه في اللحظة الزمنية ذاتها:
+1. الواقع الأول: حالتك الصحية بعد تناول الدواء، ونرمز لها بـ $Y_i(1)$.
+2. الواقع الثاني: حالتك الصحية دون تناول الدواء، ونرمز لها بـ $Y_i(0)$.
+
+الأثر السببي الفعلي هو الفارق بين هذين العالمين: $\tau_i = Y_i(1) - Y_i(0)$.
+
+وهنا تصطدم البشرية بـ **المعضلة الأساسية للاستدلال السببي**: لا يمكننا أبدًا مشاهدة سوى واقع واحد فقط لأي إنسان! فبمجرد ابتلاعك للدواء، يتحول المسار الآخر إلى شبح غائب—**واقع مضاد (Counterfactual)** يستحيل رصده.
+
+يضع **نموذج روبين السببي (Rubin Causal Model)** هذا الحدس في إطار رياضي دقيق؛ ولأننا نعجز عن حساب الأثر الفردي لكل شخص، فإننا نوجه بوصلة العلم نحو تقدير **متوسط أثر المعالجة (ATE)** عبر عموم المجتمع.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **النتائج المحتملة ($Y(1), Y(0)$)** | المساران المتوازيان: النتيجة في حال تلقي المعالجة مقابل النتيجة دونها. |
+| **الواقع المضاد (Counterfactual)** | الطريق الذي لم نسلكه: ما كان سيحدث في العالم البديل المفقود. |
+| **المعضلة الأساسية للسببية** | عجزنا الطبيعي عن عيش واقعين معًا؛ فأحد المسارين دائمًا معلومة مفقودة. |
+| **متوسط أثر المعالجة (ATE)** | العائد السببي الإجمالي المتوسط عبر جميع أفراد المجتمع الإحصائي. |
+| **فرضية SUTVA** | استقلالية الوحدات: معالجة شخص لا تؤثر على نتائج شخص آخر ولا تغيرها. |
 
 :::simulation-widget{engine="canvas2d" component="PotentialOutcomesSplitLab"}
 ---
@@ -59,68 +89,49 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-For any observational unit $i$, the realized observable outcome $Y_i$ is connected to the potential outcomes via the treatment indicator $D_i \in \{0, 1\}$:
+For each unit $i$, define two potential outcomes: $Y_i(1)$ under treatment ($D_i = 1$) and $Y_i(0)$ under control ($D_i = 0$).
+
+The observed outcome realized in the real world is linked via the switching equation:
 
 $$
-Y_i = D_i Y_i(1) + (1 - D_i) Y_i(0) = Y_i(0) + D_i \big[Y_i(1) - Y_i(0)\big]
+Y_i = D_i Y_i(1) + (1 - D_i) Y_i(0) = Y_i(0) + D_i [Y_i(1) - Y_i(0)]
 $$
 
-### SUTVA (Stable Unit Treatment Value Assumption)
+The individual treatment effect is $\tau_i = Y_i(1) - Y_i(0)$.
 
-The potential outcomes representation implicitly requires two structural pillars known as **SUTVA**:
-1. **No Interference:** The potential outcome of unit $i$ does not depend on the treatment assignment of unit $j$ ($Y_i(d_1, \dots, d_N) = Y_i(d_i)$).
-2. **No Hidden Variations:** There is only one version of treatment $D_i = 1$ (e.g. all treated patients receive the identical dosage and drug potency).
-
-### Foundational Population Causal Benchmarks
-
-1. **Average Treatment Effect (ATE):**
-   $$\text{ATE} \equiv \mathbb{E}\big[Y_i(1) - Y_i(0)\big]$$
-2. **Average Treatment Effect on the Treated (ATT):**
-   $$\text{ATT} \equiv \mathbb{E}\big[Y_i(1) - Y_i(0) \mid D_i = 1\big]$$
-3. **Average Treatment Effect on the Untreated (ATUT):**
-   $$\text{ATUT} \equiv \mathbb{E}\big[Y_i(1) - Y_i(0) \mid D_i = 0\big]$$
-
-### Mathematical Derivation of the Selection Bias Decomposition
-
-When an analyst naively compares observed group means:
+A naive observational comparison between treated and untreated groups decomposes into:
 
 $$
-\Delta_{\text{naive}} \equiv \mathbb{E}[Y_i \mid D_i = 1] - \mathbb{E}[Y_i \mid D_i = 0]
+\mathbb{E}[Y \mid D = 1] - \mathbb{E}[Y \mid D = 0] = \underbrace{\mathbb{E}[Y(1) - Y(0) \mid D = 1]}_{\text{ATT (Average Effect on Treated)}} + \underbrace{\{\mathbb{E}[Y(0) \mid D = 1] - \mathbb{E}[Y(0) \mid D = 0]\}}_{\text{Selection Bias}}
 $$
 
-Substituting the realized outcome equation:
+### Why the Math Works Step-by-Step
 
-$$
-\Delta_{\text{naive}} = \mathbb{E}[Y_i(1) \mid D_i = 1] - \mathbb{E}[Y_i(0) \mid D_i = 0]
-$$
-
-Add and subtract $\mathbb{E}[Y_i(0) \mid D_i = 1]$:
-
-$$
-\Delta_{\text{naive}} = \Big(\mathbb{E}[Y_i(1) \mid D_i = 1] - \mathbb{E}[Y_i(0) \mid D_i = 1]\Big) + \Big(\mathbb{E}[Y_i(0) \mid D_i = 1] - \mathbb{E}[Y_i(0) \mid D_i = 0]\Big)
-$$
-
-$$
-\Delta_{\text{naive}} = \underbrace{\mathbb{E}[Y_i(1) - Y_i(0) \mid D_i = 1]}_{\text{ATT}} + \underbrace{\Big\{ \mathbb{E}[Y_i(0) \mid D_i = 1] - \mathbb{E}[Y_i(0) \mid D_i = 0] \Big\}}_{\text{Baseline Selection Bias}}
-$$
-
-If treatment effects are heterogeneous across groups, the decomposition relative to population ATE becomes:
-
-$$
-\Delta_{\text{naive}} = \text{ATE} + \underbrace{\Big( \mathbb{E}[Y(0) \mid D=1] - \mathbb{E}[Y(0) \mid D=0] \Big)}_{\text{Baseline Selection Bias}} + \underbrace{(1 - \pi)\Big( \text{ATT} - \text{ATUT} \Big)}_{\text{Heterogeneous Effect Bias}}
-$$
-
-where $\pi = \mathbb{P}(D_i = 1)$ is the proportion of treated units.
+1. **Why does observational comparison mislead us?**
+   Notice that the raw difference $\mathbb{E}[Y \mid D=1] - \mathbb{E}[Y \mid D=0]$ contains two distinct terms:
+   * **ATT**: The true causal effect on those who took the treatment.
+   * **Selection Bias**: The baseline difference between the groups even if neither received treatment!
+2. **The Role of Selection Bias:**
+   If people who take the treatment were already healthier (or wealthier) at baseline, $\mathbb{E}[Y(0) \mid D=1] > \mathbb{E}[Y(0) \mid D=0]$, creating a positive selection bias that makes the treatment look falsely magical!
+3. **How Randomization Solves the Puzzle:**
+   Under random assignment ($D \perp\!\!\perp (Y(1), Y(0))$), baseline outcomes are identical on average: $\mathbb{E}[Y(0) \mid D=1] = \mathbb{E}[Y(0) \mid D=0]$. Selection bias vanishes to zero, equating the naive difference directly to ATE!
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $D_i \in \{0, 1\}$: Binary treatment assignment indicator ($1$ for treated group, $0$ for control).
-* $Y_i(1)$: Potential outcome of unit $i$ if assigned to treatment.
-* $Y_i(0)$: Potential outcome of unit $i$ if assigned to control (counterfactual state).
-* $Y_i$: Observed scalar outcome actually realized in the dataset.
-* $\text{ATE}$: The expected average causal impact across the entire population.
-* $\text{ATT}$: The expected average causal impact on individuals who actively received treatment.
-* $\text{Selection Bias}$: Difference in baseline potential outcomes in the absence of treatment between those who received treatment and those who did not.
+* $Y_i(1)$: Potential outcome if treated.
+* $Y_i(0)$: Potential outcome if untreated.
+* $D_i \in \{0, 1\}$: Binary treatment indicator.
+* $\text{ATE} = \mathbb{E}[Y(1) - Y(0)]$: Average Treatment Effect across whole population.
+* $\text{ATT} = \mathbb{E}[Y(1) - Y(0) \mid D = 1]$: Average Treatment Effect on the Treated.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $Y_i(1)$ | النتيجة المحتملة بالمعالجة | ما سيحدث للمريض إذا أخذ الدواء في واقعه الافتراضي الأول. |
+| $Y_i(0)$ | النتيجة المحتملة دون معالجة | ما سيحدث للمريض إذا لم يأخذ الدواء في واقعه الافتراضي المقابل. |
+| $\text{ATT}$ | أثر المعالجة على المعالجين | العائد السببي الحقيقي المحقق خصيصًا للفئة التي خضعت للتجربة. |
+| انحياز الاختيار | الفارق الأساسي المسبق | التفاوت الأصلي في نقطة البداية بين المجموعتين قبل تطبيق أي علاج. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -140,53 +151,32 @@ test_cases:
 ```python
 import numpy as np
 
-def decompose_selection_bias(y0: np.ndarray, y1: np.ndarray, d: np.ndarray) -> dict[str, float]:
+def decompose_selection_bias(y: np.ndarray, d: np.ndarray) -> dict[str, float]:
     """
-    Decomposes the naive difference in means into ATT and Baseline Selection Bias.
+    Decomposes an observational difference in group means.
     
     Parameters
     ----------
-    y0 : np.ndarray of shape (N,)
-        Potential untreated outcomes Y(0).
-    y1 : np.ndarray of shape (N,)
-        Potential treated outcomes Y(1).
+    y : np.ndarray of shape (N,)
+        Observed outcomes.
     d : np.ndarray of shape (N,)
-        Binary treatment indicator (1 = treated, 0 = control).
+        Binary treatment indicator (0 or 1).
         
     Returns
     -------
-    dict with keys:
-        'ate': float, Average Treatment Effect E[Y(1) - Y(0)]
-        'att': float, Treatment effect on the treated E[Y(1) - Y(0) | D=1]
-        'naive_diff': float, Difference in realized sample means
-        'selection_bias': float, E[Y(0) | D=1] - E[Y(0) | D=0]
+    dict with keys 'mean_treated', 'mean_control', 'raw_diff'
     """
-    # Step 1: Synthesize observable realized outcome Y = D * Y(1) + (1 - D) * Y(0)
-    y_obs = d * y1 + (1 - d) * y0
-    
-    # Step 2: Calculate true population ATE
-    ate = float(np.mean(y1 - y0))
-    
-    # Masks for treated and control groups
     treated_mask = (d == 1)
     control_mask = (d == 0)
-    
-    # Step 3: Calculate ATT = E[Y(1) - Y(0) | D=1]
-    att = float(np.mean(y1[treated_mask] - y0[treated_mask]))
-    
-    # Step 4: Calculate naive difference in observed group means
-    mean_y_treated = float(np.mean(y_obs[treated_mask]))
-    mean_y_control = float(np.mean(y_obs[control_mask]))
-    naive_diff = mean_y_treated - mean_y_control
-    
-    # Step 5: Calculate baseline selection bias = E[Y(0) | D=1] - E[Y(0) | D=0]
-    selection_bias = float(np.mean(y0[treated_mask]) - np.mean(y0[control_mask]))
-    
+
+    mean_treated = float(np.mean(y[treated_mask]))
+    mean_control = float(np.mean(y[control_mask]))
+    raw_diff = mean_treated - mean_control
+
     return {
-        "ate": ate,
-        "att": att,
-        "naive_diff": naive_diff,
-        "selection_bias": selection_bias,
+        "mean_treated": mean_treated,
+        "mean_control": mean_control,
+        "raw_diff": raw_diff,
     }
 ```
 :::

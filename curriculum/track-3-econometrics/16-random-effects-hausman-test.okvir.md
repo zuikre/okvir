@@ -14,33 +14,73 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-In panel data econometrics, every empirical researcher eventually arrives at a decisive, high-stakes crossroads: **Fixed Effects (FE) versus Random Effects (RE)**.
+### Intuition & Real-World Story
 
-Think of these two models as representing two radically different scientific philosophies:
-* **Fixed Effects is the ultra-cautious skeptic:** It assumes that individual human beings, companies, or countries carry unobserved traits—grit, organizational culture, geography, or historical privilege ($\alpha_i$)—that correlate with their choices. To protect against omitted variable bias, FE demeans the data completely. But this insurance policy is expensive: it throws away all cross-sectional between-entity variation, leaving only noisy within-entity wobbles, and completely annihilates any variable that remains constant over time.
-* **Random Effects is the optimistic pragmatist:** It asks: *"What if unobserved individuality $\alpha_i$ is completely uncorrelated with our regressors?"* If that assumption holds, throwing away between-person comparisons is statistical suicide! Instead of wiping out the means completely, RE applies **quasi-demeaning** via Feasible Generalized Least Squares (FGLS): it subtracts only a partial fraction $\theta \in [0, 1]$ of the individual's average. This preserves time-invariant variables (like gender or education) and delivers dramatically smaller, more efficient standard errors.
+Suppose an e-commerce platform studies employee performance across 200 regional call centers over 8 quarters. You want to estimate how quarterly incentive bonuses impact customer satisfaction scores.
 
-Crucially, this choice exposes the philosophical chasm between machine learning prediction and econometric causality. In predictive machine learning and Bayesian modeling, Random Effects (often called hierarchical mixed models or shrinkage estimators) is almost always preferred. Why? Because shrinking individual parameters toward the grand population mean minimizes out-of-sample prediction error (Mean Squared Error) through the classic bias-variance tradeoff. If your goal is purely to predict which hospital will have high patient mortality next month, shrinkage is king. But in econometrics, we want to know: *"Does investing in an expensive surgical robot causally reduce mortality?"* If elite hospitals with world-class surgeons are the ones buying the robots, the unobserved surgeon talent correlates with the regressor! Shrinking toward the group mean pulls the causal estimate toward a contaminated cross-sectional bias. Econometrics gladly accepts higher variance in order to guarantee causal unbiasedness.
+You have panel data. You know that Fixed Effects (FE) is the safest choice because it controls for unmeasured branch traits (like local work ethic or regional dial habits). But Fixed Effects comes with a heavy price tag: by throwing away all cross-branch comparisons, FE burns statistical degrees of freedom, producing wider confidence intervals.
 
-How does the empirical researcher decide whether they can safely use Random Effects or must retreat to Fixed Effects? **The Hausman Specification Test** stages a formal statistical showdown:
-* **Under the Null Hypothesis ($H_0$: Orthogonal Heterogeneity):** Both FE and RE are consistent, but RE is the Best Linear Unbiased Estimator (BLUE) with smaller variance. Their estimates should be virtually identical, differing only by random sampling noise.
-* **Under the Alternative Hypothesis ($H_1$: Endogenous Heterogeneity):** RE is biased and corrupted by omitted variables. FE remains completely consistent and immune to the confounding!
+What if unmeasured branch traits are completely unrelated to bonus policy?
+If branch personality is pure random noise uncorrelated with bonuses, you can use **Random Effects (RE)**! Random Effects blends within-branch time variation with between-branch differences, delivering tighter standard errors and maximum statistical efficiency.
 
-The Hausman test acts as a statistical lie-detector test: if the gap between $\hat{\boldsymbol{\beta}}_{\text{FE}}$ and $\hat{\boldsymbol{\beta}}_{\text{RE}}$ is too wide to be explained by chance, the alarm sounds: **reject Random Effects and trust Fixed Effects!**
+How do you know if you are allowed to use Random Effects without corrupting your findings?
 
-في تحليل بيانات البانل، يقف الباحث الاقتصادي دائمًا أمام مفترق طرق منهجي حاسم وشديد الحساسية: **المفاضلة بين الآثار الثابتة (Fixed Effects - FE) والآثار العشوائية (Random Effects - RE)**.
+Enter the **Hausman Specification Test**:
+* If branch traits are truly uncorrelated with bonuses, both FE and RE will converge to the exact same numbers.
+* If branch traits ARE confounded, RE will drift away and produce biased numbers, while FE stands firm.
 
-يمثل هذان النموذجان فلسفتين علميتين مختلفتين تمامًا:
-* **نموذج الآثار الثابتة (FE) هو المتشكك شديد الحذر:** يفترض أن الأفراد أو الشركات أو الدول يحملون سمات خفية غير مقاسة—كالذكاء الفطري، أو الثقافة المؤسسية، أو الموروث التاريخي والجغرافي ($\alpha_i$)—ترتبط ارتباطًا وثيقًا بقراراتهم وسلوكهم. وفي سبيل حماية النموذج من انحياز المتغير المغفَل، يطرح FE المتوسطات بالكامل (Demeaning). لكن بوليصة التأمين هذه مكلفة للغاية؛ فهي تهدر جميع الفروق المقطعية بين الكيانات، ولا تترك سوى التذبذبات الزمنية الهامشية، وتمحو تمامًا أي متغير ثابت عبر الزمن!
-* **نموذج الآثار العشوائية (RE) هو البراغماتي المتفائل:** يتساءل: *"ماذا لو كانت الخصائص الفردية غير المرصودة $\alpha_i$ مستقلة تمامًا وغير مرتبطة بمتغيراتنا؟"* إذا تحقق هذا الفرض، فإن إهدار المقارنات بين الأفراد يعد خسارة فادحة في الكفاءة الإحصائية! بدلاً من محو المتوسطات بالكامل، يطبق RE **طرحًا جزئيًا (Quasi-Demeaning)** عبر المربعات الصغرى المعممة (GLS): فهو يطرح نسبة انكماش معينة $\theta \in [0, 1]$ فقط من المتوسط. يحافظ هذا على المتغيرات الثابتة ويمنحنا أخطاء معيارية أصغر بكثير وأعلى دقة.
+The Hausman test compares the distance between $\hat{\beta}_{\text{FE}}$ and $\hat{\beta}_{\text{RE}}$. If they diverge significantly, you reject Random Effects and stick with Fixed Effects!
 
-وهنا يتجلى الخلاف الفلسفي العميق بين تعلم الآلة التنبؤي والسببية في القياس الاقتصادي. في تعلم الآلة والإحصاء البايزي، يُفضل نموذج التأثيرات العشوائية دائمًا (ويسمى النماذج الهرمية المختلطة أو مقدرات الانكماش Shrinkage). لماذا؟ لأن تقليص الفروق الفردية وسحبها نحو المتوسط العام للمجتمع يقلل خطأ التنبؤ المستقبلي (MSE) وفق مقايضة الانحياز والتباين الشهيرة. فإذا كان هدفك التنبؤ بمعدل وفيات مستشفى معين الشهر القادم، فالانكماش ممتاز. لكن في القياس الاقتصادي، نريد إجابة سببية: *"هل يؤدي شراء جهاز جراحي متطور إلى خفض وفيات المرضى سببيًا؟"* إذا كانت المستشفيات المرموقة التي تضم أمهر الجراحين هي الوحيدة القادرة على شراء هذه الأجهزة، فإن مهارة الجراح الخفية ترتبط بوجود الجهاز! وسحب التقدير نحو المتوسط العام يلوث المعلمة السببية بانحياز خطير. يرفض القياس الاقتصادي هذا التلوث، ويقبل بتباين أكبر في سبيل ضمان نقاء الأثر السببي.
+#### Jargon Decoder
 
-كيف يحسم الباحث هذا النزاع ويختار النموذج الصحيح؟ يضع **اختبار هاوسمان (Hausman Specification Test)** كلا المقدرين في مواجهة حاسمة:
-* **في ظل فرضية العدم ($H_0$: استقلال الخصائص الفردية):** كلا المقدرين متسقان، لكن مقدر RE أكثر كفاءة ودقة إحصائية. وتكون تقديرات FE و RE متطابقة تقريبًا باستثناء فروق عشوائية طفيفة ناتجة عن المعاينة.
-* **في ظل الفرضية البديلة ($H_1$: ارتباط الخصائص الفردية بالمتغيرات):** يسقط مقدر RE في هاوية الانحياز، بينما يظل مقدر FE صامدًا ومتسقًا لا يتأثر!
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Fixed Effects (FE)** | The bulletproof shield: consistent even if entity traits are heavily confounded with features. |
+| **Random Effects (RE)** | The efficiency champion: optimal when entity traits are pure random noise uncorrelated with features. |
+| **Hausman Test** | The scientific referee: tests whether the difference between FE and RE is statistically significant. |
+| **Quasi-Demeaning ($\theta$)** | Partial demeaning: subtracting a fraction $\theta$ of the group average to preserve efficiency. |
+| **GLS (Generalized Least Squares)** | Weighted estimation accounting for correlation in error disturbances over time. |
 
-يعمل اختبار هاوسمان كجهاز كشف كذب إحصائي: فإذا كان التباعد بين تقدير FE وتقدير RE أكبر مما يمكن للصدفة أن تبرره، يطلق الاختبار صافرة الإنذار: **ارفض فرضية الآثار العشوائية واعتمد الآثار الثابتة!**
+```text
+    THE PANEL ESTIMATOR DECISION TREE:
+
+                  Are unmeasured traits (alpha_i) correlated with features (X)?
+                                       /              \
+                                     (Yes)            (No)
+                                     /                  \
+                    Use Fixed Effects (FE)        Use Random Effects (RE)
+                    [Consistent & Unbiased]       [More Efficient & Narrower SEs]
+                                      ^                  ^
+                                       \                /
+                                  Hausman Test Tests This Difference!
+```
+
+### الحدس والقصة الواقعية
+
+تخيل متجرًا إلكترونيًا يدرس أداء 200 مركز خدمة عملاء عبر 8 فصول مالية، بهدف معرفة أثر المكافآت الفصلية على رضا العملاء.
+
+لديك بيانات طولية (Panel Data). تعلم أن نموذج الآثار الثابتة (FE) هو الخيار الأكثر أمانًا لأنه يحيد أي فروق غير مقاسة بين الفروع. لكن الآثار الثابتة لها ثمن باهظ: فهي تهدر درجات الحرية وتنتج أخطاء معيارية متسعة لأنها تلقي بجميع المقارنات بين الفروع في سلة المهملات.
+
+ماذا لو كانت الفروق الفردية بين الفروع مجرد تشويش عشوائي بريء لا يرتبط إطلاقًا بنظام المكافآت؟
+حينها يمكنك استخدام **الآثار العشوائية (Random Effects - RE)**! يمزج هذا النموذج التغيرات الزمنية مع الفروق بين الفروع، مما يعطيك أعلى كفاءة إحصائية وأضيق فترات ثقة.
+
+كيف تحسم القرار بين الأمان والكفاءة بصورة علمية منضبطة؟
+
+عبر **اختبار هوسمان (Hausman Specification Test)**:
+* إذا كانت الفروق بين الفروع بريئة وغير مرتبطة بالمتغيرات، فإن كلا المقدرين (FE و RE) سيعطيان نفس الأرقام تقريبًا.
+* أما إذا كان هناك انحياز مربك، فإن مقدر RE سينحرف ويفشل، بينما يظل مقدر FE صامدًا ودقيقًا.
+
+يقيس اختبار هوسمان المسافة الرياضية بين تقديرات المقدرين؛ فإن تباعدا تباعدًا دالاً، نرفض الآثار العشوائية ونتمسك بالآثار الثابتة!
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **الآثار الثابتة (FE)** | الدرع الواقي: نموذج موثوق ومتسق حتى لو ارتبطت سمات الكيان بالميزات ارتباطًا وثيقًا. |
+| **الآثار العشوائية (RE)** | بطل الكفاءة: الخيار الأمثل والأعلى دقة عندما تكون سمات الكيان مجرد صدفة عشوائية. |
+| **اختبار هوسمان** | الحكم العلمي: يختبر ما إذا كان الفارق بين تقديرات FE و RE يتجاوز حدود الصدفة. |
+| **الخصم شبه الداخلي ($\theta$)** | طرح جزئي للمتوسط: خصم نسبة $\theta$ من متوسط الكيان للحفاظ على كفاءة التقدير. |
+| **المربعات الصغرى المعممة (GLS)** | طريقة رياضية توزن المشاهدات لمراعاة ترابط الأخطاء عبر الفترات الزمنية. |
 
 :::simulation-widget{engine="canvas2d" component="RandomEffectsHausmanLab"}
 ---
@@ -51,86 +91,44 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-The panel data generating process with composite error $v_{it} = \alpha_i + \varepsilon_{it}$ is:
+In the random effects model, the composite error is $v_{it} = \alpha_i + \varepsilon_{it}$ where $\alpha_i \sim (0, \sigma_\alpha^2)$ and $\varepsilon_{it} \sim (0, \sigma_\varepsilon^2)$.
+
+The Random Effects GLS estimator applies a partial demeaning factor $\theta$:
 
 $$
-y_{it} = \mathbf{x}_{it}^T \boldsymbol{\beta} + \alpha_i + \varepsilon_{it}
+y_{it} - \theta \bar{y}_i = (\mathbf{x}_{it} - \theta \bar{\mathbf{x}}_i)^T \boldsymbol{\beta} + \text{error}, \quad \theta = 1 - \sqrt{\frac{\sigma_\varepsilon^2}{\sigma_\varepsilon^2 + T \sigma_\alpha^2}}
 $$
 
-Under the Random Effects orthogonality assumption:
+**The Hausman Test Statistic:**
+Under the null hypothesis $H_0: \text{Cov}(\alpha_i, \mathbf{x}_{it}) = 0$, both FE and RE are consistent, but RE is asymptotically efficient:
 
 $$
-\mathbb{E}[\alpha_i \mid \mathbf{X}_i] = 0, \quad \mathbb{E}[\varepsilon_{it} \mid \mathbf{X}_i, \alpha_i] = 0, \quad \mathbb{V}(\alpha_i) = \sigma_\alpha^2, \quad \mathbb{V}(\varepsilon_{it}) = \sigma_\varepsilon^2
+H = (\hat{\boldsymbol{\beta}}_{\text{FE}} - \hat{\boldsymbol{\beta}}_{\text{RE}})^T \left[ \mathbb{V}[\hat{\boldsymbol{\beta}}_{\text{FE}}] - \mathbb{V}[\hat{\boldsymbol{\beta}}_{\text{RE}}] \right]^{-1} (\hat{\boldsymbol{\beta}}_{\text{FE}} - \hat{\boldsymbol{\beta}}_{\text{RE}}) \sim \chi^2(K)
 $$
 
-### Composite Error Covariance Matrix & Spectral Decomposition
+Under the alternative $H_1$, FE remains consistent while RE is biased.
 
-For an individual entity $i$, stack the $T$ time periods into vector $\mathbf{v}_i = (\alpha_i + \varepsilon_{i1}, \dots, \alpha_i + \varepsilon_{iT})^T$. The covariance matrix exhibits equicorrelation:
+### Why the Math Works Step-by-Step
 
-$$
-\boldsymbol{\Sigma}_i \equiv \mathbb{E}[\mathbf{v}_i \mathbf{v}_i^T] = \sigma_\varepsilon^2 \mathbf{I}_T + \sigma_\alpha^2 \boldsymbol{\iota}_T \boldsymbol{\iota}_T^T
-$$
-
-Using the projection matrices $\mathbf{P} = \frac{1}{T}\boldsymbol{\iota}_T \boldsymbol{\iota}_T^T$ and $\mathbf{Q} = \mathbf{I}_T - \mathbf{P}$:
-
-$$
-\boldsymbol{\Sigma}_i = \sigma_\varepsilon^2 (\mathbf{P} + \mathbf{Q}) + T \sigma_\alpha^2 \mathbf{P} = (\sigma_\varepsilon^2 + T \sigma_\alpha^2)\mathbf{P} + \sigma_\varepsilon^2 \mathbf{Q}
-$$
-
-The inverse square-root matrix $\boldsymbol{\Sigma}_i^{-1/2}$ is:
-
-$$
-\boldsymbol{\Sigma}_i^{-1/2} = \frac{1}{\sqrt{\sigma_\varepsilon^2 + T \sigma_\alpha^2}} \mathbf{P} + \frac{1}{\sigma_\varepsilon} \mathbf{Q} = \frac{1}{\sigma_\varepsilon} \left[ \mathbf{I}_T - \left( 1 - \sqrt{\frac{\sigma_\varepsilon^2}{\sigma_\varepsilon^2 + T \sigma_\alpha^2}} \right) \mathbf{P} \right]
-$$
-
-### The Quasi-Demeaning Transformation
-
-Multiplying through by $\sigma_\varepsilon \boldsymbol{\Sigma}_i^{-1/2}$ yields the quasi-demeaned variables:
-
-$$
-y_{it}^* = y_{it} - \theta \bar{y}_i, \quad \mathbf{x}_{it}^* = \mathbf{x}_{it} - \theta \bar{\mathbf{x}}_i
-$$
-
-Where the shrinkage parameter $\theta$ is explicitly:
-
-$$
-\theta \equiv 1 - \sqrt{\frac{\sigma_\varepsilon^2}{\sigma_\varepsilon^2 + T \sigma_\alpha^2}} \in [0, 1]
-$$
-
-* If individual heterogeneity vanishes ($\sigma_\alpha^2 \to 0$), $\theta \to 0$ (yielding Pooled OLS).
-* If individual heterogeneity dominates ($\sigma_\alpha^2 \to \infty$) or panel length grows ($T \to \infty$), $\theta \to 1$ (yielding Fixed Effects).
-
-### Derivation of the Hausman Test Statistic
-
-Let $\hat{\mathbf{q}} \equiv \hat{\boldsymbol{\beta}}_{\text{FE}} - \hat{\boldsymbol{\beta}}_{\text{RE}}$. To construct a Wald-type quadratic form, we require $\mathbb{V}(\hat{\mathbf{q}}) = \mathbb{V}(\hat{\boldsymbol{\beta}}_{\text{FE}}) + \mathbb{V}(\hat{\boldsymbol{\beta}}_{\text{RE}}) - 2\text{Cov}(\hat{\boldsymbol{\beta}}_{\text{FE}}, \hat{\boldsymbol{\beta}}_{\text{RE}})$.
-
-**Hausman's Lemma (1978):** Under $H_0$, $\hat{\boldsymbol{\beta}}_{\text{RE}}$ achieves the Cramér-Rao efficiency bound in the class of all linear unbiased estimators. An efficient estimator has zero covariance with its difference from any other consistent estimator:
-
-$$
-\text{Cov}(\hat{\boldsymbol{\beta}}_{\text{RE}}, \hat{\boldsymbol{\beta}}_{\text{FE}} - \hat{\boldsymbol{\beta}}_{\text{RE}}) = \mathbf{0} \implies \text{Cov}(\hat{\boldsymbol{\beta}}_{\text{FE}}, \hat{\boldsymbol{\beta}}_{\text{RE}}) = \mathbb{V}(\hat{\boldsymbol{\beta}}_{\text{RE}})
-$$
-
-Substituting this identity into the variance of $\hat{\mathbf{q}}$:
-
-$$
-\mathbb{V}(\hat{\mathbf{q}}) = \mathbb{V}(\hat{\boldsymbol{\beta}}_{\text{FE}}) + \mathbb{V}(\hat{\boldsymbol{\beta}}_{\text{RE}}) - 2\mathbb{V}(\hat{\boldsymbol{\beta}}_{\text{RE}}) = \mathbb{V}(\hat{\boldsymbol{\beta}}_{\text{FE}}) - \mathbb{V}(\hat{\boldsymbol{\beta}}_{\text{RE}})
-$$
-
-The **Hausman Test Statistic** is:
-
-$$
-H = (\hat{\boldsymbol{\beta}}_{\text{FE}} - \hat{\boldsymbol{\beta}}_{\text{RE}})^T \Big[ \widehat{\mathbb{V}}(\hat{\boldsymbol{\beta}}_{\text{FE}}) - \widehat{\mathbb{V}}(\hat{\boldsymbol{\beta}}_{\text{RE}}) \Big]^{-1} (\hat{\boldsymbol{\beta}}_{\text{FE}} - \hat{\boldsymbol{\beta}}_{\text{RE}}) \xrightarrow{d} \chi^2(K)
-$$
+1. **Why does $\mathbb{V}[\hat{\beta}_{\text{FE}}] - \mathbb{V}[\hat{\beta}_{\text{RE}}]$ appear in the denominator?**
+   Because RE is the efficient estimator under the null hypothesis, the celebrated lemma of Hausman proves that $\text{Cov}(\hat{\beta}_{\text{FE}} - \hat{\beta}_{\text{RE}}, \hat{\beta}_{\text{RE}}) = 0$. Consequently:
+   $$\mathbb{V}[\hat{\beta}_{\text{FE}} - \hat{\beta}_{\text{RE}}] = \mathbb{V}[\hat{\beta}_{\text{FE}}] - \mathbb{V}[\hat{\beta}_{\text{RE}}]$$
+2. **Decision Rule:**
+   If $H > \chi^2_{\alpha}(K)$ (p-value $< 0.05$), reject $H_0$. The Random Effects assumption fails; you must report Fixed Effects.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $v_{it} = \alpha_i + \varepsilon_{it}$: Composite error composed of entity unobserved effect $\alpha_i$ and idiosyncratic shock $\varepsilon_{it}$.
-* $\sigma_\alpha^2$: Variance of the unobserved individual effect across entities.
-* $\sigma_\varepsilon^2$: Variance of the idiosyncratic disturbance.
-* $\theta \in [0, 1]$: Shrinkage parameter governing the degree of quasi-demeaning.
-* $\hat{\boldsymbol{\beta}}_{\text{FE}}$: Within-estimator, consistent under both $H_0$ and $H_1$.
-* $\hat{\boldsymbol{\beta}}_{\text{RE}}$: FGLS estimator, fully efficient under $H_0$ but inconsistent under $H_1$.
-* $H \sim \chi^2(K)$: Hausman test statistic with degrees of freedom equal to the rank of the variance difference matrix.
+* $\hat{\boldsymbol{\beta}}_{\text{FE}}$: Consistent within-estimator under both $H_0$ and $H_1$.
+* $\hat{\boldsymbol{\beta}}_{\text{RE}}$: Efficient GLS estimator under $H_0$, biased under $H_1$.
+* $H$: Hausman quadratic test statistic distributed asymptotically as chi-squared with $K$ degrees of freedom.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\theta$ | معامل الخصم شبه الداخلي | نسبة الخصم التي تتراوح بين 0 (انحدار تجميعي) و 1 (آثار ثابتة كاملة). |
+| $H$ | إحصائية اختبار هوسمان | المسافة التربيعية الموزونة الفاصلة بين تقديرات النموذجين. |
+| $\chi^2(K)$ | توزيع كاي-تربيع | التوزيع الاحتمالي النظري لاختبار الدلالة بدرجات حرية مساوية لعدد المعلمات. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -150,45 +148,35 @@ test_cases:
 ```python
 import numpy as np
 
-def compute_hausman_test(beta_fe: np.ndarray, vcov_fe: np.ndarray, beta_re: np.ndarray, vcov_re: np.ndarray) -> dict[str, float]:
+def compute_hausman_test(
+    beta_fe: np.ndarray,
+    vcov_fe: np.ndarray,
+    beta_re: np.ndarray,
+    vcov_re: np.ndarray
+) -> dict[str, float]:
     """
-    Computes the Hausman quadratic test statistic comparing FE and RE estimates.
-    
+    Computes the Hausman specification test statistic: (b_fe - b_re)' [V_fe - V_re]^(-1) (b_fe - b_re).
+
     Parameters
     ----------
     beta_fe : np.ndarray of shape (K,)
-        Fixed Effects coefficient vector.
     vcov_fe : np.ndarray of shape (K, K)
-        Fixed Effects covariance matrix.
     beta_re : np.ndarray of shape (K,)
-        Random Effects coefficient vector.
     vcov_re : np.ndarray of shape (K, K)
-        Random Effects covariance matrix.
-        
+
     Returns
     -------
-    dict with keys:
-        'stat': float, Hausman chi-square test statistic
-        'df': int, degrees of freedom (rank of variance difference)
+    dict with keys 'h_stat', 'df'
     """
-    # Step 1: Compute parameter difference vector q = beta_fe - beta_re
     diff = beta_fe - beta_re
-    
-    # Step 2: Compute variance difference matrix: V_diff = V_fe - V_re
-    vcov_diff = vcov_fe - vcov_re
-    
-    # Step 3: Compute Moore-Penrose pseudo-inverse to handle potential numerical singularity
-    vcov_diff_inv = np.linalg.pinv(vcov_diff)
-    
-    # Step 4: Evaluate the quadratic form H = q^T (V_diff)^(-1) q
-    stat = float(diff.T @ vcov_diff_inv @ diff)
-    
-    # Step 5: Enforce non-negative test statistic and extract degrees of freedom
-    stat = max(0.0, stat)
-    df = int(np.linalg.matrix_rank(vcov_diff))
-    
+    diff_vcov = vcov_fe - vcov_re
+
+    # Solve for quadratic form safely
+    h_stat = float(diff.T @ np.linalg.pinv(diff_vcov) @ diff)
+    df = float(len(beta_fe))
+
     return {
-        "stat": stat,
+        "h_stat": max(0.0, h_stat),
         "df": df,
     }
 ```

@@ -31,6 +31,17 @@ To understand how **Recursive Common Table Expressions (Recursive CTEs)** work, 
 
 Beyond trees, non-recursive CTEs (`WITH cte_name AS (...)`) act as modular building blocks for complex queries. Instead of nesting subqueries inside subqueries like impenetrable labyrinths, CTEs allow you to define declarative, named dataframes in top-to-bottom sequence, giving your SQL pipeline the readability and testability of a clean computational Directed Acyclic Graph (DAG).
 
+### Jargon Decoder / قاموس المصطلحات المعمارية
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Recursive CTE** / الاستعلام الذاتي العودي | A query that references its own output to iteratively traverse tree/graph hierarchies. Analogy: Opening nested Russian Matryoshka dolls one by one. | استعلام يشير إلى مخرجاته ذاتياً للتنقل عبر المستويات الهرمية والشجرية. التشبيه: فتح دمى الماتريوشكا الروسية المتداخلة واحدة تلو الأخرى. |
+| **Anchor Member** / عضو التثبيت الأساسي | The non-recursive base query executed exactly once to initialize the root seeds. Analogy: Planting the initial acorn from which the entire oak tree sprouts. | الاستعلام التأسيسي الأولي الذي ينفذ مرة واحدة فقط لإنتاج بذور الجذور الأساسية. التشبيه: زراعة بذرة البلوط الأولى التي تنمو منها الشجرة الضخمة بأكملها. |
+| **Recursive Member** / العضو العودي المتمدد | The inductive query joining new children to the parents found in the preceding iteration. Analogy: Branches sprouting new smaller twigs season after season. | الاستعلام المتكرر الذي يربط الأبناء الجدد بالآباء المكتشفين في الخطوة السابقة. التشبيه: الأغصان الشجرية التي تفرع أغصاناً أصغر فأصغر مع كل فصل. |
+| **Working Table ($R_i$)** / جدول العمل المؤقت | An in-memory scratchpad buffer containing strictly the tuples discovered at step $i$. Analogy: The conveyor belt tray holding only the items picked in the current round. | مخزن مؤقت في الذاكرة يحوي حصرياً السجلات المكتشفة في الدورة الحالية فقط. التشبيه: صينية خط التجميع التي تحمل فقط القطع المجمعة في هذه الجولة. |
+| **Fixed-Point Termination** / توقف النقطة الثابتة | Automatically stopping when an iteration produces an empty set ($R_{K+1} = \emptyset$). Analogy: Discovering the smallest solid wooden doll with nothing inside it. | التوقف الرياضي الحتمي للاستعلام عند خلو جولة البحث من أي سجلات جديدة. التشبيه: الوصول إلى أصغر دمية خشبية مصمتة لا تحتوي أي دمية أخرى بداخلها. |
+| **Graph Cycle Trap** / فخ الدوران البياني اللانهائي | A circular dependency in the graph ($A \to B \to A$) that causes an infinite loop and OOM crash. Analogy: A snake eating its own tail in an endless loop. | علاقة دائرية مغلقة بين السجلات تؤدي لدوران المحرك إلى ما لا نهاية ونفاد الذاكرة. التشبيه: ثعبان يبتلع ذيله في حلقة مغلقة لا تنتهي. |
+
 :::simulation-widget{engine="canvas2d" component="RecursiveCteGraphLab"}
 ---
 interactive: true
@@ -65,6 +76,36 @@ $$
 R_{\text{total}} = \bigcup_{i=0}^K R_i \quad \text{where } R_{K+1} = \emptyset \land K < \infty
 $$
 
+```text
+Visual ASCII Transformation: Recursive CTE Iterative Expansion:
+
+Organization Hierarchy Graph:
+  Emp 1 (Alice, CEO, manager=NULL)
+    |-- Emp 2 (Bob, VP, manager=1)
+    |     \-- Emp 4 (David, Eng, manager=2)
+    \-- Emp 3 (Charlie, Dir, manager=1)
+
+Step 0: Anchor Member (WHERE manager_id IS NULL)
+  Working Table R0: [ (1, 'Alice', depth=0, path='Alice') ]
+  Accumulated Output: [ Alice (d=0) ]
+
+Step 1: Recursive Member (JOIN org_chart ON manager_id IN R0.emp_id)
+  Find direct reports of Alice (Emp 1):
+  Working Table R1: [ (2, 'Bob', depth=1, path='Alice -> Bob'), 
+                      (3, 'Charlie', depth=1, path='Alice -> Charlie') ]
+  Accumulated Output: [ Alice (d=0), Bob (d=1), Charlie (d=1) ]
+
+Step 2: Recursive Member (JOIN org_chart ON manager_id IN R1.emp_id)
+  Find direct reports of Bob (2) and Charlie (3):
+  Working Table R2: [ (4, 'David', depth=2, path='Alice -> Bob -> David') ]
+  Accumulated Output: [ Alice (d=0), Bob (d=1), Charlie (d=1), David (d=2) ]
+
+Step 3: Recursive Member (JOIN org_chart ON manager_id IN R2.emp_id)
+  Find direct reports of David (4):
+  Working Table R3: [ ]  (EMPTY SET! R_3 = Ø)
+  ===> Least Fixed-Point reached! Engine automatically halts and returns R_total!
+```
+
 ### Mathematical Invariants & Symbol Breakdown
 
 | الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
@@ -78,13 +119,14 @@ $$
 | $\text{DAG}$ | Directed Acyclic Graph | Mathematical topology requirement preventing infinite circular loops | شرط المخطط التوجيهي عديم الحلقات لضمان التوقف الرياضي الحتمي |
 | $\text{DepthLimit}$ | Guard integer constraint | Safety threshold (e.g. `WHERE depth < 100`) preventing stack/memory blowup | سقف الأمان الرقمي لمنع انفجار الذاكرة والدوران اللانهائي |
 
-The mathematical foundation of Recursive CTEs is **Tarski's Fixed-Point Theorem** over monotonic relational algebra operators: the sequence $R_0, R_1, R_2, \dots$ forms an expanding monotonic sequence over the powerset of tuples. Because base relation $\mathcal{D}$ is finite ($|\mathcal{D}| < \infty$) and the relational graph is a Directed Acyclic Graph (DAG), there is a guaranteed finite integer $K \le |\mathcal{D}|$ such that $R_{K+1} = \emptyset$, guaranteeing termination.
-
-If cyclic graph dependencies exist (e.g., node $A \to B \to A$), the operator ceases to be strictly acyclic, and without explicit depth bounds ($\text{depth} < M$) or visited-node cycle-detection tracking arrays, the fixed-point condition is unreachable, driving the database into runaway resource allocation and crash termination!
-
-يرتكز الأساس الرياضي للاستعلامات العودية على **نظرية النقطة الثابتة لتارسكي (Tarski's Fixed-Point Theorem)** عبر مشغلات الجبر العلائقي الرتيبة: حيث تشكل المتتالية $R_0, R_1, R_2, \dots$ تمدداً رتيباً متصاعداً. وبما أن بيانات الجدول الأساسي $\mathcal{D}$ محدودة الحجم، وبما أن شجرة العلاقات تشكل رسماً بيانوياً توجيهياً عديم الحلقات (DAG)، فإنه يوجد بالضرورة عمق محدود $K \le |\mathcal{D}|$ تنعدم عنده النتائج الجديدة ($R_{K+1} = \emptyset$)، مما يضمن التوقف الرياضي الحتمي.
-
-أما إذا وُجدت علاقات دائرية مغلقة في البيانات (مثل: $A \to B \to A$)، فإن شرط الرسم عديم الحلقات ينكسر؛ وإذا لم يضع المهندس حداً أعلى لعدد التكرارات أو مصفوفة لتتبع العقد المزارة، فإن النقطة الثابتة تصبح مستحيلة التحقق، مما يؤدي إلى استهلاك ذاكرة النظام بالكامل وانهيار الخادم!
+#### Step-by-Step Arithmetic Cost & Invariant Breakdown:
+1. **Iterative Memory Footprint**:
+   At level $i$, the engine allocates memory strictly proportional to the working table size $|R_i|$, discarding previous working buffers.
+2. **Computational Complexity Across Tree of Height $H$**:
+   $$\text{Total Cost} = \mathcal{O}(|R_0|) + \sum_{i=1}^H \mathcal{O}(|R_{i-1}| \bowtie |\mathcal{D}|) = \mathcal{O}(N_{\text{total}} + H \cdot |\mathcal{D}|)$$
+   With indexed foreign keys on `manager_id`, each lookup is $\mathcal{O}(\log |\mathcal{D}|)$, achieving blazing sub-second traversal over millions of rows.
+3. **The Cyclic Graph Explosion Invariant**:
+   If a directed cycle exists ($A \to B \to A$), then for all $i \ge 1$: $|R_i| \ge 1$. The empty set condition $R_{K+1} = \emptyset$ is mathematically impossible, forcing infinite iterations and crashing the server with Out-Of-Memory.
 
 ## Beat 3: Interactive Code Challenge
 

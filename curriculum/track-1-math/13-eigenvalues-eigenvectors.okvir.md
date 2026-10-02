@@ -31,6 +31,27 @@ Eigenvalues and eigenvectors form the structural skeleton of modern computation,
 
 ---
 
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Eigenvector ($v$) | A special arrow that only stretches or shrinks without turning when transformed | المتجه الذاتي ($v$) | سهم استثنائي يتمدد أو ينكمش فقط دون أن يدور إطلاقاً عند تطبيق التحويل |
+| Eigenvalue ($\lambda$) | The stretch multiplier along the eigenvector's unwavering line | القيمة الذاتية ($\lambda$) | معامل التمدد أو الانكماش العددي على طول مسار المتجه الذاتي |
+| Characteristic Equation | The algebraic formula $\det(A - \lambda I) = 0$ that unlocks all eigenvalues | المعادلة المميزة | المعادلة الجبرية det(A - λI) = 0 التي تكشف قيم التمدد الذاتية |
+| Eigenspace | The full line or plane of all arrows that share the same stretch factor | الفضاء الذاتي | الخط أو المستوي الهندسي الذي يضم كافة المتجهات ذات معامل التمدد المشترك |
+| Power Iteration | Repeatedly multiplying a random arrow by a matrix until it aligns with the dominant eigenvector | طريقة القوى التكرارية | تكرار ضرب سهم عشوائي بالمصفوفة حتى ينجذب وينحاز للمتجه الذاتي الأقوى |
+
+#### Geometric & Visual Flow
+
+```
+        Ordinary arrow w                Eigenvector v
+           ▲                               ▲
+           │   * T(w)                      │   * T(v) = λ*v
+           │  /  (Rotates!)                │  /
+           │ /                             │ /  (STAYS ON SAME LINE!
+           *──► w                          *──► v Only stretches by λ)
+```
+
 ### الحدس الفيزيائي والهندسي
 
 تخيل أنك تفرد عجينة بيتزا على طاولة المطبخ، أو تشد شريحة مطاطية مرنة رُسمت عليها أشكال هندسية بيدك في اتجاهين متضادين قطرياً. عندما تسحب الشريحة بقوة، ستلاحظ أن كافة الدوائر والخطوط المرسومة عليها تتشوه وتلتوي؛ فالدائرة تتحول إلى قطع ناقص مائل، والمتجه الذي كان يشير إلى الشمال الشرقي ينحرف مجبراً ليشير إلى الشرق والجنوب. هذا ما يفعله أي تحويل خطي عام في الفضاء: إنه يعصف بالمتجهات كأوراق شجر في مهب الريح، مغيرّاً أطوالها وزوايا اتجاهاتها في آن واحد.
@@ -47,6 +68,27 @@ Eigenvalues and eigenvectors form the structural skeleton of modern computation,
 2. **تحليل المكونات الرئيسية (PCA):** في معالجة البيانات الضخمة والرؤية الحاسوبية، يتم ضغط آلاف المتغيرات بحساب المتجهات الذاتية لمصفوفة التغاير (Covariance Matrix)؛ حيث تمثل هذه المتجهات المحاور المتعامدة التي تحتفظ بأكبر قدر من تباين ومعلومات البيانات.
 3. **الرنين الميكانيكي وسلامة المنشآت:** تمتلك الجسور وناطحات السحاب وهياكل الطائرات أنماط اهتزاز طبيعية تحددها المتجهات الذاتية لمصفوفات الكتلة والصلابة. وإذا هبت رياح بتردد يطابق إحدى القيم الذاتية للهيكل، يحدث رنين كارثي يؤدي لانهيار المبنى (كما حدث لجسر تاكوما ناروز الشهير).
 4. **استقرار الشبكات العصبية المتكررة (RNNs):** عند محاكاة الأنظمة الديناميكية أو تدريب شبكات الذكاء الاصطناعي المتكررة عبر الزمن، فإن القيم الذاتية لمصفوفة الأوزان تحدد مصير الإشارة: إذا كانت $|\lambda| > 1$ تنفجر المشتقات نحو اللانهاية، وإذا كانت $|\lambda| < 1$ تتلاشى الإشارة تماماً.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| المتجه الذاتي ($v$) | A special arrow that only stretches or shrinks without turning when transformed | المتجه الذاتي ($v$) | سهم استثنائي يتمدد أو ينكمش فقط دون أن يدور إطلاقاً عند تطبيق التحويل |
+| القيمة الذاتية ($\lambda$) | The stretch multiplier along the eigenvector's unwavering line | القيمة الذاتية ($\lambda$) | معامل التمدد أو الانكماش العددي على طول مسار المتجه الذاتي |
+| المعادلة المميزة | The algebraic formula $\det(A - \lambda I) = 0$ that unlocks all eigenvalues | المعادلة المميزة | المعادلة الجبرية det(A - λI) = 0 التي تكشف قيم التمدد الذاتية |
+| الفضاء الذاتي | The full line or plane of all arrows that share the same stretch factor | الفضاء الذاتي | الخط أو المستوي الهندسي الذي يضم كافة المتجهات ذات معامل التمدد المشترك |
+| طريقة القوى التكرارية | Repeatedly multiplying a random arrow by a matrix until it aligns with the dominant eigenvector | طريقة القوى التكرارية | تكرار ضرب سهم عشوائي بالمصفوفة حتى ينجذب وينحاز للمتجه الذاتي الأقوى |
+
+#### المخطط البصري الهندسي
+
+```
+        السهم العادي w                  المتجه الذاتي v
+           ▲                               ▲
+           │   * T(w)                      │   * T(v) = λ*v
+           │  /  (ينحرف ويدور!)            │  /
+           │ /                             │ /  (يبقى على نفس الخط!
+           *──► w                          *──► v يتمدد فقط بمقدار λ)
+```
 
 :::simulation-widget{engine="canvas2d" component="EigenHunterCanvas"}
 ---

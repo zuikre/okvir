@@ -26,7 +26,30 @@ With each derivative term you sew into the polynomial, the approximation hugs th
 
 In machine learning and numerical optimization, second-order Taylor expansions are the secret weapon behind lightning-fast solvers. While basic gradient descent models the terrain as a flat tilted ramp (a 1st-order Taylor approximation), **Newton-Raphson optimization** fits a quadratic bowl (a 2nd-order Taylor approximation) to the loss landscape. Instead of taking cautious baby steps downhill, it calculates the minimum of that quadratic bowl and jumps straight to its bottom in a single step!
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Taylor Series | Rebuilding an entire mathematical function using only the derivatives measured at a single point | متسلسلة تايلور | إعادة بناء دالة كاملة بالاعتماد حصرياً على مشتقاتها عند نقطة مرجعية واحدة |
+| Polynomial Approximation | Replacing complicated functions (like $\sin x, e^x$) with simple additions and multiplications | التقريب بكثيرات الحدود | استبدال الدوال المعقدة بعمليات جمع وضرب بسيطة وسريعة للغاية |
+| Factorial ($k!$) | The scaling factor that compensates for repeated differentiation when matching powers | المضروب ($k!$) | معامل تصحيح رياضي يقسم على مشتقات القوى المتتالية لضبط التوافق |
+| Truncation Error | The leftover gap between the true curve and our finite polynomial estimate | خطأ البتر / الاقتطاع | الفجوة المتبقية بين المنحنى الحقيقي وتقديرنا المبسط متعدد الحدود |
+| Maclaurin Series | The special Taylor series centered at the easiest reference point: $x = 0$ | متسلسلة ماكلوران | حالة خاصة من متسلسلة تايلور تكون متمركزة عند أسهل نقطة إسناد: x = 0 |
+
+#### Geometric & Visual Flow
+
+```
+        Approximating a curve near x = a:
+           ▲                     * True Curve f(x)
+           │                   .' 
+           │       Degree 2  .'   Degree 1 (Tangent Line)
+           │      Parabola .'    /
+           │            \.'____/ 
+           │             * Center anchor (a, f(a))
+           └─────────────┴───────────────► x
+```
+
+### الحدس الفيزيائي والهندسي
 
 تُعد الدوال المتسامية مثل $\sin(x)$ و $\cos(x)$ و $e^x$ و $\ln(x)$ دوالاً عصية على الحساب الذهني المباشر؛ فلو سألك أحد في الطريق عن القيمة الدقيقة لـ $\cos(0.42)$ أو $e^{1.7}$، فلن تتمكن من حسابها ذهنياً بالاعتماد على الحساب البسيط. لكن كثيرات الحدود (Polynomials)—تلك التعبيرات الرياضية المبنية حصرياً من اللبنات الأولية البسيطة: الجمع والضرب، مثل $c_0 + c_1 x + c_2 x^2 + c_3 x^3$—هي أسهل ما يمكن للذهن البشري ولمعالجات السيليكون الرقمية حسابه في أجزاء من النانو ثانية.
 
@@ -39,6 +62,29 @@ In machine learning and numerical optimization, second-order Taylor expansions a
 مع كل حد إضافي تدخله في تركيبة كثيرة الحدود، يلتصق المنحنى التقريبي بالدالة الأصلية عبر نطاق أوسع وأشمل. ما يبدأ كخط مستقيم بسيط يتحول تدريجياً إلى منحنى مرن يحتضن كل وادٍ وقمة وموجة في الدالة الحقيقية. متسلسلة تايلور في جوهرها ليست سوى استنساخ حدودي لأي دالة ملساء عبر مطابقة شفرتها الوراثية المكونة من مشتقاتها المتتالية.
 
 وفي تعلم الآلة والاستمثال الرياضي، تمثل تقريبات تايلور من الدرجة الثانية السلاح السري لخوارزميات التحسين فائقة السرعة. فبينما تفترض خوارزمية الانحدار التدريجي البسيطة أن التضاريس عبارة عن منحدر مائل منبسط (تقريب تايلور من الدرجة الأولى)، تقوم **طريقة نيوتن** (Newton-Raphson) بتركيب إناء تربيعي مقعر (تقريب تايلور من الدرجة الثانية) على سطح الخسارة. وبدلاً من الهبوط بخطوات مترددة، تحسب قاع ذلك الإناء وتقفز إليه مباشرة في خطوة واحدة!
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| متسلسلة تايلور | Rebuilding an entire mathematical function using only the derivatives measured at a single point | متسلسلة تايلور | إعادة بناء دالة كاملة بالاعتماد حصرياً على مشتقاتها عند نقطة مرجعية واحدة |
+| التقريب بكثيرات الحدود | Replacing complicated functions (like $\sin x, e^x$) with simple additions and multiplications | التقريب بكثيرات الحدود | استبدال الدوال المعقدة بعمليات جمع وضرب بسيطة وسريعة للغاية |
+| المضروب ($k!$) | The scaling factor that compensates for repeated differentiation when matching powers | المضروب ($k!$) | معامل تصحيح رياضي يقسم على مشتقات القوى المتتالية لضبط التوافق |
+| خطأ البتر / الاقتطاع | The leftover gap between the true curve and our finite polynomial estimate | خطأ البتر / الاقتطاع | الفجوة المتبقية بين المنحنى الحقيقي وتقديرنا المبسط متعدد الحدود |
+| متسلسلة ماكلوران | The special Taylor series centered at the easiest reference point: $x = 0$ | متسلسلة ماكلوران | حالة خاصة من متسلسلة تايلور تكون متمركزة عند أسهل نقطة إسناد: x = 0 |
+
+#### المخطط البصري الهندسي
+
+```
+        تقريب المنحنى حول النقطة x = a:
+           ▲                     * المنحنى الحقيقي f(x)
+           │                   .' 
+           │        الدرجة 2 .'    الدرجة 1 (خط المماس المستقيم)
+           │       المكافئ .'    /
+           │            \.'____/ 
+           │             * مركز الإسناد (a, f(a))
+           └─────────────┴───────────────► x
+```
 
 :::simulation-widget{engine="canvas2d" component="RiemannIntegralFtCanvas"}
 ---

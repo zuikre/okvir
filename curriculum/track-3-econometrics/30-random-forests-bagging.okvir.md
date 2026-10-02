@@ -14,25 +14,76 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-While a single CART decision tree provides unmatched interpretability, it suffers from a notorious structural vulnerability: trees are hypersensitive and possess massive statistical variance. A microscopic tremor in the training data—such as tweaking three numbers out of ten thousand—can cause the root split to pivot to a completely different feature. This initial divergence cascades down every subsequent branch, altering the architecture of the entire tree and producing wildly contradictory predictions for the exact same patient. Trusting a single unpruned decision tree with high-stakes decisions is like putting your life in the hands of an eccentric, hyper-sensitive physician who overreacts to every fleeting symptom and rushes to perform radical surgery.
+### Intuition & Real-World Story
 
-In 2001, Leo Breiman transformed machine learning by formulating the **Random Forest**. Instead of trusting a single volatile practitioner, you convene a **council of 500 independent, highly qualified doctors who cast a democratic majority vote on the diagnosis**. If one physician is misled by idiosyncratic noise in their specific patient notes, their individual error is effortlessly canceled out and overwhelmed by the collective wisdom of the remaining 499 doctors.
+While a single decision tree is transparent and easy to explain, it suffers from a fatal structural flaw: **extreme statistical variance**.
+A tiny tremor in your training data—such as changing just two or three numbers out of ten thousand—can cause the root split to flip to an entirely different feature. This initial pivot cascades down every subsequent branch, altering the architecture of the entire tree and producing wildly contradictory predictions for the exact same patient.
 
-To make this committee work, you must guarantee that the doctors do not all read the exact same medical chart or copy each other's opinions. Random Forests enforce independence through two clever layers of stochastic randomization:
-1. **Bagging (Bootstrap Aggregation):** Each tree is cultivated on a distinct resampled dataset constructed by drawing $N$ samples *with replacement* from the original training corpus.
-2. **Random Feature Subspace Sampling:** This was Breiman's defining stroke of mathematical genius. If one dominant symptom (such as massive tumor diameter) is overwhelmingly predictive, every single tree in the forest would greedily select it for the root split. The resulting trees would become clones of each other, sharing massive positive correlation! By forcing each node to choose its split from a randomly chosen sub-palette of $m \approx \sqrt{p}$ candidate features, Random Forests break this herd behavior. Trees are forced to explore secondary and tertiary signals, resulting in deeply decorrelated individual models.
+Relying on a single unpruned decision tree for critical medical or financial decisions is like putting your life in the hands of an eccentric, hyper-sensitive doctor who overreacts to every fleeting sneeze and rushes to perform emergency surgery!
 
-The mathematical miracle of decorrelation is grounded in elementary probability: when you average $B$ independent, uncorrelated random variables, their collective variance collapses to zero at a rate of $1/B$. But if the estimators share a positive pairwise correlation $\rho$, the variance hits an irreducible asymptotic barrier: $\lim_{B \to \infty} \text{Var} = \rho \sigma^2$. By driving $\rho$ downward toward zero through feature subsampling, Random Forests slash this variance barrier, turning noisy, high-variance decision trees into an elite, robust predictive engine.
+In 2001, Leo Breiman transformed machine learning by creating the **Random Forest**.
+Instead of trusting a single volatile practitioner, you convene a **jury of 500 independent, highly qualified doctors who cast a democratic majority vote on the diagnosis**.
+If one doctor is misled by an odd symptom in their specific notes, their individual mistake is effortlessly outvoted and neutralized by the collective wisdom of the remaining 499 physicians!
 
-تتميز شجرة القرار الفردية بسهولة تفسيرها ووضوح مساراتها، لكنها تعاني من نقطة ضعف هيكلية قاتلة: وهي التباين الإحصائي المفرط (High Variance). فأي تغير طفيف أو ضجيج عابر في بيانات التدريب—كتعديل ثلاث قيم من بين عشرة آلاف—قد يقلب التفرع الجذري للشجرة بالكامل. هذا التغير الأولي يتدحرج ككرة ثلج عبر كافة التفرعات اللاحقة، مما يغير هندسة الشجرة بأكملها ويؤدي إلى تنبؤات متضاربة للحالة نفسها. إن الاعتماد على شجرة قرار فردية غير مقلمة في قرارات حاسمة يشبه وضع حياتك بين يدي طبيب غريب الأطوار، يبالغ في رد فعله تجاه كل عَرَض طفيف ويسارع إلى اتخاذ قرارات جراحية متسرعة.
+To make this committee work, the doctors must not read the exact same medical chart or copy each other's homework. Random Forests enforce independence through two clever layers of randomization:
+1. **Bagging (Bootstrap Aggregating):** Each tree is trained on its own independent resampled dataset, created by drawing $N$ samples *with replacement* from the training pool.
+2. **Random Feature Subspace Sampling:** This was Breiman's stroke of genius. If one dominant symptom (like a huge tumor diameter) is overwhelmingly predictive, every single tree in the forest would greedily pick it for the root split. The resulting trees would become clones of each other, sharing massive positive correlation!
+By forcing each node to choose its split from a randomly selected subset of only $m \approx \sqrt{p}$ candidate features, Random Forests break this herd behavior. Trees are forced to discover subtle secondary and tertiary signals, yielding deeply **decorrelated** models.
 
-في عام 2001، أحدث ليو بريمان ثورة تاريخية في تعلم الآلة عندما ابتكر **الغابات العشوائية (Random Forests)**. فبدلاً من الاعتماد على طبيب واحد مفرط الحساسية، تجمع الخوارزمية **مجلساً استشارياً يضم 500 طبيب مستقل يصوتون ديمقراطياً بالأغلبية على التشخيص النهائي**. فإذا انخدع أحد الأطباء بشائبة عشوائية في ملف مريضه، فإن خطأه الفردي يتلاشى وسط الحكمة التراكمية لبقية الأطباء الـ 499.
+The mathematics of decorrelation is miraculous: averaging $B$ independent, uncorrelated estimates shrinks variance toward zero at a rate of $1/B$. But if the trees share a positive correlation $\rho$, the variance hits an irreducible brick wall: $\lim_{B \to \infty} \text{Var} = \rho \sigma^2$. By crushing $\rho$ toward zero via feature subsampling, Random Forests obliterate this variance wall, transforming noisy decision trees into an elite predictive powerhouse.
 
-ولضمان نجاح هذا المجلس، يجب التأكد من أن الأطباء لا يقرؤون نفس التقرير الطبي حرفياً ولا يكررون نفس القرارات. تحقق الغابات العشوائية هذا التنوع عبر مستويين من العشوائية الرياضية:
+#### Jargon Decoder
+
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **High Variance** | The hyper-sensitive expert: tiny changes in data completely alter the model's structure. |
+| **Ensemble** | The committee of minds: combining multiple diverse models to make superior joint decisions. |
+| **Bagging** | Bootstrap Aggregating: training models on random resamples drawn with replacement. |
+| **Feature Subsampling** | Anti-herd rule: forcing each tree to look at a random subset of features to break correlation. |
+| **Out-of-Bag (OOB)** | Free validation: the ~37% of data left out of each bootstrap sample, used for built-in testing. |
+
+```text
+    THE BREIMAN VARIANCE ATTENUATION:
+
+    Ensemble Variance
+         ^
+  sigma^2|   * Single Tree (Unstable & High Variance)
+         |
+         |         Uncorrelated Trees (rho = 0): Var -> 0!
+         |         . . . . . . . . . . . . . . . . . . . . . . .
+         |
+rho*sig^2|-----------------------------------* Correlated Forest (rho > 0)
+         |                                     (Hits irreducible floor rho*sigma^2)
+         |
+       0 +----------------------------------------------------> Number of Trees B
+```
+
+### الحدس والقصة الواقعية
+
+تتميز شجرة القرار الفردية بالوضوح وسهولة التفسير، لكنها تعاني من نقطة ضعف هيكلية قاتلة: **التباين الإحصائي المفرط (High Variance)**.
+فأي تغير طفيف في بيانات التدريب—كتعديل قيمتين أو ثلاث من بين عشرة آلاف عينة—قد يقلب التفرع الجذري للشجرة بالكامل. هذا التغير الأولي يتدحرج ككرة ثلج عبر كافة التفرعات اللاحقة، مما يغير هندسة الشجرة بأكملها ويؤدي إلى تنبؤات متضاربة للحالة نفسها.
+
+إن الاعتماد على شجرة قرار فردية في قرارات طبية أو مالية حاسمة يشبه وضع مصيرك بين يدي طبيب مفرط الحساسية، يبالغ في رد فعله تجاه كل عَرَض عابر ويسارع لاتخاذ قرارات جراحية متسرعة!
+
+في عام 2001، أحدث ليو بريمان ثورة تاريخية عندما ابتكر **الغابات العشوائية (Random Forests)**.
+فبدلاً من الاعتماد على طبيب واحد متقلب المزاج، تجمع الخوارزمية **مجلساً يضم 500 طبيب مستقل يصوتون ديمقراطياً بالأغلبية على التشخيص النهائي**.
+فإذا انخدع أحد الأطباء بشائبة عشوائية في ملف مريضه، فإن خطأه الفردي يتلاشى وسط الحكمة التراكمية لبقية الأطباء الـ 499!
+
+ولضمان نجاح هذا المجلس، يجب التأكد من أن الأطباء لا يقرؤون نفس التقرير الطبي حرفياً. تحقق الغابات العشوائية هذا الاستقلال عبر مستويين من العشوائية:
 1. **التجميع بالعينات التمهيدية (Bagging):** تُبنى كل شجرة على عينة بيانات مستقلة يتم سحبها مع الإرجاع (Bootstrap Sample) من عينة التدريب الأصلية.
-2. **التعيين العشوائي للفضاء الجزئي للمتغيرات (Random Subspace Sampling):** هذا هو الابتكار الأبرز لبريمان؛ فإذا كان هناك متغير واحد مهيمن وفائق القوة التنبؤية (مثل حجم الورم)، فستختاره كافة الأشجار الـ 500 في جذرها تلقائياً، لتصبح نسخاً مكررة شديدة الارتباط. ولتفادي ذلك، تُجبر الخوارزمية كل عقدة على الاختيار من بين عينة عشوائية محدودة تضم $m \approx \sqrt{p}$ من المتغيرات فقط. يجبر هذا القيد الأشجار على استكشاف مؤشرات بديلة وأبعاد خفية، مما يكسر الارتباط بين الأشجار ويجعلها مستقلة حقاً.
+2. **التعيين العشوائي للفضاء الجزئي للمتغيرات (Feature Subsampling):** هذا هو الابتكار الأبرز لبريمان؛ فإذا كان هناك متغير واحد مهيمن وفائق القوة التنبؤية (مثل حجم الورم)، فستختاره كافة الأشجار الـ 500 في جذرها تلقائياً، لتصبح نسخاً مكررة شديدة الارتباط. ولتفادي ذلك، تُجبر الخوارزمية كل عقدة على الاختيار من بين عينة عشوائية محدودة تضم $m \approx \sqrt{p}$ من المتغيرات فقط. يجبر هذا القيد الأشجار على استكشاف أبعاد خفية، مما يكسر الارتباط بين الأشجار ويجعلها مستقلة حقاً.
 
-تستند هذه الحصانة الرياضية إلى قانون الاحتمالات الكلاسيكي: فحينما تحسب متوسط $B$ من المتغيرات المستقلة تماماً، يتلاشى تباينها الجمعي بمعدل $1/B$. ولكن إذا كانت النماذج مرتبطة فيما بينها بمعامل ارتباط موجب $\rho$، فإن التباين يتوقف عند حاجز أصم لا يمكن تجاوزه: $\rho \sigma^2$. ومن خلال تقليص هذا الارتباط $\rho$ نحو الصفر بفضل الاختيار العشوائي للمتغيرات، تسحق الغابات العشوائية هذا الحاجز، محولة مجموعة من الأشجار الضعيفة إلى منظومة تنبؤية خارقة وشديدة الاستقرار.
+تستند هذه الحصانة إلى قانون الاحتمالات: فحينما تحسب متوسط $B$ من المتغيرات المستقلة، يتلاشى تباينها بمعدل $1/B$. ولكن إذا كانت النماذج مرتبطة فيما بينها بمعامل ارتباط $\rho$، فإن التباين يتوقف عند حاجز أصم: $\rho \sigma^2$. وبفضل تقليص هذا الارتباط $\rho$ نحو الصفر، تسحق الغابات العشوائية هذا الحاجز، محولة مجموعة من الأشجار الضعيفة إلى منظومة تنبؤية خارقة وشديدة الاستقرار.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **التباين المفرط** | الحساسية المفرطة: أي تعديل طفيف بالبيانات يقلب بنية النموذج وتنبؤاته رأساً على عقب. |
+| **النماذج التجميعية (Ensemble)** | مجلس الحكماء: دمج قرارات عدة نماذج متنوعة للوصول إلى قرار جماعي متفوق. |
+| **التجميع بالعينات (Bagging)** | السحب مع الإرجاع: تدريب نماذج مستقلة على عينات بيانات عشوائية معاد سحبها. |
+| **تعيين الفضاء الجزئي للمتغيرات** | منع سلوك القطيع: إجبار كل شجرة على فحص عينة عشوائية من المتغيرات لكسر الارتباط. |
+| **بيانات خارج الصندوق (OOB)** | التحقق المجاني: نحو 37% من البيانات تُستبعد من كل عينة سحب، وتُستخدم للتقييم التلقائي. |
 
 :::simulation-widget{engine="canvas2d" component="DecisionTreeLaser"}
 ---
@@ -58,58 +109,38 @@ $$
 \rho = \text{Corr}\left(T_b(\mathbf{x}), T_{b'}(\mathbf{x})\right) = \frac{\text{Cov}(T_b(\mathbf{x}), T_{b'}(\mathbf{x}))}{\sigma^2}, \quad \text{for } b \ne b'
 $$
 
-Expanding the variance of the ensemble mean estimator:
+Evaluating the variance of the ensemble mean prediction:
 
 $$
 \begin{aligned}
-\text{Var}(\bar{T}(\mathbf{x})) &= \text{Var}\left( \frac{1}{B} \sum_{b=1}^B T_b(\mathbf{x}) \right) \\
-&= \frac{1}{B^2} \left[ \sum_{b=1}^B \text{Var}(T_b(\mathbf{x})) + \sum_{b=1}^B \sum_{b' \ne b}^B \text{Cov}(T_b(\mathbf{x}), T_{b'}(\mathbf{x})) \right] \\
-&= \frac{1}{B^2} \left[ B \sigma^2 + B(B - 1)\rho \sigma^2 \right] \\
-&= \rho \sigma^2 + \frac{1 - \rho}{B} \sigma^2
+\text{Var}(\bar{T}(\mathbf{x})) &= \text{Var}\left( \frac{1}{B} \sum_{b=1}^B T_b(\mathbf{x}) \right) = \frac{1}{B^2} \sum_{b=1}^B \text{Var}(T_b(\mathbf{x})) + \frac{1}{B^2} \sum_{b=1}^B \sum_{b' \ne b}^B \text{Cov}(T_b(\mathbf{x}), T_{b'}(\mathbf{x})) \\
+&= \frac{1}{B^2} (B \sigma^2) + \frac{1}{B^2} B(B - 1) \rho \sigma^2 \\
+&= \frac{\sigma^2}{B} + \frac{B - 1}{B} \rho \sigma^2 = \rho \sigma^2 + \frac{1 - \rho}{B} \sigma^2
 \end{aligned}
 $$
 
-### The Asymptotic Variance Floor:
-- As the number of ensemble trees grows without bound ($B \to \infty$):
-  $$
-  \lim_{B \to \infty} \text{Var}(\bar{T}(\mathbf{x})) = \rho \sigma^2
-  $$
-- Standard Bagging ($m = P$) reduces variance purely by increasing $B$, but leaves $\rho$ stubbornly high because all trees share identical dominant root features.
-- Random Forests intentionally weaken individual trees (slightly increasing $\sigma^2$) to aggressively drive $\rho \to 0$, fundamentally lowering the irreducible asymptotic error floor $\rho \sigma^2$.
-
-### Out-of-Bag (OOB) Generalization Theory
-Consider drawing a bootstrap sample of size $N$ with replacement from $N$ historical observations. The probability that observation $i$ is never selected in $N$ independent draws is:
+Taking the asymptotic limit as tree count $B \to \infty$:
 
 $$
-\mathbb{P}(i \notin \mathcal{B}_b) = \left( 1 - \frac{1}{N} \right)^N
+\lim_{B \to \infty} \text{Var}(\bar{T}(\mathbf{x})) = \rho \sigma^2
 $$
 
-Taking the calculus limit as dataset size $N \to \infty$:
-
-$$
-\lim_{N \to \infty} \left( 1 - \frac{1}{N} \right)^N = e^{-1} \approx 0.367879 \approx 36.8\%
-$$
-
-Approximately $36.8\%$ of the dataset is withheld from each tree as an **Out-of-Bag (OOB)** holdout. For each observation $i \in \{1, \dots, N\}$, the OOB ensemble prediction aggregates exclusively over the subset of trees that never saw sample $i$ during training:
-
-$$
-\hat{y}_i^{\text{OOB}} = \arg\max_{c \in \{1, \dots, K\}} \sum_{b: i \notin \mathcal{B}_b} \mathbb{I}(T_b(\mathbf{x}_i) = c)
-$$
-
-The empirical Out-of-Bag error rate provides an unbiased estimate of true test error that matches $K$-fold cross-validation with zero additional computational expense.
+This equation mathematically exposes the core principle of Random Forests:
+- Increasing ensemble size $B$ drives the second term $\frac{1 - \rho}{B}\sigma^2$ to zero.
+- However, the ensemble variance is strictly lower-bounded by $\rho \sigma^2$. The only way to lower this asymptotic floor is to **reduce $\rho$** via random feature subspace sampling!
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $B \in \mathbb{N}$: Number of trees grown in the random forest ensemble.
-* $T_b(\mathbf{x})$: Prediction of the $b$-th randomized decision tree for query $\mathbf{x}$.
-* $\bar{T}(\mathbf{x})$: Uniformly weighted ensemble average prediction.
-* $\sigma^2$: Sampling variance of an individual unpruned decision tree.
-* $\rho \in [0, 1]$: Pairwise correlation between individual tree predictions.
-* $m$: Number of features randomly sampled at each split node (default $m = \lfloor \sqrt{P} \rfloor$ for classification, $m = \lfloor P/3 \rfloor$ for regression).
-* $P$: Total number of explanatory features in the dataset.
-* $\mathcal{B}_b$: Bootstrap resample of size $N$ drawn with replacement for tree $b$.
-* $e^{-1} \approx 36.8\%$: Asymptotic fraction of observations excluded from each bootstrap sample.
-* $\hat{y}_i^{\text{OOB}}$: Out-of-bag ensemble prediction evaluated exclusively on pristine holdout trees.
+| Symbol / Term | Formal Definition | Intuitive Meaning / Role | المعنى والمدلول بالعربية |
+| :--- | :--- | :--- | :--- |
+| $B$ | Ensemble tree count | Total number of individual decision trees | إجمالي عدد الأشجار المستقلة في الغابة |
+| $T_b(\mathbf{x})$ | Individual tree model | Base predictor trained on bootstrap sample $b$ | شجرة القرار الأساسية المدربة على العينة $b$ |
+| $\bar{T}(\mathbf{x})$ | Ensemble prediction | Consensus aggregate prediction across trees | التنبؤ التجميعي المتوسط لجميع الأشجار |
+| $\sigma^2$ | Base tree variance | Variance of an individual unpruned decision tree | التباين الإحصائي للشجرة الفردية الواحدة |
+| $\rho$ | Pairwise correlation | Pearson correlation between distinct trees | معامل الارتباط البيني بين أي شجرتين |
+| $\rho \sigma^2$ | Asymptotic variance floor | Irreducible variance limit as $B \to \infty$ | الحاجز الأدنى للتباين التجميعي مع زيادة $B$ |
+| $m \approx \sqrt{P}$ | Feature subsample size | Number of candidate features tested at each node | عدد الميزات الفرعية المختارة عشوائياً عند كل تفرع |
+| $\mathcal{B}_b$ | Bootstrap sample | Resample of size $N$ drawn with replacement | عينة التدريب التمهيدية المسحوبة مع الإرجاع |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 

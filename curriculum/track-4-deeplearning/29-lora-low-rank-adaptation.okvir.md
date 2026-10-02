@@ -12,7 +12,7 @@ i18n:
 
 # Low-Rank Adaptation (LoRA) & Parameter-Efficient Fine-Tuning
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
 As foundation language models scaled from hundreds of millions to hundreds of billions of parameters, Full Fine-Tuning (FFT)—the traditional machine learning practice of updating every single weight tensor across the network—became computationally, financially, and logistically prohibitive. Fine-tuning a 70B parameter model in standard 16-bit precision requires:
 - **140 GB** of VRAM to store model weights
@@ -35,6 +35,49 @@ Setting the intrinsic rank to $r = 8$ or $r = 16$ slashes trainable parameters a
 
 وبفضل بدء تدريب مصفوفة الصعود $\mathbf{B}$ بقيم صفرية ومصفوفة الهبوط $\mathbf{A}$ بتوزيع غاوسي عشوائي، ينطلق التدريب بانحراف صفري تام عن أداء النموذج الأساسي. وعند انتهاء التدريب، يمكن دمج أوزان التكيف خطياً وبشكل دائم مع الأوزان الأصلية، مما يتيح تقديم الخدمات البرمجية في بيئات الإنتاج الحية دون أي تأخير زمني إضافي في سرعة الاستجابة.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Low-Rank Adaptation (LoRA)** (التكيّف منخفض الرتبة) | Corrective glasses for an expert: rather than performing brain surgery on a doctor (retraining 70B weights), just give them glasses ($B \times A$) tailored for reading legal or medical charts. | نظارات تصحيحية للخبير: بدلاً من إجراء جراحة دماغية شاملة لإعادة تدريب 70 مليار وزن، نكتفي بتزويده بعدسات رشيقة تخصصية. |
+| **PEFT (Parameter-Efficient Fine-Tuning)** (الضبط عالي الكفاءة في المعاملات) | Adapting giants on a laptop: updating less than $0.1\%$ of model weights while keeping the remaining $99.9\%$ completely frozen. | ترويض النماذج العملاقة على حواسيب عادية: تدريب أقل من 0.1% من المعاملات وتجميد 99.9% منها لتوفير الذاكرة. |
+| **Low-Rank Factorization ($B \times A$)** (التحليل منخفض الرتبة) | The hourglass bottleneck: decomposing a massive $4096 \times 4096$ update matrix into two thin slivers ($4096 \times 16$ and $16 \times 4096$), slashing parameters by $128\times$. | عنق الزجاجة الرشيق: تفكيك مصفوفة التحديث العملاقة إلى شريحتين نحيفتين تمران عبر رتبة منخفضة (مثل 16) مما يوفر 99% من الذاكرة. |
+| **Frozen Base Weights ($W_0$)** (الأوزان الأساسية المجمدة) | Untouched reference books: the original pretrained knowledge remains untouched, guaranteeing zero catastrophic forgetting of language skills. | المراجع المحفوظة المجمدة: تظل المعارف اللغوية الأساسية مجمدة ومحفوظة، مما يمنع النسيان الكارثي للقدرات العامة. |
+| **Scaling Alpha ($\frac{\alpha}{r}$)** (معامل التحجيم ألفا) | The volume knob: a scaling constant that keeps adapter influence stable so changing rank $r$ does not require re-tuning the learning rate. | مقبض ضبط القوة: معامل رياضي يضمن ثبات تأثير التحديث بحيث لا تضطر لتغيير معدل التعلم عند تغيير الرتبة $r$. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+LOW-RANK ADAPTATION (LoRA) FORWARD INFERENCE:
+=============================================================================
+Input Activations: x  [Shape: (B, S, d_in)]
+      |
+      +--------------------------------------------------------\
+      |                                                        |
+      v (Frozen Base Path: No Gradients!)                      v (Trainable LoRA Path: Rank r << d)
+[ Base Weight W_0 (d_in x d_out) ]                    [ Down-Projection A (d_in x r) ]
+      |                                                        | (Init: Gaussian \mathcal{N}(0, \sigma^2))
+      |                                                        v
+      |                                               Intermediate Rank-r Tensor
+      |                                                        |
+      |                                                        v
+      |                                               [ Up-Projection B (r x d_out) ]
+      |                                                        | (Init: Strict Zeros!)
+      |                                                        v
+      |                                               Multiply by (\alpha / r) Scale
+      |                                                        |
+      v                                                        v
+Base Output: W_0 * x                                    Adapter Output: (\alpha / r) * B * A * x
+      |                                                        |
+      +----------------------- (+) <---------------------------+
+                                |
+                                v
+               Final Output: h = W_0 * x + (\alpha / r) * B * A * x
+=============================================================================
+ZERO-INITIALIZATION GUARANTEE:
+At Step 0: B = 0 ---> \Delta W = B * A = 0 ---> Model behavior is 100% IDENTICAL to base model!
+```
+
 :::simulation-widget{engine="canvas2d" component="LoRADecompositionLab"}
 ---
 interactive: true
@@ -44,7 +87,7 @@ highlighted_metric: "loss"
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
 In Low-Rank Adaptation, the frozen linear layer $\mathbf{h} = \mathbf{W}_0 \mathbf{x}$ is augmented by a parallel low-rank pathway scaled by factor $\frac{\alpha}{r}$:
 
@@ -70,21 +113,21 @@ $$
 \frac{\text{Trainable Parameters}}{\text{Full Parameters}} = \frac{r(d + k)}{d \cdot k} \approx \frac{2r}{d} \quad (\text{for } d = k)
 $$
 
-### Comprehensive Symbol & Parameter Breakdown
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-| Symbol | Dimensionality | Mathematical Interpretation | Operational Role |
-| :--- | :--- | :--- | :--- |
-| $\mathbf{W}_0$ | $\mathbb{R}^{d \times k}$ | Frozen pretrained foundation model weight matrix | Preserves general linguistic knowledge; zero gradient allocation. |
-| $r$ | $\mathbb{Z}^+$ | Intrinsic rank hyperparameter ($r \ll \min(d, k)$) | Bottleneck rank controlling adapter capacity (typically 8, 16, or 32). |
-| $\mathbf{A}$ | $\mathbb{R}^{r \times k}$ | Down-projection adapter matrix | Compresses input representations into low-dimensional latent task space. |
-| $\mathbf{B}$ | $\mathbb{R}^{d \times r}$ | Up-projection adapter matrix | Expands task-adapted representations back to output dimension. |
-| $\alpha$ | $\mathbb{R}_{> 0}$ | Constant scaling hyperparameter | Multiplier $\frac{\alpha}{r}$ stabilizes learning dynamics when rank $r$ is varied. |
-| $\mathbf{W}_{\text{serving}}$ | $\mathbb{R}^{d \times k}$ | Folded weight matrix for deployment | Combines base weights and adapter into a single tensor for zero latency. |
-| Memory Savings | Ratio | $> 99.8\%$ reduction in optimizer states | Reduces 560 GB of AdamW optimizer VRAM down to a few hundred megabytes. |
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $\mathbf{W}_0 \in \mathbb{R}^{d \times k}$ | Pretrained Frozen Matrix / مصفوفة الأوزان المجمدة | Massive foundation model weights kept completely static during adaptation. |
+| $\Delta \mathbf{W} \in \mathbb{R}^{d \times k}$ | Task-Specific Delta / مصفوفة التعديل التخصصي | The accumulated weight adaptation update matrix learned for the target domain. |
+| $\mathbf{B} \in \mathbb{R}^{d \times r}, \mathbf{A} \in \mathbb{R}^{r \times k}$ | Low-Rank Factor Matrices / مصفوفتا الرتبة المنخفضة | Trainable parameter matrices factorizing $\Delta \mathbf{W} = \mathbf{B}\mathbf{A}$ through rank $r \ll \min(d, k)$. |
+| $r \in \mathbb{N}^+$ | Adaptation Rank / رتبة التكيّف المنخفضة | Inner bottleneck dimension (typically $r \in \{8, 16, 32, 64\}$). |
+| $\frac{\alpha}{r}$ | Scaling Hyperparameter / معامل التحجيم المعياري | Constant multiplier stabilizing gradient updates across different rank choices. |
 
-تضمن هذه الصياغة الرياضية انطلاق التدريب باستقرار تام نظراً لأن حاصل ضرب المصفوفة الصفرية $\mathbf{B}$ يلغي أي تشويش أولي، بينما يتيح معامل القياس $\frac{\alpha}{r}$ ثبات معدل التعلم وحجم التدرجات عند تجربة رتب مختلفة $r$.
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **The Intrinsic Dimensionality Hypothesis**: Aghajanyan et al. (2020) proved that overparameterized models have an intrinsic rank that is orders of magnitude smaller than their parameter space. Task adaptation does not require updating all dimensions; a subspace of dimension $r=16$ captures $>95\%$ of performance.
+2. **Zero-Inference Latency via Weight Merging**: Because matrix multiplication is distributive, $\mathbf{W}_{\text{merged}} = \mathbf{W}_0 + \frac{\alpha}{r} \mathbf{B}\mathbf{A}$ can be precomputed and saved to disk. In deployment, you evaluate $y = \mathbf{W}_{\text{merged}} x$ with zero added latency!
+3. **Drastic Optimizer Memory Savings**: During training, AdamW stores 2 states (momentum and variance) for each parameter. Freezing $\mathbf{W}_0$ saves $16$ bytes of optimizer state per base parameter, allowing fine-tuning of 70B models on modest hardware.
 
----
 
 ## Beat 3: Python Challenge
 

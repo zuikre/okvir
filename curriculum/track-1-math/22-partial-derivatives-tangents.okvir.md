@@ -26,7 +26,28 @@ Operationally, this leads to the golden rule of multivariable calculus: **freeze
 
 In machine learning and neural network training, this principle is the core of parameter tuning. When a neural network has millions of weights, computing partial derivatives allows us to isolate every single weight parameter independently: *"If we hold every single neuron in the network completely frozen, and adjust this one weight by $+0.001$, what happens to the overall prediction error?"*
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Partial Derivative ($\frac{\partial f}{\partial x_i}$) | The slope in one coordinate direction while freezing all other coordinates in blocks of ice | المشتقة الجزئية | ميل المنحنى في اتجاه بعد واحد مع تجميد كافة الأبعاد الأخرى كقوالب ثلج |
+| Ceteris Paribus | All other variables held strictly constant (the fundamental assumption of partial derivatives) | مع بقاء العوامل الأخرى ثابتة | المبدأ الجوهري: تثبيت كل المتغيرات الأخرى واعتبارها ثوابت رقمية |
+| Tangent Plane | A flat sheet of cardboard balanced resting against a 3D curved surface at one touch point | المستوي المماس | لوح مستوٍ يستند بتوازن مثالي على سطح منحنٍ عند نقطة تماس واحدة |
+| Coordinate Slice | Cutting a 3D mountain with a straight vertical knife parallel to one coordinate axis | الشريحة الإحداثية | قطع الجبل بسكين رأسي موازٍ لأحد المحاور لعزل منحنى أحادي البعد |
+
+#### Geometric & Visual Flow
+
+```
+        3D Surface f(x, y)            Slicing plane with y = constant
+           ▲                             ▲
+           │    / \                      │     Curve on the slice
+           │   /   \                     │     Slope = ∂f/∂x
+           │  /     \                    │      *─── Tangent line on slice!
+           └──┴──────┴──►                └───┴──────► x
+              x      y                      Frozen y = y0
+```
+
+### الحدس الفيزيائي والهندسي
 
 تخيل أنك تقف على سفح جبل صخري وعر تعصف به الرياح. إذا اقترب منك متسلق آخر وسألك: *"ما هو ميل الجبل عند النقطة التي تقف عليها قدمك تماماً؟"*، فلن تتمكن من إجابته برقم واحد مطلقاً! لماذا؟ لأنك إذا خطوت خطوة واحدة نحو الشمال، فقد تصعد حافة صخرية بالغة الانحدار تشق عليك؛ وإذا خطوت نحو الشرق، فقد تسير على حافة أفقية مريحة ومنبسطة؛ وإذا خطوت نحو الجنوب، فقد تهوي متدحرجاً في منحدر حصوي حاد. **الميل في الفضاء متعدد الأبعاد ليس رقماً مفرداً؛ بل يعتمد كلياً على اتجاه البوصلة الذي تختاره لخطوتك.**
 
@@ -39,6 +60,27 @@ In machine learning and neural network training, this principle is the core of p
 عملياتياً وحسابياً، يقودنا هذا إلى القاعدة الذهبية للتفاضل متعدد المتغيرات: **جمّد المتفرجين**. فعندما تحسب المشتقة الجزئية بالنسبة لـ $x$، عامل كافة المتغيرات الأخرى—سواء كانت $y$ أو $z$ أو غيرها—كأرقام جامدة خاملة لا حراك فيها، تماماً مثل الرقم $5$ أو $42$ أو $\pi$. فإذا كان التعبير الرياضي يحتوي على $7x^2 y^3$، فإنك تعامل $y^3$ كمعامل ضرب ثابت خامل وتشتق $7x^2$ بطريقة عادية تماماً، لتكون النتيجة $(14x) \cdot y^3 = 14xy^3$.
 
 وفي تدريب الشبكات العصبية والذكاء الاصطناعي، يمثل هذا المبدأ جوهر ضبط المعاملات. فعندما يحتوي النموذج على ملايين الأوزان، تمكننا المشتقات الجزئية من عزل كل وزن على حدة وفحصه مجهرياً: *"لو قمنا بتجميد كل خلية عصبية في الشبكة بأسرها، وحركنا هذا الوزن المفرد بمقدار $+0.001$، فكيف ستستجيب دالة الخطأ الكلية؟"*
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| المشتقة الجزئية | The slope in one coordinate direction while freezing all other coordinates in blocks of ice | المشتقة الجزئية | ميل المنحنى في اتجاه بعد واحد مع تجميد كافة الأبعاد الأخرى كقوالب ثلج |
+| مع بقاء العوامل الأخرى ثابتة | All other variables held strictly constant (the fundamental assumption of partial derivatives) | مع بقاء العوامل الأخرى ثابتة | المبدأ الجوهري: تثبيت كل المتغيرات الأخرى واعتبارها ثوابت رقمية |
+| المستوي المماس | A flat sheet of cardboard balanced resting against a 3D curved surface at one touch point | المستوي المماس | لوح مستوٍ يستند بتوازن مثالي على سطح منحنٍ عند نقطة تماس واحدة |
+| الشريحة الإحداثية | Cutting a 3D mountain with a straight vertical knife parallel to one coordinate axis | الشريحة الإحداثية | قطع الجبل بسكين رأسي موازٍ لأحد المحاور لعزل منحنى أحادي البعد |
+
+#### المخطط البصري الهندسي
+
+```
+        السطح ثلاثي الأبعاد f(x,y)     شريحة القطع الرأسي عند y = ثابت
+           ▲                             ▲
+           │    / \                      │     المنحنى على الشريحة
+           │   /   \                     │     الميل = ∂f/∂x
+           │  /     \                    │      *─── خط المماس على الشريحة!
+           └──┴──────┴──►                └───┴──────► x
+              x      y                      تم تجميد y = y0
+```
 
 :::simulation-widget{engine="canvas2d" component="PartialTangentPlaneCanvas"}
 ---

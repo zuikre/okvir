@@ -29,6 +29,39 @@ $$
 $$
 The probabilities are mathematically identical, but now the largest exponent is guaranteed to be $e^0 = 1.0$. Overflow is banished forever!
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Logits ($z$)** (اللوجيتات / المخرجات الخام) | Raw, unconstrained point scores from the model's final layer, ranging freely from $-\infty$ to $+\infty$. | درجات التقييم الخام غير المقيدة التي يخرجها النموذج، وتتراوح بحرية بين السالب والموجب ما لا نهاية. |
+| **Softmax** (دالة التنعيم الأسي) | A pie chart maker: turns raw scores into positive percentages that sum cleanly to exactly $1.0$ ($100\%$). | صانع المخطط الدائري: يحول الدرجات العشوائية إلى نسب مئوية موجبة مجموعها يساوي 1.0 تماماً. |
+| **Numerical Overflow** (الفيضان الرقمي في الذاكرة) | When $e^{z}$ exceeds floating-point capacity ($e^{1000} \to \infty$ or `NaN`), crashing the program. | تجاوز سعة الذاكرة: عندما ينتج عن الأس رقم فلكي يتجاوز حدود التمثيل الرقمي للحاسوب. |
+| **Log-Sum-Exp Trick** (حيلة لوغاريتم مجموع الأسس) | Subtracting the maximum score ($z - z_{\max}$) to guarantee the highest exponent is $e^0 = 1$, preventing overflow. | طرح القيمة العظمى من جميع الدرجات لضمان ألا يتجاوز أي أس $e^0 = 1$، مما يحمي الذاكرة من الانهيار. |
+| **Categorical Cross-Entropy** (خسارة الإنتروبيا المتقاطعة) | A surprise penalty: measures how shocked the model is by reality ($-\log p_{\text{correct}}$). | مقياس الصدمة أو المفاجأة: يعاقب النموذج بشدة إذا وضع احتمالاً ضئيلاً للإجابة الصحيحة. |
+| **Residual Gradient ($p_i - y_i$)** (تدرج الخطأ المتبقي) | The beautifully simple feedback: predicted probability minus target label ($1.0$ for truth, $0$ for distractors). | فارق التوقع عن الحقيقة: تدرج رياضي فائق البساطة يساوي الاحتمال المتوقع مطروحاً منه الهدف الحقيقي. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+STABLE SOFTMAX & CROSS-ENTROPY PIPELINE:
+=============================================================================
+Raw Logits z:         [ 1000.0,   1002.0,   999.0 ]  --> (Raw exp() will OVERFLOW!)
+                           |
+Step 1: Find Max:          z_max = 1002.0
+                           |
+Step 2: Shift Logits: [   -2.0,      0.0,    -3.0 ]  --> (All values <= 0, exp() safe!)
+                           |
+Step 3: Exponentiate: [ 0.1353,   1.0000,  0.0498 ]  --> Sum = 1.1851
+                           |
+Step 4: Normalize:    [  0.114,    0.844,   0.042 ]  --> Valid Probabilities p
+=============================================================================
+CROSS-ENTROPY EVALUATION & GRADIENT FEEDBACK:
+Target Label y:       [    0.0,      1.0,     0.0 ]
+Loss:                 L = -log(p_true) = -log(0.844) = 0.169
+Gradient (dL/dz):     p - y = [ +0.114,  -0.156,  +0.042 ]
+                      (Distractors pushed DOWN, True target pulled UP!)
+```
+
 :::simulation-widget{engine="canvas2d" component="NeuralActivationCanvas"}
 ---
 interactive: true

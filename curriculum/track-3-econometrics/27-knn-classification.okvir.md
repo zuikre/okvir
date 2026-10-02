@@ -14,25 +14,78 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Imagine relocating to an unfamiliar neighborhood in a bustling international city. You do not speak the local dialect, and you have no handbook detailing the community's cultural norms. If you want to know whether a local bakery down the street is reputable, what do you do? You do not formulate an elaborate system of simultaneous polynomial equations or optimize matrix derivatives. Instead, you simply lean over your garden fence, consult your three or five nearest neighbors, and follow the democratic consensus of their recommendations.
+### Intuition & Real-World Story
 
-This everyday human instinct is the beating heart of **K-Nearest Neighbors (KNN)**, the quintessential non-parametric classification algorithm. Parametric models—such as Ordinary Least Squares or Logistic Regression—force data into rigid, pre-ordained mathematical straightjackets by decreeing that features must combine linearly or through an S-curve. If the true underlying decision boundary is an intricate labyrinth, a concentric ring, or an interlocking spiral, parametric models will fail catastrophically due to irreversible specification bias. KNN, by contrast, makes zero assumptions about underlying probability distributions or functional equations.
+Imagine moving to an unfamiliar neighborhood in a bustling new city where you don't know the local language. If you want to know whether a bakery down the street is excellent, what do you do?
 
-KNN is famously described as a **"lazy learner" (instance-based learning)**. During the training phase, it performs virtually zero upfront computation: it does not distill data into weights, gradients, or concise formulas. Instead, it commits the entire training dataset to memory as a multi-dimensional spatial map. When an unlabelled query point arrives, the algorithm measures geometric distances across the metric space, identifies the $k$ closest historical neighbors, and conducts an impromptu democratic election: whichever class holds the majority among those $k$ neighbors claims the query point.
+You don't sit down at your kitchen table to solve systems of polynomial equations or compute matrix Hessians. Instead, you do something deeply human: you lean over your fence, ask your **3 or 5 nearest neighbors**, and follow the majority consensus of their advice!
 
-The hyperparameter $k$ serves as a physical tuning dial governing the fundamental **Bias-Variance tradeoff**:
-- When $k = 1$, the model possesses zero bias on training samples. Space is carved into a **Voronoi tessellation**—a mosaic of sharp polygonal cells where each training observation reigns supreme over its immediate geometric territory. However, variance is sky-high: a single mislabeled recording or noisy outlier creates an isolated island of error that distorts any new test queries wandering nearby.
-- As you dial $k$ upward toward the total sample size $N$, you dilute local geographic identity. At $k = N$, the voting district expands to encompass the entire population: the algorithm simply predicts the global majority class everywhere, driving variance to zero but incurring suffocating bias.
+This instinct is the beating heart of **K-Nearest Neighbors (KNN)**, the quintessential non-parametric classification algorithm.
 
-تخيل أنك انتقلت حديثاً للعيش في حي سكني جديد داخل مدينة عالمية لا تعرف لغتها ولا عاداتها. إذا أردت معرفة ما إذا كان المخبز القريب يقدم طعاماً صحياً وموثوقاً، فماذا ستفعل؟ لن تبدأ بكتابة معادلات جبرية معقدة ولا بحساب مشتقات تفاضلية؛ بل ستخرج إلى شرفة منزلك لتسأل أقرب ثلاثة أو خمسة جيران يقيمون بجوارك، ثم تتبع رأي الأغلبية الديمقراطية بينهم.
+Parametric models—such as Ordinary Least Squares or Logistic Regression—force data into rigid, pre-ordained mathematical molds. They insist that the boundary between categories must be a straight line or an S-curve. If the true boundary is an intricate winding labyrinth, a donut shape, or an interlocking spiral, parametric models fail completely due to specification bias.
 
-هذا الحدس البشري الفطري هو جوهر خوارزمية **الجيران الأقرب (K-Nearest Neighbors - KNN)**، وهي النموذج اللامعلمي الأبرز في تعلم الآلة الكلاسيكي. تفرض النماذج المعلمية—مثل الانحدار الخطي واللوجستي—قيوداً شكلية صارمة على البيانات؛ فتفترض مسبقاً أن العلاقات يجب أن تتخذ شكل خط مستقيم أو منحنى لوجستي. وإذا كانت الحدود الحقيقية الفاصلة بين الفئات معقدة أو متداخلة كالمتاهات والدوائر متحدة المركز، فإن تلك النماذج تعجز عن التقاطها. على النقيض من ذلك، لا تفترض خوارزمية KNN أي دالة مسبقة ولا تبني افتراضات مسبقة حول التوزيع الاحتمالي.
+KNN makes **zero assumptions** about functional forms or distributions. It is an **instance-based "lazy learner"**:
+- **During training:** It does virtually zero math. It simply commits the entire map of training points to memory.
+- **During prediction:** When an unlabelled newcomer arrives, the algorithm measures geometric distances to all stored points, picks the $k$ closest neighbors, and tallies their votes. Whichever class wins the democratic majority claims the newcomer!
 
-تُصنف خوارزمية KNN بأنها **"متعلم كسول" (Lazy Learner)**؛ حيث إنها لا تبذل أي جهد حسابي أثناء مرحلة التدريب، ولا تحسب أوزاناً أو معاملات إحصائية مسبقة، بل تحتفظ بكامل خريطة بيانات التدريب في الذاكرة كما هي. وعندما تظهر نقطة جديدة غير مصنفة، تقيس الخوارزمية المسافات الهندسية في فضاء المتغيرات، وتحدد أقرب $k$ جيران لها، وتجري تصويتاً ديمقراطياً سريعاً تمنح فيه النقطة الجديدة فئة الأغلبية الفائزة بين هؤلاء الجيران.
+The hyperparameter $k$ acts as a physical knob controlling the **Bias-Variance Tradeoff**:
+- **When $k = 1$:** The model carves space into a **Voronoi tessellation**—a mosaic of sharp polygonal cells where each training sample is king of its tiny backyard. Bias is zero, but variance explodes: a single mislabeled recording creates an isolated island of error that traps nearby test queries.
+- **As $k \to N$:** The voting district expands to include the entire city. The algorithm simply predicts the global majority everywhere: variance drops to zero, but bias suffocates all local patterns.
 
-يعمل المعامل الفائق $k$ كـ **مفتاح ميكانيكي لضبط معضلة الانحياز والتباين (Bias-Variance Tradeoff)**:
-- فعندما يكون $k = 1$، ينعدم الانحياز في عينة التدريب تماماً، وينقسم الفضاء إلى خلايا فورونوي (Voronoi Tessellation)—وهي فسيفساء من المضلعات الهندسية تحكم فيها كل نقطة نطاقها الجغرافي الخاص. غير أن التباين ينفجر إلى أقصاه؛ لأن نقطة شاذة واحدة ملوثة بالضجيج ستصنع جيباً معزولاً من التنبؤ الخاطئ يشوه أي عينة اختبار مارة بقربها.
-- ومع زيادة قيمة $k$ مقتربة من إجمالي حجم العينة $N$، تتسع دائرة التصويت لتشمل كافة سكان المدينة، مما يمحو أي خصوصية محلية؛ لتتنبأ الخوارزمية عندئذ بالفئة العامة السائدة في كل مكان، فينخفض التباين إلى الصفر ويسيطر انحياز فادح يعمي النموذج عن الفروق الدقيقة.
+#### Jargon Decoder
+
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Non-Parametric** | Freeform modeling: makes no pre-conceived assumptions about straight lines or shapes. |
+| **Lazy Learning** | Memorize now, compute later: zero work during training; all math happens at query time. |
+| **Minkowski Distance** | The universal ruler: generalizes Manhattan (grid) and Euclidean (straight-line) distance. |
+| **Voronoi Tessellation** | The geometric territory map: mosaic of polygons showing which training point is closest. |
+| **Curse of k Choice** | Balancing the voting booth: $k=1$ overreacts to noise; huge $k$ drowns out local nuance. |
+
+```text
+    THE KNN DEMOCRATIC NEIGHBORHOOD (k = 3):
+
+         Feature 2
+             ^
+             |       [Class A]
+             |           *
+             |               * [Class A]
+             |          (   ?   )  <--- Query Point finds k=3 closest:
+             |               *           2 Class A vs 1 Class B
+             |            [Class B]      --> Predicts Class A!
+             |
+             |                         [Class B]
+             |                             *
+             +----------------------------------------> Feature 1
+```
+
+### الحدس والقصة الواقعية
+
+تخيل أنك انتقلت حديثاً للعيش في حي جديد داخل مدينة لا تعرف لغتها ولا عاداتها. إذا أردت معرفة ما إذا كان المخبز القريب ممتازاً وموثوقاً، فماذا ستفعل؟
+
+لن تجلس إلى طاولتك لحل معادلات جبرية معقدة أو حساب مصفوفات تفاضلية؛ بل ستفعل شيئاً فطرياً وبسيطاً للغاية: ستخرج لتسأل **أقرب 3 أو 5 جيران يقيمون بجوارك**، ثم تتبع رأي الأغلبية الديمقراطية بينهم!
+
+هذا الحدس البشري الفطري هو جوهر خوارزمية **الجيران الأقرب (K-Nearest Neighbors - KNN)**، وهي النموذج اللامعلمي الأبرز في تعلم الآلة.
+
+تفرض النماذج المعلمية—مثل الانحدار الخطي واللوجستي—قوالب شكلية صارمة على البيانات؛ فتصر على أن الحد الفاصل بين الفئات يجب أن يكون خطاً مستقيماً أو منحنى لوجستياً. وإذا كانت الحدود الحقيقية معقدة كالمتاهات أو الحلقات الدائرية المتداخلة، تعجز تلك النماذج تماماً بسبب خطأ التوصيف.
+
+أما خوارزمية KNN، فلا تفترض أي شكل مسبق للبيانات؛ وتعمل كـ **"متعلم كسول" (Lazy Learner)**:
+- **في مرحلة التدريب:** لا تبذل أي جهد حسابي، بل تحتفظ بكامل خريطة بيانات التدريب في الذاكرة.
+- **في مرحلة التنبؤ:** عند ظهور عينة جديدة غير مصنفة، تقيس الخوارزمية المسافات الهندسية لجميع النقاط المخزنة، وتختار أقرب $k$ جيران، وتجري تصويتاً ديمقراطياً تفوز فيه فئة الأغلبية!
+
+يعمل المعامل الفائق $k$ كمقبض للتحكم في **معضلة الانحياز والتباين (Bias-Variance Tradeoff)**:
+- **عند $k = 1$:** ينقسم الفضاء إلى خلايا فورونوي (Voronoi Cells) هندسية تحكم فيها كل نقطة نطاقها الخاص. ينعدم الانحياز، لكن التباين ينفجر: فنقطة شاذة واحدة ملوثة بالضجيج ستصنع جيباً معزولاً من الخطأ يشوه أي عينة اختبار تمر بقربها.
+- **وعندما يقترب $k$ من $N$:** تتسع دائرة التصويت لتشمل كامل سكان المدينة، فيتلاشى التباين لكن يسيطر انحياز أعمى يمحو كل الفروق المحلية الدقيقة.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **النماذج اللامعلمية** | النمذجة الحرة: لا تفرض افتراضات مسبقة حول الخطوط المستقيمة أو التوزيعات. |
+| **التعلم الكسول** | احفظ الآن واحسب لاحقاً: لا تدريب مسبقاً، وتحدث كافة الحسابات عند طلب التنبؤ. |
+| **مسافة مينكوفسكي** | المسطرة الشاملة: تعمم مسافة مانهاتن (شبكة الشوارع) والإقليدية (الخط المستقيم). |
+| **تفسيف فورونوي** | خريطة النفوذ الجغرافي: فسيفساء من المضلعات تبين النطاق الأقرب لكل نقطة تدريب. |
+| **مفاضلة اختيار k** | ضبط صندوق الاقتراع: $k=1$ يبالغ في رد الفعل للضجيج، بينما $k$ الضخم يمحو المعالم. |
 
 :::simulation-widget{engine="canvas2d" component="KNNRadar"}
 ---
@@ -60,55 +113,45 @@ $$
 d(\mathbf{x}_{\text{query}}, \mathbf{x}_{\pi(1)}) \le d(\mathbf{x}_{\text{query}}, \mathbf{x}_{\pi(2)}) \le \dots \le d(\mathbf{x}_{\text{query}}, \mathbf{x}_{\pi(N)})
 $$
 
-The $k$-nearest neighborhood set is defined as:
+The $k$-neighborhood set comprises the first $k$ elements:
 
 $$
-\mathcal{N}_k(\mathbf{x}_{\text{query}}) = \{\pi(1), \pi(2), \dots, \pi(k)\}
+\mathcal{N}_k(\mathbf{x}_{\text{query}}) = \{\mathbf{x}_{\pi(1)}, \dots, \mathbf{x}_{\pi(k)}\}
 $$
 
-### Posterior Probability & Decision Rule
-The modeled posterior probability of belonging to class $c \in \{1, \dots, C\}$ is the empirical sample proportion within the neighborhood:
+The modeled posterior class probability is the empirical frequency inside the neighborhood:
 
 $$
-\hat{\mathbb{P}}(Y = c \mid \mathbf{x}_{\text{query}}) = \frac{1}{k} \sum_{i \in \mathcal{N}_k(\mathbf{x}_{\text{query}})} \mathbb{I}(y_i = c)
+\hat{p}_c(\mathbf{x}_{\text{query}}) \equiv \hat{\mathbb{P}}(Y = c \mid \mathbf{x}_{\text{query}}) = \frac{1}{k} \sum_{i \in \mathcal{N}_k(\mathbf{x}_{\text{query}})} \mathbb{I}(y_i = c)
 $$
 
-The deterministic Bayes plug-in classification rule selects the mode:
+The discrete classification decision is evaluated via majority plurality voting:
 
 $$
-\hat{y}(\mathbf{x}_{\text{query}}) = \arg\max_{c \in \{1, \dots, C\}} \hat{\mathbb{P}}(Y = c \mid \mathbf{x}_{\text{query}})
+\hat{y}(\mathbf{x}_{\text{query}}) = \arg\max_{c \in \{1, \dots, C\}} \hat{p}_c(\mathbf{x}_{\text{query}})
 $$
 
-### Effective Degrees of Freedom
-Unlike parametric models whose capacity is fixed by parameter count $P$, a KNN classifier's capacity is governed inversely by neighborhood size:
+### Asymptotic Cover-Hart Bound (1967)
+As the training sample size grows toward infinity ($N \to \infty$), the error rate of the 1-Nearest Neighbor classifier $R_{1\text{-NN}}$ is bounded relative to the theoretical Bayes optimal error rate $R^*$:
 
 $$
-\text{df}_{\text{eff}} \approx \frac{N}{k}
+R^* \le R_{1\text{-NN}} \le 2R^* (1 - R^*) \le 2R^*
 $$
 
-When $k=1$, the model possesses $N$ effective parameters (one per data point), maximizing model flexibility. When $k=N$, the model simplifies to a single global constant prediction ($\text{df} = 1$).
-
-### The Cover-Hart Theorem (1967)
-Let $R^*$ denote the optimal, irreducible Bayes error rate under the true data-generating distribution. Thomas Cover and Peter Hart proved that as sample size $N \to \infty$, the asymptotic error rate of the unweighted 1-Nearest Neighbor classifier $R_{1\text{-NN}}$ satisfies:
-
-$$
-R^* \le R_{1\text{-NN}} \le 2 R^* (1 - R^*) \le 2 R^*
-$$
-
-This milestone theorem guarantees that a purely local, memory-based classifier captures at least half of the total predictive information available in the universe without estimating a single regression parameter!
+This celebrated theorem proves that even the simplest, parameter-free 1-NN algorithm guarantees an asymptotic error rate no worse than twice the optimal error achievable by an omniscient Bayesian oracle!
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $\mathbf{x}_i \in \mathbb{R}^D$: $D$-dimensional feature coordinates of training observation $i$.
-* $y_i \in \{1, \dots, C\}$: Categorical ground-truth class label.
-* $d_p(\mathbf{x}, \mathbf{z})$: Minkowski metric measuring geometric separation in $L_p$ space.
-* $\mathcal{N}_k(\mathbf{x})$: Set of indices corresponding to the $k$ closest training points to query point $\mathbf{x}$.
-* $k$: User-specified hyperparameter controlling neighborhood voting size.
-* $\hat{\mathbb{P}}(Y = c \mid \mathbf{x})$: Local empirical probability of class $c$ within the query neighborhood.
-* $\hat{y}(\mathbf{x})$: Final predicted class label assigned via majority mode consensus.
-* $\text{df}_{\text{eff}} \approx N / k$: Effective degrees of freedom measuring model complexity.
-* $R^*$: Theoretical Bayes error rate representing irreducible classification noise.
-* $R_{1\text{-NN}}$: Asymptotic classification error rate of the 1-Nearest Neighbor algorithm.
+| Symbol / Term | Formal Definition | Intuitive Meaning / Role | المعنى والمدلول بالعربية |
+| :--- | :--- | :--- | :--- |
+| $\mathcal{D} = \{(\mathbf{x}_i, y_i)\}$ | Labeled training corpus | Stored spatial map of instances in memory | خريطة بيانات التدريب المحفوظة بالذاكرة |
+| $d_p(\mathbf{x}, \mathbf{z})$ | Minkowski $L_p$ metric | Geometric distance ruler between feature vectors | مقياس المسافة الهندسية بين نقطتين |
+| $\mathcal{N}_k(\mathbf{x})$ | Nearest neighbor indices | Set of $k$ closest historical training instances | مجموعة الجيران الـ $k$ الأقرب للنقطة |
+| $k \in \mathbb{Z}^+$ | Neighborhood size | Hyperparameter tuning the Bias-Variance tradeoff | المعامل الفائق لعدد الجيران المصوتين |
+| $\hat{p}_c(\mathbf{x})$ | Neighborhood vote share | Modeled class posterior probability | الحصة التصويتية للاحتمال البعدي للفئة |
+| $\hat{y}(\mathbf{x})$ | Plurality vote winner | Discrete predicted class label | فئة الأغلبية الفائزة بالتصويت الديمقراطي |
+| $R^*$ | Bayes error rate | Irreducible irreducible theoretical noise floor | الحد الأدنى النظري لخطأ بايز الأصيل |
+| $R_{1\text{-NN}}$ | 1-NN asymptotic error | Error bounded by at most $2 R^*$ as $N \to \infty$ | خطأ الجار الأقرب المقيد بضعف خطأ بايز |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 

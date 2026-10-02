@@ -14,25 +14,60 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-In introductory statistics courses, students often acquire the dangerous dogma of the **"Kitchen Sink Regression"**: pack every available covariate in your spreadsheet into the regression model, operating under the naive illusion that adding more control variables can never hurt and always reduces bias.
+### Intuition & Real-World Story
 
-In causal econometrics, this instinct is disastrous. Joshua Angrist and Jörn-Steffen Pischke famously coined the term **Bad Controls** to identify variables that should never be included in a regression.
+Suppose an e-commerce website redesigns its product page to increase total purchases: *does the new, cleaner layout cause higher sales?*
 
-Bad controls primarily come in two destructive varieties:
-1. **The Mediator Trap ($D \to M \to Y$):** Suppose you want to measure the total causal return of a college degree ($D$) on earnings ($Y$). Should you control for whether the individual holds a managerial role ($M$)? **Absolutely not!** Getting hired into managerial roles is one of the primary pathways through which college education boosts earnings. If you control for management status, you block the transmission pipe. You are now comparing a college graduate manager to a non-college manager, asking: *"Does college help you earn more if it didn't help you get a better job?"* You have engineered away the very effect you set out to measure!
-2. **The Collider Trap ($D \to C \leftarrow U$):** Controlling for variables determined *after* treatment can inadvertently condition on a collider, creating phantom correlations between treatment and unobserved errors that were previously independent.
+The data science team launches an A/B test. The product manager decides to be 'extra careful' and tells the data scientist: *"Make sure you control for everything! Let's control for whether the customer clicked the 'Proceed to Checkout' button."*
 
-Crucially, this is where predictive machine learning and causal econometrics violently part ways. In predictive modeling, more features almost always reduce test error. If an algorithm wants to predict tomorrow's wage, knowing the applicant's current job title ($M$) is immensely informative, and any model will eagerly incorporate it. But if a policymaker asks: *"Should we subsidize college tuition to increase national income?"*, controlling for occupation answers the wrong question. A policy intervention acts at the start of the causal domino chain; blocking intermediate falling dominoes blinds you to the full power of the intervention. **Good controls are predetermined variables established before treatment occurs** (such as birth year or parental education). Bad controls are variables that treatment itself influences.
+What happens when you add 'Clicked Checkout' to the regression?
+The estimated effect of the redesign **instantly drops to zero!** The team falsely concludes that the redesign failed.
 
-في دروس الإحصاء الأولية، يتشرب الطلاب غالبًا عادة شائعة وخطيرة تُعرف بـ **"انحدار حوض المطبخ" (Kitchen Sink Regression)**: حشر كل متغير متاح في قاعدة البيانات داخل النموذج، تحت الوهم الساذج بأن إضافة ضوابط إضافية لا تضر أبدًا وتقلل التحيز حتمًا.
+Why did this disaster happen? Because clicking checkout is not an external confounder—it is the direct **mediator** through which the redesign works! The new layout increases sales *precisely by convincing people to click checkout*. When you hold 'Clicked Checkout' constant, you ask: *"Among people who either both clicked checkout or both didn't, did the redesign help?"* You have blocked the very pipe that carries the causal effect!
 
-في الاقتصاد القياسي السببي، يعد هذا التفكير كارثيًا. صاغ الباحثان جوشوا أنغريست ويورن-ستيفن بيشكي مصطلح **ضوابط التحكم السيئة (Bad Controls)** للإشارة إلى المتغيرات التي يدمر إدراجها التعريف السببي.
+This fatal mistake is called **Overcontrolling** or adding a **Bad Control**. A good control is determined *before* treatment (like customer age or historical spend). A bad control is determined *after* treatment and sits directly on the causal transmission path.
 
-تأتي الضوابط السيئة في صورتين رئيسيتين:
-1. **فخ المتغير الوسيط ($D \to M \to Y$):** لنفترض أنك تريد قياس الأثر السببي الإجمالي للشهادة الجامعية ($D$) على الدخل ($Y$). هل يجوز أن تتحكم في متغير "شغل منصب إداري" ($M$)؟ **كلا على الإطلاق!** فالوصول إلى المناصب الإدارية هو إحدى القنوات الأساسية التي ترفع الشهادة الجامعية الدخل من خلالها. إذا تحكمت في المنصب الإداري، فإنك تسد أنبوب التدفق السببي؛ وتصبح مقارنتك بين مدير جامعي ومدير غير جامعي متسائلاً: *"هل تفيد الشهادة إذا لم تساعدك في الحصول على وظيفة أفضل؟"* لقد قتلت بيدك الأثر ذاته الذي تبحث عنه!
-2. **فخ المصادم (Collider Trap):** التحكم في متغيرات تتحدد *بعد* حدوث المعالجة قد يحولها إلى مصادمات تربط المعالجة بعوامل تشويش خفية كانت مستقلة عنها تمامًا في الأصل.
+#### Jargon Decoder
 
-وهنا يفترق تعلم الآلة التنبؤي عن الاقتصاد القياسي السببي بأوضح صورة: في التنبؤ البحت، كل متغير إضافي يقلل خطأ التنبؤ مرحب به، ومعرفة نوع وظيفة المتقدم الحالية يساعد الخوارزمية في تخمين راتبه بدقة هائلة. أما إذا سأل صانع القرار: *"هل نزيد المنح الدراسية لرفع الدخل القومي؟"*، فإن التحكم في نوع الوظيفة يحجب الأثر الكلي للسياسة، لأن جوهر جدوى التعليم يكمن تحديدًا في تمكين الطلاب من الوصول لتلك الوظائف الرفيعة! حجب أحجار الدومينو الوسيطة يعميك عن قوة الدفعة الأولى. **الضوابط الصالحة هي متغيرات سابقة على المعالجة زمنيًا وهيكليًا** (كسنة الميلاد أو تعليم الوالدين)، بينما الضوابط السيئة هي متغيرات تتأثر بالمعالجة ذاتها.
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Good Control** | Pre-treatment confounder: a background trait existing before the experiment started. |
+| **Bad Control** | Post-treatment trap: a variable influenced by the treatment that distorts its effect. |
+| **Mediator** | The transmission pipeline: a middle stepping stone through which treatment creates its impact. |
+| **Overcontrolling** | Stifling the mechanism: holding the transmission pipe fixed, choking off the effect. |
+| **Variance Inflation Factor (VIF)** | Multicollinearity alarm: measures how much coefficient variance is inflated by redundant controls. |
+
+```text
+    THE MEDIATOR PIPELINE:
+
+      [ Redesign (Treatment) ] ======> [ Clicked Checkout (Mediator) ] ======> [ Purchase (Outcome) ]
+                 |                                      ^
+                 |                                      |
+                 \====== (Controlling for this shuts off the pipeline!) =====/
+```
+
+### الحدس والقصة الواقعية
+
+تخيل متجرًا إلكترونيًا أعاد تصميم صفحة المنتج لزيادة المبيعات: *هل يؤدي التصميم الجديد إلى زيادة المشتريات الفعلية؟*
+
+أطلق فريق البيانات اختبار A/B. وأراد مدير المنتج أن يكون "شديد الدقة والحرص"، فقال للباحث: *"تأكد من ضبط كل المتغيرات الممكنة! دعنا نضبط النموذج بالتحكم في متغير: هل نقر العميل على زر الانتقال إلى الدفع؟"*
+
+ما الذي حدث عند إدخال هذا المتغير في الانحدار؟
+**انهار الأثر المقدر للتصميم الجديد إلى الصفر فورًا!** واستنتج الفريق خطأً أن التصميم الجديد فاشل ولا جدوى منه.
+
+لماذا حدثت هذه الكارثة التحليلية؟ لأن النقر على زر الدفع ليس متغيرًا مربكًا خارجيًا، بل هو **الوسيط (Mediator)** والقناة التي يعمل من خلالها التصميم! فالتصميم الجديد ينجح تحديدًا عبر إقناع الزوار بالنقر على زر الدفع. فعندما تثبت هذا الزر، فأنت تسأل: *"بين الأشخاص الذين نقروا جميعًا أو لم ينقروا جميعًا، هل أحدث التصميم فرقًا؟"* لقد خنقت الأنبوب الذي ينقل الأثر السببي بالكامل!
+
+هذا الخطأ الفادح يسمى **التحكم الخاطئ (Bad Controls)** أو **الإفراط في التحكم (Overcontrolling)**؛ فالمتغير الضابط الصالح يُقاس *قبل المعالجة*، أما المتغير الضابط السيئ فهو وليد المعالجة ويقع في مسارها.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **الضابط الصالح (Good Control)** | عامل سابق للمعالجة: صفة أساسية موجودة مسبقًا تفسر الفروق المربكة. |
+| **الضابط السيئ (Bad Control)** | فخ ما بعد المعالجة: متغير ناتج عن المعالجة يؤدي ضبطه لتشويه أثرها الحقيقي. |
+| **المتغير الوسيط (Mediator)** | أنبوب النقل: الخطوة الوسيطة التي تنتقل عبرها طاقة المعالجة نحو النتيجة. |
+| **الإفراط في التحكم (Overcontrolling)** | خنق الآلية: تثبيت المتغير الوسيط مما يؤدي لمحو الأثر السببي الإجمالي. |
+| **معامل تضخم التباين (VIF)** | جرس إنذار التعدد الخطي: يقيس مدى تضخم خطأ التقدير بسبب حشو المتغيرات. |
 
 :::simulation-widget{engine="canvas2d" component="SimpsonsParadoxLab"}
 ---
@@ -43,64 +78,56 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-Let the total causal effect of treatment $D_i$ on outcome $Y_i$ be represented by the structural equation:
+Let treatment be $D$, outcome be $Y$, and mediator be $M$. The true causal DAG is $D \to M \to Y$.
+
+The total causal effect of $D$ on $Y$ is obtained from the regression without $M$:
 
 $$
-Y_i = \alpha + \tau D_i + \varepsilon_i
+Y_i = \alpha_0 + \tau_{\text{total}} D_i + \varepsilon_i
 $$
 
-Suppose treatment directly influences an intermediate mediator $M_i$:
+When conditioning on mediator $M$, the regression decomposes into the direct effect:
 
 $$
-M_i = \gamma_0 + \gamma_1 D_i + u_i
+Y_i = \alpha_1 + \tau_{\text{direct}} D_i + \gamma M_i + u_i
 $$
 
-When a researcher includes the mediator $M_i$ in the regression:
+If there is no direct path other than through $M$, then $\tau_{\text{direct}} = 0$, completely erasing the evidence of treatment efficacy!
 
-$$
-Y_i = \pi_0 + \tau_{\text{direct}} D_i + \theta M_i + \nu_i
-$$
-
-Substituting the mediator equation into the mediated outcome equation reveals the **Mediation Decomposition**:
-
-$$
-Y_i = (\pi_0 + \theta \gamma_0) + (\tau_{\text{direct}} + \gamma_1 \theta) D_i + (\theta u_i + \nu_i)
-$$
-
-The total causal effect decomposes into direct and indirect channels:
-
-$$
-\tau = \underbrace{\tau_{\text{direct}}}_{\text{Direct Effect}} + \underbrace{\gamma_1 \cdot \theta}_{\text{Indirect (Mediated) Effect}}
-$$
-
-Controlling for $M_i$ strictly isolates $\tau_{\text{direct}}$, completely erasing the indirect transmission channel $\gamma_1 \theta$.
-
-### The Collider Danger of Post-Treatment Controls
-
-Even worse, if an unobserved factor $U_i$ (e.g. ambition) affects both the mediator $M_i$ and the outcome $Y_i$, conditioning on $M_i$ induces a negative correlation between treatment $D_i$ and $U_i$:
-
-$$
-\text{Cov}(D_i, U_i \mid M_i) \neq 0
-$$
-
-This turns a clean randomized trial where $D_i \perp\!\!\!\perp U_i$ into an endogenously confounded regression!
-
-To detect numerical overcontrolling and multicollinearity across regressor columns, the **Variance Inflation Factor (VIF)** of column $j$ is calculated via auxiliary regressions:
+Furthermore, when redundant collinear controls are added, the Variance Inflation Factor for regressor $j$ inflates coefficient variance:
 
 $$
 \text{VIF}_j = \frac{1}{1 - R_j^2}
 $$
 
-where $R_j^2$ is the coefficient of determination from regressing regressor $\mathbf{x}_j$ onto all remaining $K-1$ regressors.
+where $R_j^2$ is the coefficient of determination from regressing regressor $X_j$ on all other regressors.
+
+### Why the Math Works Step-by-Step
+
+1. **Why does conditioning on a mediator destroy total causal inference?**
+   By the chain rule of differentiation in structural models:
+   $$\frac{dY}{dD} = \frac{\partial Y}{\partial D} + \frac{\partial Y}{\partial M} \frac{dM}{dD}$$
+   The total effect includes the indirect channel $\frac{\partial Y}{\partial M} \frac{dM}{dD}$. Controlling for $M$ forces $dM = 0$, throwing away the indirect channel and measuring only the direct residual impact.
+2. **The Hazard of Collider Stratification:**
+   If there is an unobserved confounder $U$ affecting mediator $M$ and outcome $Y$ ($M \leftarrow U \to Y$), controlling for $M$ turns it into a collider along the path $D \to M \leftarrow U \to Y$, opening a spurious backdoor path between $D$ and $Y$!
+3. **Variance Inflation Factor Thresholds:**
+   When $R_j^2 \to 1$ (near-perfect collinearity), $\text{VIF}_j \to \infty$. A rule of thumb is that $\text{VIF} > 5$ or $10$ indicates severe multicollinearity that destroys statistical precision.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $\tau$: Total causal effect of policy treatment $D_i$ on final outcome $Y_i$.
-* $M_i$: Post-treatment mediator situated on the causal pathway from treatment to outcome.
-* $\gamma_1$: First-stage effect of treatment on the mediator ($D \to M$).
-* $\theta$: Partial effect of the mediator on the outcome holding treatment constant ($M \to Y$).
-* $\tau_{\text{direct}}$: Direct effect of treatment bypassing the mediator.
-* $\text{VIF}_j$: Variance Inflation Factor; $\text{VIF}_j > 10$ indicates severe multicollinearity where regressor $j$ is largely redundant.
+* $\tau_{\text{total}}$: Total causal effect capturing all direct and mediated mechanisms.
+* $\tau_{\text{direct}}$: Direct effect holding the mediator artificially fixed.
+* $\text{VIF}_j$: Factor by which $\mathbb{V}[\hat{\beta}_j]$ is inflated relative to orthogonal regressors.
+* $R_j^2$: Proportion of variance in $X_j$ explained by all other regressors.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\tau_{\text{total}}$ | الأثر السببي الإجمالي | القوة الإجمالية للمعالجة متضمنة كافة القنوات والمسارات الوسيطة. |
+| $\tau_{\text{direct}}$ | الأثر المباشر المنعزل | أثر المعالجة المتبقي بعد تثبيت الوسيط جبريًا وخنق قناته الطبيعية. |
+| $\text{VIF}_j$ | معامل تضخم التباين | مضاعف يوضح كم تضاعف خطأ التقدير بسبب التكرار والتداخل بين الميزات. |
+| $R_j^2$ | معامل تحديد الانحدار المساعد | نسبة تباين الميزة التي يمكن التنبؤ بها بواسطة بقية الميزات في النموذج. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -122,48 +149,39 @@ import numpy as np
 
 def compute_vif(X: np.ndarray) -> np.ndarray:
     """
-    Computes the Variance Inflation Factor (VIF) for each column in X.
+    Computes the Variance Inflation Factor (VIF) for each column in design matrix X.
     
     Parameters
     ----------
     X : np.ndarray of shape (N, K)
-        Matrix of explanatory covariates (K >= 2).
+        Design matrix (without intercept, or where each column is checked).
         
     Returns
     -------
-    np.ndarray of shape (K,)
-        VIF values for each column.
+    np.ndarray of shape (K,) with VIF values.
     """
-    N, K = X.shape
-    vifs = np.zeros(K)
-    
-    for j in range(K):
-        # Step 1: Extract target column j to predict
+    n, k = X.shape
+    vifs = np.zeros(k)
+
+    for j in range(k):
+        # Target column j
         y_j = X[:, j]
-        
-        # Step 2: Form matrix of all other K - 1 regressors with an intercept
-        other_indices = [idx for idx in range(K) if idx != j]
-        X_others = X[:, other_indices]
-        X_aux = np.column_stack([np.ones(N), X_others])
-        
-        # Step 3: Fit auxiliary regression y_j on X_aux and predict fitted values
-        XtX = X_aux.T @ X_aux
-        Xty = X_aux.T @ y_j
-        beta_aux = np.linalg.solve(XtX, Xty)
-        y_hat_j = X_aux @ beta_aux
-        
-        # Step 4: Compute auxiliary R_j^2 and calculate VIF_j = 1 / (1 - R_j^2)
-        y_bar = np.mean(y_j)
-        tss = np.sum((y_j - y_bar) ** 2)
-        ssr = np.sum((y_j - y_hat_j) ** 2)
-        
-        r2_j = 1.0 - (ssr / tss) if tss > 1e-12 else 0.0
-        
-        if r2_j >= 0.999999:
-            vifs[j] = 1e6
-        else:
-            vifs[j] = 1.0 / (1.0 - r2_j)
-            
+        # Regressors: all columns except j, plus an intercept
+        X_other = np.delete(X, j, axis=1)
+        X_design = np.column_stack([np.ones(n), X_other])
+
+        # Fit OLS of feature j on all other features
+        beta = np.linalg.solve(X_design.T @ X_design, X_design.T @ y_j)
+        y_hat = X_design @ beta
+
+        # Compute R^2 of this auxiliary regression
+        tss = np.sum((y_j - np.mean(y_j)) ** 2)
+        ssr = np.sum((y_j - y_hat) ** 2)
+        r2 = 1.0 - (ssr / tss) if tss > 0 else 0.0
+
+        # VIF = 1 / (1 - R^2)
+        vifs[j] = 1.0 / (1.0 - r2) if r2 < 0.999999 else 1e6
+
     return vifs
 ```
 :::

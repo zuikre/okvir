@@ -26,6 +26,39 @@ Meanwhile, **Stride ($S$)** controls how many pixels the sliding filter leaps on
 
 > **Frontier Analogy:** Think of padding as bubble-wrap around a delicate glass painting so the frame doesn't clip off its corners during shipping. Stride is walking across stepping stones: taking baby steps ($S=1$) records every pebble, while taking running leaps ($S=2$) covers twice the distance in half the time, doubling your field of view with each leap.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Stride ($S$)** (طول الخطوة / القفز) | The kangaroo hop: how many pixels the kernel skips between checks; a stride of 2 halves spatial resolution like a 50% shrink. | خطوة القفز: عدد البكسلات التي يتخطاها المرشح في كل نقلة؛ خطوة 2 تختزل الأبعاد المكانية إلى النصف. |
+| **Padding ($P$)** (التوسيد / الحواشي) | The border cushion: adding a perimeter of zeros around the image so edge pixels get inspected just as thoroughly as central ones. | وسادة الحواف: إضافة إطار من الأصفار حول أطراف الصورة حتى تنال البكسلات الحدودية نفس فرصة الفحص كالبكسلات المركزية. |
+| **Receptive Field (RF)** (المجال الإدراكي / حقل الرؤية) | The detective's vision cone: the exact patch size of the original input image that a single deep neuron can observe. | مخروط رؤية المحقق: مساحة الرقعة في الصورة الأصلية التي يستطيع عصبون عميق واحد رؤيتها والتأثر بها. |
+| **Same vs. Valid Padding** (الحشوة المتطابقة مقابل الملغاة) | "Same" pads edges so output resolution matches input; "Valid" means zero padding, letting borders trim naturally. | المتطابقة تحافظ على نفس أبعاد الصورة الأصلية بإضافة أصفار؛ والملغاة لا تضيف حواشي مما يؤدي لانكماش الأبعاد. |
+| **Stacking Small Kernels** (تراكم المرشحات الصغيرة) | Two $3 \times 3$ layers cover the same $5 \times 5$ vision field as one giant $5 \times 5$ filter, but with fewer parameters and an extra non-linear hinge! | رصف طبقتين 3×3 يغطي نفس مجال رؤية طبقة 5×5، ولكن بعدد معاملات أقل بكثير ومفصل إضافي من اللاخطية! |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+RECEPTIVE FIELD EXPANSION THROUGH LAYER STACKING:
+=============================================================================
+Layer 2 Feature:                              [ O ] (1 single neuron)
+                                            /   |   \
+Layer 1 Features:                      [ o ]   [ o ]   [ o ] (Receptive Field = 3x3)
+                                      /  |  \ /  |  \ /  |  \
+Input Pixels:                        . . . . . . . . . (Receptive Field = 5x5!)
+=============================================================================
+SPATIAL ARITHMETIC WITH STRIDE & PADDING:
+Input Width W = 7,  Kernel K = 3,  Padding P = 1,  Stride S = 2
+
+Padded Input:   [0] [x] [x] [x] [x] [x] [x] [x] [0]  (Padded Width = 7 + 2*1 = 9)
+Kernel Step 1:  [=======]                             --> Output 1
+Kernel Step 2:          [=======]                     --> Output 2
+Kernel Step 3:                  [=======]             --> Output 3
+Kernel Step 4:                          [=======]     --> Output 4
+
+Output Width:   O = floor((7 - 3 + 2*1) / 2) + 1 = floor(6 / 2) + 1 = 4
+```
+
 :::simulation-widget{engine="canvas2d" component="ConvolutionFilterCanvas"}
 ---
 interactive: true
@@ -63,15 +96,23 @@ $$
 J_l = J_{l-1} \cdot s_l, \quad \text{with base conditions: } \text{RF}_0 = 1, \; J_0 = 1
 $$
 
-### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-* $H, W$: Input feature map height and width.
-* $K \in \{1, 3, 5, 7\}$: Spatial kernel size.
-* $P \ge 0$: Number of zero-padding pixels appended symmetrically to both borders.
-* $S \ge 1$: Spatial stride step size.
-* $\text{RF}_l$: Total span of input pixels that can influence a single activation in layer $l$.
-* $J_l$: Cumulative feature stride (jump) between adjacent activations at layer $l$.
-* $\lfloor \cdot \rfloor$: Floor integer division operator.
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $W, H$ | Input Spatial Dimensions / أبعاد المدخلات | The height and width of the input feature map before this convolution layer. |
+| $K$ | Kernel Filter Size / حجم المرشح | The spatial footprint of the sliding window (e.g. $K=3$ for a $3 \times 3$ kernel). |
+| $P$ | Zero-Padding Thickness / سماكة الحشوة | Number of zero pixels appended around each spatial boundary. |
+| $S$ | Stride Step Length / طول الخطوة | Number of pixels the sliding window advances along horizontal and vertical axes. |
+| $O$ | Output Spatial Dimension / بُعد المخرجات | The resulting height or width computed as $\lfloor \frac{W - K + 2P}{S} \rfloor + 1$. |
+| $RF_l$ | Layer $l$ Receptive Field / المجال الإدراكي | Cumulative receptive field diameter of layer $l$ neurons mapped back to raw input. |
+| $j_l$ | Cumulative Stride Jump / خطوة القفز التراكمية | The total effective distance in input pixel coordinates between adjacent features at layer $l$. |
+
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **The Boundary Offset**: Adding $2P$ pads both ends (left and right, or top and bottom). Subtracting $K$ removes the length consumed by the first kernel placement. Dividing by $S$ counts how many full strides fit before running out of room, and $+1$ counts the initial placement.
+2. **VGG Architectural Revolution**: Simonyan & Zisserman (2014) showed that stacking two $3 \times 3$ filters yields an effective $5 \times 5$ receptive field with only $2 \times (3^2) = 18$ parameters versus $5^2 = 25$ for a single $5 \times 5$ filter—a $28\%$ parameter reduction with two non-linear activations instead of one.
+3. **Subsampling and Invariance**: Striding with $S > 1$ downsamples spatial dimensions, forcing high-level layers to encode abstract semantic summaries (e.g., "contains an eye") rather than precise pixel coordinates.
+
 
 ### The Architectural Magic of Stacking Small Kernels:
 Consider two architectural designs for achieving a $5 \times 5$ receptive field on an image with $C$ channels:

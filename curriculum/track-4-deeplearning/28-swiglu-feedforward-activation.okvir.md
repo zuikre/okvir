@@ -12,7 +12,7 @@ i18n:
 
 # SwiGLU Gated Feedforward Networks (FFN)
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
 In modern Transformer architectures, the Feedforward Network (FFN) constitutes the foundational engine of parametric memory and non-linear feature transformation. While multi-head self-attention routes information horizontally across different token positions in a sequence, the FFN operates independently on each token vertically, expanding its dimensionality to retrieve stored factual associations and synthesize higher-order semantic abstractions. In fact, feedforward layers account for roughly two-thirds of the total parameter count in foundation models.
 
@@ -32,6 +32,43 @@ The mathematical power of SwiGLU stems from its bilinear multiplicative interact
 
 يشبه هذا التصميم صمام خلط هيدروليكي فائق الدقة: يعمل مسار البوابة كمقبض صمام حساس للغاية يتحكم بسلاسة في تدفق وحجم الإشارة المارة في الأنبوب الرئيسي (مسار الرفع)؛ مما يتيح تصفية التشويش وتضخيم الإشارات الدلالية الحرجة بمرونة فائقة تفوق بكثير أداء البوابات الثابتة.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Gated Linear Unit (GLU)** (الوحدة الخطية ذات البوابات) | The dual-valve pipeline: one pipe carries raw data values while a parallel gating pipe multiplies by a fraction deciding how much passes. | صمام التدفق المزدوج: أنبوب يحمل البيانات، وأنبوب موازٍ يحدد نسبة التدفق المسموح بعبورها عبر الضرب العنصري. |
+| **Swish / SiLU Activation** (دالة تنشيط سويش السلسة) | The self-gated curve ($x \cdot \sigma(x)$): a smooth, gently dipped curve that lets strong signals through, suppresses negatives, and never dies. | منحنى التنشيط الذاتي السلس: دالة ناعمة تمرر الإشارات الموجبة بطلاقة وتكبح السلبية دون أن تتسبب في موت العصبونات. |
+| **SwiGLU** (تنشيط سويش المقترن بالبوابات) | The frontier standard FFN activation: gates the linear projection with a Swish-activated parallel projection ($\text{Swish}(x W_1) \odot (x W_3)$). | معيار التنشيط في النماذج الرائدة: يتحكم في تدفق الإشارة بضربها عنصرياً في قناة موازية منشطة بدالة سويش. |
+| **Hadamard Product ($\odot$)** (الجداء العنصري المباشر) | Independent feature gating: multiplying vectors element-by-element so each feature channel dynamically modulates its counterpart. | الضرب المباشر عنصراً بعنصر: يتيح لكل قناة ميزات في المتجه التحكم في فتح أو إغلاق القناة المقابلة لها بشكل مستقل. |
+| **Parameter Balancing ($\frac{8}{3} d_{\text{model}}$)** (الموازنة المعمارية للمعاملات) | Trimming width to keep weight count fair: because SwiGLU uses 3 projection matrices instead of 2, its width is tuned to $\frac{8}{3}d$ instead of $4d$. | ضبط الأبعاد لعدالة المقارنة: بما أن SwiGLU تستخدم 3 مصفوفات، يُضبط عرضها لـ 8/3 بدلاً من 4 للحفاظ على نفس عدد المعاملات. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+SWIGLU GATED FEEDFORWARD NETWORK (FFN):
+=============================================================================
+Input from Pre-Norm Residual Stream: x  [Shape: (B, S, d_model)]
+      |
+      +---> [ Linear Projection W_1 ] ---> Gate Pre-activations  [Shape: (B, S, d_ffn)]
+      |                                           |
+      |                                           v
+      |                                  [ Swish / SiLU Activation ]
+      |                                           |
+      |                                           v
+      |                                      Gating Signal
+      |                                           |
+      +---> [ Linear Projection W_3 ] ---> Value Projection     [Shape: (B, S, d_ffn)]
+                                                  |
+                                                  v
+                         Element-wise Hadamard Gating: ( Swish(x * W_1) \odot (x * W_3) )
+                                                  |
+                                                  v
+                                      [ Down-Projection W_2 ]  [Shape: (B, S, d_model)]
+                                                  |
+                                                  v
+                                      Output Added to Residual Highway!
+```
+
 :::simulation-widget{engine="canvas2d" component="NeuralActivationCanvas"}
 ---
 interactive: true
@@ -41,7 +78,7 @@ highlighted_metric: "loss"
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
 In a SwiGLU feedforward layer, the input tensor $\mathbf{x}$ is transformed via three projection weight matrices combined with element-wise bilinear gating:
 
@@ -67,21 +104,22 @@ $$
 \frac{d}{dz}\text{Swish}(z) = \sigma(z) + z \sigma(z)(1 - \sigma(z)) = \sigma(z) \left(1 + z(1 - \sigma(z))\right)
 $$
 
-### Comprehensive Symbol & Parameter Breakdown
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-| Symbol | Dimensionality | Mathematical Interpretation | Operational Role |
-| :--- | :--- | :--- | :--- |
-| $\mathbf{x}$ | $\mathbb{R}^{B \times T \times d_{\text{model}}}$ | Input token representations entering the FFN | Normalized activations exiting the attention residual stream. |
-| $\mathbf{W}_{\text{gate}}$ | $\mathbb{R}^{d_{\text{model}} \times d_{\text{ffn}}}$ | Linear projection matrix for continuous gating | Generates unactivated logits that control feature throughput. |
-| $\mathbf{W}_{\text{up}}$ | $\mathbb{R}^{d_{\text{model}} \times d_{\text{ffn}}}$ | Linear projection matrix for feature candidate expansion | Projects token representations into expanded high-dimensional space. |
-| $\text{Swish}(\cdot)$ | $\mathbb{R} \to \mathbb{R}$ | Smooth, non-monotonic activation function ($z \sigma(z)$) | Possesses negative curvature near zero, preventing dead neuron collapse. |
-| $\odot$ | Operator | Hadamard (element-wise) multiplication | Enables dynamic multiplicative modulation between gate and up pathways. |
-| $\mathbf{W}_{\text{down}}$ | $\mathbb{R}^{d_{\text{ffn}} \times d_{\text{model}}}$ | Final downward projection matrix | Compresses gated representations back to baseline model dimension. |
-| $d_{\text{ffn}} \approx \frac{8}{3} d_{\text{model}}$ | Integer | Scaled intermediate hidden dimension | Ensures total parameter count matches standard 2-matrix $4d$ FFNs. |
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $\mathbf{x} \in \mathbb{R}^{d_{\text{model}}}$ | Normalized Layer Input / مدخل الطبقة المعاير | The activation vector fed into the feedforward block from the residual stream. |
+| $\mathbf{W}_1 \in \mathbb{R}^{d \times d_{\text{ffn}}}$ | Gate Projection Weights / مصفوفة إسقاط البوابة | Parameter matrix generating the pre-activations that control channel gating. |
+| $\mathbf{W}_3 \in \mathbb{R}^{d \times d_{\text{ffn}}}$ | Up-Projection Weights / مصفوفة الإسقاط الصاعد | Parameter matrix producing the value features to be gated. |
+| $\mathbf{W}_2 \in \mathbb{R}^{d_{\text{ffn}} \times d}$ | Down-Projection Weights / مصفوفة الإسقاط الهابط | Parameter matrix projecting the gated features back down to model dimension $d$. |
+| $\text{Swish}(u) = u \cdot \sigma(u)$ | SiLU Gating Operator / دالة تنشيط سويش | Smooth continuous non-linearity modulating the gate pathway. |
+| $\odot$ | Hadamard Multiplier / الجداء النقطي العنصري | Elementwise product dynamically scaling value features by gating coefficients. |
 
-تضمن هذه الصياغة الرياضية احتفاظ النموذج بنفس الميزانية الحسابية تماماً لشبكات 4d الكلاسيكية مع الاستفادة من التفاعل ثنائي الخطية ودالة Swish السلسة غير الرتيبة، مما يمنع تجمد الخلايا العصبية ويحسن دقة التعلم في الطبقات العميقة.
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **The Expressive Superiority of Bilinear Gating**: Shazeer (2020) demonstrated empirically that SwiGLU consistently outperforms ReLU, GeLU, and traditional GLU across training perplexity benchmarks at identical compute budgets.
+2. **First-Order Derivative Flow**: In standard ReLU networks, the derivative is either $0$ or $1$. In SwiGLU, the derivative $\frac{\partial}{\partial x}[\text{Swish}(x W_1) \odot (x W_3)]$ contains continuous bilinear terms that allow gradients to flow adaptively through both pathways.
+3. **The 8/3 Dimension Rule**: Classic Transformer FFNs use two matrices of size $d \times 4d$, totaling $8 d^2$ parameters. SwiGLU uses three matrices of size $d \times d_{\text{ffn}}$. Setting $d_{\text{ffn}} \approx \frac{8}{3} d_{\text{model}}$ ensures the parameter count remains identical: $3 \times (d \times \frac{8}{3}d) = 8 d^2$.
 
----
 
 ## Beat 3: Python Challenge
 

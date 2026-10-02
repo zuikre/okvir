@@ -29,6 +29,34 @@ What happens when you multiply a vector by a plain number (called a **scalar**)?
 
 ---
 
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Vector ($\mathbf{v}$) | An arrow possessing both a physical length (size) and a compass heading | المتجه ($\mathbf{v}$) | سهم هندسي يمتلك طولاً حقيقياً (مقداراً) وتوجيهاً محدداً في الفضاء |
+| Scalar ($c$) | A plain single number that acts like a volume knob to stretch or shrink an arrow | الكمية القياسية ($c$) | رقم عادي مفرد يعمل كزر التحكم بالتكبير أو التقليص لتمديد السهم |
+| Magnitude ($\|\mathbf{v}\|$) | The straight ruler length of the arrow from tail to tip | المقدار (\|\mathbf{v}\|) | طول السهم بالمسطرة من بدايته حتى طرف رأسه |
+| Direction | The compass bearing where the arrowhead is pointing | الاتجاه | الزاوية أو الوجهة التي يشير إليها رأس السهم |
+| Vector Addition | Connecting movements head-to-tail: taking step 1, then taking step 2 | جمع المتجهات | وصل الإزاحات رأساً بذيل: إكمال الخطوة الثانية من نهاية الخطوة الأولى |
+| Vector Space | The infinite sandbox where arrows can be stretched and combined freely | الفضاء الشعاعي | الميدان الهندسي المفتوح الذي يسمح بدمج وتمديد المتجهات بحرية |
+
+#### Geometric & Visual Flow
+
+```
+                 ▲
+                 │        * Tip of (u + v)
+                 │       /│
+               v │      / │
+                 │     /  │
+                 │    *   │
+                 │   /│ u │
+               u │  / │   │
+                 │ /  │   │
+        ─────────┼─┴──┴───┴──────►
+               Origin
+                 u + v = Head-to-tail combined displacement
+```
+
 ### الحدس الفيزيائي والهندسي
 
 تخيل أنك تجدف بقارب خشبي صغير محاولاً عبور نهر عريض نحو الضفة المقابلة مباشرة. توجه مقدمة قاربك تماماً نحو الشمال وتجدف بعزم ثابت بسرعة 4 أمتار في الثانية. لكن مياه النهر ليست ساكنة؛ بل يجري تيار مائي جارف من الغرب نحو الشرق بسرعة 3 أمتار في الثانية. ما الذي يحدث لقاربك على أرض الواقع؟ أنت لن تتحرك شمالاً فقط، ولن تنجرف شرقاً فقط؛ بل تجمع الطبيعة بين التأثيرين بسلاسة مذهلة، ليندفع قاربك في مسار قطري بسرعة 5 أمتار في الثانية نحو الضفة المقابلة منحرفاً باتجاه مجرى النهر. لقد اختبرت للتو الحقيقة الفيزيائية الحية لـ **جمع المتجهات**.
@@ -43,6 +71,34 @@ What happens when you multiply a vector by a plain number (called a **scalar**)?
 1. **محركات الألعاب وهندسة الروبوتات:** كل شخصية خيالية في ألعاب الفيديو وكل سيارة ذاتية القيادة تتحرك عبر المتجهات. فالموقع، والسرعة، والتسارع، والجاذبية متجهات تتحدث في كل جزء من الثانية: $\mathbf{p}_{t+1} = \mathbf{p}_t + \mathbf{v} \cdot \Delta t$.
 2. **الذكاء الاصطناعي ومعالجة اللغات الطبيعية:** تمثل النماذج اللغوية الكبيرة معاني الكلمات كمتجهات دلالية في فضاءات عالية الأبعاد. وتتم ترجمة العلاقات الفكرية بحساب المتجهات: المعادلة الشهيرة $\mathbf{v}_{\text{ملك}} - \mathbf{v}_{\text{رجل}} + \mathbf{v}_{\text{امرأة}} \approx \mathbf{v}_{\text{ملكة}}$ هي تطبيق مباشر لجمع وطرح المتجهات.
 3. **الرؤية الحاسوبية (Computer Vision):** تعتمد خوارزميات تتبع الأجسام وضغط الفيديو على حساب متجهات التدفق البصري (Optical Flow)، لقياس اتجاه وسرعة إزاحة البكسلات بين الإطارات المتعاقبة.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| المتجه ($\mathbf{v}$) | An arrow possessing both a physical length (size) and a compass heading | المتجه ($\mathbf{v}$) | سهم هندسي يمتلك طولاً حقيقياً (مقداراً) وتوجيهاً محدداً في الفضاء |
+| الكمية القياسية ($c$) | A plain single number that acts like a volume knob to stretch or shrink an arrow | الكمية القياسية ($c$) | رقم عادي مفرد يعمل كزر التحكم بالتكبير أو التقليص لتمديد السهم |
+| المقدار (\|\mathbf{v}\|) | The straight ruler length of the arrow from tail to tip | المقدار (\|\mathbf{v}\|) | طول السهم بالمسطرة من بدايته حتى طرف رأسه |
+| الاتجاه | The compass bearing where the arrowhead is pointing | الاتجاه | الزاوية أو الوجهة التي يشير إليها رأس السهم |
+| جمع المتجهات | Connecting movements head-to-tail: taking step 1, then taking step 2 | جمع المتجهات | وصل الإزاحات رأساً بذيل: إكمال الخطوة الثانية من نهاية الخطوة الأولى |
+| الفضاء الشعاعي | The infinite sandbox where arrows can be stretched and combined freely | الفضاء الشعاعي | الميدان الهندسي المفتوح الذي يسمح بدمج وتمديد المتجهات بحرية |
+
+#### المخطط البصري الهندسي
+
+```
+                 ▲
+                 │        * نهاية محصلة (u + v)
+                 │       /│
+               v │      / │
+                 │     /  │
+                 │    *   │
+                 │   /│ u │
+               u │  / │   │
+                 │ /  │   │
+        ─────────┼─┴──┴───┴──────►
+               نقطة الأصل
+                 u + v = الإزاحة الكلية الناتجة عن وصل الرأس بالذيل
+```
 
 :::simulation-widget{engine="canvas2d" component="VectorGeometryCanvas"}
 ---

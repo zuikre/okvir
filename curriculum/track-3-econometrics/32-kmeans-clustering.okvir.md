@@ -14,29 +14,87 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-In supervised learning, our algorithms are guided by an all-knowing teacher who supplies pristine target labels $y_i$ for every training instance. But across massive frontiers of real-world industry—discovering customer purchasing personas, identifying novel biological cell types from single-cell RNA sequencing, compressing image palettes into compact color palettes, or detecting zero-day cybersecurity intrusions—labels simply do not exist. There is no teacher. The algorithm must explore an unmapped geometric landscape and discover organic, natural groupings purely from the spatial topology of the data itself.
+### Intuition & Real-World Story
 
-The classic **K-Means algorithm** (formalized by Stuart Lloyd in 1957) approaches this challenge like **a municipal urban planner deciding where to construct $K$ emergency fire stations across a sprawling metropolis**:
-1. **Initial Placement:** You drop $K$ tentative pins across the city map as temporary fire station locations.
-2. **Voronoi Assignment:** Every household in the city is assigned to the nearest fire station, carving the urban landscape into a mosaic of geometric service districts known as a **Voronoi tessellation**.
-3. **Centroid Relocation:** Each fire station is dismantled and physically rebuilt at the exact geographic center of gravity (the mathematical mean coordinate) of all the households assigned to its district.
-4. **Iterative Equilibrium:** Because the stations have moved, the jurisdictional boundaries shift: some families are now closer to a different station. You repeat this assignment-and-relocation cycle until the system settles into a stable equilibrium and no station moves an inch.
+In supervised learning, an all-knowing teacher provides clean ground-truth labels $y_i$ for every training instance.
+But across huge frontiers of real-world business and science—discovering customer purchasing personas, identifying novel cell types in single-cell cancer genomics, compressing digital color palettes, or catching zero-day cyberattacks—**labels do not exist**.
+There is no teacher. The algorithm must explore an uncharted geometric space and discover organic clusters entirely on its own.
 
-However, Lloyd's original algorithm is crippled by a fatal vulnerability: **initialization luck**. The mathematical objective landscape (Within-Cluster Sum of Squares) is riddled with thousands of deceptive local valleys. If you drop the initial $K$ pins uniformly at random, pure bad luck might plant three fire stations in the exact same quiet residential suburb while leaving a vast, high-density industrial corridor completely uncovered. The algorithm will quickly freeze in a catastrophic local minimum, forever blinding the model to the true underlying structure.
+The classic **K-Means algorithm** (Stuart Lloyd, 1957) solves this challenge like **a city planner deciding where to build $K$ emergency fire stations across a sprawling metropolis**:
+1. **Initial Guess:** You drop $K$ tentative pins across the city map as temporary fire station locations.
+2. **Jurisdiction (Voronoi) Assignment:** Every household in the city is assigned to the nearest fire station, carving the map into geometric service zones known as a **Voronoi tessellation**.
+3. **Centroid Relocation:** Each fire station is dismantled and physically rebuilt at the exact geographic center of gravity (the average coordinates) of all the homes it serves.
+4. **Iterative Equilibrium:** Because the stations moved, some families are now closer to a different station! You repeat the assignment and relocation steps until nobody changes stations and the system freezes into a stable equilibrium.
 
-David Arthur and Sergei Vassilvitskii (2007) resolved this pathology with the celebrated **K-Means++ algorithm**. Instead of naive uniform guessing, K-Means++ enforces **probabilistic spatial repulsion**. The first centroid is chosen at random. But every subsequent centroid is sampled with a probability strictly proportional to the square of its Euclidean distance from the nearest already-chosen centroid: $\mathbb{P}(\mathbf{x}) \propto D(\mathbf{x})^2$. Points huddled close to existing stations have virtually zero chance of selection, while remote, neglected frontiers are given overwhelming priority. This ingenious probabilistic spacing guarantees that initial centroids span the entire data manifold, providing a provable $O(\log K)$ mathematical competitive bound against the globally optimal clustering!
+However, Lloyd's original algorithm had an Achilles' heel: **bad initialization luck**.
+The error surface (Within-Cluster Sum of Squares) is covered in deceptive local valleys. If you drop the initial $K$ pins uniformly at random, pure bad luck might place three fire stations in the exact same quiet suburb while leaving an entire industrial district uncovered! The algorithm freezes in a terrible local trap.
 
-في التعلم الخاضع للإشراف (Supervised Learning)، تسير النماذج تحت إرشاد معلم يقدم تصنيفات مؤكدة $y_i$ لكل عينة. لكن في قطاعات صناعية وعلمية شاسعة—مثل اكتشاف الشرائح التسويقية للعملاء، أو تصنيف الخلايا الجينومية في أبحاث السرطان، أو ضغط ألوان الصور الرقمية، أو رصد الهجمات السيبرانية غير المسبوقة—تكون البيانات غير مصنفة إطلاقاً. لا يوجد معلم يرشد النموذج؛ بل يجب على الخوارزمية استكشاف الفضاء الهندسي بمفردها واكتشاف التجمعات الطبيعية المترابطة استناداً إلى تضاريس البيانات ذاتها.
+David Arthur and Sergei Vassilvitskii (2007) fixed this flaw with the famous **K-Means++ algorithm**.
+Instead of blind uniform guessing, K-Means++ uses **probabilistic spatial repulsion**:
+- The first centroid is picked uniformly at random.
+- Every subsequent centroid is chosen with probability proportional to the **square of its distance to the nearest existing centroid**: $\mathbb{P}(\mathbf{x}) \propto D(\mathbf{x})^2$.
 
-تتعامل خوارزمية **K-Means الكلاسيكية** (التي صاغها ستيوارت لويد عام 1957) مع هذه المسألة كـ **مخطط مدن يسعى لبناء $K$ من مراكز الإطفاء في مدينة مترامية الأطراف لتقليل زمن الاستجابة للحالات الطارئة**:
-1. **المواقع الأولية:** تضع الخوارزمية $K$ من الدبابيس المؤقتة على خريطة المدينة كمواقع مبدئية للمراكز.
-2. **تفسيف فورونوي (Voronoi Assignment):** يُسند كل منزل في المدينة إلى مركز الإطفاء الأقرب إليه جغرافياً، مما يقسم المدينة إلى فسيفساء من المناطق الخدمية المتعامدة المعروفة بـ **خلايا فورونوي**.
+Points crowded around existing fire stations have virtually zero chance of being picked. Remote, neglected areas get top priority! This smart spacing ensures the initial centroids span the entire dataset, giving a proven $O(\log K)$ mathematical guarantee against the global optimum.
+
+#### Jargon Decoder
+
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Unsupervised Learning** | Flying without a map: discovering patterns when no correct labels or answers are provided. |
+| **Centroid** | Center of gravity: the average $(x, y)$ coordinate of all points belonging to a cluster. |
+| **Voronoi Cell** | Service territory: the geometric polygon of space closest to a specific centroid. |
+| **Inertia (WCSS)** | Tightness score: sum of squared distances from every point to its assigned centroid. |
+| **K-Means++** | Smart seeding: spaces out initial centroids by favoring points far from existing ones. |
+
+```text
+    THE VORONOI PARTITIONING METAPHOR:
+
+           Household           Household
+               *                   *
+                  \             /
+                   \           /
+               .----[ CENTROID 1 ]----.  <--- Fire Station 1
+              |                        |      (Mean of assigned homes)
+        ------+--- VORONOI BOUNDARY ---+------
+              |                        |
+               .----[ CENTROID 2 ]----.  <--- Fire Station 2
+                   /           \
+                  /             \
+               *                   *
+           Household           Household
+```
+
+### الحدس والقصة الواقعية
+
+في التعلم الخاضع للإشراف، يقدم معلم خبير تصنيفات مؤكدة $y_i$ لكل عينة.
+لكن في قطاعات صناعية وعلمية شاسعة—كاستكشاف الشرائح التسويقية للعملاء، أو تصنيف الخلايا في أبحاث السرطان، أو ضغط ألوان الصور، أو كشف الهجمات السيبرانية غير المسبوقة—**تكون البيانات غير مصنفة إطلاقاً**.
+لا يوجد معلم يرشدك؛ بل يجب على الخوارزمية استكشاف الفضاء الهندسي بمفردها واكتشاف التجمعات الطبيعية المترابطة استناداً إلى تضاريس البيانات ذاتها.
+
+تتعامل خوارزمية **K-Means الكلاسيكية** (ستيوارت لويد، 1957) مع هذه المسألة كـ **مخطط مدن يسعى لبناء $K$ من مراكز الإطفاء في مدينة مترامية الأطراف**:
+1. **المواقع المبدئية:** تضع الخوارزمية $K$ من الدبابيس المؤقتة على خريطة المدينة كمواقع أولية للمراكز.
+2. **تفسيف فورونوي (Voronoi Assignment):** يُسند كل منزل في المدينة إلى مركز الإطفاء الأقرب إليه جغرافياً، مما يقسم المدينة إلى فسيفساء من المناطق الخدمية المعروفة بـ **خلايا فورونوي**.
 3. **تحديث المركز (Centroid Relocation):** يُعاد نقل كل مركز إطفاء مادياً إلى مركز الثقل الجغرافي الدقيق (المتوسط الحسابي للإحداثيات) لجميع المنازل التي تولى خدمتها.
 4. **الاتزان الحركي المستقر:** نظراً لتحرك المراكز، تتغير الحدود الخدمية تلقائياً؛ فتعيد المنازل الارتباط بالمراكز الأقرب إليها مجدداً. وتتكرر هذه الدورة المتناوبة حتى تستقر المراكز تماماً وتتوقف عن الحركة.
 
-غير أن خوارزمية لويد التقليدية تعاني من نقطة ضعف قاتلة: **عشوائية البداية**. فدالة الهدف (مجموع مربعات المسافات داخل التجمعات) غير محدبة ومعقدة جداً. فإذا اخترت المواقع الأولية عشوائياً، فقد تسقط ثلاثة مراكز إطفاء في نفس الحي السكني الهادئ بالصدفة، بينما يُترك قطاع صناعي كامل دون أي تغطية! تقع الخوارزمية عندئذ في فخ قاع محلي رديء، لتخرج بمجموعات مشوهة لا تعكس الواقع.
+غير أن خوارزمية لويد التقليدية تعاني من نقطة ضعف قاتلة: **عشوائية البداية**.
+فدالة الهدف غير محدبة ومليئة بالقيعان المحلية المضللة. فإذا اخترت المواقع عشوائياً، فقد تسقط ثلاثة مراكز إطفاء في نفس الحي السكني بالصدفة، بينما يُترك قطاع صناعي كامل دون تغطية! فتقع الخوارزمية في فخ قاع محلي رديء.
 
-عالج ديفيد آرثر وسيرجي فاسيليفتسكي (2007) هذه المعضلة بابتكار **K-Means++**. بدلاً من التخمين العشوائي الأعمى، تطبق K-Means++ **تباعداً احتمإلياً ذكياً**: يُختار المركز الأول عشوائياً، ثم يُختار كل مركز لاحق باحتمالية تتناسب طردياً مع مربع المسافة عن أقرب مركز قائم بالفعل: $\mathbb{P}(\mathbf{x}) \propto D(\mathbf{x})^2$. تصبح فرصة اختيار النقاط القريبة من المراكز القائمة شبه معدومة، بينما تحظى المناطق النائية غير الممثلة بأعلى احتمالية للاختيار. يضمن هذا التوزيع المتباعد استكشاف أرجاء فضاء البيانات بالكامل، ويحقق ضماناً رياضياً بحد تنافسي $O(\log K)$ مقارنة بالحل الأمثل العالمي!
+عالج ديفيد آرثر وسيرجي فاسيليفتسكي (2007) هذه المعضلة بابتكار **K-Means++**.
+بدلاً من التخمين العشوائي الأعمى، تطبق K-Means++ **تباعداً احتمإلياً ذكياً**:
+- يُختار المركز الأول عشوائياً.
+- يُختار كل مركز لاحق باحتمالية تتناسب طردياً مع **مربع المسافة عن أقرب مركز قائم بالفعل**: $\mathbb{P}(\mathbf{x}) \propto D(\mathbf{x})^2$.
+
+تصبح فرصة اختيار النقاط القريبة من المراكز القائمة شبه معدومة، بينما تحظى المناطق النائية غير الممثلة بأعلى احتمالية للاختيار، مما يضمن استكشاف كافة أرجاء فضاء البيانات بضمان رياضي $O(\log K)$ مقارنة بالحل الأمثل العالمي!
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **التعلم غير الخاضع للإشراف** | الطيران دون خريطة: اكتشاف الأنماط دون وجود تصنيفات أو إجابات صحيحة مسبقة. |
+| **المركز (Centroid)** | مركز الثقل الهندسي: متوسط إحداثيات كافة النقاط التابعة للمجموعة. |
+| **خلية فورونوي** | النطاق الخدمي: المضلع الهندسي للفضاء الأقرب لمركز تجمع معين. |
+| **القصور الذاتي (WCSS)** | مقياس التماسك: مجموع مربعات مسافات النقاط عن مراكزها المخصصة. |
+| **تهيئة K-Means++** | البذر الذكي: مباعدة المراكز الأولية عبر ترجيح النقاط البعيدة عن المراكز القائمة. |
 
 :::simulation-widget{engine="canvas2d" component="KMeansVoronoi"}
 ---
@@ -59,64 +117,45 @@ Because finding the global minimizer of $J$ over all possible partitions is NP-h
 Holding centroids $\boldsymbol{\mu}_k$ fixed, minimize $J$ with respect to the cluster assignment set $\mathcal{C}$. Because individual point contributions are additive and decoupled, the optimal assignment rule assigns each point $\mathbf{x}_i$ to its nearest Euclidean centroid:
 
 $$
-C_k^{(t)} = \left\{ i : \|\mathbf{x}_i - \boldsymbol{\mu}_k^{(t)}\|_2 \le \|\mathbf{x}_i - \boldsymbol{\mu}_j^{(t)}\|_2 \quad \forall j \in \{1, \dots, K\} \right\}
+C_k^{(t)} = \left\{ i : k = \arg\min_{j \in \{1, \dots, K\}} \|\mathbf{x}_i - \boldsymbol{\mu}_j^{(t-1)}\|_2^2 \right\}
 $$
 
-Ties are broken arbitrarily. This partitions $\mathbb{R}^D$ into convex Voronoi polyhedra.
-
-### 2. The Centroid Update Step
-Holding the cluster assignments $\mathcal{C}$ fixed, minimize $J$ with respect to centroid positions $\boldsymbol{\mu}_k$:
+### 2. The Centroid Relocation Step
+Holding the partition $\mathcal{C}$ fixed, minimize $J$ with respect to centroids $\boldsymbol{\mu}_k$. Setting the gradient with respect to $\boldsymbol{\mu}_k$ to zero:
 
 $$
-\boldsymbol{\mu}_k^{(t+1)} = \arg\min_{\boldsymbol{\mu} \in \mathbb{R}^D} \sum_{i \in C_k^{(t)}} \|\mathbf{x}_i - \boldsymbol{\mu}\|_2^2
+\nabla_{\boldsymbol{\mu}_k} J = -2 \sum_{i \in C_k} (\mathbf{x}_i - \boldsymbol{\mu}_k) = \mathbf{0} \implies \boldsymbol{\mu}_k^{(t)} = \frac{1}{|C_k^{(t)}|} \sum_{i \in C_k^{(t)}} \mathbf{x}_i
 $$
 
-Setting the vector gradient with respect to $\boldsymbol{\mu}$ to zero:
+### K-Means++ Seeding Algorithm (Arthur & Vassilvitskii, 2007)
+1. Choose the first center $\boldsymbol{\mu}_1$ uniformly at random from $\mathcal{D}$.
+2. For each point $\mathbf{x} \in \mathcal{D}$, compute the shortest squared distance to any already-chosen centroid:
+   $$
+   D(\mathbf{x})^2 = \min_{j \in \{1, \dots, k-1\}} \|\mathbf{x} - \boldsymbol{\mu}_j\|_2^2
+   $$
+3. Sample the next center $\boldsymbol{\mu}_k$ from $\mathcal{D}$ using the probability distribution:
+   $$
+   \mathbb{P}(\mathbf{x}) = \frac{D(\mathbf{x})^2}{\sum_{\mathbf{z} \in \mathcal{D}} D(\mathbf{z})^2}
+   $$
+4. Repeat Steps 2 and 3 until $K$ centroids have been selected.
 
-$$
-\nabla_{\boldsymbol{\mu}} \sum_{i \in C_k^{(t)}} \|\mathbf{x}_i - \boldsymbol{\mu}\|_2^2 = -2 \sum_{i \in C_k^{(t)}} (\mathbf{x}_i - \boldsymbol{\mu}) = \mathbf{0} \implies \boldsymbol{\mu}_k^{(t+1)} = \frac{1}{|C_k^{(t)}|} \sum_{i \in C_k^{(t)}} \mathbf{x}_i
-$$
-
-The optimal centroid is precisely the empirical center of mass (sample arithmetic mean) of points inside that cluster.
-
-### Convergence Guarantee
-At each iteration $t$:
-$$
-J(\mathcal{C}^{(t+1)}, \boldsymbol{\mu}^{(t+1)}) \le J(\mathcal{C}^{(t+1)}, \boldsymbol{\mu}^{(t)}) \le J(\mathcal{C}^{(t)}, \boldsymbol{\mu}^{(t)})
-$$
-Because the objective $J$ decreases monotonically and the number of possible partitions is strictly finite ($K^N$), Lloyd's algorithm is mathematically guaranteed to terminate at a local minimum in a finite number of iterations.
-
-### The K-Means++ Seeding Distribution
-Let $\mathcal{M} = \{\boldsymbol{\mu}_1, \dots, \boldsymbol{\mu}_m\}$ denote the current set of already-chosen centroids ($1 \le m < K$). Define the shortest distance from sample $\mathbf{x}_i$ to any existing centroid:
-
-$$
-D(\mathbf{x}_i) \equiv \min_{\boldsymbol{\mu} \in \mathcal{M}} \|\mathbf{x}_i - \boldsymbol{\mu}\|_2
-$$
-
-The next centroid $\boldsymbol{\mu}_{m+1}$ is sampled from $\mathcal{D}$ according to the probability distribution:
-
-$$
-\mathbb{P}(\mathbf{x}_i \text{ is selected}) = \frac{D(\mathbf{x}_i)^2}{\sum_{j=1}^N D(\mathbf{x}_j)^2}
-$$
-
-Arthur and Vassilvitskii proved that this $D^2$-weighting guarantees an expected approximation ratio:
-
+This seeding guarantees:
 $$
 \mathbb{E}[J_{\text{K-Means++}}] \le 8(\ln K + 2) J_{\text{Optimal}}
 $$
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $N$: Total number of unlabelled observations in the dataset.
-* $D$: Dimensionality of the Cartesian feature space.
-* $K$: User-specified number of distinct geometric clusters to discover.
-* $\mathbf{x}_i \in \mathbb{R}^D$: Feature vector of observation $i$.
-* $C_k \subset \{1, \dots, N\}$: Set of observation indices assigned to cluster $k$.
-* $\boldsymbol{\mu}_k \in \mathbb{R}^D$: Geometric centroid vector (mean coordinates) of cluster $k$.
-* $J(\mathcal{C}, \boldsymbol{\mu})$: Inertia (Within-Cluster Sum of Squares) objective function.
-* $D(\mathbf{x}_i)$: Euclidean distance from sample $\mathbf{x}_i$ to the nearest already-selected centroid.
-* $\mathbb{P}(\mathbf{x}_i)$: Probability distribution governing K-Means++ centroid initialization.
-* $J_{\text{Optimal}}$: Theoretical minimum inertia achieved by the NP-hard global optimum.
+| Symbol / Term | Formal Definition | Intuitive Meaning / Role | المعنى والمدلول بالعربية |
+| :--- | :--- | :--- | :--- |
+| $\mathcal{D}$ | $\{\mathbf{x}_1, \dots, \mathbf{x}_N\}$ | Unlabelled dataset of observations | مجموعة البيانات غير المصنفة في الفضاء |
+| $K$ | Cluster count | Number of geometric clusters to discover | عدد المجموعات والتجمعات المطلوب استكشافها |
+| $C_k$ | Point cluster set | Subset of sample indices assigned to cluster $k$ | مجموعة مؤشرات العينات المسندة للمجموعة $k$ |
+| $\boldsymbol{\mu}_k \in \mathbb{R}^D$ | Cluster centroid | Arithmetic mean coordinate vector of cluster $k$ | متجه إحداثيات مركز الثقل للمجموعة $k$ |
+| $J(\mathcal{C}, \boldsymbol{\mu})$ | Inertia / WCSS | Total within-cluster squared error to minimize | دالة القصور الذاتي ومجموع مربعات الأخطاء |
+| $D(\mathbf{x})^2$ | Squared min distance | Squared Euclidean distance to nearest chosen center | مربع المسافة الإقليدية إلى أقرب مركز قائم |
+| $\mathbb{P}(\mathbf{x})$ | $D(\mathbf{x})^2 / \sum D^2$ | K-Means++ seeding probability distribution | التوزيع الاحتمالي لانتقاء المراكز في K-Means++ |
+| $J_{\text{Optimal}}$ | Global minimum | Theoretical minimum inertia across all partitions | الحد الأدنى النظري للقصور الذاتي للحل الأمثل |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 

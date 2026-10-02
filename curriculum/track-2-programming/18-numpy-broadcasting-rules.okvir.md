@@ -30,6 +30,17 @@ NumPy compares operand shapes element-by-element starting from the **trailing (r
 2. One of the dimensions is **1** (or missing, in which case a dimension of size 1 is prepended on the left).
 Whenever a dimension is 1, NumPy broadcasts it virtually along that axis by clamping its byte stride to 0, achieving instantaneous zero-memory expansion!
 
+### Jargon Decoder / قاموس المصطلحات المعمارية
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Broadcasting** / البث متعدد الأبعاد | Performing element-wise operations between arrays of different shapes without copying data. Analogy: An audio announcement broadcast across 100 rooms from 1 microphone. | إجراء العمليات الحسابية بين مصفوفات ذات أبعاد غير متطابقة دون نسخ البيانات. التشبيه: بث نداء صوتي لـ 100 غرفة عبر مكبر صوت واحد. |
+| **Stride-0 Dimension** / بُعد ذو خطوة صفرية | A dimension where advancing an index adds 0 bytes to the memory pointer, repeating the same value. Analogy: A treadmill where you keep walking but stay in place. | بُعد في الذاكرة تكون خطوة الانتقال فيه صفراً، مما يعيد قراءة نفس القيمة. التشبيه: جهاز المشي الرياضي حيث تتحرك قدماك لكنك تظل في نفس النقطة. |
+| **Trailing Dimensions** / الأبعاد اللاحقة | The rightmost axes in a shape tuple compared first during broadcasting alignment. Analogy: Aligning numbers by their ones and tens digits from the right. | المحاور الواقعة في أقصى يمين صف الأبعاد، وتتم محاذاتها أولاً. التشبيه: محاذاة الأعداد الحسابية بدءاً من خانة الآحاد على اليمين. |
+| **Prepended Singleton Axis** / المحور الأحادي المضاف | Automatically adding a dimension of size 1 on the left when rank is smaller (`(N,) -> (1, N)`). Analogy: Writing the number 7 as 07 so it matches a two-digit column. | إضافة بُعد بقيمة 1 تلقائياً في أقصى اليسار لتوحيد الرتبة. التشبيه: كتابة الرقم 7 كـ 07 ليتطابق مع خانات جدول من خانتين. |
+| **Output Materialization** / تجسيد مصفوفة الناتج | Allocating physical RAM for the final computed tensor even if inputs were virtually broadcast. Analogy: Reading a projected slide is free, but printing 1,000 photos costs paper. | حجز مساحة ذاكرة فعلية للنتيجة المحسوبة حتى لو كانت المدخلات وهمية. التشبيه: رؤية العرض الضوئي مجانية، لكن طباعة 1000 صورة تستهلك أوراقاً فعلية. |
+| **GEMM (General Matrix Multiply)** / ضرب المصفوفات العام | Highly tuned BLAS linear algebra routine computing $C = \alpha A B + \beta C$ in cache-blocked hardware tiles. Analogy: A high-speed sorting plant processing pallets in bulk. | خوارزمية خطية فائقة السرعة تنفذ ضرب المصفوفات بكفاءة عتادية وتوزيع ذكي على الذاكرة المخبأة. |
+
 :::simulation-widget{engine="canvas2d" component="BroadcastingAlignmentGrid"}
 ---
 interactive: true
@@ -59,6 +70,30 @@ $$
 \forall k \in \{0, \dots, D-1\}: \quad (a_k = b_k) \;\lor\; (a_k = 1) \;\lor\; (b_k = 1) \implies d_{\text{out}, k} = \max(a_k, b_k), \quad s_{\text{bc}, k} = \begin{cases} 0 & \text{if } d_k = 1 < d_{\text{out}, k} \\ s_k & \text{otherwise} \end{cases}
 $$
 
+```text
+Visual ASCII Transformation: Virtual Stride-0 Dimension Broadcasting:
+
+Operand A: Shape (3, 1), Strides (8, 8)
+  Physical Buffer in RAM: [ A0, A1, A2 ] (Only 3 float64 elements = 24 bytes!)
+  Virtual Stride-0 on axis 1: stride_1 = 0 bytes!
+  Row 0: [ A0, A0, A0, A0 ]  (reading address 0x00 four times!)
+  Row 1: [ A1, A1, A1, A1 ]  (reading address 0x08 four times!)
+  Row 2: [ A2, A2, A2, A2 ]  (reading address 0x10 four times!)
+
+Operand B: Shape (1, 4), Strides (32, 8)
+  Physical Buffer in RAM: [ B0, B1, B2, B3 ] (Only 4 float64 elements = 32 bytes!)
+  Virtual Stride-0 on axis 0: stride_0 = 0 bytes!
+  Row 0: [ B0, B1, B2, B3 ]
+  Row 1: [ B0, B1, B2, B3 ]  (re-reading Row 0 with stride_0 = 0!)
+  Row 2: [ B0, B1, B2, B3 ]  (re-reading Row 0 with stride_0 = 0!)
+
+Output Buffer C = A + B: Shape (3, 4) -> Materializes 12 elements (96 bytes):
+  [ A0+B0, A0+B1, A0+B2, A0+B3 ]
+  [ A1+B0, A1+B1, A1+B2, A1+B3 ]
+  [ A2+B0, A2+B1, A2+B2, A2+B3 ]
+===> Memory Saved on Inputs: 7 elements allocated instead of 24 (70% savings)!
+```
+
 ### Mathematical Invariants & Symbol Breakdown
 
 | الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
@@ -70,9 +105,23 @@ $$
 | $s_{\text{bc}, k} = 0$ | Zero-stride invariant | Forces index advances along stretched axis to reuse identical memory | الثابت المعماري: قفزة الذاكرة الصفرية تعيد قراءة نفس العنوان دون نسخ |
 | $\text{ValueError}$ | Mismatch condition | Raised when $\exists k: a_k \ne b_k \land a_k \ne 1 \land b_k \ne 1$ | خطأ عدم التوافق الصادر عند فشل شروط التساوي أو الصفرية |
 
-Broadcasting guarantees that if an operand has dimension extent $1$, its effective memory stride is clamped to $s_{\text{bc}, k} = 0$. However, while broadcasting eliminates input memory duplication, the output array must allocate physical storage proportional to $\prod_{k=0}^{D-1} d_{\text{out}, k}$.
-
-تضمن قواعد البث أنه إذا كان طول البعد يساوي 1، فإن خطوة القفز في الذاكرة تُضبط إجبارياً على $s_{\text{bc}, k} = 0$. ومع ذلك، بينما يوفر البث الذاكرة للمدخلات، فإن مصفوفة الناتج النهائية تظل ملزمة بحجز ذاكرة فيزيائية كاملة تتناسب طردياً مع جداء جميع أبعاد المخرجات $\prod_{k=0}^{D-1} d_{\text{out}, k}$.
+#### Step-by-Step Arithmetic Cost & Invariant Breakdown:
+1. **Input Zero-Memory Invariant**:
+   Expanding shape $(1, N)$ to $(M, N)$ modifies only the stride tuple:
+   $$s_0' = 0 \text{ bytes}, \quad s_1' = s_1 \text{ bytes}$$
+   Input RAM allocated $= 0\text{ bytes}$ (retains original $N \times 8\text{ B}$ buffer).
+2. **Output Materialization Arithmetic**:
+   The output array MUST allocate memory proportional to the full Cartesian product of max dimension lengths:
+   $$\text{RAM}_{\text{out}} = \left( \prod_{k=0}^{D-1} \max(a_k, b_k) \right) \times 8\text{ bytes}$$
+3. **The 3D Cartesian Explosion Trap**:
+   Subtracting $(50000, 1, 128)$ from $(1, 100000, 128)$:
+   $$\text{Elements} = 50,000 \times 100,000 \times 128 = 6.4 \times 10^{11} \text{ floats}$$
+   $$\text{RAM Required} = 6.4 \times 10^{11} \times 8\text{ bytes} \approx 5,120\text{ GB} = 5.12\text{ TB (Fatal MemoryError!)}$$
+4. **GEMM Expansion Mitigation**:
+   Expanding $\|x - y\|^2 = \|x\|^2 - 2 x^T y + \|y\|^2$:
+   - $\|x\|^2$ shape: $(50000, 1)$ $\implies 400\text{ KB}$
+   - $\|y\|^2$ shape: $(1, 100000)$ $\implies 800\text{ KB}$
+   - $X Y^T$ via 2D GEMM: $(50000, 100000) \implies 5 \times 10^9 \times 8\text{ B} = 40\text{ GB}$ (feasible, **128x smaller** than 5.12 TB!).
 
 ## Beat 3: Interactive Code Challenge
 
@@ -103,11 +152,21 @@ def pairwise_squared_distance(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
     Returns:
         (N, M) matrix of pairwise squared Euclidean distances.
     """
-    # Step 1: Validate that X and Y are 2D and feature dimensions agree: X.shape[1] == Y.shape[1]
-    # Step 2: Reshape X to (N, 1, D) and Y to (1, M, D) using np.newaxis
-    # Step 3: Broadcast subtract and square: diff = (X[:, np.newaxis, :] - Y[np.newaxis, :, :]) ** 2
-    # Step 4: Sum squared differences along the feature axis (axis=2) to return (N, M) array
-    raise NotImplementedError("Implement pairwise_squared_distance")
+    # Step 1: Validate shapes and ensure 2D inputs with matching feature dimensions
+    if X.ndim != 2 or Y.ndim != 2:
+        raise ValueError("X and Y must be 2D arrays")
+    if X.shape[1] != Y.shape[1]:
+        raise ValueError(f"Feature dimensions must match: {X.shape[1]} vs {Y.shape[1]}")
+
+    # Step 2: Expand dimensions to (N, 1, D) and (1, M, D) to trigger broadcasting across pairs
+    X_exp = X[:, np.newaxis, :]  # Shape (N, 1, D)
+    Y_exp = Y[np.newaxis, :, :]  # Shape (1, M, D)
+
+    # Step 3: Compute element-wise squared differences along feature dimension D
+    diff_sq = (X_exp - Y_exp) ** 2  # Shape (N, M, D)
+
+    # Step 4: Sum over feature axis (axis=2) to produce (N, M) distance matrix
+    return np.sum(diff_sq, axis=2)
 ```
 :::
 
@@ -138,6 +197,6 @@ In an e-commerce vector search and recommendation engine, an engineer matches $N
 
 *التفسير الهندسي المعمق وتحليل الخيارات:*
 - **لماذا الخيار (A) صحيح:** على الرغم من أن البث يضبط خطوات المدخلات على 0 دون نسخ للمدخلات، فإن نتيجة عملية الطرح `X - Y` تتطلب تخصيص مصفوفة ناتجة وسيطة كاملة بأبعاد $(50,000, 100,000, 128)$. وبحساب 8 بايت لكل رقم `float64`، ينتج $50000 \times 100000 \times 128 \times 8 = 5.12\text{ TB}$ من الذاكرة! في البيئات الإنتاجية، تتفادى محركات البحث هذا التضخم بفك المتطابقة: $\|x - y\|^2 = \|x\|^2 - 2 X Y^T + \|y\|^2$ وحساب الضرب الداخلي عبر مكتبات GEMM الثنائية الأبعاد، أو تقسيم الاستعلامات إلى دفعات صغيرة (Tiling).
-- **لماذا الخيار (B) خاطئ:** مكتبة NumPy تعمل كلياً على المعالج المركزي (CPU) ولا تملك أي وصول لذاكرة معالج الرسوميات VRAM.
-- **لماذا الخيار (C) خاطئ:** تدعم NumPy أبعاداً مستطيلة وغير متساوية ($N \ne M$) بكل كفاءة؛ والخلل نتج عن الحجم الفيزيائي الهائل للمصفوفة ثلاثية الأبعاد.
-- **لماذا الخيار (D) خاطئ:** النصوص البرمجية تستهلك مساحة ذاكرة أكبر بكثير من الأرقام العشرية الخام بسبب الترويسات الإضافية لكائنات بايثون.
+- **لماذا الخيار (B) خاطئ:** مكتبة NumPy تعمل حصرياً على المعالج المركزي CPU، ولا تتصل أو تحجز أي ذاكرة في كرت الشاشة VRAM.
+- **لماذا الخيار (C) خاطئ:** يدعم البث في NumPy المصفوفات المستطيلة ($N \ne M$) دعماً أصيلاً، والانهيار ناتج عن سعة الذاكرة الفيزيائية لحجم المصفوفة الناتج.
+- **لماذا الخيار (D) خاطئ:** النصوص في بايثون تستهلك ذاكرة أكبر بكثير من الأرقام العشرية `float64` بسبب ترويسة الكائنات `PyUnicodeObject`.

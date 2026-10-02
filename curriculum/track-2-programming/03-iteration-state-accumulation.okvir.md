@@ -12,6 +12,8 @@ i18n:
 
 # Iteration Protocols, Loop Invariants & State Accumulators
 
+## Beat 1: Intuition & Mental Model / الحدس والنموذج الذهني
+
 When newcomers write a loop like `for item in collection:`, they usually picture Python quietly maintaining a C-style integer index behind the curtain—something like `i = 0; while i < len(collection): item = collection[i]; i += 1`. While this mental model works passably well for indexed arrays, it fails to explain how Python can effortlessly loop over dictionaries, database streams, generator expressions, open files, or infinite mathematical series that have no indices or measurable length whatsoever!
 
 Under the hood, Python achieves this through a universal contract known as the **Iterator Protocol**. Instead of relying on numeric indices, Python cleanly decouples the collection holding the data from the process of walking through that data.
@@ -22,34 +24,7 @@ Each time the loop body demands the next piece of data, it presses the dispensin
 
 What happens when the warehouse shelves are completely empty? Instead of returning a sentinel value like `None` or `-1` (which might be legitimate data items!), the clerk raises a `StopIteration` exception. The `for` loop catches this signal behind the scenes and terminates cleanly. The caller never sees the exception; the loop simply finishes and control flows onward. Any custom Python object that implements `__iter__()` and `__next__()` can participate in this protocol!
 
-:::simulation-widget{engine="canvas2d" component="ScopeChainInspector"}
 ---
-interactive: true
-highlighted_metric: "loss"
----
-:::
-
-### Mathematical & Architectural Foundations / الأسس الرياضية والمعمارية
-
-$$
-\text{Iterable} \xrightarrow{\text{iter()}} \text{Iterator} \xrightarrow{\text{next()}} (x_k, s_{k+1}) \quad \text{until } \text{StopIteration}, \quad \text{acc}_k = \bigoplus_{i=1}^k x_i
-$$
-
-```text
-The Two-Phase Iterator Protocol:
-+------------------------+
-|  Iterable Collection   |  (Implements __iter__() -> returns Iterator)
-+------------------------+
-            | iter(collection)
-            v
-+------------------------+
-|    Iterator Object     |  (Maintains internal cursor state s_k)
-+------------------------+
-      |            ^
-next()|            | advances cursor
-      v            |
-  [ Yield x_k ] ---+    --->  When depleted: raises StopIteration (caught by loop)
-```
 
 عندما يكتب المبتدئ حلقة تكرار بسيطة مثل `for item in collection:`، يتبادر إلى ذهنه فوراً أن بايثون يعد المؤشرات خلف الكواليس كما تفعل لغة C عبر عداد تزايدي (`i = 0; i < len; i++`). ومع أن هذا التصور يبدو منطقياً في القوائم المرقمة، إلا أنه يعجز تماماً عن تفسير قدرة بايثون الساحرة على التكرار فوق القواميس، أو تدفقات قواعد البيانات، أو أسطر الملفات الضخمة، أو المتتاليات الرياضية اللانهائية التي لا تمتلك فهارس ولا أطوالاً معروفة مسبقاً!
 
@@ -61,15 +36,82 @@ next()|            | advances cursor
 
 ماذا يحدث حين تنفد بضائع المستودع بالكامل؟ بدلاً من إعادة قيمة وهمية مثل `None` أو `-1` (والتي قد تكون بيانات حقيقية صالحة!)، يطلق الموظف صرخة استثناء منظمة: `StopIteration`. تلتقط حلقة `for` هذا الاستثناء تلقائياً وتغلق الحلقة بسلاسة دون أن ينهار البرنامج أو يظهر أي خطأ للمستخدم. وأي صنف في بايثون ينفذ الدالتين `__iter__()` و `__next__()` ينضم تلقائياً لهذه المنظومة.
 
-#### Architectural Breakdown & State Accumulation:
-- **Loop Invariant ($\mathcal{I}(k)$)**: A formal mathematical property that is true before loop entry, preserved across every transition step $\text{acc}_k = \text{acc}_{k-1} \oplus x_k$, and guaranteed to hold true upon termination.
-- **`GET_ITER` Bytecode**: Pushes a new iterator onto the virtual evaluation stack by calling the object's `tp_iter` slot in C.
-- **`FOR_ITER <target>`**: Calls the C-level `tp_iternext` function pointer. If an item is produced, it is pushed onto the stack. If `StopIteration` is raised, it clears the exception and jumps directly to `target`, exiting the loop in zero Python overhead.
+### Jargon Decoder / جدول فك شفرة المصطلحات
 
-#### التحليل المعماري وتراكم الحالة:
-- **اللامتغيرة الحلقية ($\mathcal{I}(k)$)**: خاصية رياضية تصدق قبل دخول الحلقة، وتظل صالحة عند كل انتقال لتراكم الحالة $\text{acc}_k = \text{acc}_{k-1} \oplus x_k$، وتضمن برهان صحة النتيجة عند النهاية.
-- **أمر البايت كود `GET_ITER`**: يستدعي فتحة `tp_iter` في بنية C للكائن لدفع المكرر إلى قمة مكدس التقييم.
-- **أمر البايت كود `FOR_ITER`**: يستدعي مؤشر الدالة `tp_iternext` بسرعة C الفائقة، ويجلب العنصر التالي؛ وحين يُرفع `StopIteration` يقفز فوراً إلى نهاية الحلقة.
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Iterable** (الكائن القابل للتكرار) | A warehouse full of boxed goods waiting to be unpacked. | مستودع بضائع مغلق يحوي سلعاً بانتظار بدء التوزيع. |
+| **Iterator** (المكرر) | A conveyor-belt clerk dispensing items one-by-one with an internal cursor bookmark. | موظف شريط ناقل يسلم البضائع باليد واحدة تلو الأخرى مع علامة مرجعية. |
+| **Iterator Protocol** (بروتوكول التكرار) | The universal two-word handshake: `__iter__()` to hire the clerk and `__next__()` to dispense. | المصافحة القياسية ذات الخطوتين: طلب المكرر ثم طلب صرف الصندوق التالي. |
+| **StopIteration Exception** (استثناء نهاية التكرار) | An empty shelf signal telling the dispensing machine to quietly shut down. | إشارة نفاد البضائع التي تنبه آلة الصرف للتوقف بهدوء دون إطلاق إنذار عطل. |
+| **State Accumulator** (مجمع الحالة) | A rolling snowball gathering up mass and combining every item that rolls by. | كرة ثلج متدحرجة تبتلع وتدمج كل ما يمر أمامها لتصبح كتلة واحدة متراكمة. |
+
+### Visual Step-by-Step Data Transformation / التحول البصري للبيانات
+
+```text
+Demonstrating State Accumulation: manual_reduce([10, 20, 30], add, initial=0)
+
+Initial State:
+  Iterable: [10, 20, 30]
+  Iterator Cursor -> [Slot 0]
+  Accumulator State: acc = 0
+
+Step 1: First next(it) Call
+  Dispensary: yields 10 | Cursor moves -> [Slot 1]
+  Accumulation: acc = acc + 10 = 0 + 10 = 10
+  State: acc = 10
+
+Step 2: Second next(it) Call
+  Dispensary: yields 20 | Cursor moves -> [Slot 2]
+  Accumulation: acc = acc + 20 = 10 + 20 = 30
+  State: acc = 30
+
+Step 3: Third next(it) Call
+  Dispensary: yields 30 | Cursor moves -> [Past End]
+  Accumulation: acc = acc + 30 = 30 + 30 = 60
+  State: acc = 60
+
+Step 4: Depletion Check
+  Dispensary: next(it) raises StopIteration!
+  Loop Handshake: Catches StopIteration cleanly.
+  Final Output: Returns acc = 60.
+```
+
+:::simulation-widget{engine="canvas2d" component="ScopeChainInspector"}
+---
+interactive: true
+highlighted_metric: "loss"
+---
+:::
+
+## Beat 2: Formal Invariants Demystified / الأسس الرياضية واللامتغيرات الصارمة
+
+$$
+\text{Iterable} \xrightarrow{\text{iter()}} \text{Iterator} \xrightarrow{\text{next()}} (x_k, s_{k+1}) \quad \text{until } \text{StopIteration}, \quad \text{acc}_k = \bigoplus_{i=1}^k x_i
+$$
+
+### Opcode Mechanics & Architectural Mapping
+
+| Opcode / أمر شفرة البايت | C-Level Function Call | Virtual Stack Action | Architectural Role / الدور المعماري |
+| :--- | :--- | :--- | :--- |
+| `GET_ITER` | `type->tp_iter(v)` | `[obj] -> [iter]` | Calls collection's C iterator constructor, pushing iterator struct |
+| `FOR_ITER <target>` | `iter->ob_type->tp_iternext(iter)` | `[iter] -> [iter, next_val]` | Retrieves next element directly via C function pointer; jumps to target on StopIteration |
+| Loop Invariant $\mathcal{I}(k)$ | Formal mathematical proof | $\text{acc}_k = \text{acc}_{k-1} \oplus x_k$ | Guarantees correctness of cumulative aggregation across all transitions |
+
+### Step-by-Step Execution Cost & Complexity Breakdown / تفكيك التكلفة الحسابية خطوة بخطوة
+
+#### 1. Streaming Reduction over $N$ Items
+- **Step 1 (Iterator Allocation)**: Instantiate iterator object `it = iter(collection)`: **~48-64 bytes** heap memory, **1 C allocation** ($O(1)$).
+- **Step 2 (Per-Iteration Fetch)**: Each `FOR_ITER` opcode invokes `tp_iternext` via direct C function pointer: **~10-15 CPU cycles** ($O(1)$).
+- **Step 3 (Accumulator Combination)**: Evaluate user reducer function `acc = op(acc, item)`: **1 function dispatch** ($T_{\text{op}}$).
+- **Step 4 (Loop Termination)**: Raising and catching `StopIteration` via C-level NULL return: **~5 CPU cycles** (zero Python exception handling overhead in bytecode).
+- **Total Arithmetic Cost**:
+  - Time Complexity: $\mathcal{O}(N \cdot T_{\text{op}})$.
+  - Space Complexity: $\mathcal{O}(1)$ auxiliary memory (streams single items, never materializing collections).
+
+---
+
+## Beat 3: Guided Code Challenge / التحدي البرمجي الموجه
 
 :::python-challenge{id="py-iteration-state-accumulation"}
 ---
@@ -83,81 +125,85 @@ test_cases:
     expected: "100"
 ---
 ```python
-from typing import Any, Callable
+from typing import Any, Callable, Iterable
 
 def manual_reduce(
-    iterable: Any,
-    reducer_fn: Callable[[Any, Any], Any],
+    iterable: Iterable[Any],
+    function: Callable[[Any, Any], Any],
     initial: Any = None,
 ) -> Any:
     """
-    Implements functools.reduce from scratch using the fundamental
-    two-phase Iterator Protocol (iter() and next()) without for-loops.
+    Implements a custom reduction loop adhering strictly to the Python Iterator Protocol,
+    accumulating state across sequence elements without relying on built-in functools.reduce.
 
     Args:
-        iterable: Any Python iterable object.
-        reducer_fn: Binary function taking (accumulator, current_item) -> new_accumulator.
+        iterable: Any object satisfying the Iterable contract (__iter__).
+        function: Binary accumulator function accepting (acc, current_item).
         initial: Optional initial accumulator value.
 
     Returns:
-        The final accumulated value.
-    """
-    # Step 1: Obtain the iterator object from the iterable collection
-    it = iter(iterable)
+        The accumulated state across all elements.
 
-    # Step 2: Determine initial accumulator value
+    Raises:
+        TypeError: If iterable is empty and initial is None.
+    """
+    # Step 1: Obtain a dedicated iterator clerk from the iterable collection
+    iterator = iter(iterable)
+
+    # Step 2: Establish the baseline accumulator value
     if initial is not None:
         accumulator = initial
     else:
         try:
-            accumulator = next(it)
+            # Consume the very first element to serve as the initial state
+            accumulator = next(iterator)
         except StopIteration:
-            raise TypeError("manual_reduce() of empty iterable with no initial value")
+            raise TypeError("manual_reduce() of empty sequence with no initial value")
 
-    # Step 3: Consume the iterator element by element until StopIteration
-    while True:
-        try:
-            item = next(it)
-            accumulator = reducer_fn(accumulator, item)
-        except StopIteration:
-            break
+    # Step 3: Iterate through remaining elements via the Iterator Protocol
+    for item in iterator:
+        # Accumulate state by applying the binary reducer function
+        accumulator = function(accumulator, item)
 
-    # Step 4: Return the accumulated result
+    # Step 4: Return final consolidated accumulator result
     return accumulator
 ```
 :::
 
-### Transfer Quiz & Practical Debugging / أسئلة الفهم ونقل المعرفة
+## Beat 4: Real-World Transfer Scenario / سيناريو التطبيق ونقل المعرفة
+
+### Reality Check: The Exhausted Generator Telemetry Trap
+
+In a high-throughput cloud telemetry pipeline, a service parses log events streaming from an Amazon S3 bucket using a generator expression:
+```python
+def compute_metrics(stream):
+    total_count = sum(1 for _ in stream)
+    error_count = sum(1 for event in stream if event.get('status') == 'ERROR')
+    return {'total': total_count, 'errors': error_count}
+```
+When tested with an input stream yielding 1,000 log events (including 50 errors), what metrics dictionary does `compute_metrics` actually return?
+
+*في خط أنابيب تحليلي سحابي لمعالجة السجلات المتدفقة عبر مولد، كتب مهندس الدالة أعلاه لحساب إجمالي السجلات ونسبة الأخطاء. عند اختبارها بتدفق يحوي 1000 سجل بينها 50 خطأ، ما هو الناتج الفعلي العائد من الدالة؟*
 
 :::transfer-quiz
 **Question / السؤال:**
-You have a generator expression `g = (x ** 2 for x in [1, 2, 3])`. You execute:
-```python
-first_sum = sum(g)
-second_sum = sum(g)
-```
-What is `second_sum`, and why?
-*لديك تعبير توليد `g = (x ** 2 for x in [1, 2, 3])`. قمت بتنفيذ:
-```python
-first_sum = sum(g)
-second_sum = sum(g)
-```
-ما هي قيمة `second_sum` الناتجة، ولماذا؟*
+What dictionary is returned by `compute_metrics(stream)`, and why?
+*ما هو القاموس المعماري الناتج ولماذا؟*
 
-- [x] 0 — The generator `g` is an iterator that was exhausted during `first_sum`; iterating it again immediately raises StopIteration.
-  *0 — المولد `g` هو مكرر ذو مسار أحادي تم استنفاده بالكامل في `first_sum`، وإعادة تكراره تطلق `StopIteration` فوراً.*
-- [ ] 14 — The generator re-evaluates its comprehension on every call to `sum()`.
-  *14 — يعيد المولد تقييم عناصره من البداية عند كل استدعاء لدالة `sum()`.*
-- [ ] A RuntimeError is raised because exhausted generators cannot be passed to built-in functions.
-  *يحدث خطأ RuntimeError لأن المولد المستنفد لا يجوز تمريره للدوال المدمجة.*
+- [x] {'total': 1000, 'errors': 0} — The first sum consumes the iterator to exhaustion; the second sum immediately receives StopIteration and yields 0.
+  *{'total': 1000, 'errors': 0} — لأن عملية الجمع الأولى تستهلك المكرر حتى نهايته؛ فيتلقى الجمع الثاني استثناء StopIteration فوراً ليعيد 0.*
+- [ ] {'total': 1000, 'errors': 50} — Python iterators automatically rewind to the beginning when a new loop starts.
+  *{'total': 1000, 'errors': 50} — مكررات بايثون تعيد لف الشريط تلقائياً إلى البداية عند بدء حلقة جديدة.*
+- [ ] A RuntimeError is raised because Python forbids iterating over an exhausted generator.
+  *يحدث خطأ RuntimeError لأن بايثون يمنع محاولة التكرار فوق مولد مستهلك.*
 
 **Analysis & Architectural Explanation / التحليل والشرح المعماري:**
-**Correct / الإجابة الصحيحة:** Iterators and generators maintain forward-only cursor state. When `sum(g)` runs the first time, it pulls elements until `next(g)` raises `StopIteration`. The generator is now officially exhausted. Calling `sum(g)` a second time asks the depleted iterator for its next element, which immediately raises `StopIteration`. The `sum()` built-in catches this immediately and returns its initial identity accumulator (which defaults to `0`).
-*المكررات والمولدات هي مجاري بيانات ذات اتجاه واحد للأمام فقط. بعد استهلاكها في `first_sum`، يبقى المؤشر في النهاية. عند استدعاء `sum(g)` مرة ثانية، يطلب العنصر الأول فيطلق المولد `StopIteration` فوراً. تلتقط الدالة الاستثناء وتعيد القيمة الابتدائية للمحايد الجمعي وهي 0.*
+**Correct / الإجابة الصحيحة:** Python iterators and generators are strictly one-way, single-pass data streams. When `total_count` completes, the stream's internal cursor has reached the end and raised `StopIteration`. When the second `sum` tries to pull items, `next(stream)` immediately raises `StopIteration` on the very first call, causing the generator comprehension to produce an empty sequence and sum to 0! To consume a stream multiple times, either materialize it into a list first (`stream = list(stream)`) or duplicate it with `itertools.tee(stream, 2)`.
+*مكررات ومولدات بايثون هي تدفقات بيانات أحادية الاتجاه تُقرأ لمرة واحدة فقط. عند اكتمال حساب `total_count`، وصل المؤشر الداخلي للمكرر إلى النهاية. وعندما تحاول الدالة الثانية القراءة منه، يُرفع استثناء `StopIteration` فوراً عند أول محاولة، مما يجعل المجموع الثاني صفراً! لحل هذه المعضلة، يجب إما تحويل التدفق إلى قائمة أولاً أو نسخه عبر `itertools.tee`.*
 
-**Incorrect / مشتت غير صحيح:** Unlike container iterables (like lists or sets) which instantiate a brand-new iterator each time `iter()` is called, a generator *is its own iterator* (`iter(g) is g`). It cannot rewind or reset.
-*على خلاف الحاويات كالقوائم التي تنشئ مكرراً جديداً عند كل دورة، فإن المولد هو نفسه كائن مكرر وحيد لا يمكن إرجاع عقاربه إلى الوراء.*
+**Incorrect / مشتت غير صحيح:** Iterators do not cache visited elements and have no rewind mechanism; once exhausted, they stay exhausted forever.
+*المكررات لا تخزن العناصر السابقة ولا تملك آلية للرجوع للوراء؛ وبمجرد استهلاكها تظل فارغة للأبد.*
 
-**Incorrect / مشتت غير صحيح:** Passing an exhausted iterator to built-in functions like `sum()`, `list()`, or `for` loops is valid syntax and common practice; it simply behaves as an empty sequence.
-*تمرير مكرر مستنفد للدوال المدمجة ممارسة قياسية مسموحة تماماً، ويتعامل معها بايثون كتسلسل فارغ دون أي أخطاء.*
+**Incorrect / مشتت غير صحيح:** Calling `next()` on an exhausted iterator simply continues to raise `StopIteration`; it never throws a `RuntimeError`.
+*استدعاء `next()` على مكرر مستهلك يعيد ببساطة `StopIteration` ولا يرمي أي خطأ تشغيلي.*
 :::

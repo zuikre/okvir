@@ -29,6 +29,28 @@ Instead, we do the next best thing: we drop a mathematical plumb line straight d
 
 ---
 
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Orthogonal Projection | The closest footprint on a subspace, where the drop line makes a 90-degree angle | المسقط المتعامد | أقرب موضع قدم داخل الفضاء الجزئي حيث يسقط عمود القياس بزاوية 90 درجة |
+| Residual Error ($e = b - p$) | The leftover gap arrow pointing perpendicular away from the subspace floor | سهم الخطأ المتبقي | سهم الفارق المتبقي المنطلق عمودياً من أرضية الفضاء نحو الهدف |
+| Least Squares | The best possible compromise when no exact solution exists | المربعات الصغرى | أفضل تسوية رياضية ممكنة للاقتراب من الهدف عند استحالة الحل الدقيق |
+| Projection Matrix ($P$) | A reusable lens that snatches any arrow and drops it onto its subspace shadow | مصفوفة الإسقاط ($P$) | عدسة هندسية تلتقط أي سهم وتسقطه فوراً كظل داخل الفضاء الجزئي |
+| Normal Equations | Demanding that the error arrow is at right angles to every column of $A$ | المعادلات الناظمية | شرط هندسي يفرض تعامد سهم الخطأ مع كافة أعمدة المصفوفة |
+
+#### Geometric & Visual Flow
+
+```
+                 b (Target data)
+                *
+               /│
+      Error e │ │ Plumb line (at 90 degrees!)
+              │ │
+              *─┴──────────────► Subspace C(A)
+             p = A*x_hat (Best approximation!)
+```
+
 ### الحدس الفيزيائي والهندسي
 
 تخيل أنك تقف في بهو قصر فسيح ذي سقف شاهق الارتفاع، وتمسك بزمام طائرة مسيرة صغيرة تطفو في الهواء عند النقطة $\mathbf{b}$. إذا أردت معرفة: *ما هي أقرب نقطة على أرضية البهو الرخامية إلى هذه الطائرة المعلقة؟* فكيف تحددها؟ لن تلجأ للتخمين بالنظر بزوايا مائلة؛ بل ستستخدم الأداة التي اعتمد عليها البناؤون منذ آلاف السنين: **الشاقول** (Plumb Line)، وهو خيط متين يتدلى في نهايته ثقل معدني تسحبه الجاذبية نحو الأسفل مباشرة. النقطة التي يلامس فيها الثقل الأرضية الرخامية بزاوية قائمة صارمة $90^\circ$ هي **الإسقاط المتعامد** $\mathbf{p}$.
@@ -43,6 +65,28 @@ Instead, we do the next best thing: we drop a mathematical plumb line straight d
 1. **الانحدار الخطي العادي (OLS) في علم البيانات:** في كل مرة يبني فيها باحث نموذج انحدار خطي للتنبؤ بالأسعار أو المبيعات ($\hat{y} = X\beta$)، فإنه ينفذ إسقاطاً متعامداً. ومعادلة الانحدار الشهيرة $\beta = (X^T X)^{-1} X^T y$ مشتقة هندسياً بالكامل من إسقاط متجه النتائج $y$ عمودياً على فضاء مصفوفة الميزات $X$.
 2. **تنقية الصوت وعزل الضوضاء الرقمية:** عندما يسجل الميكروفون صوت المتحدث مشوباً بضجيج الشارع، تقوم معالجات الإشارة بإسقاط إشارة الصوت على الفضاء الفرعي لترددات الحبال الصوتية البشرية؛ وكل ما يسقط خارج هذا الفضاء في الاتجاه العمودي يُحذف فوراً باعتباره ضوضاء زائدة.
 3. **الرسوم الهندسية المعمارية (Orthographic Projection):** في برامج التصميم الهندسي (AutoCAD)، تُسقط المجسمات ثلاثية الأبعاد على مخططات معمارية ثنائية الأبعاد باستخدام مصفوفات الإسقاط المتعامد للحفاظ على دقة الأبعاد وتوازي الجدران دون تشويه المنظور البصري.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| المسقط المتعامد | The closest footprint on a subspace, where the drop line makes a 90-degree angle | المسقط المتعامد | أقرب موضع قدم داخل الفضاء الجزئي حيث يسقط عمود القياس بزاوية 90 درجة |
+| سهم الخطأ المتبقي | The leftover gap arrow pointing perpendicular away from the subspace floor | سهم الخطأ المتبقي | سهم الفارق المتبقي المنطلق عمودياً من أرضية الفضاء نحو الهدف |
+| المربعات الصغرى | The best possible compromise when no exact solution exists | المربعات الصغرى | أفضل تسوية رياضية ممكنة للاقتراب من الهدف عند استحالة الحل الدقيق |
+| مصفوفة الإسقاط ($P$) | A reusable lens that snatches any arrow and drops it onto its subspace shadow | مصفوفة الإسقاط ($P$) | عدسة هندسية تلتقط أي سهم وتسقطه فوراً كظل داخل الفضاء الجزئي |
+| المعادلات الناظمية | Demanding that the error arrow is at right angles to every column of $A$ | المعادلات الناظمية | شرط هندسي يفرض تعامد سهم الخطأ مع كافة أعمدة المصفوفة |
+
+#### المخطط البصري الهندسي
+
+```
+                 b (البيانات المستهدفة)
+                *
+               /│
+       الخطأ e │ │ خيط شاقول متعامد (بزاوية 90 درجة!)
+              │ │
+              *─┴──────────────► الفضاء الجزئي C(A)
+             p = A*x_hat (أفضل تقريب هندسي ممكن!)
+```
 
 :::simulation-widget{engine="canvas2d" component="GramSchmidtOrthogonalCanvas"}
 ---

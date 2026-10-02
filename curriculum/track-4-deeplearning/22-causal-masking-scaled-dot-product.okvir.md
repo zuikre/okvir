@@ -28,6 +28,44 @@ The causal mask is an upper-triangular matrix that acts as an impenetrable tempo
 
 > **Frontier Analogy:** Imagine reading a suspense murder mystery with a specialized pair of reading glasses. The lenses have an electronic polarizing shutter that instantly blacks out all lines of text below the line you are currently reading. You can reread every clue on previous pages as many times as you like, but the future remains in complete darkness.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Causal Mask** (القناع السببي / حجب المستقبل) | The opaque reading shield: blocks out all upcoming text with an impenetrable wall, ensuring the model can only look backward. | درع القراءة المعتم: يحجب الكلمات المستقبلية بالكامل ليمنع النموذج من استشراف الإجابة قبل صياغتها. |
+| **Autoregressive Generation** (التوليد الذاتي المتسلسل) | One domino at a time: predicting the next word based exclusively on words already spoken ($P(x_{t+1} \mid x_{\le t})$). | السقوط المتسلسل لأحجار الدومينو: توليد الكلمة التالية بالاعتماد حصرياً على الكلمات السابقة دون غش. |
+| **Negative Infinity Mask ($-\infty$)** (قناع اللانهاية السالبة) | The mathematical eraser: setting future logits to $-\infty$ guarantees that $\exp(-\infty) = 0$ in softmax, eliminating future leakage. | الممحاة الرياضية: تحويل درجات المستقبل إلى $-\infty$ يضمن أن ينتج عنها صفر مطلق بعد دالة سوفت ماكس. |
+| **Teacher Forcing Parallelism** (التوازي الفائق بتدريب المعلم) | Training on the whole book in 1 second: causal masks allow all 4096 tokens to train simultaneously in one GPU pass without cheating. | تدريب متوازٍ فائق السرعة: يتيح القناع تدريب كافة الرموز الـ 4096 دفعة واحدة على بطاقة الرسوميات دون تسريب. |
+| **Information Leakage** (تسريب المعلومات الزمني) | The exam leak bug: if token $i$ can attend to token $i+1$, training loss drops to zero instantly but the model fails in real life. | كارثة تسريب الامتحان: إذا استطاع الرمز رؤية الرمز اللاحق، تصبح الخسارة صفراً بالتدريب لكنه يفشل واقعياً. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+CAUSAL ATTENTION MASKING WORKFLOW:
+=============================================================================
+Tokens:       [ "The",   "cat",   "sat" ]
+Raw Scores S:
+"The"        [  1.2,    0.5,    -0.1  ]  <-- Can see "cat" and "sat"? CHEATING!
+"cat"        [  0.8,    2.1,     0.4  ]
+"sat"        [  0.3,    1.1,     1.9  ]
+      |
+      +---> Add Causal Mask M (Upper Triangle = -\infty, Lower Triangle = 0.0)
+            [   0.0,  -\infty,  -\infty ]
+            [   0.0,     0.0,   -\infty ]
+            [   0.0,     0.0,      0.0  ]
+      |
+Masked Scores (S + M):
+            [   1.2,  -\infty,  -\infty ]
+            [   0.8,     2.1,   -\infty ]
+            [   0.3,     1.1,     1.9  ]
+      |
+      v (Apply Softmax row-wise: exp(-\infty) -> 0.0!)
+Final Causal Attention Matrix A:
+"The"        [  1.0,     0.0,     0.0  ]  (Only attends to itself!)
+"cat"        [  0.21,    0.79,    0.0  ]  (Attends to "The" and "cat"!)
+"sat"        [  0.11,    0.28,    0.61 ]  (Attends to all past tokens!)
+```
+
 :::simulation-widget{engine="canvas2d" component="AttentionHeatmapCanvas"}
 ---
 interactive: true

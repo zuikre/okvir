@@ -14,29 +14,69 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Most people easily understand that *failing* to control for a common confounder creates bias. If two variables share a common parent, failing to hold that parent constant lets spurious correlation leak between them. But what happens if you control for a variable that is a common *effect* of both? This triggers the mind-bending statistical trap of the **Collider ($A \to C \leftarrow B$)**: controlling for a shared outcome **manufactures a strong, phantom correlation where zero correlation existed in reality!**
+### Intuition & Real-World Story
 
-Imagine you are evaluating Hollywood movie stars on two completely independent human traits:
-* Genuine Dramatic Acting Talent ($A$)
-* Breathtaking Physical Attractiveness ($B$)
+Have you ever heard someone complain: *"Why are attractive people on dating apps always so arrogant and rude?"*
 
-In the general global population, acting talent and facial symmetry are completely uncorrelated ($r = 0$). Nature does not consult a person's acting ability when distributing facial features. However, to achieve stardom in Hollywood ($C = 1$), an aspiring performer must possess at least one of these two gifts: you must be either a transcendentally gifted actor, or drop-dead gorgeous! If an empirical researcher restricts their study sample strictly to famous Hollywood celebrities (by conditioning on the collider $C = 1$), **acting talent and attractiveness become strongly NEGATIVELY correlated ($r < 0$)!**
+Or consider Hollywood actors: *why does it seem that extraordinarily talented actors are often conventionally unattractive, while gorgeous actors can't act?*
 
-Why does this illusion occur? It is the logic of "explaining away." When you encounter an A-list Hollywood star who is a clumsy, wooden actor, you can immediately deduce that their fame must be explained by extraordinary physical beauty. Conversely, an average-looking actor who reached the pinnacle of celebrity must possess world-class acting genius to have overcome the visual barrier. The moment you step onto the red carpet ($C = 1$), knowing one trait explains away the need for the other.
+Are talent and physical attractiveness naturally negatively correlated in the human population?
+Of course not! In the general population, acting talent and physical attractiveness are completely independent traits with zero correlation.
 
-This trap profoundly demystifies the gap between prediction and causation. For a Hollywood casting director making a purely predictive forecast, observing a star with dreadful acting skills provides valid statistical evidence to predict they are stunningly attractive. But confusing this predictive association with causality leads to absurd conclusions: hiring a vocal coach to ruin an aspiring actor's talent will not magically reshape their jawline! In 1946, physician Joseph Berkson discovered this exact fallacy in clinical data: two completely independent medical diseases appeared negatively correlated among hospitalized patients simply because suffering from either illness was sufficient to admit you to a hospital bed ($C = 1$). In observational research, conditioning on a collider—whether through sample selection, filtering, or adding bad control variables—creates illusions that mimic the laws of physics while standing them entirely on their head.
+So why do they look negatively correlated on screen? **Berkson's Paradox** and **Collider Bias**.
 
-يدرك معظم الباحثين بسهولة أن *إهمال* التحكم في المتغيرات المربكة يولد تحيزًا خطيرًا؛ فإذا كان لمتغيرين سبب مشترك، فإن عدم ضبطه يفتح بابًا خلفيًا لارتباط زائف. ولكن ماذا يحدث لو قمت بالعكس تمامًا، وتحكمت في متغير هو *نتيجة مشتركة* للمتغيرين معًا؟ هنا تقع في الفخ الإحصائي الخادع والمثير للدهشة: **المصادم (Collider: $A \to C \leftarrow B$)**؛ حيث يؤدي التحكم في النتيجة المشتركة إلى **خلق ارتباط وهمي قوي بين أمرين لا صلة بينهما على الإطلاق في الواقع!**
+To become a famous Hollywood actor, you generally need to be **either** exceptionally attractive **or** extraordinarily talented (or both). If someone has neither trait, they never get cast in a movie. The casting pool is a **Collider ($C$)**:
+$$\text{Talent} \to [\text{Famous Actor}] \leftarrow \text{Attractiveness}$$
+Both traits point inward toward fame.
 
-تخيل أنك تدرس المجتمع البشري لتقييم صفتين مستقلتين تمامًا:
-* موهبة التمثيل الدرامي الفذة ($A$)
-* الوسامة والجاذبية الجسدية الباهرة ($B$)
+When you look only at famous actors, you are **conditioning on a collider**. Now, if you meet a famous actor who has mediocre acting talent, you immediately deduce that they *must* be stunningly attractive to have achieved fame! Conditioning on the collider forces two completely independent virtues into an artificial negative correlation!
 
-في عموم المجتمع الإنساني، لا توجد أي علاقة ارتباط بين موهبة التمثيل والوسامة ($r = 0$)؛ فالطبيعة لا تفحص مهارات الأداء المسرحي عند توزيع ملامح الوجه. ولكن للوصول إلى مصاف نجوم هوليوود المشاهير ($C = 1$)، تفرض صناعة السينما شرطًا صارمًا: يجب أن يمتلك الشخص إحدى الميزتين على الأقل؛ فإما أن تكون ممثلاً عبقريًا، أو فائق الجمال والوسامة! فإذا حصر باحث دراسته على مشاهير هوليوود فقط (أي قام بالتكييف والتحكم في المصادم $C = 1$)، **ستظهر بين يديه نتيجة مذهلة: ارتباط سالب حاد بين الموهبة والوسامة ($r < 0$)!**
+#### Jargon Decoder
 
-لماذا ينشأ هذا الوهم؟ إنه منطق "التبرير المتبادل" (Explaining Away)؛ فإذا قابلت نجمًا سينمائيًا شهيرًا لكن أداءه التمثيلي رديء وباهت، ستستنتج فورًا وتلقائيًا أنه شديد الوسامة لدرجة جعلته نجمًا رغم رداءة تمثيله. وعلى النقيض، فإن الممثل النجم ذو المظهر المتواضع العادي لا بد وأنه يمتلك موهبة تمثيلية جبارة جعلته يخترق معايير الشهرة الصارمة. في اللحظة التي تحصر فيها نظرك داخل فضاء الشهرة ($C = 1$)، فإن معرفة أحد المتغيرين تغنيك عن الآخر وتبرر وجوده.
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Collider ($X \to C \leftarrow Y$)** | Inverted fork: a variable caused independently by two different inputs. |
+| **Berkson's Paradox** | Phantom trade-off: two independent traits becoming negatively correlated inside a selected group. |
+| **Conditioning on a Collider** | Filtering on an outcome that opens a spurious path between its causes. |
+| **Selection on the Dependent Variable** | Only analyzing cases that survived or succeeded, distorting causal reality. |
+| **Spurious Negative Correlation** | A fake statistical trade-off created purely by the filter applied to the sample. |
 
-وهنا يتضح الفرق الجوهري بين التنبؤ والسببية: فبالنسبة لوكالة مواهب تبحث عن التنبؤ المجرد، فإن رؤية نجم هوليوودي فاشل في التمثيل تمثل دليلاً إحصائيًا كافيًا للتنبؤ بأنه شديد الجاذبية؛ وهذا استنتاج تنبؤي صحيح تمامًا داخل تلك العينة المختارة. لكن الخلط بين هذا التنبؤ والسببية يولد حماقات لا حصر لها: فإفساد مهارات ممثل واعد لن يجعله أكثر وسامة بأي حال! في عام 1946، اكتشف الطبيب جوزيف بيركسون (Joseph Berkson) هذه المغالطة في السجلات الطبية؛ حيث ظهر مرضان مستقلان تمامًا بارتباط سالب بين نزلاء المستشفيات لمجرد أن الإصابة بأي منهما كافية لإدخال المريض للمستشفى ($C = 1$). إن التكييف على المصادم—سواء عبر اختيار عينة محصورة أو إقحام متغيرات تحكم خاطئة—يصنع أوهامًا إحصائية متقنة تخدع حتى المتمرسين.
+```text
+    THE INVERTED FORK (COLLIDER):
+
+         Talent (X) ---------------> [ Fame (Collider C) ] <--------------- Attractiveness (Y)
+                                             |
+                               (Conditioning on this box
+                             forces X and Y to look negatively
+                                     correlated!)
+```
+
+### الحدس والقصة الواقعية
+
+هل سمعت يومًا من يشتكي قائلاً: *"لماذا يكون الأشخاص الجذابون على تطبيقات التعارف مغرورين وغير لطيفين؟"*
+
+أو تأمل ممثلي هوليوود المشهورين: *لماذا يبدو أن الممثلين البارعين في التمثيل غالبًا ما يكونون متواضعي المظهر، بينما الممثلون فائقو الجمال لا يجيدون التمثيل؟*
+
+هل الموهبة والجمال متعارضان بطبيعتهما في البشر؟
+بالتأكيد لا! ففي عموم الناس، الموهبة الفنية والجمال الشكلي صفتان مستقلتان تمامًا لا ترابط بينهما.
+
+إذن لماذا يظهر بينهما ترابط سلبي في السينما؟ هذا هو **تناقض بيركسون (Berkson's Paradox)** الناتج عن **انحياز المصادم (Collider Bias)**.
+
+لتصبح ممثلاً مشهورًا في هوليوود، يجب أن تكون **إما** فائق الجمال **أو** عبقري الموهبة (أو الاثنين معًا). ومن لا يملك أيًا منهما لا ينجح في تجارب الأداء. الشهرة هنا هي **المُصادِم (Collider)**:
+$$\text{الموهبة} \to [\text{الشهرة والممثلون المختارون}] \leftarrow \text{الجمال}$$
+السهمان ينطلقان معًا ويصطدمان في صندوق الشهرة.
+
+عندما تقصر دراستك على المشاهير فقط، فأنت **تتحكم في مصادم**. فإذا شاهدت ممثلاً مشهورًا تمثيله ضعيف، تدرك فورًا أنه *لا بد وأن يكون فائق الجمال* ليحقق هذه الشهرة! هذا الانتقاء يحول الصفتين المستقلتين إلى علاقة عكسية وهمية ومضللة!
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **المُصادِم (Collider)** | مفترق عكسي: متغير تصطدم فيه أسهم متعددة قادمة من أسباب مستقلة. |
+| **تناقض بيركسون** | مفارقة الفرز: نشوء ارتباط سلبي وهمي بين ميزتين مستقلتين داخل عينة منتقاة. |
+| **التحكم في مصادم** | حصر العينة في شرط ناتج عن المعالجة مما يفتح قنوات تسريب وهمية. |
+| **الانتقاء على النتيجة** | دراسة الناجين أو الفائزين فقط، مما يقلب قوانين السبب والنتيجة رأسًا على عقب. |
+| **الارتباط العكسي الزائف** | مقايضة إحصائية كاذبة وليدة الفلتر والانتقاء لا وجود لها في الأصل. |
 
 :::simulation-widget{engine="canvas2d" component="ColliderStratificationLab"}
 ---
@@ -47,83 +87,48 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-Let $A$ and $B$ be two mutually independent random variables in the population, such that their joint distribution factorizes:
+Let $X$ and $Y$ be two mutually independent random variables:
 
 $$
-A \perp\!\!\perp B \implies P(A, B) = P(A) P(B), \quad \text{Cov}(A, B) = 0
+X \perp\!\!\perp Y \implies \text{Cov}(X, Y) = 0
 $$
 
-Let $C$ be a collider node generated by a structural equation combining $A$ and $B$:
+Let collider $C$ be formed by their linear combination plus noise:
 
 $$
-C = f(A, B, U_C)
+C = X + Y + \nu
 $$
 
-### Discrete Threshold Formulation (Berkson's Binary Proof)
-
-Consider binary independent indicators $A, B \in \{0, 1\}$ with base probabilities $P(A=1) = p_A$ and $P(B=1) = p_B$. The collider admission criterion is:
+Conditioning on collider stratum $C = c$ induces a non-zero, negative conditional covariance:
 
 $$
-C = A \lor B \iff C = \mathbb{I}(A + B \ge 1)
+\text{Cov}(X, Y \mid C = c) < 0
 $$
 
-The conditional probability of $A=1$ given admission $C=1$ and the presence of $B=1$ is:
+In DAG notation, a path containing a collider $X \to C \leftarrow Y$ is naturally **blocked** by default. Conditioning on $C$ (or any descendant of $C$) **activates and opens** the path!
 
-$$
-P(A = 1 \mid C = 1, B = 1) = \frac{P(A = 1, B = 1, C = 1)}{P(B = 1, C = 1)} = \frac{p_A p_B}{p_B} = p_A
-$$
+### Why the Math Works Step-by-Step
 
-Now compute the conditional probability of $A=1$ given admission $C=1$ and the *absence* of $B$ ($B = 0$):
-
-$$
-P(A = 1 \mid C = 1, B = 0) = \frac{P(A = 1, B = 0, C = 1)}{P(B = 0, C = 1)} = \frac{p_A (1 - p_B)}{p_A (1 - p_B)} = 1.0 > p_A
-$$
-
-Because $P(A = 1 \mid C = 1, B = 0) > P(A = 1 \mid C = 1, B = 1)$, knowing that $B = 0$ dramatically increases the likelihood that $A = 1$. The conditional covariance is strictly negative:
-
-$$
-\text{Cov}(A, B \mid C = 1) = \mathbb{E}[AB \mid C = 1] - \mathbb{E}[A \mid C = 1]\mathbb{E}[B \mid C = 1] < 0
-$$
-
-### Linear Gaussian Derivation of Collider Induced Covariance
-
-Consider continuous independent latent traits $A \sim \mathcal{N}(0, \sigma_A^2)$ and $B \sim \mathcal{N}(0, \sigma_B^2)$ with independent error $\varepsilon \sim \mathcal{N}(0, \sigma_\varepsilon^2)$. The collider is linear:
-
-$$
-C = A + B + \varepsilon
-$$
-
-The joint vector $(A, B, C)^T$ is multivariate normal with covariance matrix:
-
-$$
-\boldsymbol{\Sigma} = \begin{pmatrix} 
-\sigma_A^2 & 0 & \sigma_A^2 \\
-0 & \sigma_B^2 & \sigma_B^2 \\
-\sigma_A^2 & \sigma_B^2 & \sigma_A^2 + \sigma_B^2 + \sigma_\varepsilon^2 
-\end{pmatrix}
-$$
-
-By the properties of conditional multivariate Gaussians, the conditional covariance matrix of $(A, B)$ given $C = c$ is:
-
-$$
-\boldsymbol{\Sigma}_{(A, B) \mid C} = \boldsymbol{\Sigma}_{(A, B)} - \boldsymbol{\Sigma}_{(A, B), C} \boldsymbol{\Sigma}_{C}^{-1} \boldsymbol{\Sigma}_{C, (A, B)}
-$$
-
-Computing the off-diagonal element (the conditional covariance between $A$ and $B$):
-
-$$
-\text{Cov}(A, B \mid C) = 0 - \frac{\begin{pmatrix} \sigma_A^2 \\ \sigma_B^2 \end{pmatrix}_1 \begin{pmatrix} \sigma_A^2 \\ \sigma_B^2 \end{pmatrix}_2}{\sigma_A^2 + \sigma_B^2 + \sigma_\varepsilon^2} = -\frac{\sigma_A^2 \sigma_B^2}{\sigma_A^2 + \sigma_B^2 + \sigma_\varepsilon^2} < 0
-$$
-
-The spurious negative correlation is strictly proportional to the variance transmitted by both causes into the collider! In Pearl's d-separation calculus, an unconditioned collider $A \to C \leftarrow B$ is an **inactive barrier** that blocks association. Conditioning on $C$ **activates the junction**, opening an artificial non-causal conduit.
+1. **Intuitive Proof of Negative Covariance:**
+   If $C = X + Y$, then holding $C = 10$ constant means $Y = 10 - X$.
+   As $X$ increases, $Y$ must decrease to keep their sum equal to 10!
+   Thus, $\frac{dY}{dX} = -1$, creating an artificial negative linear correlation where none existed in the unconditioned population.
+2. **The Danger of Conditioning on Hospitalization (Berkson's Original Case):**
+   If both Diabetes ($X$) and Respiratory Disease ($Y$) independently trigger hospital admission ($C = 1$), looking only at hospitalized patients creates an artificial negative correlation, making Diabetes look like it 'protects' against respiratory illness!
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $A, B$: Truly independent causal forces in the underlying population ($\text{Cov}(A, B) = 0$).
-* $C$: Collider node characterized by two or more directed arrows colliding head-to-head ($A \to C \leftarrow B$).
-* $C = 1$: Conditioning, stratifying, or filtering on the collider state, which restricts the sample to a non-random subpopulation.
-* $\text{Cov}(A, B \mid C)$: Conditional covariance induced by selection on $C$, strictly negative when both paths have positive signs.
-* d-separation: The criterion under which an unconditioned collider is closed, but conditioning on $C$ or any descendant $D \in de(C)$ unblocks the path.
+* $X \to C \leftarrow Y$: Unconditioned collider structure (path is closed and inactive).
+* $X \to \boxed{C} \leftarrow Y$: Conditioned collider structure (path is opened, inducing bias).
+* $\text{Cov}(X, Y \mid C)$: Conditional covariance between independent causes given collider.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $X \to C \leftarrow Y$ | المصادم غير المشروط | مسار مسدود طبيعيًا: استقلالية تامة بين $X$ و $Y$ دون أي تسريب إحصائي. |
+| $\boxed{C}$ | المصادم المشروط المقيد | فتح المسار بالقوة: نشوء علاقة سببية وهمية بين $X$ و $Y$ بسبب الفرز. |
+| $\text{Cov}(X, Y \mid C) < 0$ | التباين المشترك السالب المشروط | المقايضة الوهمية الناتجة عن تثبيت المجموع المشترك للقيم. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -143,47 +148,44 @@ test_cases:
 ```python
 import numpy as np
 
-def simulate_collider_bias(n: int = 1000, seed: int = 42) -> dict[str, float]:
+def simulate_collider_bias(n: int, beta_direct: float = 0.0, selection_threshold: float = 0.0) -> dict[str, float]:
     """
-    Demonstrates Berkson's Fallacy: conditioning on a collider induces spurious correlation.
+    Demonstrates Berkson's Paradox by conditioning on a collider C = X + Y.
     
     Parameters
     ----------
-    n : int, default 1000
-        Number of simulated individuals.
-    seed : int, default 42
-        Random seed for reproducibility.
+    n : int
+        Sample size.
+    beta_direct : float, default 0.0
+        True causal effect of X on Y (default 0).
+    selection_threshold : float, default 0.0
+        Threshold for collider selection C >= threshold.
         
     Returns
     -------
-    dict with keys:
-        'unconditioned_corr': float, correlation in full population
-        'conditioned_corr': float, correlation among selected collider subgroup
-        'sample_size_conditioned': int, count of individuals admitted
+    dict with keys 'unconditioned_corr', 'conditioned_corr'
     """
-    rng = np.random.default_rng(seed)
-    
-    # Step 1: Generate two strictly independent standard normal random variables
-    x = rng.standard_normal(n)
-    y = rng.standard_normal(n)
-    
-    # Step 2: Compute the unconditioned population Pearson correlation (expected ~ 0.0)
-    unconditioned_corr = float(np.corrcoef(x, y)[0, 1])
-    
-    # Step 3: Define a collider selection threshold (e.g., top combined score > 0.5)
-    collider = (x + y > 0.5)
-    
-    # Step 4: Subsample data conditioned exclusively on the collider criterion (collider == True)
-    x_cond = x[collider]
-    y_cond = y[collider]
-    
-    # Step 5: Compute the conditioned correlation within the selected subgroup (strongly negative)
-    conditioned_corr = float(np.corrcoef(x_cond, y_cond)[0, 1])
-    
+    rng = np.random.default_rng(42)
+    # Generate two truly independent standard normal features
+    X = rng.standard_normal(n)
+    Y = beta_direct * X + rng.standard_normal(n)
+
+    # Unconditioned correlation across whole population
+    unconditioned_corr = float(np.corrcoef(X, Y)[0, 1])
+
+    # Collider C influenced independently by both X and Y
+    C = X + Y + rng.standard_normal(n) * 0.1
+
+    # Condition on being in the selected upper tail (collider conditioning)
+    selected_mask = C >= selection_threshold
+    X_selected = X[selected_mask]
+    Y_selected = Y[selected_mask]
+
+    conditioned_corr = float(np.corrcoef(X_selected, Y_selected)[0, 1])
+
     return {
         "unconditioned_corr": unconditioned_corr,
         "conditioned_corr": conditioned_corr,
-        "sample_size_conditioned": int(np.sum(collider)),
     }
 ```
 :::

@@ -14,21 +14,73 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-In real-world policy rollouts, major reforms virtually never hit all jurisdictions simultaneously. California passes a paid family leave law in 2004; New Jersey follows in 2009; New York enacts it in 2018. This staggered, multi-cohort rollout has long been the hallmark of applied policy evaluation. For over thirty years, thousands of published papers evaluated such policies by estimating a **Two-Way Fixed Effects (TWFE)** regression with unit fixed effects ($\alpha_i$) and calendar time fixed effects ($\lambda_t$). Econometricians believed this was simply generalizing the $2 \times 2$ DiD estimator to multiple periods.
+### Intuition & Real-World Story
 
-Between 2018 and 2021, an econometric earthquake shattered this belief. Groundbreaking work by Goodman-Bacon (2021), Callaway & Sant'Anna (2021), and Sun & Abraham (2021) demonstrated that classical TWFE is fundamentally broken in the presence of dynamic, heterogeneous treatment effects. The regression does not just compare treated units to untreated units—it actively performs **"forbidden comparisons"** by using units that were treated *earlier* as the control group for units treated *later*.
+In the real world, major laws and corporate initiatives are rarely adopted by everyone on the exact same Monday morning. 
 
-Consider a clinical trial analogy: imagine testing an anti-inflammatory drug whose healing benefits grow steadily over time. Patient A began the therapy two years ago; their inflammation has dropped dramatically and is now stabilized at a healthy low level. Patient B begins the therapy today. If you evaluate Patient B's progress by subtracting Patient A's trajectory from Patient B's trajectory, what happens? Because Patient A's inflammation is no longer dropping (their treatment effect has already matured and plateaued), Patient A's flat trajectory acts like a zero baseline. Worse yet, if Patient A experiences any slight regression to the mean, subtracting Patient A's trajectory from Patient B's can flip the mathematical sign of the estimate completely! The math functions like an **inverted photographic negative**: a life-saving drug that helps every single patient can produce a strictly negative regression coefficient in TWFE.
+Consider the legalization of ride-sharing platforms (like Uber and Lyft) across the United States:
+* California legalized ride-sharing in 2013.
+* Texas legalized it in 2015.
+* New York legalized it in 2017.
+* Some states never legalized it at all.
 
-The modern solution, spearheaded by Brantly Callaway and Pedro Sant'Anna (2021), resolves this catastrophe by decomposing the problem into clean, unpolluted building blocks: **Group-Time Average Treatment Effects ($ATT(g, t)$)**. Instead of pooling everyone into a single contaminated regression, we analyze each treatment cohort $g$ (units first treated in year $g$) separately at calendar time $t$. We strictly forbid using already-treated units as controls, comparing cohort $g$ only against units that are **never treated** or **not-yet-treated**. Furthermore, the baseline is always cleanly anchored at period $g - 1$ (the exact year before that cohort received treatment). Only after computing these clean pairwise comparisons do we aggregate them into an interpretable event-study plot.
+For decades, econometricians analyzed this kind of rollout using traditional **Two-Way Fixed Effects (TWFE)** regressions. But between 2018 and 2021, an econometric revolution proved that traditional TWFE has a fatal flaw: **The Negative Weighting Problem**.
 
-في التطبيقات الواقعية للسياسات الاقتصادية والاجتماعية، تكاد تنعدم الإصلاحات التي تُطبق في جميع المناطق في وقت واحد. فالسياسات الكبرى—كتشريعات إجازات الأمومة مدفوعة الأجر أو برامج التأمين الصحي أو تعديل الحد الأدنى للأجور—تُعتمد عادةً عبر موجات متتابعة زمنياً: ولاية تتبناها في عام 2010، وأخرى في 2014، وثالثة في 2018. ولأكثر من ثلاثة عقود، دأب الباحثون على استخدام انحدار الآثار الثابتة ثنائي الاتجاه (TWFE) لتقدير الأثر الإجمالي للسياسة، ظناً منهم أن هذا النموذج يعمم أسلوب DiD الكلاسيكي بسلاسة وبلا أدنى مشكلة.
+Why does traditional regression fail with staggered rollouts?
+Because when evaluating Texas in 2016, TWFE doesn't just compare Texas to never-treated states. It accidentally uses **California (which was treated in 2013) as a control group for Texas!**
 
-بين عامي 2018 و2021، عصفت بعلم القياس الاقتصادي ثورة منهجية كبرى قلبت موازين البحث التجريبي. أثبتت أبحاث غودمان-بيكون (2021) وكالاواي وسانت آنا (2021) وسان وأبراهام (2021) أن نموذج TWFE الكلاسيكي يعاني من خلل حسابي مدمر عند تباين آثار المعالجة عبر الزمن؛ إذ لا يكتفي النموذج بمقارنة المعالجين بغير المعالجين، بل يجري **"مقارنات محظورة" (Forbidden Comparisons)** يستخدم فيها الأفواج التي عولجت *مبكراً* كمجموعات ضابطة للأفواج التي عولجت *لاحقاً*!
+If ride-sharing's effect in California grows dynamically over time (as more drivers buy cars and riders build habits), California is on an upward trajectory. Using an already-treated unit on an upward trend as a control group can cause a genuinely positive policy to show up with a **negative, upside-down coefficient** in your regression!
 
-لتوضيح هذا الخطر، تخيل تجربة طبية لدواء ينمو أثره العلاجي مع الوقت. المريض (أ) تلقى العلاج منذ سنتين؛ وقد تعافى بالفعل واستقرت حالته الصحية عند مستوى ممتاز. والمريض (ب) يبدأ العلاج اليوم. فإذا أردت تقييم تحسن المريض (ب) بمقارنته بمسار المريض (أ)، فإنك تستخدم مريضاً عولج بالفعل كمجموعة ضابطة! وبما أن الأثر العلاجي للمريض (أ) قد تشبع ولم يعد يطرأ عليه تحسن إضافي، فإن طرح مساره قد يلغي أثر المريض (ب)، بل قد يؤدي إلى ظهور أثر سالب وهمي تماماً كـ **نيجاتيف الصورة المقلوبة**. قد يكون الدواء مفيداً لكل المرضى دون استثناء، ومع ذلك يُخرج انحدار TWFE معامل أثر سالب وذي دلالة إحصائية!
+Modern staggered estimators (like Callaway & Sant'Anna) fix this by comparing each adoption cohort strictly against clean, never-yet-treated units.
 
-يقدم الحل الحديث لكالاواي وسانت آنا (2021) حلاً جذرياً يفكك المسألة إلى لبنات بناء نقية تُعرف باسم **متوسط أثر المعالجة للمجموعة والزمن ($ATT(g, t)$)**. فبدلاً من دمج جميع السنوات والأفواج في انحدار واحد مشوه، نحسب أثر كل فوج معالجة $g$ عند كل لحظة زمنية $t$ بمفرده. ونحظر تماماً استخدام أي فوج خضع للمعالجة مسبقاً كمجموعة ضابطة، حيث نقارن الفوج $g$ حصراً بالوحدات التي **لم تُعالج قط (Never-Treated)** أو التي **لم تُعالج بعد (Not-Yet-Treated)**. وعلاوة على ذلك، يتم تثبيت خط الأساس دائماً عند الفترة $g - 1$ السابقة للمعالجة مباشرة، ثم تُجمع هذه التقديرات النقية في دراسة حدث (Event-Study) دقيقة وموثوقة.
+#### Jargon Decoder
+
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Staggered Adoption** | Stepped rollout: different entities adopting policy in different calendar years. |
+| **Two-Way Fixed Effects (TWFE)** | Traditional panel regression with entity and time dummies that suffers from bad controls. |
+| **Negative Weighting Problem** | The mathematical glitch where positive treatment effects can turn into negative estimates. |
+| **Dynamic Treatment Effect** | An effect that changes, grows, or fades over time as people adapt to the policy. |
+| **Callaway & Sant'Anna Estimator** | Clean cohort DiD: strictly comparing newly treated cohorts against not-yet-treated peers. |
+
+```text
+    STAGGERED ROLLOUT TIMELINE:
+
+    Cohort 2013 (CA): [ Treated ===========================================> ]
+    Cohort 2015 (TX): [ Pre-period ------> ] [ Treated ====================> ]
+    Never-Treated:    [ Clean Pre-period ---------------------------------> ]
+                           ^
+                           | (TWFE mistakenly used CA as a control for TX!)
+```
+
+### الحدس والقصة الواقعية
+
+في عالم السياسات والاقتصاد، نادرًا ما تُطبق القوانين الجديدة في كافة الولايات في التوقيت ذاته.
+
+تأمل مثلاً تقنين خدمات النقل التشاركي (مثل أوبر وليفت) عبر الولايات الأمريكية:
+* قننت كاليفورنيا الخدمة في عام 2013.
+* قننتها تكساس في عام 2015.
+* قننتها نيويورك في عام 2017.
+* بينما امتنعت ولايات أخرى عن التقنين تمامًا.
+
+لعقود طويلة، حلل الباحثون هذا التدرج باستخدام نماذج الانحدار التقليدية ذات الآثار الثابتة ثنائية الاتجاه (TWFE). ولكن بين عامي 2018 و 2021، أثبتت ثورة بحثية أن هذه الطريقة الكلاسيكية تعاني من عيب قاتل: **مشكلة الأوزان السالبة (Negative Weighting)**.
+
+لماذا تفشل النماذج التقليدية في التبني المتدرج؟
+لأنه عند تقييم ولاية تكساس في 2016، لا تكتفي النماذج بمقارنتها بالولايات التي لم تطبق القانون، بل تستخدم خطأً **كاليفورنيا (التي طبقت القانون في 2013) كمجموعة ضابطة لتكساس!**
+
+ولو كان أثر القانون في كاليفورنيا يتنامى ويتصاعد سنويًا مع اعتياد الركاب، فإن استخدامها كمجموعة ضابطة يؤدي إلى قلب النتائج رأسًا على عقب، لتظهر سياسة إيجابية ناجحة في صورة معامل **سالب وهمي**!
+
+وتعالج مقدرات التبني المتدرج الحديثة (مثل مقدر كالواي وسانتانا) هذه المعضلة عبر مقارنة كل دفعة زمنية بالولايات غير المعالجة حصرًا.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **التبني المتدرج (Staggered)** | التطبيق المتعاقب: خضوع كيانات مختلفة للمعالجة في سنوات تقويمية متفاوتة. |
+| **الآثار ثنائية الاتجاه (TWFE)** | نموذج الانحدار اللوحي التقليدي الذي يقع في فخ المقارنات الملوثة. |
+| **معضلة الأوزان السالبة** | خلل جبري يؤدي لظهور آثار السياسات الناجحة بمعاملات سالبة مقلوبة. |
+| **الأثر الديناميكي المتغير** | أثر يتغير ويتراكم أو يتلاشى بمرور السنوات مع تكيف الناس مع الواقع الجديد. |
+| **مقدر كالواي وسانتانا** | المقدر النقي: يقارن كل دفعة جديدة بالكيانات التي لم تخضع للمعالجة بعد فقط. |
 
 :::simulation-widget{engine="canvas2d" component="StaggeredDiDEventStudyLab"}
 ---
@@ -39,57 +91,48 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-The conventional Two-Way Fixed Effects (TWFE) regression specification for staggered adoption across units $i \in \{1, \dots, N\}$ and calendar periods $t \in \{1, \dots, T\}$ is given by:
+Let $G_i$ be the timing of adoption cohort (the first period entity $i$ receives treatment). 
+
+The group-time Average Treatment Effect $ATT(g, t)$ for cohort $g$ at calendar time $t$ is defined as:
 
 $$
-Y_{it} = \alpha_i + \lambda_t + \beta_{\text{TWFE}} D_{it} + \varepsilon_{it}
+ATT(g, t) = \mathbb{E}[Y_t(g) - Y_t(\infty) \mid G = g]
 $$
 
-where $\alpha_i$ is an entity fixed effect, $\lambda_t$ is a calendar period fixed effect, and $D_{it} \in \{0, 1\}$ indicates active treatment status.
-
-The celebrated **Goodman-Bacon (2021) Decomposition Theorem** proved that the OLS estimate $\hat{\beta}_{\text{TWFE}}$ is an explicit weighted average of all possible $2 \times 2$ sub-comparisons in the panel:
+Callaway and Sant'Anna (2021) showed that $ATT(g, t)$ is identified using clean comparison groups (either never-treated $C = \infty$ or not-yet-treated $D_s = 0$ for $s \le t$):
 
 $$
-\hat{\beta}_{\text{TWFE}} = \sum_{k \in \mathcal{K}_{\text{clean}}} w_k \hat{\beta}_k^{\text{clean}} + \sum_{\ell \in \mathcal{L}_{\text{forbidden}}} w_\ell \hat{\beta}_\ell^{\text{forbidden}}
+\tau_{g,t} = \left( \mathbb{E}[Y_t \mid G = g] - \mathbb{E}[Y_{g-1} \mid G = g] \right) - \left( \mathbb{E}[Y_t \mid C] - \mathbb{E}[Y_{g-1} \mid C] \right)
 $$
 
-where clean comparisons match newly treated cohorts to never-treated or not-yet-treated units, but forbidden comparisons match newly treated cohorts against earlier-treated cohorts. In the presence of treatment effect dynamics (where the causal effect $\tau_{it}$ grows or decays over time), the implicit weights $w_\ell$ can become negative:
+The Goodman-Bacon (2021) decomposition revealed that the traditional TWFE coefficient $\beta_{\text{TWFE}}$ is a weighted sum:
 
 $$
-w_\ell < 0 \implies \hat{\beta}_{\text{TWFE}} < 0 \quad \text{even when } \tau_{it} > 0 \quad \forall i, t
+\beta_{\text{TWFE}} = \sum_{k} w_k \hat{\tau}_k^{\text{clean}} + \sum_{j} w_j \hat{\tau}_j^{\text{already-treated as control}}
 $$
 
-To eliminate this contamination, **Callaway and Sant'Anna (2021)** define the **Group-Time Average Treatment Effect**, $ATT(g, t)$, for units first treated in cohort $g$ observed at calendar time $t$:
+where some weights $w_j$ can be strictly negative!
 
-$$
-ATT(g, t) \equiv \mathbb{E}\left[Y_{it}(g) - Y_{it}(0) \mid G_i = g\right]
-$$
+### Why the Math Works Step-by-Step
 
-Let $C_i \in \{0, 1\}$ denote a clean comparison group (either units that never adopt treatment during the sample window, or units not yet treated by time $t$ such that $D_{is} = 0$ for all $s \le t$). Anchoring the baseline strictly at the pre-treatment period $g - 1$:
-
-$$
-\widehat{ATT}(g, t) = \mathbb{E}\left[Y_{it} - Y_{i, g-1} \mid G_i = g\right] - \mathbb{E}\left[Y_{it} - Y_{i, g-1} \mid C_i = 1\right]
-$$
-
-To evaluate dynamic treatment paths across relative event time $e = t - g$ (where $e = 0$ is the implementation period, $e > 0$ represents post-treatment exposure, and $e < 0$ tests for pre-trends), the group-time parameters are aggregated:
-
-$$
-\widehat{ATT}(e) = \sum_{g} w(g, e) \widehat{ATT}(g, g + e), \quad \text{subject to } \sum_{g} w(g, e) = 1
-$$
-
-where the weights $w(g, e)$ are proportional to the cohort sample size $N_g$ among cohorts observable at event time $e$.
+1. **Why do already-treated units create negative weights?**
+   If an early cohort's treatment effect grows by $\Delta$ between periods 1 and 2, its trend slope is $(\text{Trend} + \Delta)$. Subtracting this slope from a newly treated unit subtracts $\Delta$, artificially depressing the estimated treatment effect!
+2. **Aggregation by Event Time:**
+   After estimating individual $ATT(g, t)$, researchers aggregate them into dynamic event-study coefficients $ATT(e) = \sum_g w_g ATT(g, g + e)$ where $e = t - g$ is elapsed time since treatment.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $Y_{it}$: Observed outcome of entity $i$ at calendar period $t$.
-* $\alpha_i, \lambda_t$: Entity and calendar-time fixed effects controlling for permanent unobserved heterogeneity and universal secular shocks.
-* $D_{it} \in \{0, 1\}$: Binary treatment indicator ($D_{it} = 1$ if unit $i$ is actively treated at time $t$, $0$ otherwise).
-* $G_i \in \{1, \dots, T\} \cup \{\infty\}$: Cohort identifier indicating the exact adoption period when unit $i$ first received treatment ($G_i = \infty$ denotes never-treated units).
-* $\beta_{\text{TWFE}}$: The single scalar pooled coefficient estimated by traditional two-way fixed effects regression.
-* $ATT(g, t)$: The causal average treatment effect on the cohort first treated at time $g$, evaluated at calendar time $t$.
-* $g - 1$: The critical pre-treatment reference period immediately preceding treatment adoption, used to anchor all baseline changes.
-* $C_i$: Clean comparison indicator selecting strictly never-treated or not-yet-treated observations.
-* $e = t - g$: Relative event time (lead or lag), measuring elapsed time relative to initial policy implementation.
+* $G \in \{g_1, \dots, g_K, \infty\}$: Cohort of initial treatment adoption ($\infty$ = never treated).
+* $ATT(g, t)$: Causal treatment effect for cohort $g$ evaluated at calendar time $t$.
+* $e = t - g$: Event time (relative time elapsed since initial policy adoption).
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $G=g$ | دفعة التبني الزمنية | المجموعة التي خضعت للقرار لأول مرة في العام $g$. |
+| $ATT(g, t)$ | أثر الدفعة في الزمن $t$ | العائد السببي الخاص بالدفعة $g$ عند قياسه في السنة $t$. |
+| تفكيك بيكون | برهان تفكيك بيكون | برهان رياضي يكشف أن الانحدار التقليدي يمزج مقارنات ملوثة ذات أوزان سالبة. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -113,51 +156,47 @@ import numpy as np
 
 def compute_group_time_att(
     y: np.ndarray,
-    group: np.ndarray,
-    time: np.ndarray,
+    g: np.ndarray,
+    t: np.ndarray,
     target_g: int,
-    target_t: int,
-    never_treated_val: int = 0
+    target_t: int
 ) -> float:
     """
-    Computes Callaway-Sant'Anna cohort-time average treatment effect ATT(g, t)
-    using the never-treated comparison group and pre-treatment base period g - 1.
-    
+    Computes a clean cohort-specific group-time ATT(g, t) against never-treated units.
+
     Parameters
     ----------
     y : np.ndarray of shape (N,)
-        Observed outcome values.
-    group : np.ndarray of shape (N,)
-        Treatment cohort adoption period (never_treated_val indicates never treated).
-    time : np.ndarray of shape (N,)
-        Calendar time period of observation.
+        Outcome values.
+    g : np.ndarray of shape (N,)
+        Cohort treatment timing (use 9999 or 0 for never-treated).
+    t : np.ndarray of shape (N,)
+        Calendar time of observation.
     target_g : int
-        The cohort adoption period to evaluate.
+        Treated cohort of interest.
     target_t : int
-        The calendar period of observation.
-    never_treated_val : int
-        Identifier for the never-treated comparison group.
-        
+        Evaluation calendar period (target_t >= target_g).
+
     Returns
     -------
-    float
-        The estimated ATT(target_g, target_t).
+    float : Estimated ATT(g, t).
     """
-    # Step 1: Establish clean baseline period immediately prior to cohort adoption
-    base_period = target_g - 1
-    
-    # Step 2: Compute change for target treated cohort between base_period and target_t
-    treated_post = y[(group == target_g) & (time == target_t)]
-    treated_pre = y[(group == target_g) & (time == base_period)]
-    delta_treated = float(np.mean(treated_post) - np.mean(treated_pre))
-    
-    # Step 3: Compute change for never-treated control units across identical period
-    control_post = y[(group == never_treated_val) & (time == target_t)]
-    control_pre = y[(group == never_treated_val) & (time == base_period)]
-    delta_control = float(np.mean(control_post) - np.mean(control_pre))
-    
-    # Step 4: Clean difference-in-differences isolating ATT(g, t)
-    return float(delta_treated - delta_control)
+    base_t = target_g - 1  # Pre-treatment baseline period for cohort g
+
+    # Cohort g units
+    treated_post = y[(g == target_g) & (t == target_t)]
+    treated_pre = y[(g == target_g) & (t == base_t)]
+    delta_treated = np.mean(treated_post) - np.mean(treated_pre)
+
+    # Clean never-treated control units (g == 0 or g >= 9000)
+    control_mask = (g == 0) | (g >= 9000)
+    control_post = y[control_mask & (t == target_t)]
+    control_pre = y[control_mask & (t == base_t)]
+    delta_control = np.mean(control_post) - np.mean(control_pre)
+
+    att = float(delta_treated - delta_control)
+
+    return att
 ```
 :::
 

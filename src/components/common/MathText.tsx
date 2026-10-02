@@ -9,6 +9,7 @@ interface MathTextProps {
 
 type MarkdownBlock =
   | { type: 'display_math'; math: string }
+  | { type: 'code_block'; code: string; lang: string }
   | { type: 'heading'; level: number; text: string }
   | { type: 'table'; headers: string[]; rows: string[][] }
   | { type: 'ol'; items: string[] }
@@ -127,6 +128,22 @@ function parseMarkdownBlocks(text: string): MarkdownBlock[] {
       continue;
     }
 
+    // Code block / ASCII diagram: ```
+    if (trimmed.startsWith('```')) {
+      const lang = trimmed.slice(3).trim();
+      i++;
+      const codeLines: string[] = [];
+      while (i < lines.length && !lines[i].trim().startsWith('```')) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      if (i < lines.length) {
+        i++; // skip closing ```
+      }
+      blocks.push({ type: 'code_block', code: codeLines.join('\n'), lang });
+      continue;
+    }
+
     // Display math: $$
     if (trimmed.startsWith('$$')) {
       if (trimmed.length > 2 && trimmed.endsWith('$$')) {
@@ -218,6 +235,7 @@ function parseMarkdownBlocks(text: string): MarkdownBlock[] {
         cur === '___' ||
         cur.startsWith('#') ||
         cur.startsWith('$$') ||
+        cur.startsWith('```') ||
         (cur.startsWith('|') && cur.endsWith('|')) ||
         /^\d+\.\s+/.test(cur) ||
         /^[-*]\s+/.test(cur)
@@ -360,6 +378,17 @@ export const MathText: React.FC<MathTextProps> = ({ text, className = '', inline
               >
                 <KaTeXMath math={block.math} inline={false} className="text-[var(--text-primary)]" />
               </div>
+            );
+
+          case 'code_block':
+            return (
+              <pre
+                key={bKey}
+                dir="ltr"
+                className="my-3 p-3.5 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] font-mono text-xs overflow-x-auto text-[var(--math-vector)] leading-relaxed whitespace-pre shadow-inner"
+              >
+                <code>{block.code}</code>
+              </pre>
             );
 
           case 'heading': {

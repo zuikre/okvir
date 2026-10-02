@@ -14,21 +14,66 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Ordinary Least Squares (OLS) is almost universally introduced as a curve-fitting optimization: drawing a line across a 2D scatterplot to minimize the sum of squared vertical gaps. But this two-dimensional view obscures the deepest, most foundational insight of modern econometrics: **OLS is an orthogonal projection in sample space $\mathbb{R}^N$**.
+### Intuition & Real-World Story
 
-Imagine collecting data on $N$ people. The observed outcome $\mathbf{y}$ is not a cloud of points—it is a single high-dimensional vector in an $N$-dimensional universe. Your regressors (like education, experience, and the constant intercept) span a much smaller $K$-dimensional flat subspace $\text{col}(\mathbf{X})$. Because $N \gg K$, the outcome vector $\mathbf{y}$ almost never lies inside this subspace. 
+Suppose you are looking for an apartment in a bustling city. You browse listings and quickly notice a clear pattern: larger apartments tend to rent for more money. A 400 sq ft studio rents for $1,400, an 800 sq ft one-bedroom rents for $2,200, and a 1,200 sq ft two-bedroom rents for $3,100. You want a fair rule of thumb to estimate what any apartment should cost based on its square footage. So, you plot the apartments on a grid and draw a straight line through the cloud of points.
 
-Think of a flagpole standing at an angle on a flat lawn. If the midday sun shines directly from straight above, the shadow cast upon the grass is the fitted value $\hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol{\beta}}$. The plumb line dropping straight down from the flagpole's tip to its shadow is the residual vector $\mathbf{e}$. Just as that vertical plumb line is strictly perpendicular ($90^\circ$) to every blade of grass on the lawn, the OLS residual vector $\mathbf{e}$ is mathematically perpendicular to every single regressor in $\mathbf{X}$. Least squares is simply finding the best "line of sight" to project high-dimensional reality onto the subspace we can observe.
+Almost no apartment lands perfectly on your line. An 800 sq ft apartment might actually rent for $2,100, while your straight line predicts $2,200. That vertical gap—how much your model missed by (-$100)—is the **residual**.
 
-Crucially, we must demystify what this projection actually accomplishes. Machine learning and statistical curve-fitting ask a purely predictive question: *"Given a person with 16 years of education, what is our best mathematical guess of their wage?"* This is passive observation—spotting where the shadow falls on the lawn. Econometrics, by contrast, asks a fundamentally causal question: *"If we intervened and forced a student to stay in school for another year, how much would their future wage change?"* Orthogonal projection guarantees optimal linear prediction within your dataset, but it cannot turn correlation into causation. If unobserved factors (like family wealth or innate drive) lurk behind both education and earnings, OLS faithfully projects their combined shadow onto the grass, mistaking correlation for policy impact.
+How do we pick the 'best' possible line out of infinite options? Ordinary Least Squares (OLS) squares every vertical gap and finds the line that makes their total sum as small as possible. But why does this simple balancing act work so magically? Because OLS forces the leftovers (the residuals) to be strictly independent of apartment size—they share zero linear pattern. Geometrically, your prediction line acts like a shadow cast on the floor, and the residual errors stand straight up at a 90-degree angle, completely perpendicular to the features you observed.
 
-يُقدَّم الانحدار الخطي العادي (OLS) في الغالب كمسألة حسابية لرسم خط يقلل المسافات الرأسية في رسم بياني ثنائي الأبعاد. لكن هذا التبسيط يحجب الرؤية الهندسية الأكثر عمقًا وأصالة في القياس الاقتصادي: **OLS هو إسقاط متعامد في فضاء العينة ذي الأبعاد الـ $N$**.
+Crucially, we must untangle what this line actually tells us. A predictive machine learning model asks: *'If an apartment has 1,000 sq ft, what is our best forecast of its rent?'* That is passive observation—spotting where the shadow falls on the lawn. Econometrics asks a fundamentally causal question: *'If a landlord knocks down a wall and expands an apartment by 200 sq ft, how much will its rent actually increase?'* While OLS finds the optimal linear forecast inside your sample, it cannot turn correlation into causation if unobserved factors (like proximity to subway stations or luxury finishes) drive both size and price.
 
-عندما نجمع بيانات عن $N$ شخص، فإن المتغير التابع $\mathbf{y}$ ليس سحابة نقاط، بل هو متجه واحد في فضاء هائل ذي $N$ بعدًا. وتشكل المتغيرات المستقلة (كالتعليم والخبرة والثابت) فضاءً فرعيًا مسطحًا ذا بعد $K$ (حيث $N \gg K$). ولأن $\mathbf{y}$ لا يقع عمومًا داخل هذا الفضاء، فإن أفضل تقدير له هو إسقاط ظله العمودي تمامًا.
+#### Jargon Decoder
 
-تخيل سارية علم تميل بزاوية فوق أرضية عشبية مسطحة. عندما تسطع شمس الظهيرة عموديًا من كبد السماء، يكون الظل المنعكس على العشب هو القيم المقدرة $\hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol{\beta}}$. أما خيط الشاقول المتدلي من قمة السارية إلى قمة الظل فهو متجه البواقي $\mathbf{e}$. تمامًا كما يشكل خيط الشاقول زاوية قائمة ($90^\circ$) مع كل عشبة على الأرضية، يتعامد متجه البواقي $\mathbf{e}$ رياضيًا مع كل متغير مفسر في المصفوفة $\mathbf{X}$. إن الانحدار الخطي في جوهره هو البحث عن أفضل زاوية رؤية لإسقاط الواقع على الفضاء الذي نستطيع قياسه.
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Dependent Variable ($y$)** | The outcome you want to explain or predict (e.g., monthly apartment rent). |
+| **Independent Regressor ($X$)** | The input feature used to make the prediction (e.g., square footage). |
+| **Fitted Value ($\hat{y}$)** | The model's best guess along the regression line (e.g., predicted rent of $2,200). |
+| **Residual ($e = y - \hat{y}$)** | How much our prediction missed by (the vertical gap between reality and the line). |
+| **Sum of Squared Errors (SSE)** | Total penalty: squaring each gap so positive and negative errors do not cancel out. |
+| **Orthogonality ($90^\circ$)** | Pure independence: the residual errors have zero linear correlation with the regressors. |
 
-والأهم من ذلك هو إزالة الغموض الذي يحيط بما يحققه هذا الإسقاط فعليًا. إن تعلم الآلة والإحصاء التقليدي يجيبان عن سؤال تنبؤي بحت: *"إذا رأينا شخصًا أتم 16 عامًا من التعليم، فما هو أفضل تخمين رياضي لأجره؟"* هذا مجرد رصد سلبي لموضع سقوط الظل. أما القياس الاقتصادي فيطرح سؤالاً سببيًا جوهريًا: *"ماذا لو تدخلنا وغيرنا الواقع ومنحنا هذا الشخص عامًا إضافيًا من التعليم، كم سيزداد أجره الحقيقي؟"* يضمن الإسقاط المتعامد أفضل تنبؤ خطي ممكن داخل العينة، لكنه عاجز بمفرده عن تحويل الترابط إلى سببية. إذا كانت هناك عوامل خفية غير مقاسة (كالخلفية الأسرية أو القدرات الفطرية) تؤثر على التعليم والأجر معًا، فإن OLS سيسقط ظلها المشترك بلا تمييز، مغالطًا بين مجرد الاقتران والتأثير السببي الحقيقي للسياسات.
+```text
+  Rent ($)
+    ^
+    |                                   * Actual ($3,100)
+    |                                 / |
+    |                     * ($2,100) /  |  Residual e3 (+100)
+    |                     |         /   |
+3000|                     | e2     /----+--- Fitted y_hat
+    |                     v (-100)/
+    |                 *---------/
+2000|               / |
+    |      * ($1,500)/| e1 (+100)
+    |      |        / |
+1000|      +-------/  +------------------------------>
+    |             /                             Square Footage (sq ft)
+    0-----+------+------+------+------+------+
+          400   600    800    1000   1200
+```
+
+### الحدس والقصة الواقعية
+
+تخيل أنك تبحث عن شقة للإيجار في مدينة حيوية. تتصفح الإعلانات وتلاحظ نمطًا بديهيًا: الشقق الأكبر مساحة تكون أغلى إيجارًا. شقة استوديو بمساحة 400 قدم مربع تؤجر بـ 1,400 دولار، وشقة بمساحة 800 قدم مربع تؤجر بـ 2,200 دولار، وشقة بمساحة 1,200 قدم مربع تؤجر بـ 3,100 دولار. ترغب في قاعدة إرشادية عادلة لتقدير الإيجار المتوقع لأي مساحة، فتضع الشقق على رسم بياني وترسم خطًا مستقيمًا يمر عبر سحابة النقاط.
+
+في الواقع، قلما تقع شقة على الخط تمامًا. فشقة مساحتها 800 قدم مربع قد تؤجر فعليًا بـ 2,100 دولار بينما يتوقع خطك 2,200 دولار. هذه الفجوة الرأسية—مقدار خطأ التنبؤ (-100 دولار)—تسمى **الباقي (Residual)**.
+
+كيف نختار "أفضل" خط ممكن من بين عدد لا نهائي من الخطوط؟ تقوم طريقة المربعات الصغرى العادية (OLS) بتربيع كل خطأ رأسي والبحث عن الخط الذي يجعل مجموع هذه المربعات أصغر ما يمكن. والسر الهندسي البديع هو أن OLS تجبر بواقي الأخطاء على أن تكون متعامدة تمامًا ($90^\circ$) مع مساحة الشقة، أي خالية من أي ترابط خطي معها.
+
+والأهم هو التمييز الحاسم بين التنبؤ والسببية: يسأل علم البيانات التنبؤي: *"إذا كانت مساحة الشقة 1000 قدم مربع، فما هو أفضل تخمين لإيجارها؟"* هذا مجرد رصد سلبي لموضع الظل. أما القياس الاقتصادي فيسأل سؤالاً سببيًا: *"لو قام المالك بتوسيع الشقة بمقدار 200 قدم مربع، فكم سيزداد الإيجار فعليًا؟"* يضمن OLS أدق تنبؤ داخل العينة، لكنه يعجز عن إثبات السببية إذا كانت هناك عوامل خفية غير مقاسة (كموقع الشقة وقربها من المترو) تؤثر على المساحة والسعر معًا.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **المتغير التابع ($y$)** | النتيجة التي نريد تفسيرها أو توقعها (مثل إيجار الشقة الشهري). |
+| **المتغير المستقل ($X$)** | الميزة أو المعلومة المستخدمة للتخمين (مثل المساحة بالقدم المربع). |
+| **القيمة المقدرة ($\hat{y}$)** | التخمين الأفضل للنموذج الواقع على خط الانحدار مباشرة. |
+| **الباقي / الخطأ ($e = y - \hat{y}$)** | مقدار خطأ التنبؤ (المسافة الرأسية بين الواقع وخط النموذج). |
+| **مجموع مربعات الأخطاء (SSE)** | إجمالي العقوبة: تربيع الفروق حتى لا تلغي الأخطاء السالبة نظيرتها الموجبة. |
+| **التعامد الهندسـي ($90^\circ$)** | الاستقلالية التامة: بواقي الأخطاء لا ترتبط خطيًا بأي شكل مع المتغير المستقل. |
 
 :::simulation-widget{engine="canvas2d" component="LinearRegressionResiduals"}
 ---
@@ -51,13 +96,18 @@ $$
 S(\boldsymbol{\beta}) = \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 = (\mathbf{y} - \mathbf{X}\boldsymbol{\beta})^T (\mathbf{y} - \mathbf{X}\boldsymbol{\beta}) = \mathbf{y}^T\mathbf{y} - 2\boldsymbol{\beta}^T \mathbf{X}^T \mathbf{y} + \boldsymbol{\beta}^T \mathbf{X}^T \mathbf{X} \boldsymbol{\beta}
 $$
 
+### Why the Math Works Step-by-Step
+
+1. **Why do we square the errors instead of adding raw errors?**
+   If our line overshoots one apartment by +$100 and undershoots another by -$100, simply adding them yields $(+100) + (-100) = 0$. The raw sum would declare a terrible line to be 'perfect'! Squaring eliminates negative signs so every mistake counts positively.
+2. **Why square instead of using absolute values $|e_i|$?**
+   Absolute value graphs have a sharp, non-differentiable 'V' point at zero, making closed-form algebra difficult. Squaring produces a smooth, parabolic bowl with a single global minimum that can be solved directly with simple derivatives (setting the gradient to zero). Furthermore, squaring penalizes massive blunders quadratically (missing by 10 costs 100; missing by 50 costs 2,500).
+3. **Why do the Normal Equations enforce $\mathbf{X}^T \mathbf{e} = \mathbf{0}$?**
+   At the lowest point of the bowl, the slope (derivative) is zero. Differentiating the squared error with respect to $\boldsymbol{\beta}$ yields $-2\mathbf{X}^T(\mathbf{y} - \mathbf{X}\boldsymbol{\beta}) = \mathbf{0}$, which simplifies directly to $\mathbf{X}^T \mathbf{e} = \mathbf{0}$. This proves that the sample residuals are mathematically orthogonal ($90^\circ$) to every regressor.
+
 ### Mathematical Derivation of the Normal Equations
 
-To find the minimizer $\hat{\boldsymbol{\beta}}$, we compute the matrix derivative of $S(\boldsymbol{\beta})$ with respect to $\boldsymbol{\beta}$ using standard vector calculus rules:
-1. $\frac{\partial (\boldsymbol{\beta}^T \mathbf{a})}{\partial \boldsymbol{\beta}} = \mathbf{a}$
-2. $\frac{\partial (\boldsymbol{\beta}^T \mathbf{A} \boldsymbol{\beta})}{\partial \boldsymbol{\beta}} = 2\mathbf{A}\boldsymbol{\beta}$ for any symmetric matrix $\mathbf{A} = \mathbf{X}^T \mathbf{X}$.
-
-Taking the gradient:
+To find the minimizer $\hat{\boldsymbol{\beta}}$, we compute the matrix derivative of $S(\boldsymbol{\beta})$ with respect to $\boldsymbol{\beta}$:
 
 $$
 \nabla_{\boldsymbol{\beta}} S(\boldsymbol{\beta}) = -2\mathbf{X}^T \mathbf{y} + 2\mathbf{X}^T \mathbf{X}\boldsymbol{\beta}
@@ -69,9 +119,7 @@ $$
 \nabla_{\boldsymbol{\beta}} S(\boldsymbol{\beta}) = \mathbf{0} \implies -2\mathbf{X}^T(\mathbf{y} - \mathbf{X}\hat{\boldsymbol{\beta}}) = \mathbf{0} \implies \mathbf{X}^T \mathbf{e} = \mathbf{0}
 $$
 
-This equation states the core geometric truth: the sample residual vector $\mathbf{e} = \mathbf{y} - \mathbf{X}\hat{\boldsymbol{\beta}}$ is strictly orthogonal to every column vector in $\mathbf{X}$.
-
-Under the assumption of full column rank ($\text{rank}(\mathbf{X}) = K < N$), the Gram matrix $\mathbf{X}^T \mathbf{X}$ is symmetric positive definite and invertible:
+Under the assumption of full column rank ($\text{rank}(\mathbf{X}) = K < N$), the Gram matrix $\mathbf{X}^T \mathbf{X}$ is invertible:
 
 $$
 \hat{\boldsymbol{\beta}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y}
@@ -83,8 +131,6 @@ $$
 \hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol{\beta}} = \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y} \equiv \mathbf{P}_X \mathbf{y}, \quad \mathbf{e} = \mathbf{y} - \hat{\mathbf{y}} = (\mathbf{I}_N - \mathbf{P}_X)\mathbf{y} \equiv \mathbf{M}_X \mathbf{y}
 $$
 
-Because $\mathbf{P}_X \mathbf{P}_X = \mathbf{P}_X$ and $\mathbf{M}_X \mathbf{X} = (\mathbf{I}_N - \mathbf{P}_X)\mathbf{X} = \mathbf{X} - \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T \mathbf{X} = \mathbf{0}$, the annihilator matrix literally annihilates any vector lying in the column space of $\mathbf{X}$.
-
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
 * $\mathbf{y} \in \mathbb{R}^{N \times 1}$: Observed response vector containing the outcome variable for all $N$ economic agents.
@@ -95,6 +141,17 @@ Because $\mathbf{P}_X \mathbf{P}_X = \mathbf{P}_X$ and $\mathbf{M}_X \mathbf{X} 
 * $\mathbf{e} \in \mathbb{R}^{N \times 1}$: Sample residual vector satisfying $\mathbf{X}^T \mathbf{e} = \mathbf{0}$ by first-order construction.
 * $\mathbf{P}_X \in \mathbb{R}^{N \times N}$: The projection (hat) matrix with $\text{rank}(\mathbf{P}_X) = \text{tr}(\mathbf{P}_X) = K$.
 * $\mathbf{M}_X \in \mathbb{R}^{N \times N}$: The residual maker (annihilator) matrix with $\text{rank}(\mathbf{M}_X) = \text{tr}(\mathbf{M}_X) = N - K$, satisfying $\mathbf{M}_X \mathbf{X} = \mathbf{0}$.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\mathbf{y}$ | متجه الاستجابة المشاهد | المتغير التابع الفعلي لجميع وحدات العينة $N$ (مثل الإيجار الحقيقي). |
+| $\mathbf{X}$ | مصفوفة التصميم | المتغيرات المستقلة المفسرة متضمنة عمود الآحاد للحد الثابت. |
+| $\boldsymbol{\beta}$ | معالم المجتمع الحقيقية | الأثر السببي الحقيقي غير المشاهد في المجتمع الإحصائي الكلي. |
+| $\hat{\boldsymbol{\beta}}$ | مقدر المربعات الصغرى | معاملات الانحدار المحسوبة من العينة لتقليل مربع المسافات الرأسية. |
+| $\hat{\mathbf{y}}$ | القيم المقدرة | الإسقاط الهندسي المتعامد للمتجه $\mathbf{y}$ داخل فضاء أعمدة $\mathbf{X}$. |
+| $\mathbf{e}$ | متجه البواقي | فروق التنبؤ الفعلية التي تتعامد جبريًا بالضرورة مع كل عمود في $\mathbf{X}$. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -132,19 +189,19 @@ def fit_ols(X: np.ndarray, y: np.ndarray) -> dict[str, np.ndarray]:
         'y_hat': fitted values vector of shape (N,)
         'residuals': residual errors vector of shape (N,)
     """
-    # Step 1: Form the cross-product matrix X^T X
-    XtX = X.T @ X
+    # Step 1: Form the Gram matrix X^T X (features interacting with features)
+    gram_matrix = X.T @ X
     
-    # Step 2: Form the regressor-outcome vector X^T y
-    Xty = X.T @ y
+    # Step 2: Form the feature-target projection vector X^T y
+    feature_target_proj = X.T @ y
     
     # Step 3: Solve the normal equations (X^T X) beta = X^T y stably
-    beta = np.linalg.solve(XtX, Xty)
+    beta = np.linalg.solve(gram_matrix, feature_target_proj)
     
-    # Step 4: Compute the orthogonal projection (fitted values) y_hat = X beta
+    # Step 4: Compute the fitted values y_hat = X beta (the shadow on the floor)
     y_hat = X @ beta
     
-    # Step 5: Compute the residual vector e = y - y_hat
+    # Step 5: Compute the residual vector e = y - y_hat (the vertical error)
     residuals = y - y_hat
     
     return {

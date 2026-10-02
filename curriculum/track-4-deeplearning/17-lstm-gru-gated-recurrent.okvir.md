@@ -29,6 +29,38 @@ Crucially, because updates to the conveyor belt are **purely additive** ($\mathb
 
 > **Frontier Analogy:** Imagine an archivist maintaining the constitutional archives of a nation. The archivist doesn't rewrite the entire constitution every morning (vanilla RNN). Instead, when a new law is passed, they consult the policy manual to repeal outdated clauses (forget gate), append the new amendment (input gate), and print a daily press summary for the citizens (output gate).
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Cell State ($C_t$)** (حالة الخلية / شريط الذاكرة المحمي) | The protected conveyor belt: an additive memory channel where information glides for hundreds of steps without degradation. | شريط النقل المحمي: مسار ذاكرة تجميعي مباشر تسير فيه المعلومات لمئات الخطوات دون أي تدهور. |
+| **Forget Gate ($f_t$)** (بوابة النسيان) | The paper shredder dial: a sigmoid gate deciding what percentage ($0\%$ to $100\%$) of old memory to discard. | مقبض فرم الأوراق: بوابة احتمالية تقرر ما هي النسبة التي ينبغي محوها من الذاكرة السابقة. |
+| **Input Gate ($i_t$) & Candidate ($\tilde{C}_t$)** (بوابة الإدخال والذاكرة المرشحة) | The new memo writer: decides which fresh facts from the current input deserve permanent storage on the conveyor belt. | مسجل الملاحظات الجديد: يحدد ما هي الحقائق الجديدة الجديرة بالتثبيت في شريط الذاكرة المحمي. |
+| **Output Gate ($o_t$)** (بوابة الإخراج) | The security curtain: controls what portion of the internal memory is revealed as visible state $h_t$ to other layers. | ستارة العرض الأمنية: تحدد ما هي المعلومات التي ستظهر كحالة خفية معلنة للطبقات التالية. |
+| **Gated Recurrent Unit (GRU)** (الوحدة التكرارية ذات البوابات) | The streamlined sports version: combines cell and hidden states into one, using Reset ($r_t$) and Update ($z_t$) gates to save compute. | النسخة الرياضية الرشيقة: تدمج شريط الخلية والحالة الخفية في مسار واحد عبر بوابتي إعادة التعيين والتحديث. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+LSTM CELL INTERNAL GATING MECHANISM:
+=============================================================================
+Previous Cell State: C_{t-1} --------------------(*)-----------------(+)-----> Current C_t
+                                                  ^                    ^         |
+                                                  |                    |         |
+                                             Forget Gate: f_t          |         v
+                                                  |                    |       \tanh
+                                           \sigma(W_f [h, x])          |         |
+                                                                       |         v
+Previous Hidden State: h_{t-1} -----\                                  |        (*) <--- Output Gate: o_t
+                                     +---> Gating Branch               |         |       \sigma(W_o [h, x])
+Current Token Input:   x_t ---------/      |                           |         |
+                                           +---> Input Gate:   i_t ----*         v
+                                           |     \sigma(W_i [h, x])    |     Current Hidden: h_t
+                                           |                           |
+                                           +---> Candidate: \tilde{C}_t/
+                                                 \tanh(W_c [h, x])
+```
+
 :::simulation-widget{engine="canvas2d" component="NeuralActivationCanvas"}
 ---
 interactive: true

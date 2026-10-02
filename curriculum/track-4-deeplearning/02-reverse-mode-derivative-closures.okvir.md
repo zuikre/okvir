@@ -26,6 +26,35 @@ By basic single-variable calculus, the local rules are strikingly intuitive:
 
 How does software implement this local responsibility? Each node stores its local recipe inside a Python closure function (`_backward`). A closure is a function that "remembers" its environment: it captures the local inputs at forward execution time, lies dormant while the rest of the network finishes, waits until the upstream gradient (`out.grad`) finally arrives from downstream, and then multiplies the upstream gradient by its local derivative, accumulating blame into its parents using `+=`.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Backward Closure (`_backward`)** (دالة الإغلاق العكسية) | A dormant pager: it sleeps during the forward pass, remembering its inputs, and wakes up when blame arrives from downstream. | نداء مؤجل نائم: يخزن مدخلاته في المسار الأمامي، ولا يستيقظ إلا عندما تصله إشارة اللوم من المصب. |
+| **Local Derivative** (المشتقة الموضعية) | The immediate sensitivity between a single worker's direct output and its input knobs, ignoring the rest of the factory. | الحساسية المباشرة بين مخرج العملية ومدخلاتها المباشرة فقط، بمعزل عن بقية أجزاء الشبكة. |
+| **Upstream Gradient (`out.grad`)** (التدرج القادم من الخلف) | The cumulative blame flowing backward from the final loss node to this operation's output. | إجمالي اللوم الرياضي المتدفق من دالة الخسارة النهائية حتى مخرج هذه العملية الحسابية. |
+| **Gradient Accumulation (`+=`)** (التراكم الجمعي للتدرجات) | Adding up blame rather than overwriting (`=`), mandatory whenever a single wire branches out to multiple destinations. | جمع إشارات التدرج بدلاً من الكتابة فوقها، وهو أمر حتمي كلما تفرع مخرج عقدة إلى عدة مسارات. |
+| **Indicator Function ($\mathbb{I}$)** (دالة المؤشر الشرطية) | A binary valve switch that evaluates to $1$ when a condition is met (e.g., $x > 0$) and $0$ otherwise. | مفتاح صمام ثنائي: يعطي 1 إذا تحقق الشرط (مثل $x > 0$) ويقطع الإشارة تماماً إلى 0 في غير ذلك. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+FORWARD MULTIPLICATION: (c = a * b)
+---------------------------------------------------------------------------------
+[Input a = 2.0] ---\
+                    (*) ---> [Output c = 6.0] ---> (Stores closure: _backward)
+[Input b = 3.0] ---/
+---------------------------------------------------------------------------------
+REVERSE ADJOINT DISPATCH: (_backward unpacks and reflects inputs)
+[a.grad += b * c.grad] <--- (c.grad = 1.0) ---> [b.grad += a * c.grad]
+     (+3.0)                                          (+2.0)
+---------------------------------------------------------------------------------
+BRANCHING REUSE ACCUMULATION: (Variable used twice: z = x * x)
+                        [x] ---\
+                                (*) ---> [z] ---> (During backward: x.grad accumulates
+                        [x] ---/                   both branches: x.grad += x + x)
+```
+
 :::simulation-widget{engine="canvas2d" component="AutogradGraphLab"}
 ---
 interactive: true
@@ -65,13 +94,21 @@ $$
 \end{aligned}
 $$
 
-### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-* $\bar{v}_{\text{out}} = \frac{\partial L}{\partial v_{\text{out}}}$: The upstream adjoint (incoming gradient from downstream consumers, represented as `out.grad`).
-* $\frac{\partial f}{\partial v_j}$: The local Jacobian/partial derivative evaluated at the forward values of the inputs.
-* $\mathrel{+}=$: The accumulation operator, strictly required by multivariable calculus whenever a node branches into multiple downstream paths.
-* $\mathbb{I}(\cdot)$: The indicator function, evaluating to $1$ when the inner condition is true and $0$ otherwise.
-* $\bar{v}_1, \bar{v}_2$: The accumulated gradients stored in `self.grad` and `other.grad`.
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $\bar{v}_{\text{out}} \coloneqq \frac{\partial L}{\partial v_{\text{out}}}$ | Upstream Adjoint / التدرج الوافد | The incoming sensitivity signal received from downstream children (`out.grad`). |
+| $\frac{\partial f}{\partial v_1}$ | Local Partial Derivative / المشتقة المحلية | How fast operator $f$ moves with respect to first input $v_1$, evaluated at forward values. |
+| $\mathrel{+}=$ | Accumulation Operator / مؤثر الجمع التراكمي | Required by multivariable chain rule to sum sensitivities whenever an input feeds multiple consumers. |
+| $\mathbb{I}(v_1 > 0)$ | Heaviside Step / دالة المؤشر العتبية | Binary gate for ReLU: acts as an open circuit ($1$) for positive values and closed circuit ($0$) otherwise. |
+| $\bar{v}_1, \bar{v}_2$ | Propagated Adjoints / التدرجات المنقولة | The updated sensitivity values pushed back into parent operands (`self.grad`, `other.grad`). |
+
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **Isolation of Local Responsibility**: Each mathematical operator only needs to know its own local Jacobian. It scales the incoming scalar gradient $\bar{v}_{\text{out}}$ by its local derivative without needing any global knowledge of network depth.
+2. **Multiplication Swapping**: For $c = a \times b$, single-variable calculus gives $\frac{\partial c}{\partial a} = b$ and $\frac{\partial c}{\partial b} = a$. Thus, each input's gradient is directly scaled by the *other* input's forward magnitude.
+3. **Branching Additivity**: If a single tensor $x$ is used across $K$ different operations, the multivariable chain rule states $\frac{\partial L}{\partial x} = \sum_{k=1}^K \frac{\partial L}{\partial y_k} \frac{\partial y_k}{\partial x}$. The `+=` accumulation operator implements this exact summation.
+
 
 تمثل المتغيرات المرافقة $\bar{v}_i = \frac{\partial L}{\partial v_i}$ معدل الحساسية الكلي لدالة الهدف بالنسبة لكل عقدة. وفق قاعدة السلسلة الموضعية، يتضاعف التدرج العائد من الخلف بمقدار المشتقة الجزئية المباشرة للعملية. ويعد استخدام مؤثر الجمع التراكمي $\mathrel{+}=$ إلزاماً رياضياً تفرضه قاعدة السلسلة متعددة المتغيرات عند تفرع مخرجات العقدة إلى أكثر من مسار استهلاك لاحق.
 

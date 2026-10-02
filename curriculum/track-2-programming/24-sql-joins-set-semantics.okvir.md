@@ -29,6 +29,17 @@ How do the different relational join types seat these attendees in the dining ha
 
 If an analytics team calculates average Customer Lifetime Value (LTV) using an **INNER JOIN**, they commit a catastrophic data engineering fallacy: they silently drop every customer with 0 purchases, artificially inflating company metrics and hiding customer churn!
 
+### Jargon Decoder / قاموس المصطلحات المعمارية
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **`INNER JOIN`** / الربط الداخلي | Preserving only rows that have an exact matching key in both tables. Analogy: A double-blind date where attendees only sit down if both show up. | استبقاء الصفوف التي تمتلك مفتاحاً متطابقاً في كلا الجدولين فقط. التشبيه: موعد ثنائي لا يدخل فيه القاعة إلا الثنائي المتطابق معاً. |
+| **`LEFT OUTER JOIN`** / الربط الخارجي اليساري | Guaranteeing all left table rows are retained, padding missing right side with `NULL`. Analogy: Every invited VIP gets a table, even if their guest is absent. | ضمان بقاء كافة صفوف الجدول الأيسر مع ملء الجانب الأيمن المفقود بـ `NULL`. التشبيه: كل ضيف شرف يدخل القاعة حتى لو لم يحضر مرافقه. |
+| **Cartesian Explosion ($|R| \times |S|$)** / الانفجار الديكارتي | The unintended multiplication of rows when joining tables on non-unique keys. Analogy: Every student shaking hands with every teacher, creating thousands of handshakes. | تضخم هائل في عدد الصفوف الناتجة عند الربط على حقول غير فريدة. التشبيه: مصافحة كل طالب لكل معلم في المدرسة مما يولد آلاف المصافحات. |
+| **NULL Tuple Padding ($\boldsymbol{\omega}_S$)** / ملء الحقول الفارغة | Synthesizing dummy empty columns when an outer join finds no matching record. Analogy: An empty chair placed at the dinner table. | توليد صف وهمي من القيم الفارغة عند عدم العثور على سجل مطابق في الربط الخارجي. التشبيه: وضع كرسي فارغ أمام الضيف الذي لم يحضر رفيقه. |
+| **Survivorship Bias** / انحياز البقاء في البيانات | Training machine learning models solely on surviving active entities while discarding churned ones. Analogy: Inspecting only returned fighter planes to reinforce armor. | تدريب نماذج الذكاء الاصطناعي فقط على العملاء النشطين وتجاهل المتسربين. التشبيه: فحص الطائرات العائدة فقط من المعركة لتحديد تدريع الطائرات. |
+| **`COALESCE(x, 0)`** / دالة استبدال القيمة الفارغة | SQL function returning the first non-null argument, safely converting `NULL` to `0.0`. Analogy: Assuming a customer spent $0 if their invoice is blank. | دالة تعيد أول قيمة غير فارغة، وتستخدم لتحويل `NULL` إلى صفر بأمان. التشبيه: افتراض أن فاتورة العميل صفر دولار إن كانت الورقة بيضاء. |
+
 :::simulation-widget{engine="canvas2d" component="SqlExecutionPipelineCanvas"}
 ---
 interactive: true
@@ -57,6 +68,40 @@ $$
 R \bowtie_\theta S = \sigma_\theta(R \times S), \quad R \ \text{⟕}_\theta \ S = (R \bowtie_\theta S) \cup \left\{ (r, \boldsymbol{\omega}_S) \mid r \in R \land \neg \exists s \in S : \theta(r, s) \right\}
 $$
 
+```text
+Visual ASCII Transformation: INNER JOIN vs LEFT OUTER JOIN Mechanics:
+
+Table Customers (c):
+  customer_id | customer_name
+  ------------+--------------
+            1 | Alice
+            2 | Bob           <- Made 0 transactions (Churned / Inactive)
+
+Table Transactions (t):
+  txn_id | customer_id | amount
+  -------+-------------+-------
+     101 |           1 |  50.00
+     102 |           1 |  75.00
+
+INNER JOIN (Only matching pairs admitted):
+  customer_id | customer_name | txn_id | amount
+  ------------+---------------+--------+-------
+            1 | Alice         |    101 |  50.00
+            1 | Alice         |    102 |  75.00
+===> Bob is COMPLETELY DISCARDED!
+     Average LTV = (50 + 75) / 1 = $125.00 (Biased and artificially inflated!)
+
+LEFT OUTER JOIN (All Customers unconditionally guaranteed a seat):
+  customer_id | customer_name | txn_id | amount
+  ------------+---------------+--------+-------
+            1 | Alice         |    101 |  50.00
+            1 | Alice         |    102 |  75.00
+            2 | Bob           |   NULL |   NULL  <- Padded with synthetic NULL tuple!
+===> With COALESCE(SUM(amount), 0.0):
+     Alice LTV = $125.00, Bob LTV = $0.00
+     True Average LTV = (125.00 + 0.00) / 2 = $62.50 (Unbiased reality!)
+```
+
 ### Mathematical Invariants & Symbol Breakdown
 
 | الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
@@ -69,9 +114,20 @@ $$
 | $\boldsymbol{\omega}_S$ | Null tuple $(\bot_{\text{NULL}}, \dots)$ | Synthetic padding tuple matching right table schema arity | صف فارغ اصطناعي يملأ حقول الجدول الأيمن بقيم $\bot_{\text{NULL}}$ |
 | $\text{COALESCE}$ | $\text{COALESCE}(x, 0)$ | Total function mapping $\bot_{\text{NULL}} \mapsto 0$ for safe numeric aggregation | دالة تحول القيمة الفارغة إلى صفر لضمان سلامة الحسابات التجميعية |
 
-The cardinal invariant of the Left Outer Join states that the output relation cardinality is bounded below by the left table size: $|R \ \text{⟕}_\theta \ S| \ge |R|$. If the join key in table $S$ is a foreign key with uniqueness guarantees, the cardinality is strictly invariant: $|R \ \text{⟕}_\theta \ S| = |R|$. When performing group aggregations over outer-joined columns, using `COUNT(S.id)` correctly returns 0 for null rows, whereas `COUNT(*)` counts the padded null row as 1, introducing subtle counting errors!
-
-ينص الثابت الجوهري للربط الخارجي اليساري على أن عدد صفوف الناتج لا يقل أبداً عن عدد صفوف الجدول الأيسر: $|R \ \text{⟕}_\theta \ S| \ge |R|$. وإذا كان مفتاح الربط في $S$ فريداً، فإن عدد الصفوف يتطابق تماماً: $|R \ \text{⟕}_\theta \ S| = |R|$. وعند إجراء الحسابات التجميعية على الجداول المربوطة يسارياً، فإن استخدام `COUNT(S.id)` يعيد القيمة 0 بدقة للصفوف الفارغة، بينما استخدام `COUNT(*)` يعد الصف الفارغ خطأ كعنصر موجود برقم 1!
+#### Step-by-Step Arithmetic Cost & Invariant Breakdown:
+1. **Join Output Cardinality Invariants**:
+   - For `INNER JOIN`:
+     $$0 \le |R \bowtie_\theta S| \le |R| \cdot |S|$$
+   - For `LEFT OUTER JOIN`:
+     $$|R| \le |R \ \text{⟕}_\theta \ S| \le |R| \cdot |S|$$
+     Every record in $R$ appears at least once in the output!
+2. **Hash Join Computational Complexity**:
+   - Phase 1 (Build): Hash table built on smaller relation $S$ in $\mathcal{O}(|S|)$ time.
+   - Phase 2 (Probe): Streaming relation $R$ and probing hash table in $\mathcal{O}(|R|)$ time.
+   - Total Time Complexity $= \mathcal{O}(|R| + |S|)$.
+3. **The Outer Join Counting Trap**:
+   - `COUNT(t.txn_id)` counts non-null transaction IDs, correctly evaluating to $0$ for customers without purchases.
+   - `COUNT(*)` counts physical rows in the joined relation, incorrectly evaluating Bob's null-padded row as $1$ transaction!
 
 ## Beat 3: Interactive Code Challenge
 
@@ -90,14 +146,14 @@ test_cases:
 -- Schema: customers(customer_id, customer_name), transactions(txn_id, customer_id, amount)
 
 SELECT
-    -- Step 1: Select c.customer_id, c.customer_name
-    -- Step 2: Compute total_spent: COALESCE(ROUND(SUM(t.amount), 2), 0.0)
-    -- Step 3: Compute transaction_count: COUNT(t.txn_id)
+    c.customer_id,
+    c.customer_name,
+    COALESCE(ROUND(SUM(t.amount), 2), 0.0) AS total_spent,
+    COUNT(t.txn_id) AS transaction_count
 FROM customers c
--- Step 4: LEFT JOIN transactions t ON c.customer_id = t.customer_id
--- Step 5: GROUP BY c.customer_id, c.customer_name
--- Step 6: ORDER BY total_spent DESC, c.customer_id ASC
-;
+LEFT JOIN transactions t ON c.customer_id = t.customer_id
+GROUP BY c.customer_id, c.customer_name
+ORDER BY total_spent DESC, c.customer_id ASC;
 ```
 :::
 

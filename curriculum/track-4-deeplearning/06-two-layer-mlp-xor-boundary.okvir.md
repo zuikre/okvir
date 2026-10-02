@@ -31,6 +31,33 @@ The conceptual breakthrough that resurrected neural networks is the **Multi-Laye
 
 By mapping the 2D coordinate space through these non-linear ReLU hinges, the corner point $(1, 1)$ is folded over and repositioned. In this newly warped hidden representation space, the positive and negative points are no longer entangled diagonally: they sit cleanly on opposite sides of a single flat hyperplane! This is the profound essence of deep representation learning: stacking layers to fold complex data manifolds until entangled patterns become linearly separable.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Multi-Layer Perceptron (MLP)** (المدرك متعدد الطبقات) | A stack of neural layers that bends, stretches, and cuts geometric space to classify complex patterns. | منظومة من الطبقات العصبية المتتابعة تقوم بطي الفضاء الهندسي ومده لفرز الأنماط المعقدة. |
+| **Linear Separability** (القابلية للفصل الخطي) | The ability to divide two groups with a single, perfectly straight flat cut (line, plane, or hyperplane). | إمكانية فصل مجموعتين من النقاط باستخدام خط مستقيم واحد أو مستوى قاطع مسطح تماماً. |
+| **The XOR Paradox** (معضلة البوابة المنطقية XOR) | The classic failure point of single neurons: four points in 2D space where opposite corners share labels, defeating any straight line. | نقطة الفشل التاريخية للعصبون المنفرد: أربع نقاط في فضاء ثنائي لا يمكن لخط مستقيم واحد فصلها. |
+| **Hidden Feature Manifold ($\mathbf{h}$)** (فضاء الميزات الخفية) | A transformed coordinate system where non-linear activations fold the space, making tangled data linearly separable. | نظام إحداثيات محول تقوم دوال التنشيط بطيه ليصبح الفضاء المعقد قابلاً للفصل الخطي بسهولة. |
+| **Universal Approximation** (مبرهنة التقريب الشامل) | The theorem proving that a two-layer neural net with enough non-linear units can approximate any smooth function. | مبرهنة تثبت قدرة الشبكة العصبية ذات الطبقتين على محاكاة أي دالة مستمرة عند توفر عدد كافٍ من العصبونات. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+THE XOR MANIFOLD FOLDING PIPELINE:
+=============================================================================
+Input Space (x_1, x_2):            Linear Layer 1 + ReLU:       Hidden Space (h_1, h_2):
+(0,1) [Class 1]   (1,1) [Class 0]   W_1 = [[1, 1], [1, 1]]      (0,0) -> h=(0,0)  [Class 0]
+      \           /                 b_1 = [0, -1]               (0,1) -> h=(1,0)  [Class 1]
+       \         /                  ------------------->        (1,0) -> h=(1,0)  [Class 1]
+        \       /                   h = ReLU(W_1 x + b_1)       (1,1) -> h=(2,1)  [Class 0]
+(0,0) [Class 0]   (1,0) [Class 1]
+(Cannot be cut by ONE line!)                                    (NOW LINEARLY SEPARABLE!)
+=============================================================================
+Output Layer: y = Sigmoid(w_2^T h + b_2)
+Takes folded points in h-space and cleanly slices Class 1 from Class 0 with a single line!
+```
+
 :::simulation-widget{engine="canvas2d" component="NeuralActivationCanvas"}
 ---
 interactive: true

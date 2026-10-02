@@ -12,7 +12,7 @@ i18n:
 
 # Rotary Position Embedding (RoPE) & Sinusoidal Encodings
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
 The standard self-attention mechanism in Transformers is fundamentally permutation-equivariant: without explicit position indicators, the sentence *"the dog bit the mailman"* and *"the mailman bit the dog"* produce identical internal contextual representations. Because self-attention computes pairwise token interactions strictly through dot products of unordered sets, a raw Transformer possesses zero innate awareness of word order, syntax, or sequential temporal flow. To break this symmetry, early models had to inject explicit numerical clues indicating where each token sits in the sequence.
 
@@ -32,6 +32,40 @@ Because the dot product between two vectors rotated by angles $m\theta_i$ and $n
 
 يشبه هذا النظام حركة عقارب الساعة على مينائها الدائري: إذا كان الرمز الأول عند الموضع $m$ والرمز الثاني عند $n$، فإن المسافة النسبية بينهما تمثلها ببساطة الزاوية الفاصلة بين العقربين، بصرف النظر عن التوقيت المطلق المعلق على جدار الغرفة! فالزاوية بين الساعة 2 والساعة 5 هي تماماً نفس الزاوية بين الساعة 7 والساعة 10. وبفضل جبر الأعداد المركبة، يعتمد الجداء النقطي بين الاستعلام والمفتاح حصراً على فارق الزوايا $(m - n)\theta_i$، وتتلاشى درجات الانتباه بسلاسة مع تباعد المسافات النسبية وفق مبرهنة ريمان-لوبيغ.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Rotary Position Embedding (RoPE)** (تضمين المواضع الدوراني) | Clock hands on a dial: encodes word order by rotating query and key vectors in the complex plane; relative distance is just the angle between hands. | عقارب الساعة على الميناء: يرمز ترتيب الكلمات بتدوير متجهات الاستعلام والمفاتيح هندسياً؛ والمسافة النسبية هي الزاوية بين العقربين. |
+| **Permutation Equivariance** (التكافؤ التبادلي للأطراف) | The anagram blindspot: raw self-attention treats words as an unordered bag; "dog bites man" and "man bites dog" look identical without positions. | عمى الترتيب في الانتباه الخام: يعامل النص كمجموعة غير مرتبة، وتنتج جملة "عض الكلب رجلاً" نفس النتيجة لجملة "عض الرجل كلباً". |
+| **Absolute Positional Encoding** (الترميز الموضعي المطلق) | Street address markers: adding fixed trigonometric wave vectors directly into embeddings, which corrupts the semantic word meanings. | أرقام المنازل الثابتة: إضافة موجات جيبية مباشرة لمتجه الكلمة، مما يؤدي لتشويش المعنى الدلالي الأصلي للمفردات. |
+| **Geometric Frequency Spectrum ($\theta_i$)** (طيف الترددات الهندسية) | High gear vs. low gear: early dimensions rotate fast to detect adjacent grammar, while deep dimensions rotate slowly for global topics. | تروس السرعة المتفاوتة: أبعاد تدور بسرعة فائقة لضبط النحو المتجاور، وأبعاد تدور ببطء لربط السياق العام عبر آلاف الكلمات. |
+| **Long-Context Extrapolation** (التوسع في السياقات الطويلة) | Stretching the clock face: scaling the base frequency parameter allows the model to expand from 8k to 128k context without retraining from scratch. | تمديد ميناء الساعة: تعديل التردد الأساسي يتيح للنموذج استيعاب مستندات هائلة تصل لمئات آلاف الكلمات بسلاسة. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+ROTARY POSITION EMBEDDING (RoPE) 2D PLANAR ROTATION:
+=============================================================================
+Query Vector at Sequence Position m:  q_m = [ q_0,  q_1,   q_2,  q_3,  ..., q_{d-1} ]
+                                              \_______/     \_______/
+                                               Slice 1       Slice 2  (d/2 independent 2D pairs)
+                                                  |             |
+                                                  v             v
+Rotation Angle for Slice i:                 \theta_1 * m   \theta_2 * m
+                                                  |             |
+Planar 2D Complex Rotation:                 [ cos  -sin ]  [ cos  -sin ]
+                                            [ sin   cos ]  [ sin   cos ]
+                                                  |             |
+                                                  v             v
+Rotated Query Vector:                 \tilde{q}_m = [ \tilde{q}_0, \tilde{q}_1, \tilde{q}_2, \tilde{q}_3, ... ]
+=============================================================================
+RELATIVE DISTANCE ATTENTION INVARIANCE:
+When computing Dot Product between Token m (Query) and Token n (Key):
+(\tilde{q}_m)^T * (\tilde{k}_n) = q_m^T * R_{m-n} * k_n
+--> The result depends STRICTLY on the relative offset (m - n), NOT absolute timestamps!
+```
+
 :::simulation-widget{engine="canvas2d" component="RotaryEmbeddingLab"}
 ---
 interactive: true
@@ -41,7 +75,7 @@ highlighted_metric: "loss"
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
 In Rotary Position Embedding, the inner product between the query vector at sequence position $m$ and the key vector at sequence position $n$ is transformed such that their dot product depends solely on the relative displacement $m - n$:
 
@@ -69,22 +103,21 @@ $$
 
 Where $\text{rotate\_half}(\mathbf{x}) = [-x_2, x_1, -x_4, x_3, \dots, -x_d, x_{d-1}]$, implementing multiplication by the imaginary unit $i$ in 2D complex slices.
 
-### Comprehensive Symbol & Parameter Breakdown
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-| Symbol | Dimensionality | Mathematical Interpretation | Operational Role |
-| :--- | :--- | :--- | :--- |
-| $\mathbf{q}_m$ | $\mathbb{R}^d$ | Query vector at sequence position $m$ | Represents the search criteria emitted by the token at step $m$. |
-| $\mathbf{k}_n$ | $\mathbb{R}^d$ | Key vector at sequence position $n$ | Represents the index catalog entry emitted by the token at step $n$. |
-| $\mathbf{R}_{\Theta, m}^d$ | $\mathbb{R}^{d \times d}$ | Orthogonal block-diagonal rotation matrix | Transforms vectors by rotating consecutive 2D sub-planes by angle $m\theta_i$. |
-| $\mathbf{R}_{\theta_i, m}$ | $\mathbb{R}^{2 \times 2}$ | 2D planar rotation matrix for dimension pair $i$ | Rotates coordinate pair $(x_{2i-1}, x_{2i})$ by angle $m\theta_i$. |
-| $\theta_i$ | $\mathbb{R}_{> 0}$ | Angular frequency for subspace $i$ | Geometric base progression decaying from 1 down to $b^{-1}$. |
-| $b$ | $\mathbb{R}_{> 0}$ | Base frequency scaling constant | Set to 10,000 in original RoPE, and scaled up to 500,000 in LLaMA 3 for long context. |
-| $n - m$ | $\mathbb{Z}$ | Relative displacement between tokens | Proves mathematically that $\mathbf{R}_m^T \mathbf{R}_n = \mathbf{R}_{n - m}$, ensuring translation invariance. |
-| $\text{rotate\_half}(\mathbf{x})$ | $\mathbb{R}^d$ | Permuted vector $(-x_2, x_1, -x_4, x_3, \dots)$ | Implements complex multiplication by $i$ without matrix materialization. |
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $\mathbf{q}_m, \mathbf{k}_n \in \mathbb{R}^d$ | Query & Key Vectors / متجها الاستعلام والمفتاح | Unrotated activation projections for tokens at sequence positions $m$ and $n$. |
+| $\mathbf{R}_{\Theta, m}^d$ | Orthogonal Block-Diagonal Rotation / مصفوفة التدوير المتعامدة | Orthogonal rotation matrix composed of $d/2$ planar rotation sub-blocks. |
+| $\theta_i = b^{-2(i-1)/d}$ | Geometric Angular Frequency / التردد الزاوي الهندسي | Frequency assigned to dimension pair $i$, decaying geometrically from $1.0$ down to $1/b$. |
+| $b = 10000$ (or $500000$) | Rotary Base Frequency Constant / ثابت التردد الأساسي | Base constant governing the maximum cycle period across long context windows. |
+| $\mathbf{R}_{\Theta, n-m}^d$ | Relative Rotation Operator / مؤثر التدوير النسبي | The core algebraic identity proving that rotated inner products depend solely on distance $(n - m)$. |
 
-تضمن هذه الصياغة الرياضية انخفاض درجات الانتباه تدريجياً مع تزايد المسافة النسبية $|m - n|$ بفضل تداخل الترددات الجيبية المتعددة عبر الأبعاد المختلفة (تطبيقاً لمبرهنة ريمان-لوبيغ التحليلية). يمنح هذا النموذج تحيزاً استقرائياً طبيعياً للتركيز على السياق المحلي القريب، مع الاحتفاظ بالقدرة الكاملة على الربط الدلالي بعيد المدى عند الحاجة.
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **The Complex Conjugate Property**: In 2D complex coordinates, rotating $q$ by angle $m\theta$ corresponds to multiplication by $e^{i m \theta}$. The dot product between $q e^{i m \theta}$ and $k e^{i n \theta}$ is $\text{Re}(q \bar{k} e^{i(m - n)\theta})$, which is strictly a function of relative distance $(m - n)$.
+2. **Zero Semantic Distortion**: Unlike additive encodings where adding $p_m$ directly perturbs the word embedding norm, orthogonal rotation preserves vector length exactly: $\|\mathbf{R}_m \mathbf{q}\|_2 = \|\mathbf{q}\|_2$.
+3. **Decaying Attention with Distance**: By the Riemann-Lebesgue lemma, summing dot products across a spectrum of geometric frequencies causes the inner product to decay naturally as relative token distance $|m - n|$ grows, providing an organic inductive bias toward local context.
 
----
 
 ## Beat 3: Python Challenge
 

@@ -28,6 +28,41 @@ Because Adam divides updates by $\sqrt{v_t}$, parameters that experienced large,
 
 Loshchilov & Hutter (2017) resolved this with **AdamW** by **decoupling weight decay**: the parameters are decayed directly ($\boldsymbol{\theta} \leftarrow \boldsymbol{\theta}(1 - \eta \lambda)$) before applying the adaptive momentum step. This simple, profound fix restores proportional regularization across all weights, vastly improving generalization across Transformer architectures.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **AdamW Optimizer** (محسن AdamW المتطور) | The modern workhorse of frontier AI: combines smooth velocity, per-parameter adaptive strides, and clean weight decay. | المحرك الأساسي لكافة نماذج الذكاء الاصطناعي الرائدة: يدمج سلاسة الزخم، والخطوات التكيفية، واضمحلال الأوزان النقي. |
+| **Bias Correction ($\hat{m}_t, \hat{v}_t$)** (تصحيح الانحياز الأولي) | Starter engine booster: corrects for the fact that momentum buffers start at zero, preventing tiny steps at step 1. | معزز الانطلاق الأولي: يعوض بدء الذاكرة من الصفر لمنع تباطؤ النموذج في أولى خطوات التدريب. |
+| **Decoupled Weight Decay ($\lambda \theta$)** (اضمحلال الأوزان المنفصل) | Routine weight maintenance: directly trims parameter sizes by a small percentage each step without polluting the adaptive learning rate. | صيانة دورية للأوزان: يقلص حجم المعاملات بنسبة ضئيلة ومباشرة في كل خطوة دون تشويه معدل التعلم التكيفي. |
+| **L2 vs Decoupled Decay** (تنظيم L2 مقابل الاضمحلال المنفصل) | The historic flaw of classic Adam: standard L2 gets divided by $\sqrt{v_t}$, penalizing frequently updated weights LESS than rare weights! | الخطأ التاريخي في Adam القديم: كان تنظيم L2 يُقسم على تباين التدرجات مما يشوه آلية تقليص الأوزان. |
+| **Cosine Annealing & Warmup** (الإحماء والجدولة الجيبية) | Gentle acceleration onto the freeway (warmup), followed by a smooth glide to a halt at the exit ramp (cosine decay). | تسارع هادئ عند بدء الرحلة لحماية الأوزان، ثم تباطؤ ناعم وتدريجي حتى التوقف التام عند نهاية التدريب. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+ADAMW SINGLE-STEP UPDATE PIPELINE:
+=============================================================================
+Step 1: Compute Stochastic Gradient:      g_t = \nabla L_B(\theta_t)
+Step 2: Update 1st Moment (Direction):     m_t = \beta_1 * m_{t-1} + (1 - \beta_1) * g_t
+Step 3: Update 2nd Moment (Scale):         v_t = \beta_2 * v_{t-1} + (1 - \beta_2) * (g_t)^2
+                                                 |
+Step 4: Bias Correction for Zero-Init:    \hat{m}_t = m_t / (1 - \beta_1^t)
+                                          \hat{v}_t = v_t / (1 - \beta_2^t)
+                                                 |
+Step 5: Apply Decoupled Weight Decay:      \theta_decay = \theta_t - \eta_t * \lambda * \theta_t
+                                                 |
+Step 6: Apply Adaptive Gradient Step:      \theta_{t+1} = \theta_decay - \eta_t * \hat{m}_t / (\sqrt{\hat{v}_t} + \epsilon)
+=============================================================================
+LEARNING RATE SCHEDULE (\eta_t):
+   ^
+\eta_max|       /\
+        |      /  \---_ (Cosine Annealing)
+        |     /        \___
+    0   +----+-------------+-----> Steps (t)
+          Warmup
+```
+
 :::simulation-widget{engine="canvas2d" component="GradientDescentCanvas"}
 ---
 interactive: true

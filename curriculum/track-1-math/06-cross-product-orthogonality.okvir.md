@@ -29,6 +29,30 @@ The length (magnitude) of this perpendicular vector is not arbitrary; it represe
 
 ---
 
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Cross Product ($\mathbf{a} \times \mathbf{b}$) | A new 3D arrow shooting perpendicular out of the floor spanned by two arrows | الجداء الاتجاهي ($\mathbf{a} \times \mathbf{b}$) | سهم ثلاثي الأبعاد ينطلق عمودياً تماماً على المستوي الذي يضم السهمين |
+| Right-Hand Rule | Physical test: fingers curl from arrow A to arrow B, thumb points along the result | قاعدة اليد اليمنى | معيار فيزيائي: تدور أصابعك من السهم الأول للثاني فيشير إبهامك لاتجاه الناتج |
+| Parallelogram Area | The physical surface area enclosed between the two arrows, equal to $\|\mathbf{a} \times \mathbf{b}\|$ | مساحة متوازي الأضلاع | المساحة السطحية المحصورة بين السهمين وتساوي تماماً مقدار الجداء الاتجاهي |
+| Torque | Rotational twist produced when pulling a wrench: force times perpendicular arm | عزم الدوران | قوة التدوير الناتجة عند شد مفتاح الربط: القوة مضروبة في ذراع العزم |
+| Anti-Commutative | Swapping order flips the direction upside down: $\mathbf{b} \times \mathbf{a} = -(\mathbf{a} \times \mathbf{b})$ | الخاصية التخالفية | عكس ترتيب السهمين يقلب اتجاه السهم الناتج رأساً على عقب |
+
+#### Geometric & Visual Flow
+
+```
+                 a x b (Shoots straight UP)
+                 ▲
+                 │
+                 │   *───────────*
+                 │  /           /  Area = ||a x b||
+                 │ /           /   (Floor parallelogram)
+                 *────────────* b
+                Origin       /
+                 a ─────────*
+```
+
 ### الحدس الفيزيائي والهندسي
 
 تخيل أنك تحاول فك برغي معدني صدئ في محرك سيارة باستخدام مفتاح ربط صلب طويل. تثبت رأس المفتاح على البرغي وتقبض على طرفه الآخر، صانعاً متجه ذراع $\mathbf{r}$ يمتد من مركز البرغي إلى يدك. ثم تبذل قوة عضلية كبيرة في اتجاه عمودي على الذراع تمثل متجه القوة $\mathbf{F}$. كيف يتحرك البرغي على أرض الواقع؟ إنه لا ينزلق على طول ذراع المفتاح، ولا يتحرك في اتجاه دفع يدك المباشر؛ بل يبدأ في الدوران والانفكاك مندفعاً مباشرة إلى *الخارج* على طول محور ثالث يصنع زاوية قائمة صارمة ($90^\circ$) مع كل من ذراع المفتاح واتجاه دفع يدك!
@@ -43,6 +67,30 @@ The length (magnitude) of this perpendicular vector is not arbitrary; it represe
 1. **الرسوم ثلاثية الأبعاد ومحركات الألعاب (متجه السطح العمودي):** يتكون أي مجسم ثلاثي الأبعاد (سواء كان شخصية في لعبة فيديو أو سيارة) من ملايين المثلثات الهندسية الصغيرة. ولكي يعكس السطح الضوء بواقعية، يحتاج كارت الشاشة لمعرفة المتجه العمودي على السطح (Surface Normal). يحسب المحرك متجهين لضلعي المثلث $\mathbf{e}_1$ و $\mathbf{e}_2$، ويطبق الجداء الاتجاهي $\mathbf{N} = \mathbf{e}_1 \times \mathbf{e}_2$. لولا الجداء الاتجاهي لما استطاعت ألعاب الفيديو ثلاثية الأبعاد حساب الإضاءة والظلال والانعكاسات الواقعية!
 2. **الروبوتات وحركيات الأذرع الميكانيكية:** عندما يدور مفصل في ذراع روبوتية، فإن السرعة الخطية التي تتحرك بها الأداة في نهاية الذراع تحكمها معادلة الجداء الاتجاهي: $\mathbf{v} = \boldsymbol{\omega} \times \mathbf{r}$.
 3. **الكهرومغناطيسية والفيزياء النووية:** القوة المغناطيسية المؤثرة على جسيم مشحون يتحرك داخل مجال مغناطيسي هي قوة لورنتز: $\mathbf{F} = q(\mathbf{v} \times \mathbf{B})$. في مسرعات الجسيمات الكبرى (مثل مصادم الهادرونات الكبير CERN)، تُجبر الجسيمات على الدوران في مسارات دائرية مغلقة بدقة ميكرومترية بفعل قوى الجداء الاتجاهي.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| الجداء الاتجاهي ($\mathbf{a} \times \mathbf{b}$) | A new 3D arrow shooting perpendicular out of the floor spanned by two arrows | الجداء الاتجاهي ($\mathbf{a} \times \mathbf{b}$) | سهم ثلاثي الأبعاد ينطلق عمودياً تماماً على المستوي الذي يضم السهمين |
+| قاعدة اليد اليمنى | Physical test: fingers curl from arrow A to arrow B, thumb points along the result | قاعدة اليد اليمنى | معيار فيزيائي: تدور أصابعك من السهم الأول للثاني فيشير إبهامك لاتجاه الناتج |
+| مساحة متوازي الأضلاع | The physical surface area enclosed between the two arrows, equal to $\|\mathbf{a} \times \mathbf{b}\|$ | مساحة متوازي الأضلاع | المساحة السطحية المحصورة بين السهمين وتساوي تماماً مقدار الجداء الاتجاهي |
+| عزم الدوران | Rotational twist produced when pulling a wrench: force times perpendicular arm | عزم الدوران | قوة التدوير الناتجة عند شد مفتاح الربط: القوة مضروبة في ذراع العزم |
+| الخاصية التخالفية | Swapping order flips the direction upside down: $\mathbf{b} \times \mathbf{a} = -(\mathbf{a} \times \mathbf{b})$ | الخاصية التخالفية | عكس ترتيب السهمين يقلب اتجاه السهم الناتج رأساً على عقب |
+
+#### المخطط البصري الهندسي
+
+```
+                 a x b (ينطلق عمودياً للأعلى)
+                 ▲
+                 │
+                 │   *───────────*
+                 │  /           /  المساحة = ||a x b||
+                 │ /           /   (متوازي أضلاع الأرضية)
+                 *────────────* b
+              نقطة الأصل     /
+                 a ─────────*
+```
 
 :::simulation-widget{engine="canvas2d" component="CrossProductAreaCanvas"}
 ---

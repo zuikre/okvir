@@ -120,14 +120,14 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
         <div
           className={`absolute z-20 ${
             labelPosition === 'left'
-              ? 'right-full mr-2.5 sm:mr-3.5 top-1/2 -translate-y-1/2 w-36 sm:w-48'
-              : 'left-full ml-2.5 sm:ml-3.5 top-1/2 -translate-y-1/2 w-36 sm:w-48'
+              ? 'right-full mr-2.5 sm:mr-3.5 top-1/2 -translate-y-1/2 w-48 sm:w-56 md:w-60 min-w-[170px]'
+              : 'left-full ml-2.5 sm:ml-3.5 top-1/2 -translate-y-1/2 w-48 sm:w-56 md:w-60 min-w-[170px]'
           }`}
         >
           <button
             type="button"
             onClick={onClick}
-            className={`w-full relative p-2 sm:p-3 rounded-2xl border text-start backdrop-blur-md shadow-md transition-all cursor-pointer group/card ${
+            className={`w-full relative p-2.5 sm:p-3 rounded-2xl border text-start backdrop-blur-md shadow-md transition-all cursor-pointer group/card ${
               isHovered || isSelected
                 ? 'border-sky-500/60 bg-[var(--bg-surface)] shadow-lg scale-102'
                 : 'border-[var(--border-subtle)] bg-[var(--bg-surface)]/95 hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface)]'
@@ -140,41 +140,37 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
               <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rotate-45 bg-[var(--bg-surface)] border-b border-l border-[var(--border-subtle)] group-hover/card:border-[var(--border-strong)]" />
             )}
 
-            {/* Status / Category Header */}
-            <div className="flex items-center justify-between gap-1 mb-1 relative z-10">
-              <div className="flex items-center gap-1 min-w-0">
-                {isMastered ? (
-                  <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-emerald-400">
-                    <CheckCircle2 size={11} className="shrink-0" />
-                    <span className="truncate">{language === 'ar' ? 'متقن' : 'Mastered'}</span>
-                  </span>
-                ) : isInProgress ? (
-                  <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-amber-400">
-                    <Play size={10} fill="currentColor" className="shrink-0" />
-                    <span className="truncate">{language === 'ar' ? 'قيد الإنجاز' : 'In Progress'}</span>
-                  </span>
-                ) : isAvailable ? (
-                  <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-sky-400">
-                    <Zap size={11} className="shrink-0" />
-                    <span className="truncate">{language === 'ar' ? 'المفهوم التالي' : 'Next'}</span>
-                  </span>
-                ) : isDecaying ? (
-                  <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-rose-400">
-                    <AlertTriangle size={11} className="shrink-0" />
-                    <span className="truncate">{language === 'ar' ? 'مراجعة' : 'Review'}</span>
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono text-[var(--text-tertiary)]">
-                    <Lock size={10} className="shrink-0" />
-                    <span className="truncate">{language === 'ar' ? track?.titleAr : track?.title}</span>
-                  </span>
-                )}
-              </div>
-
-              <span className="text-[9px] sm:text-[10px] font-mono text-[var(--text-tertiary)] flex items-center gap-0.5 shrink-0">
-                <Clock size={9} />
-                <span>{module.estimatedMinutes}m</span>
-              </span>
+            {/* Status / Category Header: Full width, never crowded by duration */}
+            <div className="flex items-center gap-1.5 mb-1.5 relative z-10 text-[9px] sm:text-[10px] font-mono">
+              {isMastered ? (
+                <span className="flex items-center gap-1.5 font-bold text-emerald-400">
+                  <CheckCircle2 size={11} className="shrink-0" />
+                  <span>{language === 'ar' ? 'متقن' : 'Mastered'}</span>
+                </span>
+              ) : isInProgress ? (
+                <span className="flex items-center gap-1.5 font-bold text-amber-400">
+                  <Play size={10} fill="currentColor" className="shrink-0" />
+                  <span>{language === 'ar' ? 'قيد الإنجاز' : 'In Progress'}</span>
+                </span>
+              ) : isAvailable ? (
+                <span className="flex items-center gap-1.5 font-bold text-sky-400">
+                  <Zap size={11} className="shrink-0" />
+                  <span>{language === 'ar' ? 'المفهوم التالي' : 'Next'}</span>
+                </span>
+              ) : isDecaying ? (
+                <span className="flex items-center gap-1.5 font-bold text-rose-400">
+                  <AlertTriangle size={11} className="shrink-0" />
+                  <span>{language === 'ar' ? 'مراجعة' : 'Review'}</span>
+                </span>
+              ) : (
+                <span
+                  className="flex items-center gap-1.5 text-[var(--text-tertiary)] font-medium leading-tight"
+                  title={language === 'ar' ? track?.titleAr : track?.title}
+                >
+                  <Lock size={10} className="shrink-0" />
+                  <span>{language === 'ar' ? track?.titleAr : track?.title}</span>
+                </span>
+              )}
             </div>
 
             {/* Concept Title */}
@@ -187,6 +183,20 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
             >
               {language === 'ar' ? module.titleAr : module.title}
             </h4>
+
+            {/* Card Footer: Estimated Time & Progress Metadata */}
+            <div className="flex items-center justify-between gap-2 mt-2 pt-1.5 border-t border-[var(--border-subtle)]/40 text-[9px] sm:text-[10px] font-mono text-[var(--text-tertiary)] relative z-10">
+              <span className="flex items-center gap-1">
+                <Clock size={10} className="shrink-0 text-[var(--text-tertiary)]" />
+                <span>{module.estimatedMinutes}m</span>
+              </span>
+
+              {isInProgress && (
+                <span className="text-amber-400 font-bold">
+                  {completedBeatsCount || 1}/4
+                </span>
+              )}
+            </div>
           </button>
         </div>
 

@@ -12,6 +12,8 @@ i18n:
 
 # Object-Oriented Protocols & Dunder Methods
 
+## Beat 1: Intuition & Mental Model / الحدس والنموذج الذهني
+
 In many object-oriented languages like Java or C++, polymorphism is enforced through rigid, bureaucratic class hierarchies and formal interface contracts (`implements Comparable<T>`, `implements Serializable`). If a class fails to formally declare that it implements an interface, the compiler rejects it—even if the class contains the exact methods needed. Python approaches object-orientation with a radically different philosophy: **Duck Typing and Protocol Orientation**.
 
 The core premise of duck typing is simple and pragmatic: *"If it walks like a duck and quacks like a duck, it is a duck."* Python's runtime rarely asks for an object's pedigree (`isinstance(x, SomeInterface)`). Instead, it asks whether the object knows how to respond to specific, standardized **secret handshakes**. In Python, these secret handshakes are known as **dunder methods** (double-underscore methods like `__len__`, `__getitem__`, and `__add__`).
@@ -22,6 +24,54 @@ By implementing standard dunder protocols on your custom classes, you make them 
 
 Finally, when building complex object hierarchies with multiple inheritance, Python prevents ambiguity using the **C3 Linearization Algorithm** to construct the **Method Resolution Order (MRO)**. The MRO deterministically flattens a complex directed acyclic graph (DAG) of base classes into a clean linear chain, guaranteeing that a parent class is never checked before any of its children, and that `super()` calls traverse cooperative inheritance without infinite recursion.
 
+---
+
+في العديد من لغات البرمجة كائنية التوجه مثل Java و C++، تُفرض التعددية الشكلية (Polymorphism) عبر هياكل وراثية صارمة وبيروقراطية تعتمد على الواجهات الشكلية الصريحة (`implements Comparable`). فإن نسي المطور التصريح عن الواجهة، رفض المترجم التعامل مع الكائن حتى وإن كان يمتلك الدوال المطلوبة تماماً. أما في بايثون، فالرؤية الهندسية قائمة على فلسفة مغايرة جذرياً: **النمط البطّي (Duck Typing) والتوجه بالبروتوكولات**.
+
+المبدأ الجوهري للنمط البطي بسيط وعملي للغاية: *"إذا كان الطائر يمشي كالبطة، ويسبح كالبطة، ويصدر صوت البطة، فهو بطة!"*. نادراً ما يفحص مفسر بايثون شجرة النسب للكائن عبر `isinstance`. بل يكتفي بالتأكد من قدرة الكائن على الاستجابة لـ **مصافحات برمجية سرية موحدة**. وفي بايثون، تُعرف هذه المصافحات السرية بـ **الدوال السحرية ذات الشرطتين السفليتين (Dunder Methods)** كـ `__len__` و `__getitem__` و `__add__`.
+
+تأمل ما يحدث فعلياً حين تكتب `len(my_object)`. لا يبحث بايثون عن خاصية مخزنة مسبقاً، بل يترجم الاستدعاء مباشرة إلى دالة النوع الخاصة: `type(my_object).__len__(my_object)`. وحين تكتب `a + b`, يترجمها إلى `type(a).__add__(a, b)`. وحين تستخدم الأقواس المربعة `obj[3]`, يستدعي `__getitem__(obj, 3)`. وحين تمر على الكائن في حلقة `for`, يستدعي `__iter__()`. إن تركيب لغة بايثون بالكامل ليس سوى غطاء نحوي أنيق وناعم فوق هذه الدوال والبروتوكولات التحتية!
+
+وعندما تطبق هذه البروتوكولات على أصنافك المخصصة، تتحول كائناتك إلى مواطنين من الدرجة الأولى في لغة بايثون. فيمكن جمع متجهاتك الهندسية باستخدام علامة الجمع العادية `+`، وطباعتها بأناقة عبر `__repr__`، ومقارنتها عبر `__eq__`، واستخدامها كمفاتيح للقواميس عبر `__hash__`. تندمج كائناتك بسلاسة مع كافة مكتبات بايثون دون أن تجبر زملاءك على حفظ أسماء دوال غريبة مثل `.add_vector()` أو `.calculateLength()`.
+
+وأخيراً، عند تصميم هياكل أصناف معقدة تعتمد على الوراثة المتعددة، يقضي بايثون على أي غموض هيكلي باستخدام **خوارزمية C3 Linearization** لتحديد **ترتيب استبانة التوابع (Method Resolution Order - MRO)**. تفرد هذه الخوارزمية شجرة الوراثة المعقدة في خط مستقيم متسلسل وحتمي، وتضمن ألا يُفحص الصنف الأب قبل أبنائه، وأن تعمل نداءات `super()` التعاونية بسلاسة دون الوقوع في حلقات مفرغة.
+
+### Jargon Decoder / جدول فك شفرة المصطلحات
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Dunder Method** (الدوال ذات الشرطتين) | A standardized secret handshake letting objects respond to native operators (`+`, `==`, `len()`). | مصافحة سرية قياسية تمكن الكائن من التفاعل مع معاملات بايثون الأصلية بسلاسة. |
+| **Duck Typing** (النمط البطّي) | Caring only about what an object can do, rather than what pedigree it inherits from. | الاهتمام بما يستطيع الكائن فعله ومصافحاته، بدلاً من شجرة نسبه وسلالته الوراثية. |
+| **Protocol Contract** (عقد البروتوكول) | An informal agreement: implement `__iter__` and you become a fully qualified stream. | اتفاق سلوكي: إن نفذت دالة `__iter__` فأنت معتمد كتدفق قابل للتكرار في كل مكان. |
+| **Method Resolution Order (MRO)** (ترتيب استبانة التوابع) | A deterministic roadmap that flattens a family tree to decide which ancestor method runs. | خريطة طريق حتمية تفرد شجرة العائلة في خط مستقيم لتحديد أي دالة سلف تُستدعى أولاً. |
+| **Syntactic Sugar** (الحلاوة النحوية) | Writing clean expressions like `a + b` that the compiler expands into lower-level method calls. | شفرة نحوية أنيقة ومريحة مثل `a + b` يترجمها المفسر داخلياً إلى استدعاءات دقيقة. |
+
+### Visual Step-by-Step Data Transformation / التحول البصري للبيانات
+
+```text
+Executing Operator Overloading: v3 = v1 + v2
+Where v1 = Vector2D(1.0, 2.0) and v2 = Vector2D(3.0, 4.0)
+
+Step 1: Python Evaluates Binary Expression (v1 + v2)
+  Operator '+' dispatches to: type(v1).__add__(v1, v2)
+  CPython inspects slot: v1->ob_type->tp_as_number->nb_add
+
+Step 2: In-Method Execution (__add__)
+  Checks operand types: isinstance(v2, Vector2D) is True!
+  Computes coordinate sums:
+    new_x = v1.x + v2.x = 1.0 + 3.0 = 4.0
+    new_y = v1.y + v2.y = 2.0 + 4.0 = 6.0
+
+Step 3: New Instance Construction
+  Allocates new Vector2D object on heap: Vector2D(4.0, 6.0)
+  Binds reference tag: v3 -> Heap: Vector2D(4.0, 6.0)
+
+Step 4: Representation Inspection: repr(v3)
+  Calls: type(v3).__repr__(v3)
+  Returns developer string: "Vector2D(4.0, 6.0)"
+  Contract holds: eval(repr(v3)) == v3!
+```
+
 :::simulation-widget{engine="canvas2d" component="HashTableBucketLab"}
 ---
 interactive: true
@@ -29,46 +79,39 @@ highlighted_metric: "loss"
 ---
 :::
 
-### Mathematical & Architectural Foundations / الأسس الرياضية والمعمارية
+## Beat 2: Formal Invariants Demystified / الأسس الرياضية واللامتغيرات الصارمة
 
 $$
 x[k] \iff \text{type}(x).\_\_\text{getitem}\_\_(x, k), \quad a + b \iff \text{type}(a).\_\_\text{add}\_\_(a, b), \quad a == b \implies \text{hash}(a) == \text{hash}(b)
 $$
 
-```text
-CPython Protocol Slot Dispatch Architecture:
-Python Syntax: len(v)                     Python Syntax: a + b
-       |                                         |
-       v                                         v
-PyObject_Size(v)                         PyNumber_Add(a, b)
-       |                                         |
-       v                                         v
-v->ob_type->tp_as_sequence->sq_length    a->ob_type->tp_as_number->nb_add
-       |                                         |
-       v                                         v
-Direct C Function Pointer Call           Direct C Function Pointer Call
-(Zero Python dictionary lookup!)         (Zero Python dictionary lookup!)
-```
+### Opcode Mechanics & Protocol Slot Dispatch
 
-في العديد من لغات البرمجة كائنية التوجه مثل Java و C++، تُفرض التعددية الشكلية (Polymorphism) عبر هياكل وراثية صارمة وبيروقراطية تعتمد على الواجهات الشكلية الصريحة (`implements Comparable`). فإن نسي المطور التصريح عن الواجهة، رفض المترجم التعامل مع الكائن حتى وإن كان يمتلك الدوال المطلوبة تماماً. أما في بايثون، فالرؤية الهندسية قائمة على فلسفة مغايرة جذرياً: **النمط البطّي (Duck Typing) والتوجه بالبروتوكولات**.
+| Python Expression | CPython Virtual Opcode | C Slot Invocation | Dispatch Cost |
+| :--- | :--- | :--- | :--- |
+| `len(x)` | `UNARY_POSITIVE / CALL` | `x->ob_type->tp_as_sequence->sq_length(x)` | **~2-5 CPU cycles** (direct C pointer) |
+| `a + b` | `BINARY_OP (NB_ADD)` | `a->ob_type->tp_as_number->nb_add(a, b)` | **~2-5 CPU cycles** (direct C pointer) |
+| `a == b` | `COMPARE_OP (==)` | `a->ob_type->tp_richcompare(a, b, Py_EQ)` | **~5-10 CPU cycles** |
+| `hash(a)` | `BUILTIN_HASH` | `a->ob_type->tp_hash(a)` | **~2-5 CPU cycles** |
 
-المبدأ الجوهري للنمط البطي بسيط وعملي للغاية: *"إذا كان الطائر يمشي كالبطة، ويسبح كالبطة، ويصدر صوت البطة، فهو بطة!"*. نادراً ما يفحص مفسر بايثون شجرة النسب للكائن عبر `isinstance`. بل يكتفي بالتأكد من قدرة الكائن على الاستجابة لـ **مصافحات برمجية سرية موحدة**. وفي بايثون، تُعرف هذه المصافحات السرية بـ **الدوال السحرية ذات الشرطتين السفليتين (Dunder Methods)** كـ `__len__` و `__getitem__` و `__add__`.
+### Step-by-Step Execution Cost & Complexity Breakdown / تفكيك التكلفة الحسابية خطوة بخطوة
 
-تأمل ما يحدث فعلياً حين تكتب `len(my_object)`. لا يبحث بايثون عن خاصية مخزنة مسبقاً، بل يترجم الاستدعاء مباشرة إلى دالة النوع الخاصة: `type(my_object).__len__(my_object)`. وحين تكتب `a + b`، يترجمها إلى `type(a).__add__(a, b)`. وحين تستخدم الأقواس المربعة `obj[3]`، يستدعي `__getitem__(obj, 3)`. وحين تمر على الكائن في حلقة `for`، يستدعي `__iter__()`. إن تركيب لغة بايثون بالكامل ليس سوى غطاء نحوي أنيق وناعم فوق هذه الدوال والبروتوكولات التحتية!
+#### 1. Arithmetic Vector Addition: `v1 + v2`
+- **Step 1 (Binary Operator Dispatch)**: Virtual opcode `BINARY_OP` invokes C slot `nb_add`: **~3 CPU cycles**.
+- **Step 2 (Type Guard & Attribute Reads)**: Check `isinstance(other, Vector2D)` and read `other.x`, `other.y`: **~10 CPU cycles**.
+- **Step 3 (Floating Point Addition)**: 2 scalar float additions (`1.0 + 3.0` and `2.0 + 4.0`): **2 CPU cycles** ($O(1)$).
+- **Step 4 (Object Instantiation)**: Allocate new `Vector2D` instance on heap: **~56 bytes** memory, **~40 CPU cycles**.
+- **Total Arithmetic Cost**: Amortized $\mathcal{O}(1)$ time, $1$ new heap allocation.
 
-وعندما تطبق هذه البروتوكولات على أصنافك المخصصة، تتحول كائناتك إلى مواطنين من الدرجة الأولى في لغة بايثون. فيمكن جمع متجهاتك الهندسية باستخدام علامة الجمع العادية `+`، وطباعتها بأناقة عبر `__repr__`، ومقارنتها عبر `__eq__`، واستخدامها كمفاتيح للقواميس عبر `__hash__`. تندمج كائناتك بسلاسة مع كافة مكتبات بايثون دون أن تجبر زملاءك على حفظ أسماء دوال غريبة مثل `.add_vector()` أو `.calculateLength()`.
+#### 2. Equality & Hash Contract Enforcement
+- When storing `Vector2D` in a set or dictionary:
+  - Step 1: `hash(v)` computes `hash((v.x, v.y))` in $O(1)$ time (~10 ns).
+  - Step 2: On bucket match, `v1 == v2` checks coordinate float equality in $O(1)$ time.
+  - Set deduplication guarantees $\mathcal{O}(1)$ average lookup with zero hash corruption.
 
-وأخيراً، عند تصميم هياكل أصناف معقدة تعتمد على الوراثة المتعددة، يقضي بايثون على أي غموض هيكلي باستخدام **خوارزمية C3 Linearization** لتحديد **ترتيب استبانة التوابع (Method Resolution Order - MRO)**. تفرد هذه الخوارزمية شجرة الوراثة المعقدة في خط مستقيم متسلسل وحتمي، وتضمن ألا يُفحص الصنف الأب قبل أبنائه، وأن تعمل نداءات `super()` التعاونية بسلاسة دون الوقوع في حلقات مفرغة.
+---
 
-#### Architectural Breakdown & C-Level Slots:
-- **Type Slots (`tp_as_number`, `tp_as_sequence`, `tp_as_mapping`)**: In CPython's C source code, dunder methods are mirrored by fast C function pointer slots on the `PyTypeObject`. Built-in operations like `len()` execute at raw C speed without dictionary lookups.
-- **`__repr__` vs `__str__`**: `__repr__` should be unambiguous, aiming for `eval(repr(x)) == x` (primarily for developers and debugging); `__str__` should be human-readable and user-friendly.
-- **The Hash Contract Invariant**: If two objects compare equal via `__eq__`, their `__hash__` values must match. If you override `__eq__` without defining `__hash__`, CPython automatically sets `__hash__ = None` to prevent corrupting hash tables.
-
-#### التحليل المعماري وفتحات مفسر C:
-- **فتحات النوع في لغة C**: في شفرة بايثون المصدرية، ترتبط الدوال السحرية بفتحات مؤشرات دوال C سريعة (Slots) داخل بنية `PyTypeObject`، مما يجعل استدعاء `len()` ينفذ بسرعة لغة C الخام دون تفتيش قواميس الخصائص.
-- **الفرق بين `__repr__` و `__str__`**: الدالة `__repr__` صُممت للمطورين ويجب أن تعيد تمثيلاً دقيقاً غير غامض يمكن تمريره لـ `eval()`، بينما صُممت `__str__` للمستخدم النهائي لتكون مقروءة وواضحة.
-- **عقد التجزئة الحتمي**: إن تساوى كائنان عبر `__eq__`، وجب تطابق شفرة تجزئتهما. وإن عرفت `__eq__` دون `__hash__`، يعطل بايثون التجزئة تلقائياً بجعل `__hash__ = None`.
+## Beat 3: Guided Code Challenge / التحدي البرمجي الموجه
 
 :::python-challenge{id="py-object-oriented-dunder"}
 ---
@@ -87,54 +130,76 @@ class Vector2D:
     A 2D geometric vector implementing Python's arithmetic, equality,
     representation, and hashing dunder protocols.
     """
-    # Step 1: Initialize coordinates converting values to float
-    def __init__(self, x: float, y: float):
+    def __init__(self, x: float, y: float) -> None:
+        # Step 1: Initialize coordinates converting values to float
         self.x = float(x)
         self.y = float(y)
 
-    # Step 2: Implement unambiguous string representation for debugging
-    def __repr__(self) -> str:
-        return f"Vector2D({self.x}, {self.y})"
-
-    # Step 3: Implement value equality comparing floating coordinates
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Vector2D):
-            return False
-        return self.x == other.x and self.y == other.y
-
-    # Step 4: Implement vector addition returning a new Vector2D instance
     def __add__(self, other: "Vector2D") -> "Vector2D":
-        if not isinstance(other, Vector2D):
-            return NotImplemented
-        return Vector2D(self.x + other.x, self.y + other.y)
+        # Step 2: Implement vector addition protocol
+        if isinstance(other, Vector2D):
+            return Vector2D(self.x + other.x, self.y + other.y)
+        return NotImplemented
 
-    # Step 5: Implement hash protocol based on immutable coordinate tuple
+    def __eq__(self, other: object) -> bool:
+        # Step 3: Implement value equality protocol
+        if isinstance(other, Vector2D):
+            return self.x == other.x and self.y == other.y
+        return False
+
     def __hash__(self) -> int:
+        # Step 4: Implement hash protocol consistent with equality
         return hash((self.x, self.y))
+
+    def __repr__(self) -> str:
+        # Step 5: Implement developer representation protocol
+        return f"Vector2D({self.x}, {self.y})"
 ```
 :::
 
-### Transfer Quiz & Practical Debugging / أسئلة الفهم ونقل المعرفة
+## Beat 4: Real-World Transfer Scenario / سيناريو التطبيق ونقل المعرفة
+
+### Reality Check: The Broken Hash Table Invariant
+
+A game developer defines an entity coordinate class:
+```python
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __eq__(self, other):
+        return isinstance(other, Point) and self.x == other.x and self.y == other.y
+
+p1 = Point(1, 2)
+p2 = Point(1, 2)
+points_set = {p1, p2}
+```
+When the developer runs `points_set = {p1, p2}`, Python crashes with:
+`TypeError: unhashable type: 'Point'`.
+Why does defining `__eq__` suddenly make an object unhashable in Python?
+
+*عرف مطور ألعاب صنفاً لإحداثيات النقاط وعرف فيه دالة التساوي `__eq__` دون دالة التجزئة `__hash__`. عند محاولة إدخال النقطتين في مجموعة، انهار الكود بخطأ `TypeError: unhashable type: 'Point'`. لماذا يؤدي تعريف دالة التساوي بمفردها إلى تعطيل التجزئة تلقائياً في بايثون؟*
 
 :::transfer-quiz
 **Question / السؤال:**
-Why does defining `__eq__` on a custom Python class automatically set its `__hash__ = None` unless explicitly overridden?
-*لماذا يؤدي تعريف الدالة `__eq__` في أي صنف مخصص إلى تعيين `__hash__ = None` تلقائياً ما لم يتم التصريح عنها صراحة؟*
+Why does overriding `__eq__` automatically disable `__hash__` in Python classes?
+*لماذا يؤدي تجاوز دالة `__eq__` إلى إلغاء دالة `__hash__` تلقائياً في بايثون؟*
 
-- [x] To uphold the Hash Contract: if two objects compare equal, their hash codes must be identical; default identity-based hashing would break this contract.
-  *للحفاظ على العقد الرياضي للتجزئة: إذا تساوى كائنان فيجب تطابق شفرتيهما، والتجزئة الافتراضية القائمة على عنوان الذاكرة تخرق هذا العقد.*
-- [ ] Because Python's virtual machine deletes methods when new ones are compiled.
-  *لأن مفسر بايثون يحذف الدوال القديمة عند ترجمة دوال جديدة.*
-- [ ] Because classes with `__eq__` are automatically converted to mutable types.
-  *لأن الأصناف التي تحوي `__eq__` تتحول تلقائياً إلى أنواع قابلة للتعديل.*
+- [x] In Python, defining __eq__ automatically sets __hash__ = None to enforce the fundamental hash contract (a == b implies hash(a) == hash(b)) and prevent hash table corruption.
+  *في بايثون، يؤدي تعريف __eq__ إلى ضبط __hash__ = None تلقائياً لفرض عقد التجزئة الجوهري (تساوي الكائنين يفرض تساوي شفرة تجزئتهما) وحماية جداول التجزئة من التلف.*
+- [ ] User-defined classes can never be stored in sets or dictionaries in Python.
+  *لا يمكن تخزين الأصناف المعرفة من قبل المستخدم في المجموعات أو القواميس في بايثون.*
+- [ ] Sets require class inheritance from collections.Hashable before accepting custom objects.
+  *تتطلب المجموعات أن يرث الصنف صراحة من collections.Hashable لقبول الكائنات المخصصة.*
 
 **Analysis & Architectural Explanation / التحليل والشرح المعماري:**
-**Correct / الإجابة الصحيحة:** In Python, the default `object.__hash__` is derived from the instance's unique heap memory address (`id(self)`). However, once you implement a custom `__eq__`, two separate instances at different memory addresses can be deemed equal in value (`Vector2D(1, 2) == Vector2D(1, 2)`). If they kept the default identity hash, they would produce different hash codes and land in different hash table buckets—violating the fundamental Hash Contract ($a == b \implies \text{hash}(a) == \text{hash}(b)$). Setting `__hash__ = None` intentionally prevents this corruption by raising a clear `TypeError` until you define a matching hash function.
-*في بايثون، تُشتق التجزئة الافتراضية للكائنات من عنوانها في الكومة (`id(self)`). لكن بمجرد تعريف `__eq__`، يصبح بإمكان نسختين مختلفتين في العنوان أن تتطابقا في القيمة (`Vector2D(1, 2) == Vector2D(1, 2)`). فلو احتفظتا بالتجزئة المعتمدة على العنوان لاختلفت شفرتاهما وسكنتا في صناديق مختلفة بالقاموس، مما يقوض عقد التجزئة الحتمي. لذا يعطل بايثون التجزئة تلقائياً بجعل `__hash__ = None` لحماية سلامة البيانات وإلزام المطور بتعريف دالة تجزئة متوافقة.*
+**Correct / الإجابة الصحيحة:** By default, custom Python classes inherit an identity-based `__hash__` (derived from their memory address `id(self)`). However, if you override `__eq__` to compare values (`self.x == other.x`), two distinct instances `p1` and `p2` would compare as equal ($p_1 == p_2$) while possessing completely different memory-address hashes ($\text{hash}(p_1) \ne \text{hash}(p_2)$). This violates the core mathematical hash contract and causes hash tables to store duplicate "equal" items. To prevent this, CPython explicitly sets `__hash__ = None` whenever `__eq__` is defined without an accompanying `__hash__`.
+*افتراضياً، ترث الأصناف دالة تجزئة مبنية على هوية عنوان الذاكرة `id(self)`. فإذا عدلت دالة `__eq__` لتقارن القيم، فسيتساوى الكائنان في القيمة بينما تختلف شفرة تجزئتهما المبنية على العناوين. وهذا يكسر العقد الرياضي الأساسي لجداول التجزئة ويؤدي لتكرار العناصر المتساوية. ولمنع هذا التلف، يعطل بايثون دالة التجزئة `__hash__ = None` فوراً ما لم يعرف المطور دالة `__hash__` متوافقة صراحة.*
 
-**Incorrect / مشتت غير صحيح:** Python's compiler never deletes methods during class compilation; this is an explicit, safety-critical language rule.
-*لا يحذف مفسر بايثون الدوال أثناء الترجمة، بل هذه قاعدة أمان معمارية صريحة في لغة بايثون.*
+**Incorrect / مشتت غير صحيح:** Custom classes can freely participate in sets and dictionaries once they define both `__eq__` and `__hash__`.
+*تستطيع الأصناف المخصصة الانضمام للمجموعات والقواميس بمجرد تعريف الدالتين معاً.*
 
-**Incorrect / مشتت غير صحيح:** Custom classes remain mutable or immutable depending on whether their instance attributes can be rebound or modified, regardless of `__eq__`.
-*تحديد قابلية الصنف للتعديل يرتبط بإمكانية تعديل خصائصه الداخلية ولا علاقة له بتعريف دالة المقارنة.*
+**Incorrect / مشتت غير صحيح:** Python relies on duck typing protocols, not rigid class inheritance from abstract base classes.
+*يعتمد بايثون على بروتوكولات النمط البطّي الحرة دون فرض الوراثة الإجبارية من الأصناف التجريدية.*
 :::

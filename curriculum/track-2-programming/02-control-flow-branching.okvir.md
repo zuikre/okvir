@@ -12,7 +12,9 @@ i18n:
 
 # Control Flow, Short-Circuit Boolean Logic & Branching Trees
 
-At the hardware level, your computer's Central Processing Unit (CPU) is an relentless clockwork machine. By default, it reads instructions sequentially from memory, incrementing its Instruction Pointer (Program Counter) step by step, like a locomotive hurtling down a single, unbending stretch of railroad track. If programs could only execute sequentially, computers would be little more than glorified calculators playing back fixed tapes.
+## Beat 1: Intuition & Mental Model / الحدس والنموذج الذهني
+
+At the hardware level, your computer's Central Processing Unit (CPU) is a relentless clockwork machine. By default, it reads instructions sequentially from memory, incrementing its Instruction Pointer (Program Counter) step by step, like a locomotive hurtling down a single, unbending stretch of railroad track. If programs could only execute sequentially, computers would be little more than glorified calculators playing back fixed tapes.
 
 Conditional branching (`if`, `elif`, `else`) introduces **railroad switches** onto the tracks. When execution reaches a junction, the CPU evaluates a condition expression and flips the switch, steering the instruction pointer onto an alternate branch of bytecode while skipping the other entirely.
 
@@ -22,31 +24,7 @@ Here is the stunning realization that surprises even intermediate programmers: *
 
 How does Python decide whether an arbitrary object is truthy or falsy? This is governed by Python's **Truthiness Protocol**. Under the hood, Python calls `bool(x)`, which first consults the object's `__bool__()` method. If that is undefined, it checks `__len__()` (where a length of zero is falsy). Only a tiny handful of built-in values are inherently falsy: constants `None` and `False`, numeric zeros (`0`, `0.0`, `0j`), and empty collections (`""`, `()`, `[]`, `{}`, `set()`). Every other object in Python—including custom class instances by default—evaluates to truthy!
 
-:::simulation-widget{engine="canvas2d" component="ControlFlowGraphLab"}
 ---
-interactive: true
-highlighted_metric: "loss"
----
-:::
-
-### Mathematical & Architectural Foundations / الأسس الرياضية والمعمارية
-
-$$
-\mathcal{E}\llbracket e_1 \land e_2 \rrbracket = \begin{cases} e_1 & \text{if } \text{bool}(e_1) = \mathbf{False} \\ e_2 & \text{if } \text{bool}(e_1) = \mathbf{True} \end{cases}, \quad \mathcal{E}\llbracket e_1 \lor e_2 \rrbracket = \begin{cases} e_1 & \text{if } \text{bool}(e_1) = \mathbf{True} \\ e_2 & \text{if } \text{bool}(e_1) = \mathbf{False} \end{cases}
-$$
-
-```text
-Short-Circuit Execution Graph: expr1 and expr2
-         [ Evaluate expr1 ]
-                 |
-          bool(expr1) is True?
-             /       \
-          (No)       (Yes)
-           /           \
-     Return expr1    [ Evaluate expr2 ]
-  (Short-circuit!)          |
-                       Return expr2
-```
 
 على المستوى العتادي، تعمل وحدة المعالجة المركزية (CPU) كآلة زمنية دقيقة؛ تقرأ التعليمات تتابعياً من الذاكرة وتزيد مؤشر التعليمات (Program Counter) خطوة بخطوة، تماماً كقطار يندفع على سكة حديد مستقيمة ذات مسار واحد. ولو كانت البرامج تعمل تتابعياً فقط، لأصبحت الحواسيب مجرد آلات حاسبة بدائية تعيد تشغيل شريط مسجل ثابت.
 
@@ -56,19 +34,84 @@ Short-Circuit Execution Graph: expr1 and expr2
 
 وهنا تظهر المفاجأة المعمارية التي تبهر الكثير من المطورين: **معاملات `and` و `or` في بايثون لا تعيد قيماً منطقية مجردة (`True` أو `False`)!** بل تعيد **الكائن الحقيقي ذاته** الذي حسم القرار المنطقي! ففي `A or B`: إن كان `A` صادقاً أعاد بايثون الكائن `A`، وإلا قيم وأعاد `B`. وفي `A and B`: إن كان `A` زائفاً أعاد الكائن `A`، وإلا أعاد `B`. هذا السلوك يسمح بصياغات دفاعية غاية في القوة والأناقة مثل `user and user.get_profile()`، حيث لا يتم استدعاء التابع على الإطلاق إذا كان `user` يساوي `None`، مما يمنع أخطاء الانهيار القاتلة `AttributeError`.
 
-كيف يحكم بايثون على أي كائن عشوائي بأنه صادق أو زائف؟ يتم ذلك عبر **بروتوكول الصدق والزيف** (Truthiness Protocol). يستدعي بايثون داخلياً الدالة `bool(x)`، والتي تبحث أولاً عن الدالة الخاصة `__bool__()` في الكائن. فإن لم تجدها، بحثت عن `__len__()` (حيث يعتبر الطول 0 زائفاً). وهناك حفنة محددة فقط من القيم الزائفة بطبيعتها في بايثون: الثوابت `None` و `False`، والأصفار الرقمية (`0`, `0.0`, `0j`)، والحاويات الفارغة (`""`, `()`, `[]`, `{}`, `set()`). وكل ما عدا ذلك في بايثون يُعتبر صادقاً (Truthy) افتراضياً!
+### Jargon Decoder / جدول فك شفرة المصطلحات
 
-#### Architectural Breakdown & Opcode Mechanics:
-- **`POP_JUMP_IF_FALSE` / `POP_JUMP_IF_TRUE`**: Standard conditional jump instructions that pop the top-of-stack (TOS) and conditionally branch the instruction pointer.
-- **`JUMP_IF_FALSE_OR_POP`**: The dedicated opcode for `and`. Inspects TOS: if falsy, it leaves the value on the stack and jumps past the right-hand operand; if truthy, it pops TOS and continues execution into the right operand.
-- **`JUMP_IF_TRUE_OR_POP`**: The dedicated opcode for `or`. Inspects TOS: if truthy, it preserves the value on the stack and jumps past the right-hand operand; if falsy, it pops TOS and continues.
-- **Truthiness Resolution**: `type(x)->tp_as_number->nb_bool` followed by `type(x)->tp_as_sequence->sq_length`.
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Branching / Jump** (التفريع الشرطي) | A railroad switch steering a train down track A or track B based on a green/red signal. | تحويلة سكة حديد توجه مسار القطار يميناً أو يساراً بناءً على إشارة المرور الخضراء أو الحمراء. |
+| **Short-Circuit Evaluation** (الدارة القصيرة) | An automatic electrical breaker tripping early to prevent unnecessary energy waste. | قاطع دارة كهربائي آلي يفصل فوراً لتوفير الطاقة والجهد بمجرد حسم النتيجة المنطقية. |
+| **Truthiness Protocol** (بروتوكول الصدق والزيف) | A standardized security checkpoint rule checking if a package has contents (`True`) or is empty (`False`). | قاعدة فحص معيارية عند نقطة تفتيش تقرر هل الصندوق يحوي بضائع (`True`) أم فارغ (`False`). |
+| **Operand Object Return** (إعادة كائن المعامل) | Handing over the actual decision-making box itself instead of printing an abstract yes/no receipt. | تسليم الصندوق الفعلي الذي حسم القرار باليد بدلاً من طباعة إيصال ورقي مجرد بنعم أو لا. |
+| **Instruction Pointer** (مؤشر التعليمات) | The musical conductor's baton pointing strictly to the current note being played right now. | عصا قائد الأوركسترا التي تشير بدقة إلى النوتة الموسيقية الجاري عزفها في هذه اللحظة. |
 
-#### التحليل المعماري وميكانيكا شفرة البايت:
-- **أوامر القفز المشروط**: تستخدم جمل `if` أمري `POP_JUMP_IF_FALSE` و `POP_JUMP_IF_TRUE` لتفريغ قمة المكدس والقفز نحو العنوان المطلوب.
-- **أمر `JUMP_IF_FALSE_OR_POP`**: الأمر المخصص لمعامل `and`. يفحص الكائن في قمة المكدس؛ فإن كان زائفاً يتركه ويقفز متجاوزاً الطرف الأيمن، وإن كان صادقاً يحذفه ويواصل التنفيذ.
-- **أمر `JUMP_IF_TRUE_OR_POP`**: الأمر المخصص لمعامل `or`. إن كان الكائن صادقاً يتركه على المكدس ويقفز فوراً، وإن كان زائفاً يحذفه ويقيم الطرف الأيمن.
-- **آلية فحص الصدق**: تفحص فتحة `nb_bool` أولاً، ثم فتحة `sq_length` في بنية C للنوع.
+### Visual Step-by-Step Data Transformation / التحول البصري للبيانات
+
+```text
+Evaluating: result = user and user.get_profile() or default_profile
+
+Scenario 1: user is None (Falsy Guarded Bypass)
+Step 1: Evaluate Left Operand (user)
+        [ user is None ] ---> bool(None) == False!
+Step 2: Short-Circuit Operator 'and'
+        Left side is Falsy -> Entire 'and' expression immediately yields None!
+        'user.get_profile()' is NEVER EVALUATED! (Zero AttributeError crash!)
+Step 3: Evaluate Operator 'or': None or default_profile
+        Left side (None) is Falsy -> Operator 'or' evaluates right-hand operand.
+        Output: default_profile returned!
+
+Scenario 2: user is Authenticated (Truthy Pass-Through)
+Step 1: Evaluate Left Operand (user)
+        [ user is UserObj ] ---> bool(UserObj) == True!
+Step 2: Proceed across 'and'
+        Left side is Truthy -> Evaluate right side: user.get_profile()
+        Returns ProfileObj (Truthy)
+Step 3: Evaluate Operator 'or': ProfileObj or default_profile
+        Left side (ProfileObj) is Truthy -> Short-circuits 'or'!
+        'default_profile' is never touched!
+        Output: ProfileObj returned!
+```
+
+:::simulation-widget{engine="canvas2d" component="ControlFlowGraphLab"}
+---
+interactive: true
+highlighted_metric: "loss"
+---
+:::
+
+## Beat 2: Formal Invariants Demystified / الأسس الرياضية واللامتغيرات الصارمة
+
+$$
+\mathcal{E}\llbracket e_1 \land e_2 \rrbracket = \begin{cases} e_1 & \text{if } \text{bool}(e_1) = \mathbf{False} \\ e_2 & \text{if } \text{bool}(e_1) = \mathbf{True} \end{cases}, \quad \mathcal{E}\llbracket e_1 \lor e_2 \rrbracket = \begin{cases} e_1 & \text{if } \text{bool}(e_1) = \mathbf{True} \\ e_2 & \text{if } \text{bool}(e_1) = \mathbf{False} \end{cases}
+$$
+
+### Opcode Mechanics & Architectural Mapping
+
+| Opcode / أمر شفرة البايت | Stack Transformation / تحول المكدس | Execution Condition / شرط التنفيذ | Architectural Benefit / الفائدة المعمارية |
+| :--- | :--- | :--- | :--- |
+| `POP_JUMP_IF_FALSE` | `TOS -> []` | Jump if `bool(TOS) == False` | Standard `if` statement jump popping top value |
+| `JUMP_IF_FALSE_OR_POP` | `TOS -> TOS` (jump) / `[]` (fallthrough) | Short-circuits `and` | Preserves operand on stack if falsy, skips right side |
+| `JUMP_IF_TRUE_OR_POP` | `TOS -> TOS` (jump) / `[]` (fallthrough) | Short-circuits `or` | Preserves operand on stack if truthy, skips right side |
+
+### Step-by-Step Execution Cost & Complexity Breakdown / تفكيك التكلفة الحسابية خطوة بخطوة
+
+#### 1. Short-Circuiting `a and b` when `a` is Falsy
+- **Step 1 (Load `a`)**: Load local variable `a` onto top of stack: **1 CPU cycle** ($O(1)$).
+- **Step 2 (Truthiness Check)**: Inspect `a->ob_type->tp_as_number->nb_bool` or `tp_as_sequence->sq_length`: **~5-10 CPU cycles**.
+- **Step 3 (Short-Circuit Jump)**: `JUMP_IF_FALSE_OR_POP` encounters False: branches instruction pointer past `b`: **1 branch cycle**.
+- **Cost Avoided**: Skips evaluation of `b` completely (saving arbitrary function calls, database queries, or network latency).
+- **Total Arithmetic Cost**: $O(1)$ time, $0$ stack allocation, avoids $T(b)$ latency entirely.
+
+#### 2. Eager vs Short-Circuit Evaluation Latency Comparison
+- **Eager Evaluation (Traditional Function Call `check(a, b)`)**: Both arguments are evaluated before invocation: Cost $= T(a) + T(b) + T(\text{call})$.
+- **Python Short-Circuit (`a and b`)**:
+  - If $a$ is False: Cost $= T(a) + \mathcal{O}(1)$.
+  - If $a$ is True: Cost $= T(a) + T(b) + \mathcal{O}(1)$.
+- **Worst-case Time Complexity**: $\mathcal{O}(T(a) + T(b))$.
+- **Best-case Time Complexity**: $\mathcal{O}(T(a))$.
+
+---
+
+## Beat 3: Guided Code Challenge / التحدي البرمجي الموجه
 
 :::python-challenge{id="py-control-flow-branching"}
 ---
@@ -121,20 +164,26 @@ def resolve_config_setting(
 ```
 :::
 
-### Transfer Quiz & Practical Debugging / أسئلة الفهم ونقل المعرفة
+## Beat 4: Real-World Transfer Scenario / سيناريو التطبيق ونقل المعرفة
 
-:::transfer-quiz
-**Question / السؤال:**
-A developer writes:
+### Reality Check: The Worker Pool Default Setting Bug
+
+A developer configures an asynchronous backend worker pool:
 ```python
 max_workers = user_input or default_workers
 ```
 If `user_input = 0` (intended to mean single-threaded / non-concurrent execution) and `default_workers = 8`, what is `max_workers`, and why?
-*كتب مطور برمجيات الكود التالي:
+
+*كتب مطور برمجيات الكود التالي لضبط تجمع خيوط المعالجة:
 ```python
 max_workers = user_input or default_workers
 ```
 إذا كانت قيمة `user_input = 0` (وكان القصد تنفيذ المهمة بخيط واحد / دون تزامن) و `default_workers = 8`، فما قيمة `max_workers` ولماذا؟*
+
+:::transfer-quiz
+**Question / السؤال:**
+What is the resulting assignment and underlying architectural cause?
+*ما هي النتيجة المعادة وما هو السبب المعماري الكامن؟*
 
 - [x] 8 — Because `bool(0)` is False, Python's `or` short-circuits to the right-hand operand, clobbering the intentional 0 value.
   *8 — لأن `bool(0)` تعطي False، فينتقل المعامل `or` إلى الطرف الأيمن متجاهلاً القيمة 0 المقصودة ومستبدلاً إياها بالافتراضية.*

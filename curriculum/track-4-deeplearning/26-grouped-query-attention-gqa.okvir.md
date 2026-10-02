@@ -12,7 +12,7 @@ i18n:
 
 # Grouped-Query Attention (GQA) & Multi-Query Attention (MQA)
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
 As context windows expanded from 2,048 tokens in GPT-3 to 32,768, 128,000, and even 1,000,000 tokens in modern frontier foundation models, the **KV Cache Memory Wall** became the single greatest bottleneck in production LLM inference serving. In classical Multi-Head Attention (MHA), every single query head possesses its own dedicated key and value head ($H_Q = H_{KV}$). For a model with 64 attention heads, 64 distinct Key matrices and 64 distinct Value matrices must be allocated in GPU memory and read across the memory bus for every single generated token.
 
@@ -32,6 +32,40 @@ During autoregressive inference decoding, GQA dramatically boosts hardware effic
 
 يشبه هذا النظام مجموعات الدراسة التفاعلية: ففي حين يتطلب النظام الكلاسيكي معلماً خاصاً لكل طالب على حدة (مكلف للغاية في الموارد)، ويفرض نظام MQA معلماً واحداً لثلاثين طالباً (مما يخفض جودة الاستيعاب)، ينظم نظام GQA الطلاب في 8 مجموعات تخصصية يشرف على كل منها معلم بارع؛ مما يوفر توازناً مثالياً بين الكفاءة العالية وجودة التعلم الفائقة.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Grouped-Query Attention (GQA)** (الانتباه بالاستعلامات المجمعة) | The shared camera crew: groups of 8 journalists (Queries) share a single camera and mic (one Key-Value pair), slashing memory overhead. | طاقم التصوير المشترك: تشترك كل 8 استعلامات في مفتاح وقيمة واحدة، مما يقلص استهلاك الذاكرة دون المساس بجودة النموذج. |
+| **Multi-Head Attention (MHA)** (الانتباه متعدد الرؤوس التقليدي) | One camera per journalist: $H_Q = H_{KV}$; rich representation power, but creates massive KV caches that overwhelm GPU memory bandwidth. | كاميرا مستقلة لكل صحفي: كل رأس استعلام يمتلك رأس مفتاح وقيمة مستقل، وهو مكلف جداً في استهلاك الذاكرة. |
+| **Multi-Query Attention (MQA)** (الانتباه أحادي المفتاح والقيمة) | One camera for the entire stadium: all 32 Query heads share a single Key and Value head ($H_{KV}=1$), maximizing speed but degrading nuance. | كاميرا واحدة للملعب بأكمله: تشترك كافة رؤوس الاستعلام في رأس مفاتيح واحد، مما يسرع التوليد لكنه يقلل الدقة اللغوية. |
+| **KV Cache Compression Ratio** (نسبة توفير ذاكرة الكاش) | Memory savings factor: an $8:1$ query-to-KV ratio reduces KV cache size by $87.5\%$ ($8\times$ smaller), enabling huge context windows. | معدل خفض الذاكرة: نسبة 8 إلى 1 تقلص حجم مخزن المفاتيح والقيم بنسبة 87.5%، مما يتيح معالجة سياقات أطول بثماني مرات. |
+| **Memory Bandwidth Wall** (عنق زجاجة نطاق تردد الذاكرة) | The GPU traffic jam: because generation is memory-bound, reducing KV cache size by $8\times$ translates directly into near-$8\times$ higher throughput. | اختناق حركة البيانات في الذاكرة: بما أن التوليد محكوم بسرعة نقل البيانات، فإن تقليص الكاش يترجم مباشرة لقفزة هائلة في سرعة التوليد. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+MHA VS. MQA VS. GQA HEAD TOPOLOGIES:
+=============================================================================
+MULTI-HEAD ATTENTION (MHA):  (H_Q = 8, H_KV = 8)
+Queries:   [ Q_1 ] [ Q_2 ] [ Q_3 ] [ Q_4 ] [ Q_5 ] [ Q_6 ] [ Q_7 ] [ Q_8 ]
+Keys/Vals: [ K_1 ] [ K_2 ] [ K_3 ] [ K_4 ] [ K_5 ] [ K_6 ] [ K_7 ] [ K_8 ]
+--> 1-to-1 matching: Maximum quality, Maximum KV Cache memory consumption!
+
+MULTI-QUERY ATTENTION (MQA): (H_Q = 8, H_KV = 1)
+Queries:   [ Q_1 ] [ Q_2 ] [ Q_3 ] [ Q_4 ] [ Q_5 ] [ Q_6 ] [ Q_7 ] [ Q_8 ]
+                  \     \     \     |     /     /     /     /
+Keys/Vals:                         [ K_1 ]
+--> 8-to-1 matching: Minimum KV Cache memory, Significant quality degradation!
+
+GROUPED-QUERY ATTENTION (GQA): (H_Q = 8, H_KV = 2, Group Size = 4)
+Queries:   [ Q_1 ] [ Q_2 ] [ Q_3 ] [ Q_4 ]     [ Q_5 ] [ Q_6 ] [ Q_7 ] [ Q_8 ]
+                  \     |     |     /                 \     |     |     /
+Keys/Vals:             [ K_1 ]                               [ K_2 ]
+--> Group 1 shares K_1, V_1; Group 2 shares K_2, V_2!
+--> Goldilocks balance: Full MHA quality with 4x-8x smaller KV memory footprint!
+```
+
 :::simulation-widget{engine="canvas2d" component="AttentionHeatmapCanvas"}
 ---
 interactive: true
@@ -41,7 +75,7 @@ highlighted_metric: "loss"
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
 In Grouped-Query Attention, the $H_Q$ query heads are organized into $H_{KV}$ groups, each containing $r = H_Q / H_{KV}$ query heads. For each group $g \in \{1, \dots, H_{KV}\}$ and head index $i \in \{1, \dots, r\}$, the attention head is computed against the shared Key and Value projections:
 
@@ -61,21 +95,21 @@ $$
 \text{Memory Compression Ratio} = \frac{H_{KV}}{H_Q} = \frac{1}{r}
 $$
 
-### Comprehensive Symbol & Parameter Breakdown
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-| Symbol | Dimensionality | Mathematical Interpretation | Operational Role |
-| :--- | :--- | :--- | :--- |
-| $H_Q$ | $\mathbb{Z}^+$ | Total number of Query attention heads | Dictates the diversity and expressivity of questions the model can ask. |
-| $H_{KV}$ | $\mathbb{Z}^+$ | Total number of Key and Value attention heads | Dictates the number of distinct memory streams stored in the KV cache. |
-| $r = H_Q / H_{KV}$ | $\mathbb{Z}^+$ | Head repetition / expansion ratio | Number of query heads that share the same key-value projection pair. |
-| $\mathbf{q}_{g, i}$ | $\mathbb{R}^{T \times d_k}$ | Query projection for head $i$ inside group $g$ | Emits distinct query representations for specialized contextual search. |
-| $\mathbf{k}_g, \mathbf{v}_g$ | $\mathbb{R}^{S \times d_k}$ | Shared Key and Value representations for group $g$ | Reused across all $r$ queries in group $g$, eliminating redundant memory allocations. |
-| $\mathbin{\Vert}$ | Operator | Tensor concatenation across head channel dimension | Combines all $H_Q$ contextualized heads prior to output projection $\mathbf{W}_O$. |
-| $\mathbf{W}_O$ | $\mathbb{R}^{d \times d}$ | Final multi-head linear projection | Merges all grouped attention head representations into the model dimension. |
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $H_Q$ | Number of Query Heads / عدد رؤوس الاستعلام | Total count of distinct query projections in the multi-head layer (e.g. 32). |
+| $H_{KV}$ | Number of Key-Value Heads / عدد رؤوس المفاتيح والقيم | Count of key and value heads stored in cache (e.g. 8 in LLaMA-3-8B). |
+| $G = H_Q / H_{KV}$ | Query Group Size / حجم المجموعة | Ratio of queries sharing each single key-value head (e.g. $32 / 8 = 4$). |
+| $\text{Memory Savings} = \frac{H_{KV}}{H_Q}$ | KV Cache Compression Fraction / نسبة تقليص الذاكرة | Fraction of original MHA memory consumed by the KV cache (e.g. $1/4$ or $1/8$). |
+| $\text{repeat\_interleave}(G)$ | KV Head Broadcasting / التكرار البرمجي للرؤوس | Hardware operation expanding $H_{KV}$ heads to match $H_Q$ during matrix multiplication. |
 
-يوضح هذا الجدول كيف يختزل GQA حجم الذاكرة المستهلكة بنسبة $1/r$؛ فعندما يكون $H_Q = 64$ و$H_{KV} = 8$، تصبح نسبة الضغط $1/8 = 12.5\%$، مما يعني توفير $87.5\%$ من ذاكرة البطاقة الرسومية المخصصة للتخزين المؤقت دون المساس بجودة التوليد.
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **The Asymmetry of Attention**: Ainslie et al. (2023) discovered that while query heads need rich diversity to ask different questions, keys and values only represent factual context, which can be shared across multiple questions with minimal loss of nuance.
+2. **Memory Bandwidth Bottleneck Resolution**: During autoregressive decoding with batch size $B$, the GPU must transfer $2 \times L \times S \times H_{KV} \times d_k$ bytes per step. Dividing $H_{KV}$ by 8 slashes memory traffic by $87.5\%$, overcoming the memory bandwidth wall.
+3. **The Frontier Gold Standard**: Virtually every modern open-weight LLM (LLaMA 3, Mistral, Gemma 2, DeepSeek) uses GQA with an $8:1$ or $4:1$ ratio as the mandatory architectural default.
 
----
 
 ## Beat 3: Python Challenge
 

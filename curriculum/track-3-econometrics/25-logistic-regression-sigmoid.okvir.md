@@ -14,21 +14,76 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Imagine attempting to measure the curvature of a delicate crystal bowl using a rigid wooden yardstick. In classical statistics, fitting Ordinary Least Squares (OLS) to a binary classification problem—often termed the **Linear Probability Model (LPM)**—is guilty of the exact same mechanical blunder. When predicting whether a borrower will default on a mortgage, whether a patient has a malignant tumor, or whether an enterprise client will churn, the true target $y \in \{0, 1\}$ is categorical and bounded. But a straight line is relentlessly linear: as an applicant's debt-to-income ratio climbs, a linear equation will unblinkingly output a default probability of $140\%$, or assign a $-25\%$ probability of disease to an exceptionally healthy patient. These nonsensical outputs violate the fundamental Kolmogorov axioms of probability.
+### Intuition & Real-World Story
 
-Logistic regression resolves this pathology by replacing the rigid wooden ruler with an **elastic hydraulic shock absorber: the Sigmoid S-curve**. Think of the Sigmoid activation as a mathematical dampening chamber. You feed it any raw, unbounded linear score $z = \mathbf{w}^T \mathbf{x}$—whether it is $-5,000$, $+42$, or zero—and the chamber smoothly compresses and squashes the output into the strictly bounded open interval $(0, 1)$. As the score shoots toward positive infinity, the curve saturates gracefully toward certainty ($1.0$); as the score plummets into deep negative territory, it flattens out toward impossibility ($0.0$), but it can never breach the physical boundaries of probability.
+Suppose you are a loan officer at a major regional bank tasked with predicting whether mortgage applicants will default ($y = 1$) or repay in full ($y = 0$).
 
-To understand why this dampening works so naturally, we must demystify the concept of **odds and log-odds (the logit)**. In daily conversation, if a horse has an $80\%$ chance of winning, its probability is $p = 0.8$. But bookmakers speak in *odds*: the ratio of winning to losing, which is $0.8 / 0.2 = 4 \text{ to } 1$. Odds live in the asymmetric domain $[0, \infty)$. By taking the natural logarithm of the odds—computing $\ln(p / (1 - p))$—we unlock the entire infinite real number line $(-\infty, +\infty)$. Logistic regression does not assume that your explanatory variables linearly shift probability itself; rather, it posits that each unit change in a feature linearly increments the *log-odds*, which corresponds to multiplying the *odds ratio* by a constant geometric scale factor $e^{w_j}$.
+If you apply Ordinary Least Squares (OLS) regression to this problem—a setup known in economics as the **Linear Probability Model (LPM)**—disaster immediately strikes. Because a straight line has no boundaries, it marches relentlessly toward infinity:
+- For an applicant with low income and huge debts, OLS cheerfully calculates a default probability of **135%**.
+- For an ultra-wealthy surgeon with pristine credit, OLS outputs a default probability of **-18%**!
 
-Under the hood, we do not train logistic regression by minimizing squared residuals, because squaring probability errors creates a warped, non-convex landscape plagued with deceptive local traps. Instead, we embrace **Maximum Likelihood Estimation (MLE)** guided by **Binary Cross-Entropy Loss**. Imagine you are an auditor inspecting historical data: your objective is to rotate and tilt the decision boundary until the observed historical reality becomes the least surprising outcome possible. Binary cross-entropy acts as an unforgiving referee that levies an exponential penalty when the model is confidently wrong—such as assigning a $99\%$ probability of repayment to a borrower who subsequently defaults.
+What does a negative 18% chance of default mean in the real world? It is a logical impossibility. Probabilities must obey Kolmogorov's axioms: they must remain strictly bounded between 0.0 (impossible) and 1.0 (certain).
 
-تخيل أنك تحاول قياس انحناءات إناء بلوري رقيق باستخدام مسطرة خشبية صلبة ومستقيمة. في الإحصاء الكلاسيكي، يؤدي تطبيق انحدار المربعات الصغرى العادي (OLS) على مسائل التصنيف الثنائي—وهو ما يُعرف بنموذج الاحتمال الخطي (Linear Probability Model)—إلى نفس الخطأ الميكانيكي الفادح. عندما نحاول التنبؤ بما إذا كان المقترض سيتعثر في سداد قرضه، أو ما إذا كان الورم خبيثاً، أو ما إذا كان العميل سيلغي اشتراكه، فإن النتيجة المستهدفة محصورة تماماً بين الصفر والواحد $\{0, 1\}$. لكن الخط المستقيم بطبيعته صلب وممتد بلا حدود: فمع ارتفاع نسبة ديون المقترض، سيتنبأ النموذج الخطي دون أي تردد باحتمال تعثر يبلغ $140\%$، أو سيعطي احتمالاً سالباً مثل $-25\%$ لمريض يتمتع بصحة ممتازة! هذه القيم غير المنطقية تنتهك أبسط بديهيات نظرية الاحتمالات الرياضية.
+To cure this pathology, we replace the rigid straight ruler with an **elastic hydraulic shock absorber: the Sigmoid S-curve**. 
+Imagine taking any unbounded linear score $z = \mathbf{w}^T \mathbf{x}$—whether it is $-1,000$, $+42$, or zero—and feeding it into a soft compression chamber. The Sigmoid function smoothly compresses the score:
+- Large positive scores saturate gently toward $1.0$.
+- Large negative scores taper smoothly toward $0.0$.
+- A score of zero sits perfectly balanced at $0.5$ (a 50/50 coin flip).
 
-يعالج الانحدار اللوجستي هذا الخلل الجوهري باستبدال المسطرة الخشبية الصلبة بـ **ممتص صدمات هيدروليكي مرن: منحنى السجمويد (Sigmoid S-curve)**. تخيل دالة السجمويد كغرفة تخميد انسيابية؛ تستقبل أي ناتج ترجيح خطي غير مقيد $z = \mathbf{w}^T \mathbf{x}$—سواء كان $-5,000$ أو $+42$ أو صفراً—وتقوم بضغطه وتعديله بسلاسة ليستقر دائماً داخل المجال الاحتمالي المفتوح $(0, 1)$. كلما اندفعت النتيجة الخطية نحو اللانهاية الموجبة، تشبع المنحنى تدريجياً مقترباً من اليقين التام ($1.0$)؛ وكلما هوت النتيجة نحو السالب السحيق، استقر المنحنى مقترباً من الاستحالة ($0.0$)، مستحيلاً عليه اختراق الحدود المنطقية للاحتمال.
+Behind the scenes, we do not train logistic regression by minimizing squared residuals, because squaring probability gaps creates a warped, bumpy landscape with deceptive local traps. Instead, we use **Maximum Likelihood Estimation (MLE)** guided by **Binary Cross-Entropy Loss**. Like an auditor seeking the truth, MLE rotates the decision boundary until the observed reality becomes the least surprising outcome possible, levying an exponential penalty whenever the model is confidently wrong.
 
-ولفهم السر الكامن وراء هذا التوافق الهندسي، يجب أن نزيل الغموض عن مفهوم **الأرجحية ولوغاريتم الأرجحية (Log-Odds أو Logit)**. في الحياة اليومية، إذا كان احتمال فوز فريق ما هو $80\%$ ($p = 0.8$)، فإن أرجحية الفوز (Odds) هي نسبة النجاح إلى الفشل، أي $0.8 / 0.2 = 4$ إلى $1$. تمتد الأرجحية في المجال الموجب $[0, \infty)$. وحينما نأخذ اللوغاريتم الطبيعي لهذه الأرجحية $\ln(p / (1-p))$، فإننا نحصل على خط الأعداد الحقيقية كاملاً من $-\infty$ إلى $+\infty$. لا يفترض الانحدار اللوجستي أن المتغيرات التفسيرية تغير الاحتمال بشكل خطي ومباشر؛ بل يفترض أنها تزيد لوغاريتم الأرجحية زيادة خطية، وهو ما يكافئ ضرب نسبة الأرجحية الحقيقية في معامل هندسي مضاعف $e^{w_j}$.
+#### Jargon Decoder
 
-لا يتم تدريب الانحدار اللوجستي بتقليل مجموع مربعات الأخطاء (MSE)، لأن تربيع أخطاء الاحتمالات يولد سطحاً متعرجاً غير محدب مليئاً بالفخاخ والقيعان المحلية المضللة. وبدلاً من ذلك، نستخدم **تقدير الأرجحية القصوى (Maximum Likelihood Estimation - MLE)** عبر تقليل **خسارة الإنتروبيا المتقاطعة الثنائية (Binary Cross-Entropy)**. تخيل أنك محقق يفحص وقائع تاريخية: هدفك هو تدوير وضبط حد الفصل (Decision Boundary) حتى يصبح الواقع التاريخي المشاهد هو النتيجة الأكثر احتمالاً والأقل مفاجأة رياضياً. وتعمل دالة الإنتروبيا المتقاطعة كحكم صارم يفرض غرامة فلكية تتصاعد أضعافاً مضاعفة عندما يكون النموذج واثقاً من تنبؤ خاطئ تماماً.
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Linear Probability Model** | Fitting a straight ruler to yes/no data: produces absurd probabilities like 140% or -25%. |
+| **Sigmoid Function** | The S-curve squasher: compresses any score from $-\infty$ to $+\infty$ into a valid (0, 1) probability. |
+| **Odds** | Ratio of winning to losing: probability of success divided by probability of failure ($p / (1-p)$). |
+| **Log-Odds (Logit)** | The natural logarithm of odds: maps probability onto the entire infinite real number line. |
+| **Binary Cross-Entropy** | The penalty referee: punishes confident wrong guesses with astronomical loss. |
+
+```text
+    THE SIGMOID PROBABILITY S-CURVE:
+
+    Probability p
+         1.0 |                                 .------ Certainty (Default = 1)
+             |                              .-'
+             |                            .'
+         0.5 |--------------------------*----------------- Decision Boundary (z = 0)
+             |                        .'
+             |                     .-'
+         0.0 | '------ Impossibility (Repaid = 0)
+             +--------------------------|-----------------> Linear Score z = w^T x
+                                       z=0
+```
+
+### الحدس والقصة الواقعية
+
+تخيل أنك مسؤول ائتمان في بنك تجاري، ومهمتك هي التنبؤ بما إذا كان المقترض سيتعثر في سداد قرضه العقاري ($y = 1$) أم سيسدده بالكامل ($y = 0$).
+
+إذا حاولت تطبيق انحدار المربعات الصغرى العادي (OLS) على هذه المسألة—وهو ما يُعرف في الاقتصاد بـ **نموذج الاحتمال الخطي (Linear Probability Model)**—فستقع في ورطة حسابية فورية. فالخط المستقيم صلب وممتد بلا حدود:
+- لمقترض يعاني من تراكم الديون وضعف الدخل، قد يتنبأ النموذج باحتمال تعثر قدره **135%**.
+- ولجراح ثري يتمتع بسجل ائتماني ممتاز، قد يخرج النموذج باحتمال تعثر يبلغ **-18%**!
+
+ماذا يعني احتمال سالب قدره -18% في الواقع؟ إنه مستحيل منطقيًا ورياضيًا. فالاحتمالات يجب أن تظل دائمًا محصورة بدقة بين 0.0 (استحالة) و 1.0 (يقين تام).
+
+لعلاج هذا الخلل، نستبدل المسطرة الخشبية الصلبة بـ **ممتص صدمات هيدروليكي مرن: منحنى السجمويد (Sigmoid S-curve)**.
+تخيل دالة السجمويد كغرفة ضغط انسيابية؛ تستقبل أي ناتج ترجيح خطي $z = \mathbf{w}^T \mathbf{x}$—سواء كان $-1,000$ أو $+42$ أو صفرًا—وتقوم بضغطه بسلاسة:
+- تتقارب القيم الموجبة الكبيرة برقة نحو $1.0$.
+- وتستقر القيم السالبة العميقة مقتربة من $0.0$.
+- أما القيمة صفر، فتستقر تمامًا في المنتصف عند $0.5$ (احتمال 50/50).
+
+لا ندرب الانحدار اللوجستي بتربيع الأخطاء لأن ذلك يصنع تضاريس متموجة مليئة بالقيعان المضللة، بل نستخدم **تقدير الأرجحية القصوى (MLE)** عبر **خسارة الإنتروبيا المتقاطعة الثنائية (Binary Cross-Entropy)**، التي تفرض غرامة فلكية تتصاعد أضعافًا مضاعفة عندما يكون النموذج واثقًا من تنبؤ خاطئ تمامًا.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **نموذج الاحتمال الخطي** | استخدام مسطرة مستقيمة لبيانات نعم/لا: يفرز احتمالات شاذة مثل 140% أو -25%. |
+| **دالة السجمويد** | المكبس المرن: تضغط أي رقم من $-\infty$ إلى $+\infty$ ليصبح احتمالاً حقيقياً بين 0 و 1. |
+| **الأرجحية (Odds)** | نسبة الفوز إلى الخسارة: احتمال وقوع الحدث مقسوماً على احتمال عدم وقوعه. |
+| **لوغاريتم الأرجحية (Logit)** | اللوغاريتم الطبيعي للأرجحية: يفك أسر الاحتمال المحدود نحو خط الأعداد المفتوح. |
+| **الإنتروبيا المتقاطعة الثنائية** | الحكم الصارم: يفرض عقوبة تصاعدية قاسية على التخمينات الخاطئة شديدة الثقة. |
 
 :::simulation-widget{engine="canvas2d" component="LogisticSigmoidSurface"}
 ---
@@ -92,17 +147,19 @@ Because $p_i \in (0, 1)$, every diagonal element $p_i(1-p_i) > 0$. Consequently,
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $\mathbf{x}_i \in \mathbb{R}^D$: Feature vector for the $i$-th observation, typically including a leading $1$ for bias.
-* $\mathbf{w} \in \mathbb{R}^D$: Parameter weight vector governing the orientation and scale of the decision boundary.
-* $z_i = \mathbf{x}_i^T \mathbf{w}$: Unbounded linear logit score driving classification confidence.
-* $\sigma(z) = \frac{1}{1 + e^{-z}}$: Sigmoid activation function mapping real numbers to calibrated probabilities.
-* $p_i \in (0, 1)$: Modeled posterior probability $\mathbb{P}(Y_i = 1 \mid \mathbf{x}_i)$ of the positive class.
-* $\text{logit}(p) = \ln(p / (1-p))$: Natural log of the odds ratio, mapping bounded probability back to the real line.
-* $\mathcal{L}(\mathbf{w})$: Bernoulli likelihood function measuring probability of the observed dataset given weights $\mathbf{w}$.
-* $J(\mathbf{w})$: Binary Cross-Entropy loss function to be minimized via numerical optimization.
-* $\nabla_{\mathbf{w}} J$: Gradient vector dictating the direction of steepest ascent in empirical prediction error.
-* $\mathbf{S} \in \mathbb{R}^{N \times N}$: Diagonal weighting matrix of Bernoulli variances $p_i(1 - p_i)$ driving the curvature of the loss.
-* $\mathbf{H} \in \mathbb{R}^{D \times D}$: Hessian matrix ensuring global convexity and enabling Newton-Raphson optimization.
+| Symbol / Term | Formal Definition | Intuitive Meaning / Role | المعنى والمدلول بالعربية |
+| :--- | :--- | :--- | :--- |
+| $\mathbf{x}_i \in \mathbb{R}^D$ | Feature vector | Regressors for observation $i$ (including bias) | متجه ميزات العينة $i$ بما فيها الحد الثابت |
+| $\mathbf{w} \in \mathbb{R}^D$ | Parameter weights | Orientation and slope of decision boundary | أوزان معاملات النموذج والحد الفاصل |
+| $z_i = \mathbf{x}_i^T \mathbf{w}$ | Linear score / logit | Unbounded raw score driving classification | الدرجة الخطية الخام غير المقيدة |
+| $\sigma(z)$ | $\frac{1}{1 + e^{-z}}$ | Sigmoid function mapping real score to probability | دالة السجمويد لتحويل الدرجة إلى احتمال |
+| $p_i \in (0, 1)$ | $\mathbb{P}(Y_i=1 \mid \mathbf{x}_i)$ | Modeled probability of positive class | الاحتمال المتنبأ به للفئة الإيجابية |
+| $\text{logit}(p)$ | $\ln(p / (1-p))$ | Natural log of odds mapping $(0, 1) \to \mathbb{R}$ | دالة اللوجيت لتحويل الاحتمال لخط الأعداد |
+| $\mathcal{L}(\mathbf{w})$ | $\prod p_i^{y_i}(1-p_i)^{1-y_i}$ | Bernoulli likelihood across $N$ instances | دالة الأرجحية المشتركة لبيانات برنولي |
+| $J(\mathbf{w})$ | $-\frac{1}{N}\sum [y\ln p + (1-y)\ln(1-p)]$ | Binary Cross-Entropy loss to be minimized | دالة خسارة الإنتروبيا المتقاطعة الثنائية |
+| $\nabla_{\mathbf{w}} J$ | $\frac{1}{N}\mathbf{X}^T(\mathbf{p} - \mathbf{y})$ | Gradient vector along steepest error ascent | متجه التدرج الرياضي لاتجاه تصاعد الخطأ |
+| $\mathbf{S}$ | $\text{diag}(p_i(1-p_i))$ | Diagonal Bernoulli variance matrix | مصفوفة التباينات البرنولية القطرية |
+| $\mathbf{H}$ | $\frac{1}{N}\mathbf{X}^T\mathbf{S}\mathbf{X}$ | Hessian matrix ensuring global convexity | مصفوفة الهيسيان الضامنة للتحدب الرياضي |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 

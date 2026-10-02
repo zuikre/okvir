@@ -26,7 +26,28 @@ The proportionality constant $\lambda$ is the famous **Lagrange Multiplier**. It
 
 In economics and machine learning, $\lambda$ has a beautiful physical meaning: it is the **shadow price** or marginal tension of the constraint. It answers a vital practical question: *"If the park rangers allowed you to widen the trail by just one meter ($c \to c + 1$), by exactly how many vertical meters would your maximum achievable elevation increase?"* In Support Vector Machines (SVMs), the Lagrange multipliers identify the critical "Support Vectors"—the select training data points that directly push against and define the decision boundary.
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Constrained Optimization | Finding the highest elevation while staying strictly on a fenced walking path | التحسين المقيد | البحث عن أعلى قمة ممكنة مع الالتزام الصارم بالبقاء على مسار مسيج |
+| Lagrange Multiplier ($\lambda$) | The tension in the fence: how much higher you could climb if the fence expanded by 1 meter | مضروب لاغرانج ($\lambda$) | قوة شد السياج / سعر الظل: كم سترتفع إضافياً لو توسع السياج متراً واحداً |
+| Contour Tangency | The sweet spot where the objective contours kiss the constraint boundary without crossing | تماس خطوط الكنتور | نقطة التماس السحرية حيث يلامس مسار الهدف خط القيد دون أن يقطعه |
+| Constraint ($g(x) = 0$) | The rigid boundary rule or budget limit that you are forbidden from violating | القيد ($g(x) = 0$) | السياج الحدي أو الميزانية المالية الصارمة التي يُحظر تجاوزها |
+
+#### Geometric & Visual Flow
+
+```
+        Contours of f(x, y)          Constraint Path g(x, y) = 0
+               (100)                      /
+              (  80  )                   /
+             (   60   )                 /  At the optimum, grad(f)
+            (    40    )────*──────────/   is PARALLEL to grad(g):
+           (     20     )   │              grad(f) = λ * grad(g)
+                            Tangent Kiss!
+```
+
+### الحدس الفيزيائي والهندسي
 
 لنفترض أنك تتجول في محمية طبيعية محمية وترغب في الوصول إلى أعلى منسوب ممكن على تضاريس جبل شاهق $f(x, y)$. ومع ذلك، فإن القوانين الصارمة لحراس المحمية تمنعك منعاً باتاً من مغادرة مسار سياحي مرصوف بالأسفلت ومحدد بمعادلة القيد $g(x, y) = c$. لا يمكنك التوجه ببساطة نحو قمة الجبل الحقيقية، لأن المسار المرصوف لا يمر بها على الإطلاق. أين بالضبط على طول هذا المسار المقيد ستحقق أعلى ارتفاع ممكن؟
 
@@ -39,6 +60,27 @@ $$
 يُدعى معامل التناسب $\lambda$ بـ **مضروب لاغرانج** (The Lagrange Multiplier). إنه أحد أكثر المفاهيم رسوخاً وأناقة في الرياضيات التطبيقية: فهو يحول مسألة الاستمثال المقيدة المعقدة إلى مسألة بحث عن نقطة سرجية غير مقيدة عبر موازنة قوة دالة الهدف ضد جدار القيد الصلب.
 
 وفي الاقتصاد وتعلم الآلة المعاصر، يمتلك المعامل $\lambda$ تفسيراً فيزيائياً وعملياً رائعاً: إنه **السعر الخفي** (Shadow Price) أو الحساسية الهامشية لشدة القيد. فهو يجيب عن سؤال استراتيجي حاسم: *"لو سمح لك حراس المحمية بإزاحة المسار بمقدار متر واحد إضافي ($c \to c + 1$)، فكم متراً رأسياً إضافياً ستكسبه في أقصى ارتفاع متاح لك؟"* وفي آلات المتجهات الداعمة (SVMs)، تحدد مضروبات لاغرانج متجهات الدعم الحرجة—تلك النقاط التدريبية القليلة التي تستند مباشرة على حدود الهامش وتحدد موقع الفصل بين الفئات.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| التحسين المقيد | Finding the highest elevation while staying strictly on a fenced walking path | التحسين المقيد | البحث عن أعلى قمة ممكنة مع الالتزام الصارم بالبقاء على مسار مسيج |
+| مضروب لاغرانج ($\lambda$) | The tension in the fence: how much higher you could climb if the fence expanded by 1 meter | مضروب لاغرانج ($\lambda$) | قوة شد السياج / سعر الظل: كم سترتفع إضافياً لو توسع السياج متراً واحداً |
+| تماس خطوط الكنتور | The sweet spot where the objective contours kiss the constraint boundary without crossing | تماس خطوط الكنتور | نقطة التماس السحرية حيث يلامس مسار الهدف خط القيد دون أن يقطعه |
+| القيد ($g(x) = 0$) | The rigid boundary rule or budget limit that you are forbidden from violating | القيد ($g(x) = 0$) | السياج الحدي أو الميزانية المالية الصارمة التي يُحظر تجاوزها |
+
+#### المخطط البصري الهندسي
+
+```
+        خطوط كنتور الهدف f(x, y)       مسار القيد g(x, y) = 0
+               (100)                      /
+              (  80  )                   /
+             (   60   )                 /  عند النقطة المثلى، يكون grad(f)
+            (    40    )────*──────────/   موازياً تماماً لـ grad(g):
+           (     20     )   │              grad(f) = λ * grad(g)
+                            نقطة التماس!
+```
 
 :::simulation-widget{engine="canvas2d" component="LagrangeMultiplierCanvas"}
 ---

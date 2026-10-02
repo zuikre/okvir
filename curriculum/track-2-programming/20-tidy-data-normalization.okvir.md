@@ -27,6 +27,17 @@ To understand this boundary geometry, consider two physical tools humans use eve
 
 Recognizing that `iloc` functions as a half-open geometric ruler $[i, j)$ while `loc` operates as an inclusive lexical dictionary $[\ell_1, \ell_2]$ eliminates over 90% of off-by-one errors and data leakage in production pipelines!
 
+### Jargon Decoder / قاموس المصطلحات المعمارية
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Half-Open Interval $[i, j)$** / المجال نصف المفتوح | Range including the starting point but strictly excluding the endpoint. Analogy: Working from 9:00 AM to 5:00 PM (you punch out at 5:00, not 5:59). | نطاق رقمي يتضمن نقطة البداية ويستثني نقطة النهاية تماماً. التشبيه: دوام العمل من 9 صباحاً إلى 5 مساءً (تنصرف عند الساعة 5 تماماً). |
+| **Closed Interval $[\ell_1, \ell_2]$** / المجال المغلق الطرفين | Range including both the starting label and ending label completely. Analogy: Reading chapters 1 through 3 of a book (chapter 3 is fully read). | نطاق يتضمن كلاً من عنصر البداية وعنصر النهاية بالكامل. التشبيه: قراءة الفصول من 1 إلى 3 في كتاب (حيث تقرأ الفصل الثالث كاملاً). |
+| **Off-by-One Error** / خطأ الإزاحة بواحد | A classic software bug occurring when a loop or slice includes or excludes one element too many or too few. Analogy: Building a 10-meter fence and miscounting the number of fence posts. | خطأ برمجي شائع ينتج عن زيادة أو نقصان عنصر واحد عند تحديد حدود الحلقات أو الشرائح. التشبيه: بناء سياج بطول 10 أمتار والخطأ في حساب عدد أعمدة التثبيت. |
+| **Ordinal Position Function $\text{pos}(\ell)$** / دالة الرتبة الموضعية | Looking up the numerical zero-based row index corresponding to a semantic string label. Analogy: Finding page 42 when searching for the word "Algorithm" in an index. | تحديد الترتيب الرقمي في الذاكرة المقابل للتسمية النصية. التشبيه: معرفة أن مصطلح "خوارزمية" يقع في الصفحة رقم 42 في فهرس الكتاب. |
+| **Monotonic Index Ordering** / الترتيب الرتيب للفهرس | Slicing labels requires strictly sorted indices; unsorted labels raise an error or scan linearly. Analogy: Words in a printed dictionary must be in alphabetical order to find word ranges. | اشتراط ترتيب التسميات تصاعدياً لتحديد المجالات بكفاءة. التشبيه: وجوب ترتيب الكلمات أبجدياً في القاموس لتتمكن من فتح صفحات النطاق المطلوب. |
+| **Transaction Density** / كثافة السجلات الزمنية | Multiple transactions occurring within the exact same calendar timestamp. Analogy: Multiple passengers boarding the same airplane departure time. | تسجيل عدة معاملات مالية أو أحداث خلال نفس اليوم أو الدقيقة. التشبيه: صعود مئات الركاب لنفس رحلة الطيران المجدولة في نفس الموعد. |
+
 :::simulation-widget{engine="canvas2d" component="LocIlocCaliperLab"}
 ---
 interactive: true
@@ -53,6 +64,31 @@ $$
 \text{iloc}[i:j) = \{ k \in \mathbb{N} \mid i \le k < j \}, \quad \text{loc}[\ell_1:\ell_2] = \{ \ell \in \mathcal{I} \mid \text{pos}(\ell_1) \le \text{pos}(\ell) \le \text{pos}(\ell_2) \}
 $$
 
+```text
+Visual ASCII Transformation: iloc Ruler vs loc Encyclopedia Boundary Geometry:
+
+Array Labels:  [ 'a',   'b',   'c',   'd',   'e' ]
+Integer Pos:      0      1      2      3      4
+
+Case 1: Positional Slicing df.iloc[1:3]  (Half-Open Interval [1, 3))
+  Ruler Measurement: Start at mark 1, stop right before mark 3!
+   Pos 0: 'a'  (Skipped: 0 < 1)
+   Pos 1: 'b'  [SELECTED]
+   Pos 2: 'c'  [SELECTED]
+   Pos 3: 'd'  (EXCLUDED: 3 is the exclusive stop boundary!)
+   Pos 4: 'e'  (Skipped)
+  ===> Output: ['b', 'c']  | Length = stop - start = 3 - 1 = 2 elements
+
+Case 2: Label-Based Slicing df.loc['b':'d']  (Closed Interval ['b', 'd'])
+  Encyclopedia Reading: Read from volume 'b' THROUGH volume 'd'!
+   'a': (Skipped: precedes 'b')
+   'b': [SELECTED - Start boundary included]
+   'c': [SELECTED - Intermediate entry included]
+   'd': [SELECTED - End boundary INCLUDED!]
+   'e': (Skipped: follows 'd')
+  ===> Output: ['b', 'c', 'd']  | Length = pos('d') - pos('b') + 1 = 3 - 1 + 1 = 3 elements
+```
+
 ### Mathematical Invariants & Symbol Breakdown
 
 | الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
@@ -64,9 +100,17 @@ $$
 | $\text{loc}[\ell_1:\ell_2]$ | Fully closed bounded interval | Yields subset with cardinality $|\text{loc}| = \text{pos}(\ell_2) - \text{pos}(\ell_1) + 1$ | مجال مغلق الطرفين يضمن احتواء عنصري البداية والنهاية معاً |
 | $N$ | $N = |\mathcal{D}|$ | Total row cardinality of the active DataFrame | إجمالي عدد صفوف إطار البيانات النشط |
 
-The fundamental cardinality invariant states that positional slicing satisfies $|\text{iloc}[i:j)| = j - i$, matching linear memory displacements, whereas label slicing satisfies $|\text{loc}[\ell_1:\ell_2]| = \text{pos}(\ell_2) - \text{pos}(\ell_1) + 1$. In time-series applications, label slicing over a sorted `DateTimeIndex` includes the entire terminal timestamp interval.
-
-الثابت الرياضي الأساسي ينص على أن عدد صفوف الاقتطاع الموضعي يحقق دائماً $|\text{iloc}[i:j)| = j - i$ بما يطابق الإزاحات الفيزيائية في الذاكرة، بينما يحقق الاقتطاع بالتسميات دائماً $|\text{loc}[\ell_1:\ell_2]| = \text{pos}(\ell_2) - \text{pos}(\ell_1) + 1$. وفي السلاسل الزمنية، يضمن الاقتطاع بـ `loc` عبر فهرس تواريخ مرتب تضمين جميع البيانات حتى اللحظة الأخيرة من التاريخ المحدد.
+#### Step-by-Step Arithmetic Cost & Invariant Breakdown:
+1. **Positional Cardinality Invariant**:
+   $$|\text{iloc}[i:j)| = j - i$$
+   Example: `iloc[1:3]` yields $3 - 1 = 2$ elements.
+2. **Label Cardinality Invariant**:
+   $$|\text{loc}[\ell_1:\ell_2]| = \text{pos}(\ell_2) - \text{pos}(\ell_1) + 1$$
+   Example: `loc['b':'d']` where $\text{pos}(\text{'b'}) = 1, \text{pos}(\text{'d'}) = 3$ yields $3 - 1 + 1 = 3$ elements.
+3. **The Financial Time-Series Density Trap**:
+   In a production market ledger with 1,000 trades/day over 31 days ($N = 31,000$ rows):
+   - `df.iloc[0:31]` yields exactly $31 - 0 = 31\text{ rows}$ (only the first 31 trades of January 1st; **drops 99.9% of the month!**).
+   - `df.loc['2024-01-01':'2024-01-31']` yields all $31,000\text{ rows}$ matching timestamps up to 23:59:59 on January 31st!
 
 ## Beat 3: Interactive Code Challenge
 
@@ -98,15 +142,26 @@ def slice_tabular_index(
     Returns:
         Sub-list of labels matching the indexing semantics.
     """
-    # Step 1: If mode == "iloc":
-    #         - Validate start_token and stop_token are ints
-    #         - Return standard half-open Python list slice: index[start_token:stop_token]
-    # Step 2: If mode == "loc":
-    #         - Validate start_token and stop_token are strings present in index
-    #         - Find start_idx and stop_idx via index.index(...)
-    #         - Return inclusive slice: index[start_idx : stop_idx + 1]
-    # Step 3: Raise TypeError/KeyError/ValueError on invalid mode or missing tokens
-    raise NotImplementedError("Implement slice_tabular_index")
+    if mode == "iloc":
+        if not isinstance(start_token, int) or not isinstance(stop_token, int):
+            raise TypeError("iloc tokens must be integers")
+        # Standard half-open Python list slice [start:stop)
+        return index[start_token:stop_token]
+
+    elif mode == "loc":
+        if not isinstance(start_token, str) or not isinstance(stop_token, str):
+            raise TypeError("loc tokens must be strings")
+        if start_token not in index or stop_token not in index:
+            raise KeyError("loc tokens must exist in the index")
+        
+        start_idx = index.index(start_token)
+        stop_idx = index.index(stop_token)
+        
+        # Inclusive closed interval [start:stop + 1]
+        return index[start_idx : stop_idx + 1]
+
+    else:
+        raise ValueError(f"Unknown indexing mode: {mode}")
 ```
 :::
 
@@ -138,5 +193,5 @@ A financial reconciliation microservice processes trade records. A software engi
 *التفسير الهندسي المعمق وتحليل الخيارات:*
 - **لماذا الخيار (A) صحيح:** الفهرسة الموضعية `iloc` تعد صفوفاً مجردة في الذاكرة دون أي إدراك للتواريخ أو الزمن الواقعي. في أسواق المال، تجري آلاف المعاملات في اليوم الواحد؛ وبالتالي فإن كتابة `iloc[0:31]` اقتطعت أول 31 معاملة فقط (وهي صفقات تمت قبل ظهيرة الثاني من يناير!)، مما أدى إلى حذف بيانات 29 يوماً بالكامل دون إطلاق أي تنبيه! في المقابل، تقوم `loc['2024-01-01':'2024-01-31']` بفحص قيم التواريخ في الفهرس وتجلب جميع المعاملات التي تنتمي لشهر يناير مهما بلغ عدد صفوفها.
 - **لماذا الخيار (B) خاطئ:** أداة `iloc` مخصصة لتحديد مواقع الصفوف والأعمدة فقط ولا تغير أنواع البيانات ولا تقرب الكسور العشرية.
-- **لماذا الخيار (C) خاطئ:** شريحة الأرقام `[0:31]` تتحرك للأمام بترتيب تصاعدي؛ وعكس الترتيب يتطلب تمرير خطوة سالبة مثل `[::-1]`.
-- **لماذا الخيار (D) خاطئ:** مكتبة Pandas تعمل محلياً على جهاز واحد في ذاكرة المعالج المركزي، ولا تطلق استعلامات Apache Spark الموزعة.
+- **لماذا الخيار (C) خاطئ:** شرائح الأرقام تتقدم للأمام رتيباً ولا تعكس ترتيب الصفوف ما لم تُستخدم خطوة سالبة مثل `[::-1]`.
+- **لماذا الخيار (D) خاطئ:** مكتبة Pandas هي مكتبة محلية تعمل داخل ذاكرة المعالج لجهاز واحد ولا تحوي محركاً موزعاً كـ Apache Spark.

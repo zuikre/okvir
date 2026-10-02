@@ -29,6 +29,33 @@ A set of vectors is **linearly independent** if and only if every single vector 
 
 ---
 
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Linear Combination | Blending arrows by stretching each by some amount and chaining them together | التركيب الخطي | مزج الأسهم بتمديد كل منها بمقدار محدد ثم وصلها متتالية |
+| Span | The entire reachable universe of destinations you can visit using your base arrows | فضاء الامتداد (Span) | كامل المساحة الجغرافية التي تستطيع الوصول إليها باستخدام أسهمك المتاحة |
+| Linear Independence | Each arrow provides a genuinely new direction; no arrow is a redundant copy | الاستقلال الخطي | امتلاك مسار جديد أصيل؛ لا يمكن لأي سهم أن يُشتق من الآخرين |
+| Basis | The minimal set of non-redundant compass arrows needed to reach any point in space | الأساس (Basis) | أقل عدد ممكن من الأسهم المستقلة القادرة على بناء كامل الفضاء |
+| Dimension | The number of independent arrows required to form a basis for the space | البُعد (Dimension) | عدد الأسهم المستقلة الضرورية لبناء ذلك الفضاء وتغطيته بالكامل |
+| Subspace | A flat line, flat sheet, or slice passing through the origin inside a larger space | الفضاء الجزئي (Subspace) | مسطح مستوٍ أو خط يمر بنقطة الأصل ويعيش داخل فضاء أكبر منه |
+
+#### Geometric & Visual Flow
+
+```
+           Grid of combinations: c1*v1 + c2*v2
+              ▲
+              │        2*v1 + 1*v2
+              │         *
+              │        / ◄── Reachable Destination!
+           v2 │   v1  /
+           ▲  │  ▲   /
+           │  │  │  /
+           └──┼──┴─*────────►
+             Origin
+              Span(v1, v2) fills the entire 2D flat plane!
+```
+
 ### الحدس الفيزيائي والهندسي
 
 تخيل نفسك في قمرة قيادة مركبة فضائية تجريبية تطفو في الفضاء السحيق. أمامك على لوحة التحكم مقبضان للوقود. المقبض الأول يشغل محركاً يدفعك باتجاه المتجه $\mathbf{v}_1$ (للأمام وإلى اليمين مثلاً)، بينما يشغل المقبض الثاني محركاً منفصلاً يدفعك باتجاه المتجه $\mathbf{v}_2$ (للأمام وإلى اليسار). من خلال تحريك هذين المقبضين للأمام أو للخلف—أي باختيار معاملات قياسية حقيقية $c_1$ و $c_2$—ما هي المواقع التي يمكنك زيارتها في هذا الفضاء الشاسع؟ إن العالم الكامل لكل نقطة وموقع يمكنك بلوغه بضبط هذين المقبضين هو ما يسميه علماء الرياضيات **مدى المتجهات** (Span).
@@ -43,6 +70,33 @@ A set of vectors is **linearly independent** if and only if every single vector 
 1. **التعلم الآلي ومشكلة التعدد الخطي (Multicollinearity):** إذا دربت نموذج انحدار خطي لتوقع أسعار المنازل مستخدماً عمود "المساحة بالقدم المربع" وعمود "المساحة بالمتر المربع" معاً، فإن هذين العمودين مرتبطان خطياً تماماً. وعندما يحاول الحاسوب تطبيق معادلة الحل المباشر $(X^T X)^{-1} X^T y$، ينهار البرنامج ويفشل في قلب المصفوفة لأن محددها يصبح صفراً! الاستقلال الخطي شرط لا غنى عنه لاستقرار الحسابات.
 2. **تقليص الأبعاد (PCA):** غالباً ما تحتوي قواعد البيانات الضخمة على آلاف الأعمدة التي هي في الواقع تكرار مشوش لمعلومات محدودة. تهدف خوارزمية تحليل المكونات الرئيسية (PCA) إلى استخراج أقل عدد ممكن من المتجهات المستقلة خطياً التي تولد جوهر المعلومات الفعلي للبيانات.
 3. **النماذج التوليدية وفضاء التمثيل الكامن (Latent Space):** في نماذج توليد الصور مثل Stable Diffusion، تمثل المفاهيم البصرية كمتجهات مستقلة خطياً في الفضاء الكامن؛ فاتجاه مستقل يضيف ابتسامة للوجه، بينما اتجاه مستقل آخر يغير لون الشعر دون أن يؤثر على الابتسامة.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| التركيب الخطي | Blending arrows by stretching each by some amount and chaining them together | التركيب الخطي | مزج الأسهم بتمديد كل منها بمقدار محدد ثم وصلها متتالية |
+| فضاء الامتداد (Span) | The entire reachable universe of destinations you can visit using your base arrows | فضاء الامتداد (Span) | كامل المساحة الجغرافية التي تستطيع الوصول إليها باستخدام أسهمك المتاحة |
+| الاستقلال الخطي | Each arrow provides a genuinely new direction; no arrow is a redundant copy | الاستقلال الخطي | امتلاك مسار جديد أصيل؛ لا يمكن لأي سهم أن يُشتق من الآخرين |
+| الأساس (Basis) | The minimal set of non-redundant compass arrows needed to reach any point in space | الأساس (Basis) | أقل عدد ممكن من الأسهم المستقلة القادرة على بناء كامل الفضاء |
+| البُعد (Dimension) | The number of independent arrows required to form a basis for the space | البُعد (Dimension) | عدد الأسهم المستقلة الضرورية لبناء ذلك الفضاء وتغطيته بالكامل |
+| الفضاء الجزئي (Subspace) | A flat line, flat sheet, or slice passing through the origin inside a larger space | الفضاء الجزئي (Subspace) | مسطح مستوٍ أو خط يمر بنقطة الأصل ويعيش داخل فضاء أكبر منه |
+
+#### المخطط البصري الهندسي
+
+```
+           شبكة التركيبات الخطية: c1*v1 + c2*v2
+              ▲
+              │        2*v1 + 1*v2
+              │         *
+              │        / ◄── وجهة يمكن الوصول إليها!
+           v2 │   v1  /
+           ▲  │  ▲   /
+           │  │  │  /
+           └──┼──┴─*────────►
+             نقطة الأصل
+              فضاء الامتداد Span(v1, v2) يغطي كامل المستوي ثنائي الأبعاد!
+```
 
 :::simulation-widget{engine="canvas2d" component="VectorSpanBasisCanvas"}
 ---

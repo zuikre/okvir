@@ -14,19 +14,74 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Imagine a high-stakes mayoral election decided by a microscopic margin: Candidate A wins $50.001\%$ of the vote, while Candidate B finishes with $49.999\%$. In the grand scheme of politics, the electorate of a city that voted $50.001\%$ for Candidate A is virtually identical in demographics, economic health, ideological preferences, and voter anger to an electorate that voted $49.999\%$. A single gust of rain in one precinct could have flipped the outcome. Yet the institutional rules enforce an absolute, non-negotiable cliff: Candidate A gains $100\%$ of mayoral executive authority, while Candidate B receives $0\%$.
+### Intuition & Real-World Story
 
-Nature has effectively engineered a localized **Randomized Controlled Trial** right at the threshold! Comparing cities where a party won by a landslide ($80\%$ vs $20\%$) would hopelessly confound the political party's governance with deep ideological differences. But in a razor-thin photo-finish, whether a city barely lands above or below the $50\%$ cutoff is essentially determined by idiosyncratic test-day noise. Any discontinuous, vertical leap in downstream outcomes—such as municipal bond yields or infrastructure spending—observed immediately at the threshold can be decisively attributed to the winner's party rather than baseline municipal characteristics.
+Suppose a prestigious university offers full-tuition merit scholarships to all applicants who score 80.0% or higher on an entrance examination. You want to measure: *does winning this scholarship cause higher lifetime career earnings?*
 
-This is the foundational genius of the **Sharp Regression Discontinuity Design (SRDD)**. In observational data, people rarely receive policy interventions at random: affluent families buy tutoring, ambitious entrepreneurs apply for startup accelerators, and vulnerable patients seek clinical treatments. SRDD bypasses confounding by exploiting strict administrative assignment rules: treatment status switches deterministically from $0$ to $1$ the instant an observable, continuous index—known as the **running (or forcing) variable**—crosses a rigid administrative cutoff $c$.
+If you simply compare all scholarship winners (who scored 80% to 100%) against non-winners (who scored 0% to 79%), your study is heavily confounded. Students who score 95% possess extraordinary natural talent, better prior schooling, and wealthier family backgrounds.
 
-To estimate this causal jump cleanly, modern econometric practice relies on **Local Linear Regression** within a narrow bandwidth $h$ around the cutoff. Why local linear rather than fitting a curvy high-order global polynomial? Global polynomials suffer from Runge's phenomenon: distant observations (like an election won with $90\%$ of the vote) exert extreme mathematical leverage, flexing the curve near the boundary and creating illusory, fake discontinuities out of thin air. By fitting separate straight lines weighted by a triangular kernel on either side of the cutoff, we zoom in on the true local causal jump.
+Now zoom in on the razor's edge of the cutoff:
+* **Student Alice** scored **80.1%** and won the full scholarship.
+* **Student Bob** scored **79.9%** and received nothing.
 
-في البيانات الواقعية، نادراً ما يحصل الأفراد أو المناطق على السياسات الحكومية أو المزايا الاقتصادية بشكل عشوائي؛ فالأسر الثرية تشتري تعليماً خاصاً، والشركات الكبرى توظف أمهر المحامين للحصول على الإعفاءات الضريبية. يتجاوز **تصميم انقطاع الانحدار الحاد (Sharp RDD)** معضلة انحياز الاختيار عبر استغلال القواعد المؤسسية الصارمة: حيث يتغير وضع المعالجة بشكل حتمي وقاطع من صفر إلى واحد بمجرد أن يتجاوز متغير مستمر—يسمى **المتغير الحاكم أو الجاري (Running/Forcing Variable)**—عتبة إدارية فاصلة $c$.
+Is Alice a genius and Bob unmotivated? Of course not! That tiny 0.2% gap was pure luck—a broken pencil lead, a distracting sneeze in the exam hall, or one lucky guess on a multiple-choice question.
 
-تخيل انتخابات بلدية حُسمت بفارق ضئيل جداً: نال المرشح (أ) نسبة 50.001% من الأصوات، بينما نال منافسه 49.999%. من الناحية الديموغرافية والاجتماعية والاقتصادية، فإن الناخبين في هذه المدينة متطابقون تماماً مع ناخبي مدينة مجاورة خسر فيها المرشح بفارق صوتين. كان هطول زخات مطر خفيفة في أحد الأحياء كفيلاً بقلب النتيجة! لقد أقامت الطبيعة تجربة عشوائية محكمة عند العتبة تماماً؛ فالمرشح الفائز يحصل على 100% من صلاحيات المنصب التنفيذي، بينما لا ينال الخاسر شيئاً. وأي قفزة فجائية في الأداء المالي للمدينة بعد الانتخابات تُعزى بالكامل إلى الحزب الفائز، لا إلى الفروق الأولية بين المدن.
+Alice and Bob are virtually identical twins in every conceivable dimension: ability, family background, and work ethic. Yet Alice gets free tuition while Bob pays full price!
 
-لتقدير هذه القفزة السببية بدقة، تعتمد الممارسة الإحصائية الحديثة على **الانحدار الخطي الموضعي (Local Linear Regression)** داخل نافذة ضيقة تُعرف بعرض النطاق الترددي $h$ حول العتبة. ولماذا نفضل الخطوط المستقيمة الموضعية على المعادلات الحدودية العامة ذات الدرجات العالية؟ لأن الحدوديات العامة تعاني من ظاهرة رونغ (Runge's Phenomenon): فالنقاط البعيدة جداً عن العتبة تفرض عزماً رافعاً شديداً على طرفي المنحنى، مما يؤدي إلى تذبذبات كاذبة تخلق قفزات وهمية غير حقيقية عند العتبة. وباستخدام انحدار خطي موضعي مرجح بنواة مثلثة تركز على النقاط القريبة من العتبة، نعزل الأثر السببي الحقيقي بثبات وأمان.
+This is the beauty of **Sharp Regression Discontinuity Design (RDD)**. Right at the threshold, nature runs an almost perfect randomized trial. Any sudden vertical jump in future career earnings at the 80.0% mark can be attributed squarely to the causal impact of the scholarship!
+
+#### Jargon Decoder
+
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Running / Forcing Variable ($X$)** | The continuous score or rating used to assign treatment (e.g., exam score). |
+| **Cutoff / Threshold ($c$)** | The strict boundary line where treatment turns on (e.g., 80.0%). |
+| **Sharp RDD** | The light switch: treatment probability jumps cleanly from 0% to 100% at the cutoff. |
+| **Bandwidth ($h$)** | The zoom lens: the narrow window $[c - h, c + h]$ of data points analyzed around the cutoff. |
+| **Local Average Treatment Effect** | The causal jump isolated specifically for students near the threshold boundary. |
+
+```text
+    THE SHARP RDD DISCONTINUITY JUMP:
+
+    Future Earnings ($)
+      ^
+      |                                              *   *
+      |                                            *   *
+      |                                 *  *  * (Treated Curve)
+      |                                * |
+      |                       Discontinuity Jump (tau)
+      |                                * |
+      |                    *  *  * (Control Curve)
+      |                  *   *
+      0-----------------+--------------+-----------------------------> Exam Score (X)
+                        c - h          c (Cutoff: 80%)    c + h
+```
+
+### الحدس والقصة الواقعية
+
+تخيل جامعة مرموقة تمنح منحًا دراسية كاملة لجميع المتقدمين الذين يحصلون على 80.0% أو أكثر في اختبار القبول. وتريد الإجابة عن سؤال مهم: *هل تسبب هذه المنحة زيادة الدخل المهني للطلاب مستقبلاً؟*
+
+إذا قارنت جميع الحاصلين على المنحة (أصحاب الدرجات من 80% إلى 100%) بغير الحاصلين عليها (من 0% إلى 79%)، ستكون دراستك ملوثة بانحياز شديد؛ فالطلاب أصحاب درجات 95% يملكون مهارات استثنائية وخلفيات أسرية وتعليمية متميزة بطبيعتهم.
+
+ولكن قرّب العدسة وركز على حافة الحد الفاصل تمامًا:
+* **الطالبة مريم** حصلت على **80.1%** وفازت بالمنحة الكاملة.
+* **الطالب عمر** حصل على **79.9%** وحُرم من المنحة.
+
+هل مريم عبقرية وعمر متكاسل؟ بالتأكيد لا! فهذا الفارق الضئيل (0.2%) كان مجرد صدفة عشوائية بحتة: ارتباك لحظي أو عطسة في قاعة الاختبار.
+
+مريم وعمر متطابقان تمامًا في الذكاء والاجتهاد والظروف الاجتماعية؛ ومع ذلك نالت مريم التعليم المجاني بينما اضطر عمر لدفع الرسوم كاملة!
+
+هذه هي روعة **تصميم انقطاع الانحدار الحاد (Sharp RDD)**؛ فعند نقطة الحد الفاصل تمامًا، تقدم الطبيعة تجربة عشوائية مثالية. وأي قفزة رأسية مفاجئة في رواتب الطلاب عند عتبة 80.0% هي أثر سببي خالص للمنحة!
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **المتغير الفاصل (Running Variable)** | المقياس المستمر الذي يحدد استحقاق المعالجة (مثل درجة اختبار القبول). |
+| **العتبة / الحد الفاصل ($c$)** | الخط الحاسم الذي ينقلب عنده القرار وتُمنح عنده المعالجة (مثل 80%). |
+| **الانقطاع الحاد (Sharp RDD)** | مفتاح الكهرباء: احتمالية تلقي العلاج تقفز فجأة من 0% إلى 100% عند العتبة. |
+| **عرض النطاق (Bandwidth - $h$)** | عدسة التقريب: النافذة الضيقة حول العتبة لمقارنة الحالات المتشابهة بدقة. |
+| **الأثر السببي الموضعي** | القفزة الرأسية في النتيجة عند حافة العتبة الفاصلة تحديدًا. |
 
 :::simulation-widget{engine="canvas2d" component="SharpRDDCutoffLab"}
 ---
@@ -37,42 +92,54 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-In a Sharp Regression Discontinuity Design, treatment assignment $D_i \in \{0, 1\}$ is a deterministic, discontinuous step function of the observed continuous running variable $X_i$ relative to an institutional cutoff $c$:
+In a Sharp RDD, deterministic treatment assignment is governed by forcing variable $X_i$ relative to cutoff $c$:
 
 $$
-D_i = \mathbb{I}(X_i \ge c) = \begin{cases} 1 & \text{if } X_i \ge c \\ 0 & \text{if } X_i < c \end{cases}
+D_i = \mathbf{1}(X_i \ge c)
 $$
 
-Under the fundamental identifying assumption that the potential outcome conditional expectations $\mathbb{E}[Y_i(0) \mid X_i = x]$ and $\mathbb{E}[Y_i(1) \mid X_i = x]$ are continuous in $x$ at $x = c$, the average causal treatment effect at the cutoff is non-parametrically identified by the difference between two one-sided boundary limits:
+The Sharp RDD treatment effect is the jump in expected outcome at cutoff $c$:
 
 $$
-\tau_{\text{SRD}} = \lim_{x \downarrow c} \mathbb{E}[Y_i \mid X_i = x] - \lim_{x \uparrow c} \mathbb{E}[Y_i \mid X_i = x]
+\tau_{\text{SRDD}} = \lim_{x \downarrow c} \mathbb{E}[Y \mid X = x] - \lim_{x \uparrow c} \mathbb{E}[Y \mid X = x]
 $$
 
-To estimate $\tau_{\text{SRD}}$ without boundary bias, we estimate a **Local Linear Regression** within an optimal bandwidth $h > 0$ around the centered running variable $\tilde{X}_i \equiv X_i - c$, solving the kernel-weighted least squares optimization problem:
+Hahn, Todd, and Van der Klaauw (2001) proved that under the continuity assumption ($\mathbb{E}[Y(0) \mid X=x]$ and $\mathbb{E}[Y(1) \mid X=x]$ are continuous at $c$), $\tau_{\text{SRDD}}$ identifies the causal effect at the cutoff:
 
 $$
-\min_{\alpha, \tau, \beta_0, \beta_1} \sum_{i: |X_i - c| \le h} \left[ Y_i - \alpha - \tau D_i - \beta_0 (X_i - c) - \beta_1 D_i(X_i - c) \right]^2 K\left(\frac{X_i - c}{h}\right)
+\tau_{\text{SRDD}} = \mathbb{E}[Y(1) - Y(0) \mid X = c]
 $$
 
-where:
-- $\alpha$: Intercept of the control outcome regression line approaching the cutoff from the left ($\lim_{x \uparrow c} \mathbb{E}[Y(0) \mid X = x]$).
-- $\tau$: The sharp causal vertical jump at the cutoff ($\tau_{\text{SRD}}$).
-- $\alpha + \tau$: Outcome level approaching the cutoff from the treated right ($\lim_{x \downarrow c} \mathbb{E}[Y(1) \mid X = x]$).
-- $\beta_0$: Local slope of the regression function to the left of the cutoff.
-- $\beta_0 + \beta_1$: Local slope of the regression function to the right of the cutoff.
-- $K(u) = (1 - |u|) \cdot \mathbb{I}(|u| \le 1)$: The standard triangular kernel weighting function, which places maximal weight on observations closest to the cutoff and tapers linearly to zero at the bandwidth frontier $|X_i - c| = h$.
+In practice, this is estimated via local linear regression inside bandwidth $h$:
+
+$$
+\min_{\alpha, \beta, \tau, \gamma} \sum_{i: |X_i - c| \le h} \left( Y_i - \alpha - \beta(X_i - c) - \tau D_i - \gamma D_i(X_i - c) \right)^2
+$$
+
+### Why the Math Works Step-by-Step
+
+1. **Why subtract $c$ from $X_i$ in $(X_i - c)$?**
+   Centering the running variable at cutoff $c$ ensures that the intercept $\alpha$ represents the expected control outcome right at the threshold, and $\tau$ represents the exact vertical discontinuity jump at $X = c$!
+2. **The Role of Bandwidth $h$:**
+   Bandwidth balances a fundamental trade-off:
+   * Tiny $h$: Lower bias (comparing very close twins), but higher variance (fewer data points).
+   * Wide $h$: Lower variance (more data points), but higher bias (curvature errors from points far from cutoff).
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $X_i$: Observable continuous running (or forcing) variable used to determine institutional eligibility.
-* $c$: The strict administrative threshold or eligibility cutoff point.
-* $D_i \in \{0, 1\}$: Deterministic binary treatment assignment indicator ($D_i = 1$ if $X_i \ge c$, $0$ otherwise).
-* $Y_i$: Observed continuous or binary outcome of interest.
-* $Y_i(1), Y_i(0)$: Potential outcomes for unit $i$ under treatment and control states.
-* $\tau_{\text{SRD}}$: Sharp regression discontinuity causal estimand evaluated locally at $X = c$.
-* $h$: Bandwidth parameter governing the trade-off between bias (narrow $h$, closer to the cutoff) and variance (wide $h$, more sample observations).
-* $K(u)$: Kernel weighting function ensuring boundary stability and non-parametric convergence.
+* $X_i$: Running variable continuously measured around cutoff $c$.
+* $c$: Policy cutoff threshold.
+* $h$: Selected bandwidth determining the estimation neighborhood $[c - h, c + h]$.
+* $\tau$: Discontinuity jump parameter measuring treatment effect at cutoff.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\mathbf{1}(X_i \ge c)$ | دالة التفعيل الثنائية | تحول مؤشر المعالجة إلى 1 بمجرد ملامسة أو تجاوز العتبة $c$. |
+| $\lim_{x \downarrow c} - \lim_{x \uparrow c}$ | الفارق بين النهايتين | قياس الفجوة الرأسية بين نهاية المنحنى من اليمين ونهايته من اليسار. |
+| $(X_i - c)$ | تمركز المتغير الفاصل | طرح العتبة لجعل المعامل $\tau$ يمثل القفزة الصافية عند النقطة $c$ مباشرة. |
+| النطاق $h$ | نافذة التوازن البيزية | الموازنة بين دقة التماثل (نطاق ضيق) وحجم العينة الكافي (نطاق واسع). |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -95,68 +162,51 @@ test_cases:
 ```python
 import numpy as np
 
-def fit_sharp_rdd_local_linear(
-    x: np.ndarray,
-    y: np.ndarray,
-    cutoff: float,
-    bandwidth: float
-) -> dict[str, float]:
+def fit_sharp_rdd_local_linear(y: np.ndarray, x: np.ndarray, c: float, h: float) -> dict[str, float]:
     """
-    Fits a local linear regression for Sharp RDD with a triangular kernel.
-    
+    Fits a local linear regression for Sharp RDD within bandwidth [c - h, c + h].
+
     Parameters
     ----------
-    x : np.ndarray of shape (N,)
-        Continuous running variable.
     y : np.ndarray of shape (N,)
-        Observed outcome variable.
-    cutoff : float
-        Institutional threshold c.
-    bandwidth : float
-        Half-width of the local estimation window h.
-        
+        Observed outcomes.
+    x : np.ndarray of shape (N,)
+        Running variable.
+    c : float
+        Cutoff threshold.
+    h : float
+        Bandwidth window.
+
     Returns
     -------
-    dict with keys:
-        'tau': Treatment effect jump at the cutoff.
-        'alpha_left': Estimated limit from the left (control counterfactual at cutoff).
-        'alpha_right': Estimated limit from the right (treated outcome at cutoff).
+    dict with keys 'tau_rdd', 'se_rdd'
     """
-    # Step 1: Filter to observations within local window [cutoff - h, cutoff + h]
-    mask = (x >= cutoff - bandwidth) & (x <= cutoff + bandwidth)
-    x_sub = x[mask]
+    # Step 1: Filter observations within bandwidth window [c - h, c + h]
+    mask = (x >= c - h) & (x <= c + h)
     y_sub = y[mask]
-    
-    # Step 2: Center running variable at cutoff and construct treatment indicator
-    x_centered = x_sub - cutoff
-    d = (x_sub >= cutoff).astype(float)
-    
-    # Step 3: Compute triangular kernel weights: K(u) = 1 - |u| for |u| <= 1
-    u = np.abs(x_centered) / bandwidth
-    weights = 1.0 - u
-    W = np.diag(weights)
-    
-    # Step 4: Build design matrix: [1, D, (X - c), D*(X - c)]
-    X_mat = np.column_stack([
-        np.ones_like(x_centered),
-        d,
-        x_centered,
-        d * x_centered
-    ])
-    
-    # Step 5: Solve Weighted Least Squares: beta = (X^T W X)^(-1) X^T W y
-    XtWX = X_mat.T @ W @ X_mat
-    XtWy = X_mat.T @ W @ y_sub
-    beta = np.linalg.solve(XtWX, XtWy)
-    
-    alpha_left = float(beta[0])
-    tau = float(beta[1])
-    alpha_right = alpha_left + tau
-    
+    x_sub = x[mask]
+    n_sub = len(y_sub)
+
+    # Step 2: Construct centered regressors and treatment dummy
+    x_centered = x_sub - c
+    d_sub = (x_sub >= c).astype(float)
+    interaction = d_sub * x_centered
+
+    # Step 3: Design matrix: [1, x_centered, D, interaction]
+    X_mat = np.column_stack([np.ones(n_sub), x_centered, d_sub, interaction])
+
+    # Step 4: Fit OLS
+    beta = np.linalg.solve(X_mat.T @ X_mat, X_mat.T @ y_sub)
+    residuals = y_sub - X_mat @ beta
+
+    tau_rdd = float(beta[2])
+    s2 = np.sum(residuals ** 2) / (n_sub - 4)
+    vcov = s2 * np.linalg.inv(X_mat.T @ X_mat)
+    se_rdd = float(np.sqrt(vcov[2, 2]))
+
     return {
-        "tau": tau,
-        "alpha_left": alpha_left,
-        "alpha_right": alpha_right,
+        "tau_rdd": tau_rdd,
+        "se_rdd": se_rdd,
     }
 ```
 :::

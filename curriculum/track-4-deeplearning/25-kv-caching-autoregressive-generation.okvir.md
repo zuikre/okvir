@@ -12,7 +12,7 @@ i18n:
 
 # Key-Value (KV) Caching & Autoregressive Inference Generation
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
 During LLM pretraining, computation is parallelized across all $T$ tokens simultaneously via the causal triangular mask. However, during real-world inference generation, tokens are produced strictly one by one in an autoregressive feedback loop: to predict token $t+1$, the model requires the sampled output of token $t$. This fundamental duality separates transformer execution into two distinct regimes: the compute-bound **Prefill phase** (processing the user prompt in parallel) and the memory-bandwidth-bound **Decode phase** (generating tokens sequentially).
 
@@ -32,6 +32,39 @@ While KV caching dramatically cuts projection compute from $\mathcal{O}(T^2)$ do
 
 يشبه التخزين المؤقت للمفاتيح والقيم تدوين ملاحظات موجزة في مسودتك الجانبية حتى لا تضطر إلى إعادة قراءة الكتاب بأكمله من الصفحة الأولى عند كتابة كل كلمة جديدة! فعند صياغة فكرة جديدة، ترجع إلى مسودة النقاط المحورية السابقة وتضيف سطراً واحداً فقط للمفاهيم المستجدة، بدلاً من قراءة 500 صفحة من جديد في كل مرة، مما يرفع كفاءة التوليد إلى مستويات قياسية.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **KV Cache** (مخزن المفاتيح والقيم المؤقت) | The author's Rolodex: stores computed Keys and Values of all past words in GPU VRAM so you never have to re-read them when generating the next word. | حافظة بطاقات المفاتيح والقيم: تخزن مخرجات الكلمات السابقة في ذاكرة الرسوميات لتجنب إعادة حسابها عند توليد كل كلمة جديدة. |
+| **Prefill Phase** (مرحلة الاستيعاب الأولي للطلب) | Reading the prompt: processing the initial 1000 user tokens in parallel in a single GPU pass to fill up the initial KV cache. | قراءة نص السؤال دفعة واحدة: معالجة كافة مدخلات المستخدم بالتوازي لملء الذاكرة المؤقتة الأولية للنموذج. |
+| **Decode Phase** (مرحلة التوليد التسلسلي اللاحق) | The steady typewriter: generating one new token at a time autoregressively ($S=1$) by querying the accumulated KV cache. | الكتابة المتسلسلة على الآلة الكاتبة: توليد رمز واحد في كل خطوة بالاعتماد على مخزون الذاكرة التراكمي. |
+| **Quadratic Waste Elimination** (إلغاء الهدر التربيعي) | Going from $O(N^2)$ to $O(N)$ operations: without KV caching, generating token 1000 requires recomputing all 999 previous tokens from scratch! | الانتقال من التعقيد التربيعي إلى الخطي: بدون الكاش، يتطلب توليد الكلمة رقم 1000 إعادة حساب كافة الكلمات الـ 999 السابقة! |
+| **Memory Bandwidth Bottleneck** (عنق زجاجة نقل البيانات في الذاكرة) | The delivery truck limit: during generation, modern GPUs spend 95% of their time waiting to fetch giant KV caches from VRAM, not doing math. | قيود سعة نقل الذاكرة: تقضي بطاقة الرسوميات 95% من وقتها في انتظار جلب بيانات الكاش من الذاكرة بدلاً من تنفيذ العمليات الحسابية. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+AUTOREGRESSIVE GENERATION: NAIVE VS. KV-CACHED
+=============================================================================
+NAIVE GENERATION (Without KV Cache):
+Step 1: Feed [ "The" ]                        ---> Compute Q, K, V for 1 token
+Step 2: Feed [ "The", "cat" ]                 ---> Recompute Q, K, V for "The" AND "cat"!
+Step 3: Feed [ "The", "cat", "sat" ]          ---> Recompute ALL 3 tokens from scratch!
+...
+Step N: Feed [ token_1, ..., token_N ]        ---> Quadratic Compute Blowup: O(N^2) FLOPs!
+=============================================================================
+KV-CACHED GENERATION:
+Prefill: Input [ "The", "cat", "sat" ]        ---> Compute & Store Keys & Values in VRAM
+Decode Step t: (Generating Next Word)
+               New Token Input: "on"          ---> Only compute q_t, k_t, v_t for "on"!
+                     |
+                     +---> Append k_t to K_cache, Append v_t to V_cache
+                     |
+               Query q_t attends against [ K_cache ] ---> Retrieve [ V_cache ]
+               Output Next Token: "the"       ---> Pure Linear Compute: O(N) FLOPs!
+```
+
 :::simulation-widget{engine="canvas2d" component="AttentionHeatmapCanvas"}
 ---
 interactive: true
@@ -41,7 +74,7 @@ highlighted_metric: "loss"
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
 In an autoregressive decoding step at timestep $t$, key and value tensors are updated by concatenating the newest token representations:
 
@@ -67,22 +100,21 @@ $$
 \text{Memory}_{\text{KV}} = 2 \times 2 \times n_{\text{layers}} \times n_{\text{heads}} \times d_{\text{head}} \times T \times B \quad \text{(bytes in 16-bit precision)}
 $$
 
-### Comprehensive Symbol & Parameter Breakdown
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-| Symbol | Dimensionality | Mathematical Interpretation | Operational Role |
-| :--- | :--- | :--- | :--- |
-| $\mathbf{x}_t$ | $\mathbb{R}^{1 \times d}$ | Embedding of newest single token at time $t$ | Input token entering decoder layer at current step. |
-| $\mathbf{q}_t$ | $\mathbb{R}^{1 \times d_k}$ | Query vector for newest token | Searches against entire historical memory bank. |
-| $\mathbf{k}_t, \mathbf{v}_t$ | $\mathbb{R}^{1 \times d_k}, \mathbb{R}^{1 \times d_v}$ | Key and Value vectors for newest token | New state vectors appended to the persistent cache. |
-| $\mathbf{K}_{\text{cached}}^{(t)}$ | $\mathbb{R}^{t \times d_k}$ | Accumulated historical keys across positions $1 \dots t$ | Serves as the addressable catalog for attention dot products. |
-| $\mathbf{V}_{\text{cached}}^{(t)}$ | $\mathbb{R}^{t \times d_v}$ | Accumulated historical values across positions $1 \dots t$ | Contains content payload vectors retrieved by softmax weights. |
-| $\mathbf{a}_t$ | $\mathbb{R}^{1 \times d_v}$ | Single-token context output vector | Context vector passed to output projection matrix $\mathbf{W}_O$. |
-| $2 \times 2$ | Constant | 2 matrices ($\mathbf{K}$ and $\mathbf{V}$) $\times$ 2 bytes per element | Memory multiplier for FP16 / BF16 numerical precision. |
-| FLOPs per step | Complexity | Reduced from $\mathcal{O}(t \cdot d^2)$ down to $\mathcal{O}(1 \cdot d^2)$ | Projections are computed for 1 token instead of $t$ tokens. |
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $\mathbf{q}_t \in \mathbb{R}^{1 \times d_k}$ | Current Step Query / استعلام اللحظة الحالية | Single row query vector generated exclusively for the newly arrived token $t$. |
+| $\mathbf{K}_{\text{past}}^{(t-1)} \in \mathbb{R}^{(t-1) \times d_k}$ | Historical Key Cache / مخزن المفاتيح التاريخي | Cached matrix holding key representations of all preceding sequence tokens. |
+| $\mathbf{V}_{\text{past}}^{(t-1)} \in \mathbb{R}^{(t-1) \times d_v}$ | Historical Value Cache / مخزن القيم التاريخي | Cached matrix holding value representations of all preceding sequence tokens. |
+| $[\mathbf{K}_{\text{past}}; \mathbf{k}_t]$ | In-Place Concatenation / التحديث الإلحاقي للكاش | Fast append operation inserting current key vector into GPU cache memory. |
+| $\mathbf{z}_t \in \mathbb{R}^{1 \times d_v}$ | Output Context Vector / المتجه السياقي المولد | The synthesized context vector driving the prediction of token $t+1$. |
 
-توضح هذه المعادلات الرياضية كيف يتحول التوليد ذاتي الانحدار من مسألة مقيدة بالمعالجة الحسابية (Compute-Bound) إلى مسألة مقيدة بسعة ونطاق الذاكرة (Memory-Bandwidth Bound)؛ حيث يقرأ المعالج غيغابايت من مصفوفات الذاكرة في كل خطوة لإجراء عمليات ضرب مصفوفية بسيطة ذات كثافة حسابية منخفضة.
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **Mathematical Equivalence**: Because causal masking prevents past tokens from looking at future tokens, the Key and Value representations of word 5 do *not* change when word 10 is appended. They are mathematically frozen, making recomputation 100% redundant.
+2. **Computational Savings**: Without caching, generating $T$ tokens costs $\sum_{t=1}^T O(t \cdot d) = O(T^2 d)$ operations. With KV caching, each step costs only $O(t \cdot d)$ for attention against cached memory, slashing redundant projection work completely.
+3. **The VRAM Footprint Cost**: For an 8B model with 32 layers and sequence length 8192, the KV cache consumes $\approx 2 \times 32 \times 8192 \times 4096 \times 2 \text{ bytes} \approx 4.3 \text{ GB}$ of VRAM per single user request, making KV compression techniques like GQA essential.
 
----
 
 ## Beat 3: Python Challenge
 

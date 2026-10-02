@@ -12,7 +12,7 @@ i18n:
 
 # Direct Preference Optimization (DPO) & Implicit Reward Dynamics
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
 After pretraining and Supervised Fine-Tuning (SFT), alignment with human values, safety guidelines, and user intent traditionally relied on **Reinforcement Learning from Human Feedback (RLHF)** using Proximal Policy Optimization (PPO). Standard RLHF is a notoriously brittle, multi-stage engineering pipeline:
 1. Collect pairwise human preferences ($y_w \succ y_l$, where $y_w$ is the preferred response and $y_l$ is the rejected response).
@@ -40,6 +40,42 @@ Substituting this analytical identity directly into the Bradley-Terry preference
 
 عبر هذا التعويض الجبري المباشر، تلغي DPO الحاجة لنموذج المكافأة ولخوارزمية PPO بالكامل! وتتحول مواءمة النموذج إلى دالة خسارة انحدارية بسيطة وعالية الاستقرار تشبه دالة الإنتروبيا التقاطعية الثنائية.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Direct Preference Optimization (DPO)** (التحسين المباشر للتفضيلات) | Learning from direct comparison: training an AI using pairs of good vs bad essays directly, completely skipping the need to build a complex separate grader. | التعلم من المقارنة المباشرة: تدريب النموذج عبر أزواج من الإجابات الفائزة والخاسرة مباشرة دون الحاجة لتدريب نموذج مكافأة وسيط. |
+| **Human Alignment** (المواءمة مع القيم والتفضيلات البشرية) | Taming the wild autocomplete: steering a raw web-trained text predictor into a helpful, honest, and harmless conversational assistant. | ترويض المتنبئ الآلي: تحويل نموذج التنبؤ بالنصوص إلى مساعد ذكي نافع وصادق يلتزم بالمعايير الأخلاقية للمستخدم. |
+| **RLHF (Reinforcement Learning from Human Feedback)** (التعلم التعزيزي من التغذية الراجعة) | The old complex machinery: required juggling 4 separate neural nets simultaneously (Actor, Critic, Reward, Reference) with unstable PPO training. | المنظومة التقليدية المعقدة: تطلبت تشغيل 4 شبكات عصبية ضخمة معاً عبر خوارزميات التعلم التعزيزي غير المستقرة. |
+| **Implicit Reward Function ($r_\theta$)** (دالة المكافأة الضمنية) | The mathematical hidden mirror: the analytical discovery that the policy model's own log-probability ratio mathematically *is* the optimal reward function. | المرآة الرياضية الخفية: الاكتشاف النظري بأن نسبة احتمالات النموذج نفسه تمثل رياضياً دالة المكافأة المثلى دون أي وسيط. |
+| **Reference Model ($\pi_{\text{ref}}$)** (النموذج المرجعي المجمد) | The anchor of sanity: a frozen copy of the model preventing it from collapsing into gibberish shortcuts (KL divergence penalty). | مرساة الأمان والاستقرار: نسخة مجمدة من النموذج تمنعه من الانجراف نحو نصوص شاذة أو متكررة أثناء محاولة كسب التفضيل. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+DPO PREFERENCE LOSS EVALUATION PIPELINE:
+=============================================================================
+Training Pair: Prompt x  ---> Winning Response y_w  (Preferred by human)
+                         ---> Losing Response  y_l  (Dispreferred by human)
+=============================================================================
+EVALUATE LOG-PROBABILITIES UNDER TWO MODELS:
+1. Active Policy \pi_\theta (Trainable):
+   Compute Log-Prob: log \pi_\theta(y_w | x)   AND   log \pi_\theta(y_l | x)
+
+2. Frozen Reference \pi_ref (Static):
+   Compute Log-Prob: log \pi_ref(y_w | x)     AND   log \pi_ref(y_l | x)
+=============================================================================
+COMPUTE IMPLICIT REWARD MARGIN:
+Implicit Reward Margin = \beta * [ log(\pi_\theta(y_w)/\pi_ref(y_w)) - log(\pi_\theta(y_l)/\pi_ref(y_l)) ]
+                                  \____________________________/       \____________________________/
+                                     Implicit Reward for Winner           Implicit Reward for Loser
+=============================================================================
+MINIMIZE DPO OBJECTIVE:
+Loss = - log \sigma( Implicit Reward Margin )
+--> Pushes probability of winning response y_w UP, pushes losing response y_l DOWN!
+--> Stable, simple binary cross-entropy gradient: NO reinforcement learning instability!
+```
+
 :::simulation-widget{engine="canvas2d" component="AutogradGraphLab"}
 ---
 interactive: true
@@ -49,7 +85,7 @@ highlighted_metric: "loss"
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
 The DPO loss objective is derived by substituting the analytical policy-to-reward mapping into the negative log-likelihood of pairwise human preferences:
 
@@ -69,22 +105,22 @@ $$
 \nabla_\theta \mathcal{L}_{\text{DPO}} = -\beta \sigma\left(\hat{r}_\theta(x, y_l) - \hat{r}_\theta(x, y_w)\right) \left[ \nabla_\theta \log \pi_\theta(y_w \mid x) - \nabla_\theta \log \pi_\theta(y_l \mid x) \right]
 $$
 
-### Comprehensive Symbol & Parameter Breakdown
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-| Symbol | Dimensionality | Mathematical Interpretation | Operational Role |
-| :--- | :--- | :--- | :--- |
-| $x$ | Sequence | User input prompt | Conditioning context for completion candidates. |
-| $y_w$ | Sequence | Preferred (winning / chosen) response | Candidate whose log-likelihood is actively boosted. |
-| $y_l$ | Sequence | Dispreferred (losing / rejected) response | Candidate whose log-likelihood is actively penalized. |
-| $\pi_\theta(y \mid x)$ | $\mathbb{R}_{> 0}$ | Active parameterized policy probability | The LLM being trained to align with human preferences. |
-| $\pi_{\text{ref}}(y \mid x)$ | $\mathbb{R}_{> 0}$ | Frozen reference policy probability | The SFT baseline checkpoint anchoring linguistic grammar. |
-| $\beta$ | $\mathbb{R}_{> 0}$ | Regularization temperature parameter | Inverse KL divergence weight controlling anchor strength. |
-| $\hat{r}_\theta(x, y)$ | $\mathbb{R}$ | Implicit reward metric | Analytical reward derived directly from log probability ratios. |
-| $\sigma(\hat{r}_l - \hat{r}_w)$ | $[0, 1]$ | Dynamic gradient scaling coefficient | Applies maximum force when model errs, vanishing when margin is secure. |
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $y_w, y_l$ | Winning & Losing Responses / الإجابة الفائزة والخاسرة | The preferred ($y_w$) and dispreferred ($y_l$) responses generated for prompt $x$. |
+| $\pi_\theta(y \mid x)$ | Trainable Policy Model / النموذج قيد التدريب | The current language model whose weights are being optimized to match human preferences. |
+| $\pi_{\text{ref}}(y \mid x)$ | Frozen Reference Model / النموذج المرجعي الثابت | The static pre-alignment foundation model enforcing KL divergence regularization. |
+| $\beta > 0$ | Regularization Hyperparameter / معامل كبح الانجراف | Inverse temperature controlling how strictly the policy must stay anchored to $\pi_{\text{ref}}$. |
+| $\sigma(z) = \frac{1}{1 + e^{-z}}$ | Sigmoid Function / دالة سيجمويد | Maps the margin difference into a valid probability representing human pairwise preference. |
+| $\mathcal{L}_{\text{DPO}}(\theta)$ | DPO Loss Objective / دالة خسارة DPO | Binary cross-entropy loss driving the model to prefer winning over losing responses. |
 
-تضمن هذه الصياغة الرياضية انسياب تدرجات التعلم لتفضيل الاستجابات الإيجابية وقمع السلبية، مع توفير حماية كاملة ضد انهيار الأنماط بفضل القيد المرجعي $\pi_{\text{ref}}$.
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **The Closed-Form Inversion**: In RLHF, the optimal policy under a reward function $r(x, y)$ subject to KL regularization is $\pi^*(y|x) \propto \pi_{\text{ref}}(y|x) \exp(\frac{1}{\beta} r(x, y))$. Rafailov et al. (2023) simply inverted this equation: $r(x, y) = \beta \log \frac{\pi^*(y|x)}{\pi_{\text{ref}}(y|x)} + \beta \log Z(x)$.
+2. **Canceling the Partition Function**: Substituting this implicit reward into the Bradley-Terry preference model $P(y_w \succ y_l) = \sigma(r(x, y_w) - r(x, y_l))$ causes the intractable partition function $\log Z(x)$ to cancel out completely!
+3. **Optimization Stability**: Instead of training an unstable actor-critic policy gradient loop with high variance, DPO optimizes standard supervised cross-entropy over offline data, eliminating training collapse.
 
----
 
 ## Beat 3: Python Challenge
 

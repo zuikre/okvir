@@ -159,6 +159,10 @@ def extract_beat1_narrative(body, default_ar=""):
     en_paragraphs = []
     ar_paragraphs = []
 
+    def is_skipped_header(p_text):
+        p_clean = p_text.strip()
+        return bool(re.match(r'^#{1,3}\s+(?:Intuition|Tactile|Beat\s*1|الحدس|حدس)', p_clean, re.I))
+
     # Check for explicit subsection headers
     # E.g. ### Intuition & Physical Grounding / ### الحدس الفيزيائي والهندسي
     if '### الحدس' in beat1_raw or '### حدس' in beat1_raw:
@@ -167,11 +171,11 @@ def extract_beat1_narrative(body, default_ar=""):
         ar_part = parts[1] if len(parts) > 1 else ""
         
         en_part = re.sub(r'^###\s+[^\n]+\n', '', en_part).strip()
-        en_paragraphs = [p.strip() for p in en_part.split('\n\n') if p.strip() and not p.strip().startswith('#')]
-        ar_paragraphs = [p.strip() for p in ar_part.split('\n\n') if p.strip() and not p.strip().startswith('#')]
+        en_paragraphs = [p.strip() for p in en_part.split('\n\n') if p.strip() and not is_skipped_header(p)]
+        ar_paragraphs = [p.strip() for p in ar_part.split('\n\n') if p.strip() and not is_skipped_header(p)]
     else:
         # Split by paragraphs
-        raw_paras = [p.strip() for p in beat1_raw.split('\n\n') if p.strip() and not p.strip().startswith('#')]
+        raw_paras = [p.strip() for p in beat1_raw.split('\n\n') if p.strip() and not is_skipped_header(p)]
         for p in raw_paras:
             if re.search(r'[\u0600-\u06FF]', p):
                 ar_paragraphs.append(p)

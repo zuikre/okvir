@@ -37,6 +37,25 @@ SVD is the master engine driving the algorithms of modern artificial intelligenc
 
 ---
 
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| SVD ($A = U \Sigma V^T$) | The master decomposition factoring ANY matrix into rotate, stretch, and rotate | تفكيك القيم المفردة (SVD) | التحليل الشامل الذي يفكك أي مصفوفة إلى دوران ثم تمديد ثم دوران |
+| Singular Values ($\sigma_i$) | The sorted stretch factors along the principal axes, measuring importance | القيم المفردة ($\sigma_i$) | معاملات التمديد المرتبة تنازلياً، وتقيس وزن وأهمية كل نمط في البيانات |
+| Right Singular Vectors ($V$) | The perpendicular input directions that experience pure stretching | المتجهات المفردة اليمنى ($V$) | المحاور المتعامدة في فضاء المدخلات التي تتعرض لتمدد نقي |
+| Left Singular Vectors ($U$) | The perpendicular output directions where the stretched axes land | المتجهات المفردة اليسرى ($U$) | المحاور المتعامدة في فضاء المخرجات التي تستقر عندها الأبعاد الممددة |
+| Low-Rank Approximation | Data compression: keeping only the largest singular values and tossing the noise | التقريب منخفض الرتبة | ضغط البيانات والصور: الاحتفاظ بأكبر القيم المفردة وحذف الضجيج |
+
+#### Geometric & Visual Flow
+
+```
+   Unit Sphere          Aligned Sphere        Hyper-Ellipsoid      Rotated Output
+      (x)       ──V^T──►     (V^T*x)    ──Σ──►   (Σ*V^T*x)  ──U──►   (U*Σ*V^T*x)
+    Circle               Rotated              Stretched            Final orientation
+                       (Input bases)        by σ1, σ2,...        (Output bases)
+```
+
 ### الحدس الفيزيائي والهندسي
 
 تخيل أنك تصنع كرة مستديرة تماماً من الصلصال بيديك. الآن، اضغط عليها واسحبها بقوة بين راحتي كفيك في اتجاهات مختلفة. أو تخيل أنك تسلط ضوء مصباح يدوي على كرة قدم من زاوية مائلة، مسقطاً ظلها على جدار مائل. مهما كان مقدار الشد والضغط والدوران الذي تعرضت له الكرة، فإن شكلها الهندسي يتحول حتماً إلى **قطع ناقص فائق** (Hyper-ellipsoid، يشبه كرة الركبي). هذا القطع الناقص يمتلك محاور رئيسية متعامدة لا تخطئها العين: محوراً رئيسياً يمثل أقصى استطالة، ومحوراً أوسط، ومحوراً أصغر يمثل أشد انضغاط.
@@ -59,6 +78,25 @@ SVD is the master engine driving the algorithms of modern artificial intelligenc
 3. **معالجة اللغات الطبيعية والتحليل الدلالي الكامن (LSA):** في مصفوفات تكرار الكلمات داخل المستندات، يُسقط SVD آلاف الكلمات على فضاء المفاهيم الدلالية، ملتقطاً الترادف والمعاني السياقية تلقائياً.
 4. **شبه المعكوس لمور-بينروز ($\mathbf{A}^+$):** عند حل المنظومات الخطية $\mathbf{A}\mathbf{x} = \mathbf{b}$ المستطيلة أو غير القابلة للعكس، يمنحنا SVD الحل الفريد الأدنى معياراً للمربعات الصغرى: $\mathbf{x}^+ = \mathbf{V}\mathbf{\Sigma}^+\mathbf{U}^T\mathbf{b}$.
 5. **التوليف الفعال للنماذج اللغوية الضخمة (LoRA):** تعتمد تقنية LoRA المستخدمة في تدريب وتخصيص نماذج الذكاء الاصطناعي التوليدي على تمثيل تحديثات الأوزان الضخمة $\Delta \mathbf{W}$ كمصفوفات منخفضة الرتبة، وهو تطبيق عصري مباشر لرؤية SVD الهندسية.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| تفكيك القيم المفردة (SVD) | The master decomposition factoring ANY matrix into rotate, stretch, and rotate | تفكيك القيم المفردة (SVD) | التحليل الشامل الذي يفكك أي مصفوفة إلى دوران ثم تمديد ثم دوران |
+| القيم المفردة ($\sigma_i$) | The sorted stretch factors along the principal axes, measuring importance | القيم المفردة ($\sigma_i$) | معاملات التمديد المرتبة تنازلياً، وتقيس وزن وأهمية كل نمط في البيانات |
+| المتجهات المفردة اليمنى ($V$) | The perpendicular input directions that experience pure stretching | المتجهات المفردة اليمنى ($V$) | المحاور المتعامدة في فضاء المدخلات التي تتعرض لتمدد نقي |
+| المتجهات المفردة اليسرى ($U$) | The perpendicular output directions where the stretched axes land | المتجهات المفردة اليسرى ($U$) | المحاور المتعامدة في فضاء المخرجات التي تستقر عندها الأبعاد الممددة |
+| التقريب منخفض الرتبة | Data compression: keeping only the largest singular values and tossing the noise | التقريب منخفض الرتبة | ضغط البيانات والصور: الاحتفاظ بأكبر القيم المفردة وحذف الضجيج |
+
+#### المخطط البصري الهندسي
+
+```
+   كرة الوحدة            كرة مدورة             شكل بيضاوي ممدد      المخرج النهائي
+      (x)       ──V^T──►     (V^T*x)    ──Σ──►   (Σ*V^T*x)  ──U──►   (U*Σ*V^T*x)
+    دائرة أولية          دوران المحاور        تمدد المحاور         دوران نهائي
+                        (أساسات الدخل)       بالمعاملات σ         (أساسات الخرج)
+```
 
 :::simulation-widget{engine="canvas2d" component="SVDImageCompressorLab"}
 ---

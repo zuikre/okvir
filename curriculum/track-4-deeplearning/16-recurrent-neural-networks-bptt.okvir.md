@@ -29,6 +29,37 @@ However, unrolling an RNN across 100 time steps reveals a fatal mathematical tra
 
 > **Frontier Analogy:** Imagine whispering a secret through a line of 100 people (a game of telephone). Each person adds a tiny bit of mumbling and attenuation ($\mathbf{W}_{hh} \cdot \tanh'$). By person 20, the original message has dissolved into complete unintelligible silence; by person 50, it is gone forever.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Hidden State ($h_t$)** (الحالة الخفية / الذاكرة المتسلسلة) | The traveler's pocket diary: a dense vector summarizing everything learned from the past sequence, updated at each step. | مفكرة المسافر: متجه ملخص يحمل في طياته كافة الأحداث الماضية، ويتم تحديثه عند كل محطة زمنية. |
+| **Recurrent Weight ($W_{hh}$)** (مصفوفة الانتقال التكراري) | The immutable memory rule: the identical weight matrix applied at every single point in time to blend old memory with new input. | قاعدة الذاكرة الثابتة: مصفوفة أوزان موحدة تطبق عبر كافة اللحظات الزمنية لدمج الماضي مع الحاضر. |
+| **Temporal Unrolling** (الفرد الزمني للمسار) | Unfolding an accordion: drawing the looped recurrent cell as a deep chain of identical feedforward layers across time $T$. | فرد الأكورديون: رسم العصبون الدائري كسلسلة ممتدة من الطبقات المتعاقبة بعدد الخطوات الزمنية. |
+| **Backpropagation Through Time (BPTT)** (التفاضل العكسي عبر الزمن) | Tracing blame through history: replaying the temporal chain backwards to compute how early words influenced late errors. | تتبع اللوم عبر التاريخ: الرجوع بالزمن للخلف لمعرفة كيف أثرت الكلمات الأولى في أخطاء التوقع المتأخرة. |
+| **Exploding / Vanishing Gradients** (تلاشي وانفجار التدرجات) | The compound interest trap: multiplying by $W_{hh}$ repeatedly causes gradients to either compound to infinity or decay to zero. | فخ الفائدة المركبة: ضرب التدرجات المتكرر في مصفوفة الانتقال يرفعها أُسياً نحو اللانهاية أو يخمدها للصفر. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+RECURRENT NEURAL NETWORK: TEMPORAL UNROLLING
+=============================================================================
+Time t=1                   Time t=2                   Time t=T
+[Input x_1]                [Input x_2]                [Input x_T]
+     |                          |                          |
+     v (W_xh)                   v (W_xh)                   v (W_xh)
+[Hidden h_1] ==(W_hh)==>   [Hidden h_2] ==(W_hh)==>   [Hidden h_T]
+     |                          |                          |
+     v (W_hy)                   v (W_hy)                   v (W_hy)
+[Output \hat{y}_1]         [Output \hat{y}_2]         [Output \hat{y}_T]
+=============================================================================
+BACKPROPAGATION THROUGH TIME (BPTT) GRADIENT MULTIPLICATION:
+dL/dh_1 = (dL/dh_T) * (dh_T/dh_{T-1}) * ... * (dh_2/dh_1)
+        = (dL/dh_T) * \prod_{k=2}^T ( W_hh^T * \text{diag}(1 - h_k^2) )
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      (Product of T matrices: Leads to 0 or \infty!)
+```
+
 :::simulation-widget{engine="canvas2d" component="AutogradGraphLab"}
 ---
 interactive: true

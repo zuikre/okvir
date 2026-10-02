@@ -29,6 +29,17 @@ To develop an intuitive physical mental model, imagine a single straight flight 
 
 This elegant architectural invariant is known as **Zero-Copy Slicing**. Whether an array holds 10 numbers or 10,000,000,000 numbers, creating a sliced view takes less than 1 microsecond and consumes $O(1)$ additional memory!
 
+### Jargon Decoder / قاموس المصطلحات المعمارية
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Strides Tuple** / صف الخطوات الذاكرية | The number of bytes to jump in physical RAM to reach the next element along each dimension. Analogy: Walking stride length (leap 4 steps for row, 1 step for col). | عدد البايتات المطلوب قفزها في الذاكرة الفيزيائية للوصول للعنصر التالي في كل بعد. التشبيه: طول الخطوة أثناء المشي (القفز 4 درجات للصف، ودرجة واحدة للعمود). |
+| **Zero-Copy View** / مشهد عرض بلا نسخ | A new multidimensional window over existing RAM without duplicating any data. Analogy: Looking at the same landscape through a differently shaped picture frame. | إطار عرض جديد للبيانات دون نسخ أي بايت في الذاكرة. التشبيه: النظر إلى نفس المنظر الطبيعي من خلال إطار نافذة ذي شكل مختلف. |
+| **C-Contiguous (Row-Major)** / الترتيب الصفي C | Storing rows sequentially in memory, where the last dimension changes fastest. Analogy: Reading English text left-to-right, row-by-row down the page. | رصف الصفوف بتتابع في الذاكرة حيث يتغير البعد الأخير بأسرع وتيرة. التشبيه: قراءة نص سطراً بسطر من اليسار لليمين نزولاً لأسفل الصفحة. |
+| **Fortran-Contiguous (Column-Major)** / الترتيب العمودي | Storing columns sequentially in memory, where the first dimension changes fastest. Analogy: Reading a newspaper column top-to-bottom before moving right. | رصف الأعمدة بتتابع في الذاكرة حيث يتغير البعد الأول بأسرع وتيرة. التشبيه: قراءة عمود صحفي من الأعلى للأسفل قبل الانتقال للعمود المجاور. |
+| **Array Header Metadata** / الترويسة الوصفية للمصفوفة | An 80-byte C struct containing pointers, shape, and strides that interprets the flat buffer. Analogy: A label on a storage box describing what is packed inside. | هيكل C خفيف الوزن (80 بايت) يحوي المؤشرات والأبعاد والخطوات لتفسير الذاكرة. التشبيه: بطاقة ملصقة على صندوق تصف كيفية ترتيب الأغراض داخله. |
+| **`as_strided`** / دالة التلاعب بالخطوات | Low-level NumPy utility creating virtual views by directly overriding shape and strides. Analogy: Re-indexing a library shelf without moving a single book. | دالة متقدمة في NumPy تنشئ مشاهد افتراضية بتعديل خطوات القفز مباشرة. التشبيه: إعادة ترقيم رفوف المكتبة دون تحريك كتاب واحد من مكانه. |
+
 :::simulation-widget{engine="canvas2d" component="StrideMemoryGridLab"}
 ---
 interactive: true
@@ -57,6 +68,32 @@ $$
 s_{n-1} = w, \quad s_k = s_{k+1} \cdot d_{k+1} = w \cdot \prod_{j=k+1}^{n-1} d_j \implies \text{byte\_offset}(\mathbf{i}) = \sum_{k=0}^{n-1} i_k \cdot s_k
 $$
 
+```text
+Visual ASCII Transformation: 1D Buffer to 2D Strided Rolling Window View:
+
+Physical Contiguous 1D Buffer in RAM (5 int64 elements = 40 bytes):
+Address:    0x100       0x108       0x110       0x118       0x120
+Bytes:    [  10   ]   [  20   ]   [  30   ]   [  40   ]   [  50   ]
+Index:      arr[0]      arr[1]      arr[2]      arr[3]      arr[4]
+Stride:   s = 8 bytes per integer
+
+Virtual 2D Rolling Window of size W=3:
+  Shape:   (3, 3)  -> 3 windows, each of length 3
+  Strides: (8, 8)  -> Row stride = 8 bytes, Column stride = 8 bytes!
+
+Window 0: byte_offset(0, c) = 0*8 + c*8
+  c=0: 0x100 -> 10 | c=1: 0x108 -> 20 | c=2: 0x110 -> 30  ===> [ 10, 20, 30 ]
+
+Window 1: byte_offset(1, c) = 1*8 + c*8 (Row advance is just +8 bytes!)
+  c=0: 0x108 -> 20 | c=1: 0x110 -> 30 | c=2: 0x118 -> 40  ===> [ 20, 30, 40 ]
+
+Window 2: byte_offset(2, c) = 2*8 + c*8
+  c=0: 0x110 -> 30 | c=1: 0x118 -> 40 | c=2: 0x120 -> 50  ===> [ 30, 40, 50 ]
+
+===> Result: 9 virtual matrix cells mapped to ONLY 5 physical numbers in RAM!
+             Zero new buffers allocated. Pure O(1) metadata reconfiguration!
+```
+
 ### Mathematical Invariants & Symbol Breakdown
 
 | الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
@@ -69,9 +106,19 @@ $$
 | $\text{byte\_offset}(\mathbf{i})$ | $\text{offset} \in \mathbb{N}$ | Physical memory displacement added to base buffer pointer | الإزاحة المكانية بالبايت المضافة لعنوان المؤشر الأساسي في RAM |
 | $n$ | $n \in \mathbb{N}^+$ | Rank (number of dimensions / tensor order) | رتبة المصفوفة (عدد الأبعاد الإجمالي) |
 
-In a standard row-major (C-contiguous) layout, elements of the last dimension ($k = n-1$) are placed consecutively in memory. Slicing with a step parameter $p$ modifies the stride $s_k' = p \cdot s_k$ and shape $d_k' = \lceil d_k / p \rceil$ without allocating a single byte of heap memory. Transposing an array simply reverses the stride tuple: $\text{strides}(A^T) = (s_1, s_0)$ for $\text{strides}(A) = (s_0, s_1)$.
-
-في الترتيب الصفي القياسي (C-Contiguous)، تتجاور عناصر البعد الأخير ($k = n-1$) مباشرة في الذاكرة. وعملية الاقتطاع بخطوة $p$ تعدل الخطوة الذاكرية $s_k' = p \cdot s_k$ وتعدل الطول $d_k'$ دون حجز أي بايت في الذاكرة العامة. وتدوير المصفوفة (Transpose) يقلب ترتيب خطوات الأبعاد فقط: $\text{strides}(A^T) = (s_1, s_0)$.
+#### Step-by-Step Arithmetic Cost & Invariant Breakdown:
+1. **Stride Offset Computation**:
+   For 2D array of shape $(M, N)$ and element width $w = 8\text{ bytes}$:
+   $$s_1 = 8\text{ bytes (column stride)}, \quad s_0 = N \times 8\text{ bytes (row stride)}$$
+   $$\text{Memory Address}(i, j) = \text{base\_ptr} + i \cdot s_0 + j \cdot s_1$$
+2. **Zero-Copy View Cost**:
+   - Time complexity: $\mathcal{O}(1)$ (populates a single 80-byte header).
+   - Auxiliary space: Exactly $80\text{ bytes}$ regardless of dataset size $N$.
+3. **Deep Copy Explosion Cost**:
+   - For rolling window of size $W = 1,024$ over $N = 50,000,000$ points:
+   $$\text{Elements to Copy} = (N - W + 1) \times W \approx 50 \times 10^6 \times 1024 \approx 5.12 \times 10^{10} \text{ floats}$$
+   $$\text{RAM Required} = 5.12 \times 10^{10} \times 8\text{ bytes} \approx 409.6\text{ GB (Instant Out-Of-Memory Crash!)}$$
+   - With Strided View: $\text{RAM Required} = 50 \times 10^6 \times 8\text{ bytes} = 400\text{ MB} + 80\text{ bytes header}$!
 
 ## Beat 3: Interactive Code Challenge
 
@@ -100,13 +147,26 @@ def strided_rolling_window(arr: np.ndarray, window_size: int) -> np.ndarray:
     Returns:
         2D NumPy array of shape (N - W + 1, W) sharing the underlying buffer.
     """
-    # Step 1: Validate that arr is 1D and window_size satisfies 1 <= window_size <= len(arr)
-    # Step 2: Ensure contiguous buffer layout: c_arr = np.ascontiguousarray(arr)
-    # Step 3: Extract single element byte stride: elem_stride = c_arr.strides[0]
-    # Step 4: Define new shape: (N - window_size + 1, window_size)
-    # Step 5: Define new strides: (elem_stride, elem_stride)
-    # Step 6: Construct and return zero-copy view via as_strided(c_arr, shape=..., strides=..., writeable=False)
-    raise NotImplementedError("Implement strided_rolling_window")
+    # Step 1: Ensure contiguous 1D array layout
+    c_arr = np.ascontiguousarray(arr)
+    n = len(c_arr)
+
+    # Step 2: Validate window size constraints
+    if not (1 <= window_size <= n):
+        raise ValueError("window_size must satisfy 1 <= window_size <= len(arr)")
+
+    # Step 3: Extract single element byte stride along the 1D axis
+    elem_stride = c_arr.strides[0]
+
+    # Step 4: Define output 2D shape: (number_of_windows, window_size)
+    num_windows = n - window_size + 1
+    new_shape = (num_windows, window_size)
+
+    # Step 5: Define 2D strides: step by 1 element for next row, and by 1 element for next col
+    new_strides = (elem_stride, elem_stride)
+
+    # Step 6: Construct zero-copy view via as_strided
+    return as_strided(c_arr, shape=new_shape, strides=new_strides, writeable=False)
 ```
 :::
 
@@ -138,5 +198,5 @@ An industrial IoT monitoring facility samples vibration sensors at 100,000 Hz, g
 *التفسير الهندسي المعمق وتحليل الخيارات:*
 - **لماذا الخيار (A) صحيح:** حلقة بايثون البسيطة تنشئ مصفوفة جديدة مستقلة لكل نافذة، مما يتطلب تخزين $50,000,000 \times 1,024$ رقماً عشارياً، وهو ما يستهلك أكثر من 409 جيجابايت من الذاكرة الفيزيائية. أما `as_strided` فتنشئ ترويسة بيانات وصفية بحجم 80 بايت فقط تشير إلى المخزن الأصلي (400 ميجابايت) بخطوات `(8, 8)`، فيتقدم كلا البعدين بمقدار 8 بايتات، قارئة النوافذ المتداخلة من نفس الذاكرة بصفر نسخ إضافي.
 - **لماذا الخيار (B) خاطئ:** مصفوفات NumPy في الذاكرة هي مخازن خام غير مضغوطة. خوارزميات مثل Snappy أو ZSTD تخص تنسيقات الأقراص كـ Parquet وليست شاشات عرض الذاكرة.
-- **لماذا الخيار (C) خاطئ:** تعمل `as_strided` كلياً في ذاكرة RAM الحالية ولا تستدعي ملفات القرص أو تقنيات `mmap` إلا إذا كانت المصفوفة الأصلية قد أُنشئت عمداً كـ `np.memmap`.
-- **لماذا الخيار (D) خاطئ:** قفل المفسر العام (GIL) ينظم تزامن الخيوط ولا يضع حداً لعدد تكرار الحلقات. تستمر الحلقات في العمل حتى تنفد الذاكرة الفعلية للجهاز.
+- **لماذا الخيار (C) خاطئ:** تعمل `as_strided` داخل ذاكرة المعالج العشوائية RAM مباشرة على المصفوفات القائمة؛ ولا تستدعي إدارة صفحات النظام أو `mmap` ما لم تُفتح المصفوفة عبر `np.memmap`.
+- **لماذا الخيار (D) خاطئ:** قفل المفسر العام (GIL) ينظم تسلسل الخيوط البرمجية ولا يضع أي حدود عددية على حلقات التكرار. يمكن لحلقات بايثون الاستمرار لملايين الدورات حتى تنفد الذاكرة.

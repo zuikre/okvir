@@ -24,6 +24,37 @@ Now, you slide that identical flashlight across the entire canvas, step by step,
 
 > **Frontier Analogy:** Think of a rubber ink stamp carved with the shape of an eye. Instead of hand-drawing a billion eyes from scratch across a city map, you stamp the identical eye template across every street corner. Wherever an eye truly exists, the ink stamp matches the underlying outline and rings an alarm bell.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Convolutional Kernel / Filter ($K$)** (مرشح الالتفاف / النواة) | A sliding cookie cutter: a tiny grid of weights (e.g. $3 \times 3$) scanned across the image to detect local visual clues like edges or corners. | قالب تقطيع منزلق: مصفوفة صغيرة من الأوزان (مثل 3×3) تمر عبر الصورة للكشف عن معالم بصرية محددة كالحواف. |
+| **Feature Map ($Y$)** (خريطة الميزات الناتجة) | The heatmap of discoveries: a 2D surface showing exactly where and how strongly the kernel's target pattern was spotted. | خريطة الرصد الحرارية: سطح ثنائي الأبعاد يوضح مواقع وقوة رصد النمط البصري المستهدف عبر الصورة. |
+| **Weight Sharing** (مشاركة الأوزان) | One detector for the whole city: the exact same filter weights are reused across every single pixel, saving millions of parameters. | كاشف واحد لكل المواقع: إعادة استخدام نفس أوزان المرشح عبر كافة بكسلات الصورة، مما يوفر ملايين المعاملات. |
+| **Spatial Locality** (الموضعية المكانية) | Neighborhood focus: adjacent pixels form meaningful objects together, while pixels across opposite corners are initially unrelated. | التركيز على الجوار: تشكل البكسلات المتقاربة أشكالاً ذات معنى، بينما لا ترتبط البكسلات المتباعدة موضعياً. |
+| **Translation Equivariance** (التكافؤ الانتقالي) | Position-following outputs: if the cat walks from the left to the right of the photo, its feature activation shifts right by the same amount. | تتبع الحركة: إذا تحرك القط من يسار الصورة إلى يمينها، فإن استجابة الشبكة العصبية تتحرك بنفس المقدار بالضبط. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+2D CROSS-CORRELATION / CONVOLUTION MECHANISM:
+=============================================================================
+Input Image Patch (3x3):            Convolutional Kernel (3x3):
+[ 1,  2,  0 ]                      [  1,  0, -1 ]
+[ 0,  1,  3 ]          (*)         [  1,  0, -1 ]  (Vertical Edge Detector)
+[ 2,  1,  0 ]                      [  1,  0, -1 ]
+      |
+      v (Element-wise Multiplication & Accumulation)
+Result = (1*1 + 2*0 + 0*-1) + (0*1 + 1*0 + 3*-1) + (2*1 + 1*0 + 0*-1) + Bias
+       = (1 + 0 + 0) + (0 + 0 - 3) + (2 + 0 + 0) + 0 = 0
+      |
+      v
+Stored at Feature Map output location: Y[i, j] = 0.0
+=============================================================================
+SLIDING WINDOW REPETITION:
+Input [H x W x C_in] ---> Slide [K_h x K_w] Kernel ---> Output Feature Map [H_out x W_out x C_out]
+```
+
 :::simulation-widget{engine="canvas2d" component="ConvolutionFilterCanvas"}
 ---
 interactive: true

@@ -12,7 +12,7 @@ i18n:
 
 # Autoregressive Decoder-Only GPT Transformer Architecture
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
 While the original 2017 Transformer architecture featured an encoder-decoder topology engineered specifically for bidirectional translation tasks, contemporary generative foundation models (GPT-4, Claude, LLaMA 2/3, Mistral, Gemma) converged completely on the **Decoder-Only** paradigm. This architectural unification is grounded in the foundational objective of causal language modeling: next-token prediction, where the joint probability distribution over any arbitrary sequence factorizes strictly autoregressively as $P(x_1, x_2, \dots, x_T) = \prod_{t=1}^T P(x_t \mid x_1, \dots, x_{t-1})$. By eliminating the cross-attention bridge between separate encoder and decoder stacks, the decoder-only model maximizes parameter utilization and GPU hardware compute density.
 
@@ -32,6 +32,47 @@ Mathematically, this Pre-LN identity formulation ensures that the final represen
 
 يشبه هذا النظام خط تجميع سيارات فائق السرعة يسير على حزام ناقل متصل: يقوم الفني في كل محطة بفحص القطع المركبة مسبقاً فقط (الحجب السببي)، وتصنيع ترقية محددة، ثم تثبيتها برفق على هيكل السيارة المار دون إيقاف الحزام الناقل الرئيسي إطلاقاً. تضمن هذه الصياغة الرياضية انسياب تدرجات التعلم العكسية من الطبقة المائة إلى الطبقة الأولى مباشرة ودون أي تلاشٍ أو انفجار رقمي، مما أتاح تدريب أضخم النماذج المعاصرة باستقرار تام.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Decoder-Only Transformer** (المحول التوليدي للمفكك فقط) | The skyscraper of workshops: the universal blueprint of modern LLMs (GPT-4, LLaMA, Claude) where all tokens pass through identical causal layers. | ناطحة سحاب من ورش الصقل المتطابقة: المعمارية القياسية لكافة النماذج التوليدية الحديثة التي تتنبأ بالرمز التالي. |
+| **Residual Stream** (مجرى البواقي الرئيسي) | The central elevator shaft: a high-dimensional vector highway carrying information straight up through all 32+ layers without degradation. | عمود المصعد المركزي: مسار بيانات عالي الأبعاد يمر عمودياً عبر كافة الطبقات دون أن تفقد الإشارات قوتها. |
+| **Pre-Norm Formulation** (المعايرة القبلية) | Cleaning tools before each job: normalizing activations before each attention and MLP block keeps the central highway pure and training stable. | غسل الأدوات قبل بدء العمل: معايرة البيانات قبل دخول كتل الانتباه والتغذية لضمان استقرار التدريب في النماذج العميقة. |
+| **Feedforward Network (FFN)** (شبكة التغذية الأمامية المعرفية) | The factual library: expansive linear layers expanding dimensions by $4\times$ to store factual knowledge and world concepts. | المكتبة المعرفية التخزينية: طبقات خطية موسعة تتسع لـ 4 أضعاف الحجم لتخزين الحقائق والروابط المعرفية للنموذج. |
+| **Unembedding Head ($W_U$)** (رأس فك التضمين اللغوي) | The final projection booth: converts the top hidden vector back into a ranking over the 100,000 vocabulary words. | شاشة العرض الختامية: تحول المتجه الخفي الأخير إلى درجات ترجيحية على امتداد مفردات القاموس لاختيار الكلمة التالية. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+DECODER-ONLY GPT TRANSFORMER BLOCK (Pre-RMSNorm):
+=============================================================================
+Input Tokens ---> Token & Positional Embedding ---> Residual Stream State: h_0
+                                                          |
+  +-------------------------------------------------------+ <=== [Repeat for L Layers]
+  |                                                       |
+  |  Residual Stream Backbone: h_{l-1}                    |
+  |      |                                                |
+  |      +---> [ RMSNorm ] ---> [ Causal Multi-Head Attn ]+
+  |      |                                                |
+  |      v                                                |
+  |    ( + ) <--- (Add Attention Output to Highway)       |
+  |      |                                                |
+  |    State h_l'                                         |
+  |      |                                                |
+  |      +---> [ RMSNorm ] ---> [ Gated MLP / SwiGLU ] ---+
+  |      |                                                |
+  |      v                                                |
+  |    ( + ) <--- (Add FFN Output to Highway)             |
+  |      |                                                |
+  |    State h_l                                          |
+  |                                                       |
+  +-------------------------------------------------------+
+                                                          |
+Final Output Layer:                                       v
+Residual State h_L ---> [ Final RMSNorm ] ---> [ Linear Head W_U ] ---> Vocab Logits
+```
+
 :::simulation-widget{engine="canvas2d" component="AttentionHeatmapCanvas"}
 ---
 interactive: true
@@ -41,7 +82,7 @@ highlighted_metric: "loss"
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
 In a modern autoregressive Pre-RMSNorm decoder block, the hidden representations propagate through attention and feedforward sub-layers via two parallel residual updates:
 
@@ -71,22 +112,21 @@ $$
 \frac{\partial \mathcal{L}}{\partial \mathbf{h}^{(0)}} = \frac{\partial \mathcal{L}}{\partial \mathbf{h}^{(L)}} \left( \mathbf{I} + \sum_{l=1}^L \frac{\partial \Delta_l}{\partial \mathbf{h}^{(0)}} \right)
 $$
 
-### Comprehensive Symbol & Parameter Breakdown
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-| Symbol | Dimensionality | Mathematical Interpretation | Operational Role |
-| :--- | :--- | :--- | :--- |
-| $\mathbf{h}^{(l-1)}$ | $\mathbb{R}^{B \times T \times d}$ | Hidden state activations entering layer $l$ | The main conveyor belt carrying token representations through depth. |
-| $\text{RMSNorm}(\cdot)$ | $\mathbb{R}^d \to \mathbb{R}^d$ | Root Mean Square feature normalization | Stabilizes variance along the channel dimension without costly mean-centering. |
-| $\text{CausalMHA}(\cdot)$ | $\mathbb{R}^{B \times T \times d} \to \mathbb{R}^{B \times T \times d}$ | Multi-Head Attention with causal mask $\mathbf{M}$ | Gathers contextual evidence strictly from current and past token positions. |
-| $\mathbf{M} \in \mathbb{R}^{T \times T}$ | Upper triangular matrix ($-\infty$ above diagonal) | Causal autoregressive mask | Enforces the direction of time; zeroes out future token visibility in softmax. |
-| $\mathbf{h}^{(l)\prime}$ | $\mathbb{R}^{B \times T \times d}$ | Intermediate hidden state after attention | First residual highway addition preserving identity gradient paths. |
-| $\text{FFN}(\cdot)$ | $\mathbb{R}^d \to \mathbb{R}^d$ | Feedforward sub-layer (GELU or SwiGLU) | Performs non-linear factual memory retrieval and feature transformation. |
-| $\mathbf{h}_t^{(L)}$ | $\mathbb{R}^d$ | Final layer hidden state for token $t$ | Fully contextualized representation synthesized across all $L$ layers. |
-| $\mathbf{W}_{\text{unembed}}$ | $\mathbb{R}^{V \times d}$ | Language model unembedding projection | Maps deep continuous representations to raw logits across vocabulary size $V$. |
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $\mathbf{h}_0 = \mathbf{E}[t]$ | Initial Sequence Embedding / التضمين الأولي | Look-up vectors representing input tokens entering the first layer. |
+| $\mathbf{h}_l' = \mathbf{h}_{l-1} + \text{MHA}(\text{Norm}(\mathbf{h}_{l-1}))$ | Post-Attention Residual State / حالة البواقي بعد الانتباه | Intermediate representation updated by communication between sequence tokens. |
+| $\mathbf{h}_l = \mathbf{h}_l' + \text{FFN}(\text{Norm}(\mathbf{h}_l'))$ | Post-FFN Residual State / حالة البواقي بعد التغذية | Final representation at layer $l$ updated by per-token factual processing. |
+| $\mathbf{W}_U \in \mathbb{R}^{d \times V}$ | Unembedding Matrix / مصفوفة فك التضمين | Linear weights projecting the top hidden state into vocabulary logit scores. |
+| $\hat{\mathbf{y}} = \text{softmax}(\mathbf{W}_U \text{Norm}(\mathbf{h}_L))$ | Next-Token Distribution / توزيع احتمال الرمز التالي | Final categorical probability distribution over the complete vocabulary $V$. |
 
-تسمح هذه البنية بتدريب مليارات المعاملات بتوازٍ هائل عبر استغلال كامل الذاكرة التخزينية أثناء مرحلة الملء الأولي (Prefill)، وتوليد الإجابات تدريجياً رمزاً تلو الآخر أثناء مرحلة الاستدلال (Generation).
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **The Role Division**: Self-Attention allows tokens to communicate horizontally across the sequence ("Who is the subject of this sentence?"), while the FFN operates independently on each token vertically ("What factual associations does this subject have?").
+2. **Pre-Norm Superiority**: In early Post-Norm Transformers, gradients degraded rapidly as depth increased, requiring careful warmup. Pre-Norm maintains an identity gradient highway from layer $L$ to layer $1$, allowing models to scale effortlessly to hundreds of layers.
+3. **Causal Autoregressive Training**: Thanks to causal masking inside MHA, the entire sequence $t_1, \dots, t_T$ is trained simultaneously under cross-entropy loss $\mathcal{L} = -\sum \log P(t_{i+1} | t_{\le i})$, maximizing compute efficiency.
 
----
 
 ## Beat 3: Python Challenge
 

@@ -27,7 +27,27 @@ Geometrically, the Jacobian is the ultimate description of **local spatial defor
 
 In contemporary generative artificial intelligence, this geometric transformation is the engine of **Normalizing Flows** and generative coordinate transforms. By chaining together invertible vector mappings with easily computable Jacobians, AI models stretch and fold a simple bell-shaped Gaussian distribution into the fantastically complex probability distribution of realistic human faces, audio waveforms, or protein structures.
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Jacobian Matrix ($J$) | A local distortion grid showing how every output coordinate responds to every input knob | مصفوفة جاكوبي ($J$) | جدول التشوه المحلي الذي يوضح كيف يستجيب كل مخرج لكل مدخل |
+| Vector-Valued Function | A system taking multiple inputs and producing multiple outputs (e.g. mapping coordinates) | دالة متعددة المخرجات | منظومة تستقبل عدة إحداثيات وتنتج عدة إحداثيات جديدة |
+| Jacobian Determinant ($|\det J|$) | The local area or volume magnification multiplier at that exact coordinate | محدد جاكوبي ($|\det J|$) | معامل تضخيم المساحة أو الحجم المحلي عند تلك النقطة تحديداً |
+| Local Linearization | Treating a tiny patch of warped curved space as a simple matrix multiplication | التقريب الخطي المحلي | التعامل مع رقعة مجهرية من الفضاء المشوه كعملية ضرب مصفوفي بسيطة |
+
+#### Geometric & Visual Flow
+
+```
+       Input Domain (dx by dy)           Output Space (Deformed)
+           ▲                               ▲           *
+        dy │ *───*                      J*dy*         /
+           │ │   │ Area = dx*dy           │   \      /  New Area =
+           └──*───┴──►                    └───*─────┴──► |det(J)| * dx*dy
+              dx                             J*dx
+```
+
+### الحدس الفيزيائي والهندسي
 
 في استكشافاتنا السابقة لعلم الحسبان، كانت دوالنا عبارة عن حقول عددية: تستقبل نقطة متعددة الأبعاد وتُخرج رقماً قياسياً وحيداً—مثل إدخال إحداثيات الموقع $(x, y)$ واستقبال الارتفاع $z$، أو إدخال ملايين الأوزان واستقبال قيمة خسارة وحيدة $\mathcal{L}$. ولكن ماذا يحدث عندما تستقبل المنظومة الرياضية أو الفيزيائية متجهاً متعدد الأبعاد وتُخرج **متجهاً آخر متعدد الأبعاد**؟
 
@@ -41,6 +61,26 @@ In contemporary generative artificial intelligence, this geometric transformatio
 هندسياً، تمثل مصفوفة جاكوبي الوصف الرياضي الأكمل لـ **التشوه المكاني المحلي**. تخيل أنك رسمت قطرة حبر دائرية متناهية الصغر على غشاء مطاطي مرن. إذا أمسكت بأطراف الغشاء المطاطي وشددته ولوّيته وشوهته وفقاً للتحويل المتجهي $\mathbf{F}$، فماذا سيحدث لتلك القطرة الدائرية الدقيقة؟ تحت مجهر لانهائي، ستتحول الدائرة المشوهة إلى **قطع ناقص (شكل بيضاوي)** مثالي! مصفوفة جاكوبي $\mathbf{J}$ هي التحويل الخطي الدقيق الذي يصف كيف تمددت تلك القطرة الدائرية، وكيف دارت، وكيف تغير حجمها لتتحول إلى ذلك القطع الناقص.
 
 وفي الذكاء الاصطناعي التوليدي الحديث، يمثل هذا التحول الهندسي القلب النابض لنماذج **التدفقات المعيارية** (Normalizing Flows). فعبر ربط سلسلة من التحويلات المتجهية القابلة للعكس ذات مصفوفات جاكوبي سهلة الحساب، يستطيع النموذج شد وثني توزيع احتمالي غاوسي بسيط ليشكل التوزيع فائق التعقيد لصور الوجوه البشرية فائقة الدقة أو الأصوات أو الهياكل الجزيئية للبروتينات.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| مصفوفة جاكوبي ($J$) | A local distortion grid showing how every output coordinate responds to every input knob | مصفوفة جاكوبي ($J$) | جدول التشوه المحلي الذي يوضح كيف يستجيب كل مخرج لكل مدخل |
+| دالة متعددة المخرجات | A system taking multiple inputs and producing multiple outputs (e.g. mapping coordinates) | دالة متعددة المخرجات | منظومة تستقبل عدة إحداثيات وتنتج عدة إحداثيات جديدة |
+| محدد جاكوبي ($|\det J|$) | The local area or volume magnification multiplier at that exact coordinate | محدد جاكوبي ($|\det J|$) | معامل تضخيم المساحة أو الحجم المحلي عند تلك النقطة تحديداً |
+| التقريب الخطي المحلي | Treating a tiny patch of warped curved space as a simple matrix multiplication | التقريب الخطي المحلي | التعامل مع رقعة مجهرية من الفضاء المشوه كعملية ضرب مصفوفي بسيطة |
+
+#### المخطط البصري الهندسي
+
+```
+       نطاق المدخلات (dx في dy)          فضاء المخرجات (المشوه محلياً)
+           ▲                               ▲           *
+        dy │ *───*                      J*dy*         /
+           │ │   │ المساحة = dx*dy        │   \      /  المساحة الجديدة =
+           └──*───┴──►                    └───*─────┴──► |det(J)| * dx*dy
+              dx                             J*dx
+```
 
 :::simulation-widget{engine="canvas2d" component="JacobianMappingCanvas"}
 ---

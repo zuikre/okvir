@@ -31,6 +31,25 @@ This geometric reality immediately dissolves the greatest mystery of linear alge
 
 ---
 
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Matrix Multiplication ($AB$) | Chaining two transformations in series: first do $B$, then do $A$ | ضرب المصفوفات ($AB$) | تطبيق تحويلين هندسيين متتاليين: تطبيق التحويل B أولاً ثم التحويل A |
+| Composition ($A \circ B$) | Packaging a two-stage assembly line into a single master operation | تركيب الدوال ($A \circ B$) | دمج مرحلتين متعاقبتين في خط معالجة واحد مباشر |
+| Non-Commutative ($AB \ne BA$) | Order matters! Putting on socks then shoes is NOT shoes then socks | عدم التبديلية ($AB \ne BA$) | الترتيب جوهري! ارتداء الجوارب ثم الحذاء يختلف تماماً عن العكس |
+| Associativity ($(AB)C = A(BC)$) | Grouping intermediate stages does not alter the final output | الخاصية التجميعية | حرية تجميع محطات المعالجة دون أن يتأثر الناتج النهائي |
+| Identity Matrix ($I$) | The do-nothing transform: leaves every arrow completely untouched | مصفوفة الوحدة ($I$) | التحويل المحايد: يترك كل سهم في مكانه الأصلي دون أدنى تغيير |
+
+#### Geometric & Visual Flow
+
+```
+       Input x ──► [ Machine B ] ──► B*x ──► [ Machine A ] ──► A*(B*x)
+                                ▲                         ▲
+                                └─────── [ Matrix AB ] ───┘
+                                   Combined single jump!
+```
+
 ### الحدس الفيزيائي والهندسي
 
 تأمل روتينك الصباحي عند ارتداء ملابسك. إذا ارتديت جواربك أولاً ثم انتعلت حذاءك، ستبدأ يومك براحة وثقة طبيعية. ولكن ماذا لو عكست ترتيب الخطوتين: انتعلت حذاءك الشتوي الثقيل أولاً، ثم حاولت شد الجوارب فوق الحذاء من الخارج؟ الفعلان المنفردان هما نفس الفعلان تماماً، لكن النتيجة الفيزيائية النهائية مختلفة جذرياً ومضحكة! ترتيب الأفعال المتتالية في العالم الواقعي يغير مصير النتائج تماماً.
@@ -47,6 +66,25 @@ This geometric reality immediately dissolves the greatest mystery of linear alge
 1. **الشبكات العصبية العميقة والتعلم العميق:** عند تدفق البيانات عبر طبقات شبكة عصبية متعددة، فإنها تخضع لتحويلات متتالية: $h_1 = W_1 x$ ثم $h_2 = W_2 h_1 = W_2 W_1 x$. لولا وجود دوال التنشيط غير الخطية (مثل ReLU)، لانهارت شبكة عميقة مكونة من 100 طبقة إلى تحويل خطي مفرد وبسيط: $W_{\text{composite}} = W_{100} \dots W_1$. تركيب المصفوفات يشرح سبب إلزامية اللاخطية لتمكين الذكاء الاصطناعي من تعلم أنماط معقدة!
 2. **محركات ألعاب الفيديو والرسوم ثلاثية الأبعاد:** تدمج كروت الشاشة ثلاثة تحويلات رئيسية في مصفوفة واحدة: مصفوفة المجسم (Model)، ومصفوفة الكاميرا (View)، ومصفوفة الإسقاط المنظوري على الشاشة (Projection). تدمج الألعاب هذه العمليات في مصفوفة موحدة $\mathbf{M} = \mathbf{P} \cdot \mathbf{V} \cdot \mathbf{M}_{\text{model}}$، مما يتيح لكارت الشاشة تحويل 10 ملايين مضلع في جزء من الثانية بالتوازي.
 3. **الحوسبة الكمومية (Quantum Computing):** البوابات الكمومية التي تعالج البتات الكمية (Qubits) ليست سوى مصفوفات تحويل وحدوية (Unitary Matrices). وتنفيذ خوارزمية كمومية ما هو إلا ضرب متتالٍ وسريع لهذه المصفوفات لتعديل الحالة الكمية للنظام.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| ضرب المصفوفات ($AB$) | Chaining two transformations in series: first do $B$, then do $A$ | ضرب المصفوفات ($AB$) | تطبيق تحويلين هندسيين متتاليين: تطبيق التحويل B أولاً ثم التحويل A |
+| تركيب الدوال ($A \circ B$) | Packaging a two-stage assembly line into a single master operation | تركيب الدوال ($A \circ B$) | دمج مرحلتين متعاقبتين في خط معالجة واحد مباشر |
+| عدم التبديلية ($AB \ne BA$) | Order matters! Putting on socks then shoes is NOT shoes then socks | عدم التبديلية ($AB \ne BA$) | الترتيب جوهري! ارتداء الجوارب ثم الحذاء يختلف تماماً عن العكس |
+| الخاصية التجميعية | Grouping intermediate stages does not alter the final output | الخاصية التجميعية | حرية تجميع محطات المعالجة دون أن يتأثر الناتج النهائي |
+| مصفوفة الوحدة ($I$) | The do-nothing transform: leaves every arrow completely untouched | مصفوفة الوحدة ($I$) | التحويل المحايد: يترك كل سهم في مكانه الأصلي دون أدنى تغيير |
+
+#### المخطط البصري الهندسي
+
+```
+       المدخل x ──► [ الآلة B ] ──► B*x ──► [ الآلة A ] ──► A*(B*x)
+                                ▲                       ▲
+                                └────── [ المصفوفة AB ] ┘
+                                   قفزة واحدة مدمجة تختصر المرحلتين!
+```
 
 :::simulation-widget{engine="canvas2d" component="MatrixCompositionCanvas"}
 ---

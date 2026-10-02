@@ -32,6 +32,40 @@ When the Query vector of *"it"* takes the dot product with the Key vector of *"a
 
 > **Frontier Analogy:** Think of a YouTube search. You type a search phrase (Query $\mathbf{Q}$). YouTube compares your text against the titles and tags of billions of uploaded videos (Keys $\mathbf{K}$). The videos with the highest match scores rise to the top of your recommendations, and you stream the actual video content (Values $\mathbf{V}$).
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Query ($Q$)** (متجه الاستعلام) | "What am I searching for?" — The current word's inquiry vector seeking relevant context elsewhere. | "عما أبحث؟" — استفسار يطلقه الرمز الحالي للبحث عن الكلمات المرتبطة به دلالياً في السياق. |
+| **Key ($K$)** (متجه المفتاح) | "What do I represent?" — The label or index card that each word advertises to incoming queries. | "ما هو عنواني؟" — بطاقة تعريفية يعرضها كل رمز في السياق لتطابق استعلامات الرموز الأخرى. |
+| **Value ($V$)** (متجه القيمة / المحتوى) | "What information do I offer?" — The actual semantic payload retrieved if query and key match. | "ما هي حمولتي الدلالية؟" — المحتوى المعرفي الفعلي الذي يُسترجع عندما يتطابق الاستعلام مع المفتاح. |
+| **Scaled Dot-Product Attention** (الانتباه بالجداء النقطي المقاس) | The matching score engine: computes dot-product similarities, divides by $\sqrt{d_k}$, and takes a softmax to build weights. | محرك درجات التطابق: يحسب التشابه النقطي ويقسمه على $\sqrt{d_k}$ ثم يطبّق سوفت ماكس لتوزيع الأوزان. |
+| **Scaling Factor ($\frac{1}{\sqrt{d_k}}$)** (معامل التحجيم الرياضي) | The thermostat: prevents dot products from growing huge in high dimensions, which would freeze the softmax and kill gradients. | منظم الحرارة الرياضي: يمنع تضخم نواتج الضرب عند كبر الأبعاد، مما يحمي دالة سوفت ماكس من التجمد وتلاشي التدرجات. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+SCALED DOT-PRODUCT ATTENTION TENSOR FLOW:
+=============================================================================
+Input Sequence Representation: X  [Shape: (Sequence_Length S, Hidden_Dimension d)]
+       |
+       +---> [Linear W_Q] ---> Query Matrix Q  [Shape: (S, d_k)]
+       +---> [Linear W_K] ---> Key Matrix   K  [Shape: (S, d_k)]
+       +---> [Linear W_V] ---> Value Matrix V  [Shape: (S, d_v)]
+       |
+Step 1: Compute Raw Similarity:    Scores = Q * K^T               [Shape: (S, S)]
+       |
+Step 2: Scale Variance:            Scaled = Scores / \sqrt{d_k}    [Shape: (S, S)]
+       |
+Step 3: Normalize to Probabilities: Attention Weights A = Softmax(Scaled) [Shape: (S, S)]
+       |
+Step 4: Retrieve Weighted Values:  Context Output Z = A * V        [Shape: (S, d_v)]
+=============================================================================
+SEMANTIC ROUTING INTUITION:
+In "The animal didn't cross the street because IT was too tired":
+Query for "IT" matches Key for "animal" with high score -> Retrieves Value of "animal"!
+```
+
 :::simulation-widget{engine="canvas2d" component="AttentionHeatmapCanvas"}
 ---
 interactive: true

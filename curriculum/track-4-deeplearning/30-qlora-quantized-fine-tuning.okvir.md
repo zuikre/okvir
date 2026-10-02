@@ -12,7 +12,7 @@ i18n:
 
 # QLoRA: 4-Bit NormalFloat (NF4) & Double Quantization
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
 While Low-Rank Adaptation (LoRA) successfully eliminated optimizer memory by training low-rank adapter matrices, fine-tuning massive foundation models still confronted a formidable hardware barrier: the frozen base model weights had to remain loaded in 16-bit precision. Storing a 70B parameter model in standard FP16 requires at least **140 Gigabytes of VRAM** solely for baseline model parameters, necessitating multiple high-end enterprise data-center GPUs ($2\times \text{A100 } 80\text{GB}$) before a single token can be processed.
 
@@ -32,6 +32,47 @@ To maximize memory compression, QLoRA pairs NF4 with **Double Quantization (DQ)*
 
 ومع إضافة تقنية **التكميم المزدوج (Double Quantization)** لمعاملات القياس واستخدام المحسّنات المقسمة لتجنب طفرات الذاكرة، انخفضت متطلبات VRAM لنماذج 70 مليار معامل من 140 غيغابايت إلى أقل من 45 غيغابايت، مما أتاح تدريب أعتى النماذج على بطاقة رسوميات مكتبية واحدة دون أي تراجع في دقة المخرجات.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **QLoRA (Quantized LoRA)** (الضبط منخفض الرتبة المكمم) | The ultimate memory shrinker: squeezes a 65B model into a single 48GB GPU by storing weights in 4-bit precision while fine-tuning 16-bit LoRA adapters. | الإعجاز في توفير الذاكرة: يتيح تدريب نموذج عملاق بحجم 65 مليار معامل على بطاقة واحدة عبر ضغط الأوزان إلى 4 بت وتدريب وصلات 16 بت. |
+| **NormalFloat 4 (NF4)** (تنسيق التعويم الطبيعي رباعي البتات) | The bell-curve ruler: a 4-bit data type with bins spaced specifically to capture Gaussian-distributed neural network weights with zero information waste. | مسطرة التوزيع الطبيعي: نظام تمثيل رقمي بأربعة بتات مصمم خصيصاً ليتطابق مع التوزيع الغاوسي لأوزان الشبكات العصبية. |
+| **Double Quantization (DQ)** (التكميم المزدوج) | Compressing the footnotes: quantizing the quantization scaling constants from 32-bit to 8-bit, saving an extra $0.37$ bits per parameter across billions of weights. | ضغط هوامش التحجيم: تكميم ثوابت التكميم نفسها من 32 بت إلى 8 بت، مما يوفر مليارات البتات الإضافية في الذاكرة. |
+| **Paged Optimizers** (محسنات الذاكرة المقسمة لصفحات) | The safety valve: when VRAM spikes during long context sequences, optimizer states spill over safely to CPU RAM via PCIe rather than crashing with an OOM. | صمام أمان الذاكرة: تفريغ حالات المحسن تلقائياً إلى ذاكرة المعالج المركزي عند حدوث قفزات مفاجئة لتفادي انهيار البرنامج. |
+| **On-the-Fly Dequantization** (فك التكميم اللحظي) | Unzipping at computation time: 4-bit weights are stored compressed in VRAM and only unpacked into 16-bit BF16 inside GPU registers during the forward dot product. | فك الضغط الفوري في السجلات: تخزن الأوزان بـ 4 بت في الذاكرة، ولا تفك إلى 16 بت إلا داخل مسجلات الحساب اللحظية أثناء ضرب المصفوفات. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+QLORA SYSTEM ARCHITECTURE & MEMORY HIERARCHY:
+=============================================================================
+GPU VRAM STORAGE (Extremely Compressed):
+- Base Weights: Stored in 4-bit NF4 format (~0.5 bytes per parameter!)
+- Double Quant: Scaling constants stored in 8-bit FP8 format (Saves 0.37 bits/param)
+- Total 65B Model Footprint in VRAM: Shrinks from 130 GB (FP16) down to ~35 GB!
+=============================================================================
+FORWARD PASS RUNTIME (Inside GPU Registers & SRAM):
+Input Activations x (BF16)
+       |
+       +---> [ Read 4-bit NF4 Weights from VRAM ]
+       |             |
+       |             v
+       |     [ Fast On-the-Fly Dequantization to BF16 ]
+       |             |
+       |             v
+       |     [ Matrix Multiply: W_dequant * x ] (BF16 Precision)
+       |             |
+       +---> [ Trainable 16-bit LoRA Adapters: B * A * x ] (Full Precision Gradients!)
+       |             |
+       v             v
+Accumulate: y = W_dequant * x + (\alpha / r) * B * A * x
+=============================================================================
+BACKWARD PASS:
+- Gradients computed ONLY for 16-bit LoRA matrices A and B!
+- Base 4-bit weights remain completely frozen (Zero optimizer state memory!)
+```
+
 :::simulation-widget{engine="canvas2d" component="LoRADecompositionLab"}
 ---
 interactive: true
@@ -41,7 +82,7 @@ highlighted_metric: "loss"
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
 In NormalFloat4 quantization, a continuous weight block is mapped to the nearest codebook centroid according to the standard normal quantiles:
 
@@ -65,21 +106,21 @@ $$
 \mathbf{Y}^{\text{BF16}} = \mathbf{X}^{\text{BF16}} \cdot \text{Dequantize}\left(\mathbf{W}^{\text{NF4}}, s_1\right) + \frac{\alpha}{r} \mathbf{X}^{\text{BF16}} \mathbf{A}^T \mathbf{B}^T
 $$
 
-### Comprehensive Symbol & Parameter Breakdown
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-| Symbol | Dimensionality | Mathematical Interpretation | Operational Role |
-| :--- | :--- | :--- | :--- |
-| $w_i$ | $\mathbb{R}$ | Continuous high-precision base model weight | Weight element in a quantization block (block size $B = 64$). |
-| $s$ | $\mathbb{R}_{> 0}$ | First-level block scaling factor | Maps raw block weights into normalized codebook range $[-1, 1]$. |
-| $\mathcal{C}_{\text{NF4}}$ | $\mathbb{R}^{16}$ | The 16 NormalFloat4 quantile centroids | Information-theoretically optimal centroids for $\mathcal{N}(0, 1)$. |
-| $q_i$ | $\{0, \dots, 15\}$ | 4-bit integer index stored in GPU memory | Packed 2 weights per byte, cutting storage from 16 bits to 4 bits ($4\times$). |
-| $s_1, s_2$ | Scales | Double quantization constants | Quantizes 32-bit scale $s_1$ into 8-bit FP8 using secondary scale $s_2$. |
-| $\text{Dequantize}(\cdot)$ | Operator | Dynamic on-the-fly reconstruction | Reconstructs BF16 weights in SRAM registers during matrix multiplication. |
-| $\mathbf{A}, \mathbf{B}$ | $\mathbb{R}^{r \times k}, \mathbb{R}^{d \times r}$ | High-precision 16-bit LoRA adapters | Receive full backpropagation gradients while base weights remain 4-bit frozen. |
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $\mathbf{W}^{\text{NF4}}$ | 4-Bit NormalFloat Indices / معاملات NF4 | Discrete 4-bit indices pointing to the 16 information-theoretically optimal quantiles. |
+| $c_1 \in \mathbb{R}$ | First-Level Quantization Scale / ثابت التحجيم الأولي | Block scaling constant mapping discrete NF4 indices back to continuous magnitudes. |
+| $c_2 \in \mathbb{R}$ | Second-Level (Double Quant) Scale / ثابت التكميم المزدوج | 8-bit scale factor quantizing the array of first-level constants $c_1$. |
+| $\text{dequant}(\cdot)$ | Dynamic Dequantizer / دالة فك التكميم اللحظي | Register-level unpacker restoring 16-bit BrainFloat floating-point values for matmul. |
+| $\mathbf{W}^{\text{BF16}} = c_1 \cdot \text{dequant}(\mathbf{W}^{\text{NF4}})$ | Recovered FP16 Base Weights / الأوزان المستعادة للحساب | High-precision operating weights materialized ephemerally during tensor operations. |
 
-تضمن هذه الصياغة الرياضية استرجاع الأوزان بدقة غاوسية مثالية لحظة الحساب فقط، دون الحاجة لحجز الذاكرة الكاملة، مما يلغي المفاضلة التاريخية بين حجم النموذج ودقة التدريب.
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **Information-Theoretic Optimality of NF4**: Dettmers et al. (2023) showed that pretrained neural weights are standard normally distributed $\mathcal{N}(0, \sigma^2)$. NF4 builds quantiles such that each of the $2^4 = 16$ discrete bins has equal probability under the Gaussian curve, minimizing quantization distortion.
+2. **Double Quantization Geometry**: Storing a 32-bit FP constant for every block of 64 parameters adds $32/64 = 0.5$ bits/param. Double Quant compresses these constants into 8-bit numbers with block size 256, reducing overhead from $0.5$ to $0.127$ bits/param—a saving of $3$ GB on a 65B model.
+3. **Zero Quality Loss**: Because gradients flow strictly into the unquantized 16-bit LoRA parameters ($A$ and $B$), the optimizer state remains full-precision, delivering performance identical to 16-bit full fine-tuning.
 
----
 
 ## Beat 3: Python Challenge
 

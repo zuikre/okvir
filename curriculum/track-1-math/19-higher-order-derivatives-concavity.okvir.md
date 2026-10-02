@@ -22,7 +22,28 @@ Geometrically, consider the shape of a smooth ceramic soup bowl sitting on a din
 
 In geometry and robotics, we quantify this bendiness through **intrinsic curvature** $\kappa(x)$. Picture placing a circular coin against a bending curve so that it snugly fits the inner contour. This is called the *osculating circle* (the "kissing circle"). A tight hairpin turn on a mountain pass has a tiny kissing circle and huge curvature $\kappa$; a long, sweeping highway bend has a gigantic kissing circle and near-zero curvature. Understanding curvature allows self-driving cars to negotiate corners safely and optimization algorithms to adjust their step sizes to the contour of the terrain.
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Second Derivative ($f''(x)$) | The acceleration of slope: how quickly the steepness itself is changing | المشتقة الثانية ($f''(x)$) | تسارع الميل: مدى سرعة تغير شدة الانحدار ذاتها مع التقدم |
+| Concave Up ($f'' > 0$) | A bowl or smile shape that holds water; tangent lines lie BELOW the curve | التقعر لأعلى ($f'' > 0$) | منحنى بشكل وعاء أو ابتسامة يحفظ الماء؛ والمماسات تقع أسفل المنحنى |
+| Concave Down ($f'' < 0$) | An umbrella or frown shape that sheds water; tangent lines lie ABOVE the curve | التقعر لأسفل ($f'' < 0$) | منحنى بشكل مظلة أو عبوس يسقط الماء؛ والمماسات تقع أعلى المنحنى |
+| Inflection Point | The transition spot where the road switches from banking left to banking right ($f'' = 0$) | نقطة الانعطاف | موضع التحول الذي ينتقل فيه المنحنى من التقعر لأسفل إلى التقعر لأعلى |
+| Curvature ($\kappa$) | The bending tightness of a curve, equal to 1 divided by the radius of the turning circle | الانحناء (Curvature) | مقياس شدة انثناء المنحنى، ويساوي مقلوب نصف قطر دائرة الانعطاف |
+
+#### Geometric & Visual Flow
+
+```
+        Concave Down (f'' < 0)       Inflection        Concave Up (f'' > 0)
+             Umbrella                   Point              Soup Bowl
+               .-.                        *                   \     /
+              /   \                      /                     \___/
+             /     \                    /                        
+         Tangents ABOVE             f''(x) = 0             Tangents BELOW
+```
+
+### الحدس الفيزيائي والهندسي
 
 إذا كانت المشتقة الأولى هي عداد سرعتك—تخبرك بما إذا كنت تصعد الجبل أم تهبطه—فماذا تخبرك **المشتقة الثانية**؟ إنها تقيس ما يحدث لشدة الانحدار ذاتها: هل يتسارع الميل صعوداً ليتحول إلى جرف صخري شاهق، أم ينبسط تدريجياً ليتحول إلى مرج جبلي هادئ؟ المشتقة الأولى هي السرعة؛ أما المشتقة الثانية فهي التسارع والانحناء الهندسي.
 
@@ -31,6 +52,27 @@ In geometry and robotics, we quantify this bendiness through **intrinsic curvatu
 هندسياً، تأمل شكل إناء حساء خزفي أملس موضوع على طاولة طعام. ينحني الإناء نحو الأعلى في جميع الاتجاهات: فهو قادر على استقبال الماء وجمعه ليستقر في أعمق نقطة في قاعه. وأي كرة زجاجية تسقط داخل هذا الإناء ستتدحرج تلقائياً على الجوانب المائلة لتستقر بثبات في القاع الفريد. هذه هي السمة الجوهرية للمنحنى **المحدب أو المقعر لأعلى** ($f''(x) > 0$): حيث يتزايد الميل باستمرار من القيم السالبة إلى الموجبة. وعلى النقيض من ذلك، إذا قلبت الإناء ليصبح مظلة مقلوبة ($f''(x) < 0$)، فإنه يطرد قطرات المطر، وأي كرة تستقر فوق قمته ستتدحرج مبتعدة عند أدنى هبة ريح.
 
 وفي الهندسة والروبوتات، نقيس هذا الالتواء بما يُعرف بـ **الانحناء الجوهري** $\kappa(x)$. تخيل وضع قرص دائري يلامس المنحنى من الداخل ويلتصق به بنعومة تامة. تُسمى هذه الدائرة هندسياً "دائرة التقبيل" (Osculating Circle). المنعطف الجبلي الحاد يمتلك دائرة تقبيل بالغة الصغر وانحناءً فائق الشدة $\kappa$؛ بينما يمتلك منعطف الطريق السريع العريض دائرة تقبيل عملاقة وانحناءً يقترب من الصفر. يساعد فهم الانحناء سيارات القيادة الذاتية على الدوران بسلاسة، كما يمكّن خوارزميات الاستمثال من تكييف حجم خطواتها مع تضاريس الوادي.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| المشتقة الثانية ($f''(x)$) | The acceleration of slope: how quickly the steepness itself is changing | المشتقة الثانية ($f''(x)$) | تسارع الميل: مدى سرعة تغير شدة الانحدار ذاتها مع التقدم |
+| التقعر لأعلى ($f'' > 0$) | A bowl or smile shape that holds water; tangent lines lie BELOW the curve | التقعر لأعلى ($f'' > 0$) | منحنى بشكل وعاء أو ابتسامة يحفظ الماء؛ والمماسات تقع أسفل المنحنى |
+| التقعر لأسفل ($f'' < 0$) | An umbrella or frown shape that sheds water; tangent lines lie ABOVE the curve | التقعر لأسفل ($f'' < 0$) | منحنى بشكل مظلة أو عبوس يسقط الماء؛ والمماسات تقع أعلى المنحنى |
+| نقطة الانعطاف | The transition spot where the road switches from banking left to banking right ($f'' = 0$) | نقطة الانعطاف | موضع التحول الذي ينتقل فيه المنحنى من التقعر لأسفل إلى التقعر لأعلى |
+| الانحناء (Curvature) | The bending tightness of a curve, equal to 1 divided by the radius of the turning circle | الانحناء (Curvature) | مقياس شدة انثناء المنحنى، ويساوي مقلوب نصف قطر دائرة الانعطاف |
+
+#### المخطط البصري الهندسي
+
+```
+        مقعر لأسفل (f'' < 0)         نقطة           مقعر لأعلى (f'' > 0)
+              شكل المظلة               الانعطاف             شكل الوعاء
+               .-.                        *                   \     /
+              /   \                      /                     \___/
+             /     \                    /                        
+         المماسات تعلو المنحنى         f''(x) = 0            المماسات أسفل المنحنى
+```
 
 :::simulation-widget{engine="canvas2d" component="TaylorSeriesCanvas"}
 ---

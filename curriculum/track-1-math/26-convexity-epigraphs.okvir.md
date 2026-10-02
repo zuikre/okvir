@@ -24,7 +24,29 @@ Furthermore, convexity gives birth to **Jensen's Inequality**, one of the most p
 
 In machine learning and statistics, this gap—the Jensen gap—is not an inconvenience; it is a foundational construction tool. It guarantees that the Kullback-Leibler (KL) divergence between two probability distributions is strictly non-negative, provides the mathematical justification for the Evidence Lower Bound (ELBO) in Variational Autoencoders (VAEs), and proves why cross-entropy loss works so reliably.
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Convex Function | A bowl shape where any straight chord drawn between two points floats strictly above the curve | الدالة المحدبة | دالة بشكل وعاء بحيث يقع أي وتر مستقيم بين نقطتين فوق المنحنى دوماً |
+| Epigraph | The entire region of space resting inside and above the bowl of the function | فوق المخطط (Epigraph) | كامل المنطقة الفراغية الواقعة داخل وعاء الدالة وأعلى منحناها |
+| Global Minimum | The absolute bottom of the bowl; any local valley is guaranteed to be the overall lowest point | النهاية الصغرى الشاملة | قاع الوعاء المطلق؛ أي قاع محلي تبلغه هو حتماً أدنى نقطة في الكون |
+| Jensen's Inequality | The value of the average is always less than or equal to the average of the values | متراجحة ينسن | قيمة الدالة عند المتوسط أقل من أو تساوي متوسط قيم الدالة |
+
+#### Geometric & Visual Flow
+
+```
+        f(x)
+          ▲
+          │   * (x1, f(x1))
+          │    \           Chord line floats ABOVE curve!
+          │     \   * (x2, f(x2))
+          │      \ /
+          │       V   Unique Global Minimum at bottom!
+          └────────────────────────► x
+```
+
+### الحدس الفيزيائي والهندسي
 
 تخيل إناء حساء خزفياً أملس ومستديراً موضوعاً على طاولة طعام. لنفترض أنك اخترت أي نقطتين عشوائيتين في أي مكان داخل الحساء أو على حافة الإناء البيضاء، وشددت بينهما شعاع ليزر مستقيماً فائق الدقة. تأمل مسار هذا الشعاع: هل يخترق جدران الخزف ليخرج إلى الهواء الطلق خارج الإناء؟ كلا على الإطلاق! يظل شعاع الليزر بالكامل محتواً بأمان داخل الإناء أو يطفو في الفضاء الواقع فوق قاعه.
 
@@ -35,6 +57,28 @@ In machine learning and statistics, this gap—the Jensen gap—is not an inconv
 وفضلاً عن ذلك، يمنحنا التحدب **متباينة ينسن** (Jensen's Inequality)، إحدى أقوى مبرهنات نظرية الاحتمالات. تخيل أنك وزعت آلاف الكتل الصغيرة داخل إناء الحساء. أين سيقع مركز كتلتها المشترك؟ نظراً لأن الإناء ينحني لأعلى، فإن مركز الكتلة يطفو في الهواء *فوق* قاع الإناء. رياضياً: قيمة الدالة عند القيمة المتوقعة تكون دوماً أقل من أو مساوية للقيمة المتوقعة للدالة: $f(\mathbb{E}[X]) \le \mathbb{E}[f(X)]$.
 
 وفي الذكاء الاصطناعي وتعلم الآلة، لا تُعد هذه الفجوة—فجوة ينسن—مجرد فضول نظري؛ بل هي اللبنة التأسيسية التي تضمن أن تباعد كولباك-ليبلر (KL Divergence) بين أي توزيعين احتماليين يكون موجباً دوماً، وتوفر الأساس الرياضي المتين لاشتقاق الحد الأدنى للدليل الاحتمالي (ELBO) في شفرات التشفير التلقائي التوليدية (VAEs)، وتبرر الفعالية المذهلة لدوال خسارة الإنتروبيا المتقاطعة.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| الدالة المحدبة | A bowl shape where any straight chord drawn between two points floats strictly above the curve | الدالة المحدبة | دالة بشكل وعاء بحيث يقع أي وتر مستقيم بين نقطتين فوق المنحنى دوماً |
+| فوق المخطط (Epigraph) | The entire region of space resting inside and above the bowl of the function | فوق المخطط (Epigraph) | كامل المنطقة الفراغية الواقعة داخل وعاء الدالة وأعلى منحناها |
+| النهاية الصغرى الشاملة | The absolute bottom of the bowl; any local valley is guaranteed to be the overall lowest point | النهاية الصغرى الشاملة | قاع الوعاء المطلق؛ أي قاع محلي تبلغه هو حتماً أدنى نقطة في الكون |
+| متراجحة ينسن | The value of the average is always less than or equal to the average of the values | متراجحة ينسن | قيمة الدالة عند المتوسط أقل من أو تساوي متوسط قيم الدالة |
+
+#### المخطط البصري الهندسي
+
+```
+        f(x)
+          ▲
+          │   * (x1, f(x1))
+          │    \           الوتر المستقيم يطفو دوماً أعلى المنحنى!
+          │     \   * (x2, f(x2))
+          │      \ /
+          │       V   نهاية صغرى شاملة وحيدة ومضمونة في القاع!
+          └────────────────────────► x
+```
 
 :::simulation-widget{engine="canvas2d" component="ConvexityJensensCanvas"}
 ---

@@ -25,6 +25,17 @@ To build an intuitive physical mental model of this architecture, imagine washin
 
 When performing cohort feature engineering—such as calculating employee salary Z-scores ($z = \frac{x - \mu_k}{\sigma_k}$)—you must never compare an executive's compensation directly against an entry-level intern. You **Split** by departmental title, **Apply** local mean and standard deviation scaling, and **Combine** the normalized features back into a unified model-ready dataset!
 
+### Jargon Decoder / قاموس المصطلحات المعمارية
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Split-Apply-Combine** / التقسيم والتطبيق والدمج | Partitioning data into subsets, executing operations per group, and reuniting results. Analogy: Sorting laundry by colors, running appropriate wash cycles, and folding them into one closet. | تجزئة البيانات لفئات مستقلة، وتنفيذ عمليات مخصصة لكل فئة، ثم دمج النتائج. التشبيه: فرز الملابس في سلال حسب اللون، وغسل كل سلة ببرنامجها، ثم جمعها في خزانة واحدة. |
+| **Disjoint Partition ($\bigsqcup \mathcal{D}_k$)** / المجموعات المنفصلة | Splitting records such that no single row appears in more than one subgroup. Analogy: A student belongs to exactly one graduating homeroom class. | تقسيم السجلات بحيث لا يظهر أي سجل في أكثر من مجموعة فرعية واحدة في نفس الوقت. التشبيه: انتماء الطالب لصف دراسي واحد محدد دون تكرار. |
+| **Cohort Z-Score Normalization** / التقييس المعياري الفئوي | Measuring how many standard deviations a value is away from its specific group mean ($z = \frac{x - \mu_k}{\sigma_k}$). Analogy: Grading a student on a curve within their own honors class. | قياس بعد القيمة عن متوسط فئتها بالانحرافات المعيارية. التشبيه: تقييم درجة طالب مقارنة بزملائه في نفس الفصل المتقدم بدلاً من عموم المدرسة. |
+| **Bessel's Correction ($N - 1$)** / تصحيح بيسل للعينات | Dividing by $N-1$ instead of $N$ when calculating sample variance to eliminate negative bias. Analogy: Leaving an extra margin of safety when estimating bridge weight capacity. | القسمة على $N-1$ بدلاً من $N$ لحساب تباين العينة بدقة والتخلص من الانحياز الإحصائي. التشبيه: ترك هامش أمان إضافي عند تقدير حمولة جسر مروري. |
+| **Scale-Invariant Statistical Surprise** / المفاجأة الإحصائية المستقلة عن المقياس | Identifying anomalies by relative probabilistic unlikelihood rather than raw magnitude. Analogy: An ant carrying a grape is far more surprising than an elephant carrying a log. | كشف الشذوذ وفقاً للاستبعاد الإحصائي النسبي وليس الحجم المطلق. التشبيه: نملة تحمل حبة عنب تثير الدهشة أكثر من فيل يحمل جذع شجرة ضخم. |
+| **Zero-Variance Sentinel ($z \triangleq 0$)** / القيمة المعيارية الآمنة لعدم التباين | Defaulting Z-score to 0.0 when a group has only 1 sample or identical values, avoiding division by zero. Analogy: Declaring everyone average in a competition where everyone scored identically. | إسناد القيمة صفر عندما تضم المجموعة عنصراً واحداً أو قيماً متطابقة لتفادي القسمة على صفر. التشبيه: منح الجميع تقييم "متوسط" في مسابقة تطابقت فيها كافة النتائج. |
+
 :::simulation-widget{engine="canvas2d" component="GroupBySplitApplyCombineLab"}
 ---
 interactive: true
@@ -49,6 +60,37 @@ $$
 \mathcal{D} = \bigsqcup_{k \in \mathcal{K}} \mathcal{D}_k, \quad \mu_k = \frac{1}{|\mathcal{D}_k|} \sum_{x \in \mathcal{D}_k} x, \quad \sigma_k = \sqrt{\frac{1}{|\mathcal{D}_k| - 1} \sum_{x \in \mathcal{D}_k} (x - \mu_k)^2} \implies z_i = \frac{x_i - \mu_k}{\sigma_k}
 $$
 
+```text
+Visual ASCII Transformation: Group-Wise Split-Apply-Combine Workflow:
+
+Raw Input Transactions:
+  Record 0: { 'grp': 'GasStation', 'val': 350.0 }
+  Record 1: { 'grp': 'GasStation', 'val':  40.0 }
+  Record 2: { 'grp': 'Jewelry',    'val': 350.0 }
+  Record 3: { 'grp': 'Jewelry',    'val': 950.0 }
+
+Step 1: SPLIT into Disjoint Partitions by group_key:
+  Bin 'GasStation' -> [ 350.0, 40.0 ]
+  Bin 'Jewelry'    -> [ 350.0, 950.0 ]
+
+Step 2: APPLY Local Statistics & Standard Deviation (Bessel Corrected):
+  Bin 'GasStation':
+    mean = (350.0 + 40.0) / 2 = 195.0
+    diffs = [ (350 - 195)^2, (40 - 195)^2 ] = [ 24025, 24025 ]
+    std = sqrt(48050 / (2 - 1)) = sqrt(48050) = 219.2031
+  Bin 'Jewelry':
+    mean = (350.0 + 950.0) / 2 = 650.0
+    diffs = [ (350 - 650)^2, (950 - 650)^2 ] = [ 90000, 90000 ]
+    std = sqrt(180000 / (2 - 1)) = sqrt(180000) = 424.2641
+
+Step 3: COMBINE - Compute Z-Scores z = (val - mean) / std for each record:
+  Record 0 (GasStation $350): (350 - 195) / 219.2031 = +0.7071  (Suspicious outlier!)
+  Record 1 (GasStation  $40): ( 40 - 195) / 219.2031 = -0.7071
+  Record 2 (Jewelry    $350): (350 - 650) / 424.2641 = -0.7071  (Routine low amount!)
+  Record 3 (Jewelry    $950): (950 - 650) / 424.2641 = +0.7071
+===> Both transactions were $350, but group-wise Z-scoring reveals context!
+```
+
 ### Mathematical Invariants & Symbol Breakdown
 
 | الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
@@ -61,9 +103,17 @@ $$
 | $\sigma_k$ | $\mathbb{R}_{\ge 0}$ | Bessel-corrected sample standard deviation ($N_k - 1$ denominator) | الانحراف المعياري لبيانات العينة مع تصحيح بيسل |
 | $z_i$ | Standardized scalar ($z \in \mathbb{R}$) | Dimensionless standard score relative to cohort distribution | القيمة المعيارية الخالية من الوحدات الدالة على بعد القيمة عن المتوسط |
 
-The partition invariant guarantees that the original relation is decomposed into mutually exclusive and collectively exhaustive subsets: $\bigcup_{k \in \mathcal{K}} \mathcal{D}_k = \mathcal{D}$ and $\mathcal{D}_i \cap \mathcal{D}_j = \emptyset$ for $i \ne j$. When applying local transformations, if a cohort has $|\mathcal{D}_k| < 2$ or zero variance ($\sigma_k = 0$), the transformation defaults to the invariant sentinel $z_i \triangleq 0.0$ to prevent numerical division-by-zero exceptions.
-
-يضمن ثابت التجزئة الرياضي تفكيك الجدول الأصلي إلى مجموعات منفصلة تماماً وشاملة كلياً: $\bigcup_{k \in \mathcal{K}} \mathcal{D}_k = \mathcal{D}$ مع $\mathcal{D}_i \cap \mathcal{D}_j = \emptyset$ عند اختلاف $i$ و $j$. وعند تطبيق التحويلات المحلية، إذا كانت المجموعة تضم أقل من عنصرين أو كان تباينها صفراً ($\sigma_k = 0$)، يُعين الناتج تلقائياً إلى القيمة الثابتة $z_i \triangleq 0.0$ لمنع أخطاء القسمة على الصفر في المعالج.
+#### Step-by-Step Arithmetic Cost & Invariant Breakdown:
+1. **Partitioning Time Complexity**:
+   Grouping $N$ records into $|\mathcal{K}|$ hash bins takes $\mathcal{O}(N)$ time and $\mathcal{O}(N)$ memory pointers.
+2. **Local Transformation Arithmetic**:
+   For each partition $\mathcal{D}_k$ of size $N_k$:
+   $$\mu_k = \frac{1}{N_k} \sum_{i=1}^{N_k} x_i, \quad \sigma_k = \sqrt{\frac{1}{N_k - 1} \sum_{i=1}^{N_k} (x_i - \mu_k)^2}$$
+   Total work across all groups: $\sum_{k \in \mathcal{K}} \mathcal{O}(N_k) = \mathcal{O}(N)$.
+3. **Bessel's Correction Invariant**:
+   Dividing by $N_k - 1$ ensures that the sample variance is an unbiased estimator: $\mathbb{E}[s^2] = \sigma^2$.
+4. **Division-by-Zero Safety**:
+   If $N_k < 2$ or $\sigma_k = 0$, the Z-score is formally defined as $z_i \triangleq 0.0$.
 
 ## Beat 3: Interactive Code Challenge
 
@@ -97,11 +147,41 @@ def groupby_zscore_normalize(
     Returns:
         List of new dictionaries with f"{target_key}_zscore" attached (rounded to 4 decimals).
     """
-    # Step 1: Split - Group target values by group_key using defaultdict(list)
-    # Step 2: Apply - Compute mean and sample std (N-1) for each group; if len < 2, std = 0.0
-    # Step 3: Combine - Iterate over original records, compute z = (val - mean) / std if std > 0 else 0.0,
-    #         and attach f"{target_key}_zscore" rounded to 4 decimals
-    raise NotImplementedError("Implement groupby_zscore_normalize")
+    # Step 1: Split - Group target values by group_key using defaultdict
+    groups: dict[Any, list[float]] = defaultdict(list)
+    for row in records:
+        if group_key in row and target_key in row:
+            groups[row[group_key]].append(float(row[target_key]))
+
+    # Step 2: Apply - Compute local mean and sample standard deviation (Bessel-corrected N-1)
+    stats: dict[Any, tuple[float, float]] = {}
+    for g, vals in groups.items():
+        n = len(vals)
+        if n < 2:
+            stats[g] = (vals[0] if n == 1 else 0.0, 0.0)
+            continue
+        mean_val = sum(vals) / n
+        var = sum((x - mean_val) ** 2 for x in vals) / (n - 1)
+        std_val = math.sqrt(var)
+        stats[g] = (mean_val, std_val)
+
+    # Step 3: Combine - Attach group-normalized Z-score to each original record
+    result: list[dict[str, Any]] = []
+    for row in records:
+        new_row = dict(row)
+        g = row.get(group_key)
+        val = float(row.get(target_key, 0.0))
+        mean_val, std_val = stats.get(g, (0.0, 0.0))
+        
+        if std_val > 0.0:
+            z = (val - mean_val) / std_val
+        else:
+            z = 0.0
+            
+        new_row[f"{target_key}_zscore"] = f"{z:.4f}"
+        result.append(new_row)
+
+    return result
 ```
 :::
 

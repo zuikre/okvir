@@ -14,29 +14,73 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-What can an empirical economist do when a critical treatment $D$ is inextricably tangled with unobserved confounders—when endogeneity poisons OLS, and running an actual Randomized Controlled Trial is physically impossible or morally prohibited? 
+### Intuition & Real-World Story
 
-Consider estimating the causal wage return to an extra year of university education. People who choose to complete university degrees often possess higher innate motivation, family financial safety nets, and social networks. Because an ethical government cannot randomly forbid thousands of bright young citizens from attending college, an observational OLS regression will hopelessly conflate the genuine causal boost of college lectures with unobserved innate ability. 
+Suppose an economist wants to measure the financial impact of military service: *does serving in the army increase or decrease a veteran's lifetime civilian earnings?*
 
-Econometricians solve this seemingly intractable puzzle using an **Instrumental Variable ($Z$)**. Think of an instrument as a **natural gust of wind** or an exogenous coin toss engineered by nature that nudges people into treatment from the outside. Imagine a fleet of sailboats on a lake: some captains have powerful inboard motors (unobserved ability), while others do not. If you want to measure the true hydrodynamic drag of the hull, watching who moves fastest is useless because motor power confounds the race. But if an sudden, random gust of offshore wind ($Z$) sweeps across only half the lake, tilting the sails of certain boats ($D$) without touching their hidden motors ($\varepsilon$), you can isolate the pure hydrodynamic speed response ($Y$) generated solely by the wind's nudge!
+If you simply compare veterans to non-veterans in survey data, your estimate is severely contaminated. Enlisting is voluntary. People who volunteer for military service often come from lower-income rural towns, have fewer civilian job opportunities, or possess unique patriotic motivations. These unobserved background differences create severe confounding.
 
-Crucially, this illuminates the fundamental difference between predictive machine learning and econometric causality. A predictive model observes a college graduate earning $\$100,000$ and accurately forecasts that they will repay their mortgage. The predictive model does not care whether the high wage came from coursework or from the graduate's wealthy uncle; it only cares about the statistical shadow. But a policymaker designing a $\$50\text{ billion}$ student tuition subsidy asks a causal question: *"If we intervene and induce students who would otherwise have stopped at high school to complete university, by how much will their future earnings rise?"* If earnings are driven primarily by uncle connections, the subsidy will fail. 
+In the 1970s during the Vietnam War, the US government held the famous **Vietnam Draft Lottery**. Balls with every day of the year (January 1 through December 31) were placed in a glass drum and drawn on national television. Young men with lottery numbers drawn first were called up for mandatory military service; men with high numbers were spared.
 
-The **Wald Estimator** operationalizes this causal logic through the elegant ratio of two observable quantities:
-$$\hat{\beta}_{\text{IV}} = \frac{\text{Effect of Instrument on Outcome (Reduced Form)}}{\text{Effect of Instrument on Treatment (First Stage Compliance)}}$$
-By dividing the total nudge in wages by the percentage of people actually pushed into college by the instrument, IV inflates the signal to recover the pristine, unconfounded causal effect.
+Notice what this draft lottery did:
+* Your birthday lottery number ($Z$) was decided by pure random chance.
+* Having a low lottery number dramatically increased your probability of serving in the military ($D$).
+* But your birthday has zero direct effect on your earnings 20 years later ($Y$), except through whether it pushed you into the military!
 
-ماذا يفعل الباحث الاقتصادي عندما يكون متغير المعالجة الحاسم $D$ متشابكًا بصورة ميؤوس منها مع متغيرات خفية ومربكة—بحيث يصبح انحدار OLS ملوثًا بالانحياز، ويكون إجراء تجربة عشوائية منضبطة مستحيلاً عمليًا أو محظورًا أخلاقيًا؟
+This lottery is the quintessential **Instrumental Variable (IV)**. An instrument acts like an 'exogenous nudge' from the heavens: it moves the treatment without having any direct relationship with the outcome or unobserved confounders!
 
-تأمل مثلاً محاولة قياس العائد السببي الحقيقي لسنوات التعليم الجامعي الإضافية على أجور العمال. في الواقع العملي، يمتلك الطلاب الذين يلتحقون بالجامعات ميزات فطرية؛ كالشغف الذاتي العالي، وشبكات الأمان المالي العائلية، والعلاقات الاجتماعية النافذة. ولأنه لا يمكن لأي حكومة رشيدة أن تحرم آلاف الشباب الموهوبين عشوائيًا من التعليم لدواعي البحث العلمي، فإن انحدار OLS الكلاسيكي سيخلط حتمًا بين العائد الحقيقي للمناهج الجامعية وبين الذكاء والفرص الفطرية غير المرصودة للمتعلمين.
+The **Wald Estimator** calculates the causal effect with breathtaking simplicity: it takes the lottery's effect on earnings and divides it by the lottery's effect on military enlistment:
+$$\text{Causal Effect} = \frac{\text{Impact of Lottery on Earnings}}{\text{Impact of Lottery on Military Service}} = \frac{\text{Reduced Form}}{\text{First Stage}}$$
 
-يحل الاقتصاديون هذا اللغز المستعصي باستخدام **المتغير الآداتي (Instrumental Variable - $Z$)**. تخيل الأداة كـ **هبة ريح طبيعية خارجية** أو قرعة عشوائية تجريها الطبيعة تدفع الناس نحو المعالجة من الخارج دون استئذان. تخيل أسطولاً من المراكب الشراعية في بحيرة هادئة؛ بعض القادة يمتلكون محركات ديزل سرية قوية تحت الماء (القدرات الفطرية الخفية)، بينما يفتقر إليها آخرون. إذا أردت قياس كفاءة الشراع المجردة، فإن مراقبة سرعة المراكب لن تفيدك، لأن المحركات الخفية تشوه المقارنة تمامًا. لكن إذا هبت فجأة عاصفة ريح عشوائية ($Z$) على جزء من البحيرة دون غيره، فحركت أشرعة بعض المراكب ($D$) دون أن تؤثر على محركاتها الخفية ($\varepsilon$)، فإنك تستطيع عزل سرعة الحركة الإضافية ($Y$) الناتجة فقط عن قوة الرياح!
+#### Jargon Decoder
 
-وهنا يتجلى الفرق الحاسم بين تعلم الآلة التنبؤي والسببية الاقتصادية: يرى النموذج التنبؤي خريجًا جامعيًا يجني $100,000$ دولار، فيتنبأ بنجاح بقدرته على سداد القروض؛ فالنموذج التنبؤي لا يعنيه هل مصدر الثروة هو المحاضرات الجامعية أم علاقات أسرته الثرية، بل يكتفي برصد الظل الإحصائي. أما صانع السياسات الذي يدرس تخصيص ميزانية ضخمة لدعم الرسوم الجامعية فيطرح سؤالاً سببيًا صارمًا: *"لو تدخلنا ودفعنا طلابًا كانوا سيتوقفون عند الثانوية لدخول الجامعة، فكم ستزيد أجورهم الحقيقية؟"* إذا كانت الأجور نابعة من علاقات العائلة، فستفشل السياسة بالكامل.
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Instrumental Variable ($Z$)** | The exogenous nudge: a random lever that pushes treatment without affecting the outcome directly. |
+| **First Stage (Relevance)** | The lever works: the instrument actually moves the treatment variable ($Z \to D$). |
+| **Exclusion Restriction** | The sole channel: the instrument affects the outcome ONLY through the treatment ($Z \to D \to Y$). |
+| **Reduced Form** | The raw intention: the direct relationship between the instrument and the outcome ($Z \to Y$). |
+| **Wald Estimator** | The scaling ratio: dividing the reduced form by the first stage to recover the causal payoff. |
 
-يقيس **مقدر فالد (Wald Estimator)** هذا التأثير السببي عبر حاصل قسمة غاية في البساطة والعبقرية الرياضية:
-$$\hat{\beta}_{\text{IV}} = \frac{\text{أثر الأداة على النتيجة النهائية (النموذج المختزل)}}{\text{أثر الأداة على الامتثال للمعالجة (المرحلة الأولى)}}$$
-بقسمة الأثر الإجمالي للدفعة الخارجية على نسبة الأشخاص الذين استجابوا لها ودخلوا الجامعة فعليًا، يعيد مقدر IV تضخيم النسبة وتطهيرها من شوائب القدرات الخفية لعزل الأثر السببي الصافي.
+```text
+    THE INSTRUMENTAL VARIABLE PIPELINE:
+
+               Unobserved Background Confounders (U)
+                       /                  \
+                      /                    \
+                     v                      v
+    Instrument (Z) ====> Treatment (D) ======> Outcome (Y)
+    (Random Lottery)     (Military Service)     (Lifetime Earnings)
+         |                                           ^
+         \========= No Direct Arrow Allowed! ========/
+```
+
+### الحدس والقصة الواقعية
+
+تخيل باحثًا يقيس الأثر المالي للخدمة العسكرية: *هل تؤدي الخدمة في الجيش إلى زيادة أم خفض الدخل المدني للمحاربين القدامى طوال حياتهم؟*
+
+إذا قارنت رواتب من خدموا في الجيش بمن لم يخدموا، ستكون النتيجة مشوهة تمامًا؛ فالالتحاق بالجيش قرار طوعي يتأثر بالخلفية الاقتصادية والفرص الوظيفية البديلة ومستوى التعليم. هذه الفروق الخفية تمثل انحيازًا مربكًا شديدًا.
+
+في سبعينيات القرن الماضي خلال حرب فيتنام، أجرت الحكومة الأمريكية **قرعة التجنيد الشهيرة (Draft Lottery)**؛ حيث وُضعت تواريخ أيام السنة (من 1 يناير إلى 31 ديسمبر) في كرات زجاجية وسُحبت عشوائيًا على الهواء مباشرة. وكان الشباب أصحاب الأرقام الأولى يُستدعون إجباريًا للخدمة، بينما عُفي أصحاب الأرقام المتأخرة.
+
+تأمل ما حققته هذه القرعة العشوائية:
+* تاريخ ميلادك وسحب رقمك ($Z$) كان محض صدفة عشوائية مطلقة.
+* سحب رقم مبكر زاد بشكل كبير من احتمالية التحاق الشاب بالجيش ($D$).
+* لكن تاريخ ميلادك ليس له أي أثر مباشر على راتبك بعد 20 عامًا ($Y$) إلا من خلال كونه السبب في تجنيدك!
+
+هذه القرعة هي المثال الأبرز لـ **المتغير الأداتي (Instrumental Variable - IV)**؛ فهو بمثابة "دفعة عشوائية خارجية" تحرك المعالجة دون أن ترتبط بالمتغيرات المربكة.
+
+ويحسب **مقدر فالد (Wald Estimator)** الأثر السببي ببساطة عبقرية: يقسم أثر القرعة على الراتب على أثر القرعة على التجنيد!
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **المتغير الأداتي ($Z$)** | الرافعة العشوائية: عامل خارجي يحرك المعالجة دون أن يملك مسارًا مباشرًا نحو النتيجة. |
+| **المرحلة الأولى (الملاءمة)** | قوة الرافعة: قدرة المتغير الأداتي على تحريك وتغيير متغير المعالجة فعليًا ($Z \to D$). |
+| **شرط الاستبعاد (Exclusion)** | المسار الوحيد: حظر وجود أي أثر للمتغير الأداتي على النتيجة إلا عبر المعالجة ($Z \to D \to Y$). |
+| **الصيغة المختزلة (Reduced Form)** | الأثر الإجمالي المباشر بين المتغير الأداتي والنتيجة النهائية ($Z \to Y$). |
+| **مقدر فالد (Wald Estimator)** | نسبة التكبير: قسمة الصيغة المختزلة على المرحلة الأولى لاستخراج الأثر السببي الصافي. |
 
 :::simulation-widget{engine="canvas2d" component="InstrumentalVariablesLab"}
 ---
@@ -47,77 +91,50 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-Consider the structural linear causal relationship with an endogenous regressor $D_i$:
+Consider the structural linear equation where regressor $D$ is endogenous ($\text{Cov}(D, \varepsilon) \ne 0$):
 
 $$
-y_i = \beta_0 + \beta_1 D_i + \varepsilon_i, \quad \text{where } \text{Cov}(D_i, \varepsilon_i) \ne 0
+Y = \beta_0 + \beta_1 D + \varepsilon
 $$
 
-Because treatment correlates with the unobserved error term $\varepsilon_i$, OLS is asymptotically inconsistent:
+A valid instrumental variable $Z$ must satisfy two fundamental identifying conditions:
+1. **Instrument Relevance:** $\text{Cov}(Z, D) \ne 0$ (the instrument predicts treatment).
+2. **Instrument Exogeneity (Exclusion Restriction):** $\text{Cov}(Z, \varepsilon) = 0$ (the instrument is uncorrelated with the error).
+
+Taking the covariance of both sides with $Z$:
 
 $$
-\text{plim} \, \hat{\beta}_{1, \text{OLS}} = \beta_1 + \frac{\text{Cov}(D_i, \varepsilon_i)}{\mathbb{V}(D_i)} \ne \beta_1
+\text{Cov}(Z, Y) = \beta_1 \text{Cov}(Z, D) + \text{Cov}(Z, \varepsilon) = \beta_1 \text{Cov}(Z, D) + 0
 $$
 
-### The Core IV Identification Assumptions
-
-Let $Z_i$ be an instrumental variable. Identification of $\beta_1$ requires two foundational conditions:
-1. **Instrument Relevance (First Stage):** The instrument must predict treatment uptake:
-   $$
-   \text{Cov}(Z_i, D_i) \ne 0 \iff \mathbb{E}[D_i \mid Z_i = 1] \ne \mathbb{E}[D_i \mid Z_i = 0]
-   $$
-2. **Exclusion Restriction & Exogeneity:** The instrument is as good as randomly assigned and has no direct causal link to $y_i$ other than through $D_i$:
-   $$
-   \text{Cov}(Z_i, \varepsilon_i) = 0 \iff \mathbb{E}[\varepsilon_i \mid Z_i = 1] = \mathbb{E}[\varepsilon_i \mid Z_i = 0] = 0
-   $$
-
-### Algebraic Derivation of the Wald Estimator
-
-Taking the covariance of both sides of the structural equation with the instrument $Z_i$:
+Solving for $\beta_1$ yields the population **Wald Estimator**:
 
 $$
-\text{Cov}(Z_i, y_i) = \text{Cov}(Z_i, \beta_0 + \beta_1 D_i + \varepsilon_i) = \beta_1 \text{Cov}(Z_i, D_i) + \underbrace{\text{Cov}(Z_i, \varepsilon_i)}_{= 0}
+\beta_1 = \frac{\text{Cov}(Z, Y)}{\text{Cov}(Z, D)} = \frac{\mathbb{E}[Y \mid Z = 1] - \mathbb{E}[Y \mid Z = 0]}{\mathbb{E}[D \mid Z = 1] - \mathbb{E}[D \mid Z = 0]}
 $$
 
-Under the exclusion restriction ($\text{Cov}(Z_i, \varepsilon_i) = 0$), the error covariance vanishes:
+### Why the Math Works Step-by-Step
 
-$$
-\text{Cov}(Z_i, y_i) = \beta_1 \text{Cov}(Z_i, D_i) \implies \beta_1 = \frac{\text{Cov}(Z_i, y_i)}{\text{Cov}(Z_i, D_i)}
-$$
-
-For a binary instrument $Z_i \in \{0, 1\}$, recall that for any random variable $W_i$, $\text{Cov}(Z_i, W_i) = P(Z_i=1)P(Z_i=0) \big( \mathbb{E}[W_i \mid Z_i=1] - \mathbb{E}[W_i \mid Z_i=0] \big)$.
-
-Substituting this property into the numerator and denominator:
-
-$$
-\beta_1 = \frac{P(Z_i=1)P(Z_i=0) \big( \mathbb{E}[y_i \mid Z_i = 1] - \mathbb{E}[y_i \mid Z_i = 0] \big)}{P(Z_i=1)P(Z_i=0) \big( \mathbb{E}[D_i \mid Z_i = 1] - \mathbb{E}[D_i \mid Z_i = 0] \big)}
-$$
-
-Canceling the common marginal probability terms yields the **Wald Estimator**:
-
-$$
-\hat{\beta}_{\text{Wald}} = \frac{\mathbb{E}[y_i \mid Z_i = 1] - \mathbb{E}[y_i \mid Z_i = 0]}{\mathbb{E}[D_i \mid Z_i = 1] - \mathbb{E}[D_i \mid Z_i = 0]} \equiv \frac{\text{Reduced Form Intent-to-Treat (ITT}_Y\text{)}}{\text{First Stage Compliance Rate (ITT}_D\text{)}}
-$$
-
-### Asymptotic Variance & The Weak Instrument Hazard
-
-The asymptotic variance of the instrumental variables estimator reveals the statistical price paid for exogeneity:
-
-$$
-\text{AVar}(\hat{\beta}_{\text{IV}}) = \frac{\sigma_\varepsilon^2}{N \cdot \mathbb{V}(D_i) \cdot \rho_{ZD}^2} = \frac{\text{AVar}(\hat{\beta}_{\text{OLS}})}{\rho_{ZD}^2}
-$$
-
-Where $\rho_{ZD} = \text{Corr}(Z_i, D_i)$. If the instrument is "weak" ($\rho_{ZD} \to 0$), the first stage collapses, causing the sampling variance of $\hat{\beta}_{\text{IV}}$ to explode to infinity!
+1. **Why does dividing by $\text{Cov}(Z, D)$ scale up the effect?**
+   The instrument $Z$ is often an intention or a nudge (e.g., winning a lottery ticket), not the treatment itself. The numerator measures the 'Intention-to-Treat' (ITT) effect on outcome $Y$. Because only a fraction of people comply with the nudge, the denominator measures the compliance rate. Dividing by compliance inflates the ITT back up to measure the full effect on those who were actually moved!
+2. **What happens if the instrument is weak ($\text{Cov}(Z, D) \approx 0$)?**
+   If the denominator is close to zero, the estimator divides by a tiny noisy number. The standard errors explode, and even the tiniest violation of exogeneity ($\text{Cov}(Z, \varepsilon) \ne 0$) gets magnified into massive, catastrophic bias! This is the notorious **Weak Instrument Problem** (checked via First-Stage $F > 10$).
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $D_i$: Endogenous treatment variable correlated with unobserved disturbance term $\varepsilon_i$.
-* $Z_i$: Instrumental variable acting as an exogenous lever on treatment selection.
-* $\text{Cov}(Z_i, D_i) \ne 0$: Relevance condition ensuring the first stage has substantive explanatory power.
-* $\text{Cov}(Z_i, \varepsilon_i) = 0$: Exclusion restriction stating that the instrument is uncorrelated with unobserved determinants of $y_i$.
-* $\text{ITT}_Y = \mathbb{E}[y_i \mid Z_i = 1] - \mathbb{E}[y_i \mid Z_i = 0]$: Reduced form intent-to-treat effect on the primary outcome.
-* $\text{ITT}_D = \mathbb{E}[D_i \mid Z_i = 1] - \mathbb{E}[D_i \mid Z_i = 0]$: First-stage compliance differential measuring the shift in treatment uptake.
-* $\rho_{ZD}$: Correlation between instrument and treatment; small values signal weak instrument danger.
+* $Z$: Instrumental variable satisfying relevance and exclusion restriction.
+* $D$: Endogenous treatment variable confounded by unobserved disturbance $\varepsilon$.
+* $\beta_1$: Structural causal effect identified by the instrument.
+* $\hat{\beta}_{\text{Wald}}$: Sample Wald ratio of sample differences in means.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\text{Cov}(Z, Y)$ | التباين المشترك بين الأداة والنتيجة | الصيغة المختزلة: كم تحركت النتيجة استجابةً للرافعة الخارجية العشوائية. |
+| $\text{Cov}(Z, D)$ | التباين المشترك بين الأداة والمعالجة | المرحلة الأولى: مدى استجابة الأفراد للرافعة والتحاقهم بالمعالجة فعليًا. |
+| $\beta_{\text{Wald}}$ | مقدر فالد السببي | ناتج قسمة الصيغة المختزلة على المرحلة الأولى لمعرفة الأثر الصافي لكل معالج. |
+| مشكلة الأداة الضعيفة | انهيار دقة الأداة | عندما يكون المقام قريبًا من الصفر فتتضخم الأخطاء المعيارية وتنعدم الثقة بالنتائج. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -137,51 +154,43 @@ test_cases:
 ```python
 import numpy as np
 
-def compute_wald_estimator(y: np.ndarray, d: np.ndarray, z: np.ndarray) -> dict[str, float]:
+def compute_wald_estimator(y: np.ndarray, d: np.ndarray, z: np.ndarray) -> float:
     """
-    Computes the Wald Estimator and first-stage compliance for binary instrumental variables.
-    
+    Computes the Wald IV estimator: [E[Y|Z=1] - E[Y|Z=0]] / [E[D|Z=1] - E[D|Z=0]].
+
     Parameters
     ----------
     y : np.ndarray of shape (N,)
-        Continuous outcome vector.
+        Observed continuous outcome.
     d : np.ndarray of shape (N,)
-        Binary endogenous treatment (0 or 1).
+        Endogenous treatment indicator.
     z : np.ndarray of shape (N,)
-        Binary instrument (0 or 1).
-        
+        Binary instrumental variable (0 or 1).
+
     Returns
     -------
-    dict with keys:
-        'first_stage_compliance': float, E[D|Z=1] - E[D|Z=0]
-        'reduced_form_intent': float, E[Y|Z=1] - E[Y|Z=0]
-        'wald_estimate': float, reduced_form / first_stage
+    float : Wald causal estimate.
     """
-    # Step 1: Create boolean index masks for instrument assignment groups (z=1 and z=0)
     z1_mask = (z == 1)
     z0_mask = (z == 0)
-    
-    # Step 2: Compute first-stage compliance effect: E[D|Z=1] - E[D|Z=0]
-    mean_d_z1 = float(np.mean(d[z1_mask]))
-    mean_d_z0 = float(np.mean(d[z0_mask]))
-    first_stage = mean_d_z1 - mean_d_z0
-    
-    # Step 3: Compute reduced-form intent-to-treat effect on outcome: E[Y|Z=1] - E[Y|Z=0]
-    mean_y_z1 = float(np.mean(y[z1_mask]))
-    mean_y_z0 = float(np.mean(y[z0_mask]))
+
+    # Step 1: Compute reduced form difference in outcome Y
+    mean_y_z1 = np.mean(y[z1_mask])
+    mean_y_z0 = np.mean(y[z0_mask])
     reduced_form = mean_y_z1 - mean_y_z0
-    
-    # Step 4: Compute the Wald Estimator ratio = Reduced Form / First Stage
-    if abs(first_stage) > 1e-12:
-        wald = float(reduced_form / first_stage)
-    else:
-        wald = 0.0
-        
-    return {
-        "first_stage_compliance": first_stage,
-        "reduced_form_intent": reduced_form,
-        "wald_estimate": wald,
-    }
+
+    # Step 2: Compute first stage difference in treatment D
+    mean_d_z1 = np.mean(d[z1_mask])
+    mean_d_z0 = np.mean(d[z0_mask])
+    first_stage = mean_d_z1 - mean_d_z0
+
+    if abs(first_stage) < 1e-8:
+        raise ValueError("First stage is zero: Instrument has no relevance.")
+
+    # Step 3: Wald ratio
+    wald_estimate = float(reduced_form / first_stage)
+
+    return wald_estimate
 ```
 :::
 

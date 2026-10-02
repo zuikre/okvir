@@ -27,6 +27,41 @@ Finally, engineers face the strategic dilemma of **Vocabulary Engineering & Toke
 
 > **Frontier Analogy:** Think of the embedding table as a universal currency exchange counter at an international airport. Travelers arrive holding discrete tickets from 128,000 different towns (token IDs). The teller immediately hands them a standardized gold currency pouch of 4,096 distinct gold coins (the continuous embedding vector) that can be spent anywhere in the city.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Special Tokens** (الرموز الخاصة التوجيهية) | Passport stamps and turnstiles: structural boundary markers like `<|im_start|>` and `<|im_end|>` that teach the model who is speaking. | أختام العبور وبوابات النظام: علامات بنيوية تحدد بداية ونهاية الحديث وهوية المتحدث في المحادثة. |
+| **Embedding Matrix ($W_E$)** (مصفوفة التضمين الدلالي) | The grand coordinate directory: a giant table mapping each integer token ID to a dense 4096-dimensional semantic address. | دليل العناوين الدلالي: جدول ضخم يحول كل رقم توكن إلى إحداثيات مكانية ذات 4096 بعداً تعكس معناه بدقة. |
+| **Token Fertility** (معدل خصوبة الرموز) | The word fragmentation tax: the average number of tokens required to express a single word; higher fertility means slower, more expensive inference. | ضريبة تجزئة الكلمات: متوسط عدد الرموز اللازمة لكتابة كلمة واحدة؛ كلما زادت الخصوبة زادت تكلفة التوليد وبطؤه. |
+| **Untrained / Dead Tokens** (الرموز الميتة غير المدربة) | Phantom hotel rooms: reserved vocabulary slots never seen during training; sending them to the model causes wild hallucinations. | غرف فارغة مهجورة: رموز محجوزة في القاموس لم تظهر في التدريب، ويؤدي استدعاؤها لاضطراب النموذج وهلوسته. |
+| **Weight Tying** (ربط أوزان الإدخال والإخراج) | Sharing the dictionary: using the exact same matrix for input token embedding and final output logit projection ($W_U = W_E^T$). | القاموس المزدوج المشترك: استخدام نفس المصفوفة لتضمين المدخلات وحساب احتمالات المخرجات توفيراً للذاكرة. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+STRUCTURED CHAT TEMPLATING & EMBEDDING LOOKUP:
+=============================================================================
+Raw User Message: "Hello!"
+
+ChatML Structured Formatting:
+<|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+Hello!<|im_end|>
+<|im_start|>assistant
+      |
+      v (Tokenizer converts text & special tags into discrete integer IDs)
+Token IDs: [ 32001, 1587, 32002, 32001, 882, 15339, 32002, 32001, 77 ]
+      |
+      v (Row-lookup into Embedding Matrix W_E of shape [V, d_model])
+Vector Sequence:
+ID 32001 ---> [ -0.12,  0.45,  0.89, ..., -0.04 ] (Embedding vector in \mathbb{R}^d)
+ID 1587  ---> [  0.02, -0.31,  0.11, ...,  0.72 ]
+      |
+      v (Fed into Transformer Decoder blocks!)
+```
+
 :::simulation-widget{engine="canvas2d" component="BpeTokenizerLab"}
 ---
 interactive: true

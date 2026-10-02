@@ -14,31 +14,66 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-In empirical research, you will constantly hear researchers state: *"We estimate the causal effect of schooling on wages, controlling for experience, industry, and location."* But what does "controlling for" actually mean under the hood? Does the statistical software magically pause time or create cloned human beings with identical industries?
+### Intuition & Real-World Story
 
-The **Frisch-Waugh-Lovell (FWL) Theorem** reveals the elegant algebraic mechanics of "partialling out":
-1. **Purge the Outcome:** Regress the outcome $Y$ on the control variables $X_2$, and save the residuals $\tilde{\mathbf{y}}$. This strips away every shred of variation in $Y$ that can be predicted by $X_2$.
-2. **Purge the Regressor:** Regress the key variable of interest $X_1$ on the controls $X_2$, and save the residuals $\tilde{\mathbf{X}}_1$. This wipes out any correlation or overlap between $X_1$ and $X_2$.
-3. **Run a Simple Bivariate Regression:** Regress the purified outcome residuals $\tilde{\mathbf{y}}$ on the purified regressor residuals $\tilde{\mathbf{X}}_1$.
+Suppose an economist is studying the gender wage gap at a technology firm. The raw data shows male engineers earn $15,000 more on average than female engineers. But critics immediately object: *"Wait! Men in this dataset have an average of 8 years of tenure, while women have an average of 4 years because the company only recently expanded hiring. Is the gap driven by discrimination, or simply by tenure?"*
 
-The slope of this simple bivariate regression is **mathematically identical down to the last decimal place** to the coefficient $\hat{\boldsymbol{\beta}}_1$ from the giant multiple regression! 
+To isolate the pure effect of gender holding tenure constant, you could run a multiple regression with both variables. But the celebrated **Frisch-Waugh-Lovell (FWL) Theorem** reveals an astonishing 3-step 'cleansing' procedure that achieves the exact same answer:
 
-Think of active noise-cancelling headphones: to hear a subtle violin solo ($X_1$) inside a noisy airplane cabin ($X_2$), the headphones generate an inverse acoustic wave to cancel the engine drone from the microphone ($Y$) and from the audio stream ($X_1$). Controlling for variables simply means washing the fingerprints of the controls off both the treatment and the outcome before comparing what remains.
+1. **Clean Salary:** Regress salary on tenure alone and take the residuals. This gives the *cleansed salary*—the variation in pay that has nothing to do with tenure.
+2. **Clean Gender:** Regress gender on tenure and take the residuals. This gives *cleansed gender*—the variation in gender that is completely unrelated to tenure.
+3. **The Payoff:** Run a simple bivariate regression of cleansed salary on cleansed gender!
 
-However, we must strictly demystify causality here: **partialling out is an algebraic wash, not a magical causal purifier!** While FWL proves how multiple regression extracts the net variation between $X_1$ and $Y$, the decision of *which* variables to place into $X_2$ determines whether your estimate is causal or catastrophic. If $X_2$ is a true confounder (like family wealth), partialling it out removes bias. But if $X_2$ is a mediator on the causal pathway (like job title chosen after college) or a collider, partialling it out actually blocks the true causal mechanism or introduces spurious bias. Prediction cares only about variance explained; causal inference demands knowing whether the noise-cancelling headphones are filtering the engine noise or accidentally silencing the violin.
+The slope of this bivariate regression is **mathematically identical to the multiple regression coefficient**! 
 
-في أبحاث الاقتصاد القياسي، ستسمع الباحثين يكررون دائمًا: *"نقيس الأثر السببي للتعليم على الأجور، مع التحكم في سنوات الخبرة والقطاع الاقتصادي والمنطقة الجغرافية."* ولكن ما الذي يعنيه "التحكم في المتغيرات" بدقة رياضية؟ هل يمتلك الحاسوب آلة زمنية تجمد الواقع أو تصنع نسخًا بشرية متطابقة في كافة الظروف؟
+FWL proves that multiple regression is not a black box: every coefficient in a multiple regression is simply a simple bivariate regression after all other variables have been purged ('partialled out') from both the feature and the outcome!
 
-تكشف **مبرهنة فريش-وو-لوفيل (FWL Theorem)** عن الآلية الحسابية المذهلة لمفهوم "التجريد الجزئي" (Partialling Out):
-1. **تطهير المتغير التابع:** أجرِ انحدارًا لـ $Y$ على متغيرات التحكم $X_2$، واحتفظ بالبواقي $\tilde{\mathbf{y}}$. هذا الإجراء يمسح من $Y$ كل أثر يمكن تفسيره بواسطة $X_2$.
-2. **تطهير المتغير المستقل:** أجرِ انحدارًا لمتغير المعالجة $X_1$ على متغيرات التحكم $X_2$، واحتفظ بالبواقي $\tilde{\mathbf{X}}_1$. هذا الإجراء يزيل أي تداخل أو تشابك بين $X_1$ و $X_2$.
-3. **إجراء انحدار خطي بسيط:** قم بانحدار بواقي النتيجة المطهرة $\tilde{\mathbf{y}}$ على بواقي المعالجة المطهرة $\tilde{\mathbf{X}}_1$.
+#### Jargon Decoder
 
-إن ميل هذا الانحدار البسيط **يتطابق رياضيًا وبالفاصلة العشرية** مع معامل الانحدار المتعدد الضخم $\hat{\boldsymbol{\beta}}_1$!
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Partialling Out** | Scrubbing away the influence of confounding variables to isolate clean residual variance. |
+| **FWL Theorem** | The proof that multiple regression coefficients equal bivariate slopes on purged residuals. |
+| **Auxiliary Regression** | A behind-the-scenes regression of one feature on all other features. |
+| **Residualized Feature** | The pure, unique part of a feature that cannot be predicted by other features. |
+| **Net Effect** | The isolated causal or predictive impact after stripping all competing explanations. |
 
-تخيل سماعات إلغاء الضجيج الذكية: لسماع عزف كمان رقيق ($X_1$) داخل مقصورة طائرة صاخبة ($X_2$)، تولد السماعات موجة صوتية معاكسة تلغي هدير المحرك تمامًا من أذنيك ($Y$) ومن جهاز التسجيل ($X_1$). التحكم في المتغيرات يعني ببساطة مسح بصمات عوامل التشويش من كل من المعالجة والنتيجة قبل فحص الرابط السببي المتبقي بينهما.
+```text
+    THE 3-STEP FWL CLEANSING PIPELINE:
 
-لكن الحذر السببي هنا جوهري: **التجريد الجزئي هو عملية غسيل جبري وليس عصا سحرية تنتج السببية تلقائيًا!** تبين مبرهنة FWL كيف يعزل الانحدار التباين الصافي، لكن اختيار المتغيرات التي نضعها في $X_2$ هو الذي يحدد صلاحية النموذج. فإذا كان المتغير عاملاً مربكًا حقيقيًا (كثروة الأسرة)، فإن عزله يزيل التحيز. أما إذا كان المتغير وسيطًا على مسار السببية (كنوع الوظيفة التي حصل عليها الفرد بعد تخرجه)، فإن عزله يحجب الأثر السببي الحقيقي للتعليم. التنبؤ يكتفي بتنقية التباين لخفض الخطأ، بينما الاستدلال السببي يشترط معرفة طبيعة المسارات السببية قبل الضغط على زر التجريد.
+    [ Raw Salary (y) ] -------- Regress on Tenure (X2) -------> [ Clean Salary (e_y) ]
+                                                                       |
+                                                               (Simple Bivariate
+                                                                  Regression)
+                                                                       v
+    [ Raw Gender (X1) ] ------- Regress on Tenure (X2) -------> [ Clean Gender (e_X1) ]
+                                                                       |
+                                                             Slope = beta_1 (Exact!)
+```
+
+### الحدس والقصة الواقعية
+
+تخيل باحثًا اقتصاديًا يدرس فجوة الرواتب بين الجنسين في شركة تكنولوجيا. تظهر البيانات الأولية أن المهندسين الذكور يتقاضون في المتوسط 15,000 دولار سنويًا أكثر من الإناث. ولكن يعترض البعض فورًا: *"مهلاً! متوسط سنوات أقدمية الذكور في الشركة 8 سنوات، بينما متوسط أقدمية الإناث 4 سنوات بسبب توسع التوظيف حديثًا. فهل الفجوة ناتجة عن التمييز أم عن سنوات الخبرة والأقدمية؟"*
+
+لعزل الأثر الصافي للجنس مع تثبيت الأقدمية، يمكن تشغيل انحدار متعدد. لكن **مبرهنة فريش-وو-لوفيل (FWL Theorem)** الشهيرة تكشف عن آلية عبقرية من 3 خطوات تنقية تعطي النتيجة ذاتها بالضبط:
+
+1. **تنقية الراتب:** نقوم بانحدار الراتب على سنوات الأقدمية ونستخرج البواقي. هذا هو *الراتب المنقى* من أي أثر للأقدمية.
+2. **تنقية متغير الجنس:** نقوم بانحدار متغير الجنس على سنوات الأقدمية ونستخرج البواقي. هذا هو *الجنس المنقى* الخالي من أي ارتباط بالأقدمية.
+3. **حساب الأثر الصافي:** نجري انحدارًا بسيطًا بين الراتب المنقى والجنس المنقى!
+
+ميل هذا الخط البسيط **يتطابق رياضيًا بنسبة 100% مع معامل الانحدار المتعدد المعقد**!
+
+تثبت مبرهنة FWL أن الانحدار المتعدد ليس صندوقًا أسود غامضًا، بل هو في جوهره انحدار بسيط بين متغيرات تم تطهيرها وتنقية شوائبها من أثر بقية المتغيرات المشتركة.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **التنقية والعزل (Partialling Out)** | غسل المتغير وتطهيره من تأثيرات المتغيرات المربكة الأخرى لاستخراج تباينه النقي. |
+| **مبرهنة FWL** | برهان رياضي يثبت أن معاملات الانحدار المتعدد تكافئ ميل انحدار بسيط للبواقي المنقاة. |
+| **الانحدار المساعد (Auxiliary Regression)** | انحدار تحضيري داخلي لمتغير مستقل على بقية المتغيرات المستقلة الأخرى. |
+| **المتغير المتبقي المنقى** | الجزء الصافي الفريد من المتغير الذي لا تستطيع المتغيرات الأخرى التنبؤ به. |
+| **الأثر الصافي (Net Effect)** | القوة التفسيرية الحقيقية للمتغير بعد استبعاد وتجريد كل التفسيرات البديلة. |
 
 :::simulation-widget{engine="canvas2d" component="FWLPartiallingOutLab"}
 ---
@@ -49,72 +84,50 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-Consider partitioning the design matrix into the regressor of interest $\mathbf{X}_1$ and control covariates $\mathbf{X}_2$:
+Partition the design matrix $\mathbf{X} = [\mathbf{X}_1 \quad \mathbf{X}_2]$ where $\mathbf{X}_1$ contains the regressors of primary interest and $\mathbf{X}_2$ contains the control covariates:
 
 $$
 \mathbf{y} = \mathbf{X}_1 \boldsymbol{\beta}_1 + \mathbf{X}_2 \boldsymbol{\beta}_2 + \boldsymbol{\varepsilon}
 $$
 
-The joint Normal Equations in block partitioned form:
+Let $\mathbf{M}_2 = \mathbf{I}_N - \mathbf{X}_2(\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T$ be the annihilator matrix for $\mathbf{X}_2$. Pre-multiplying the entire equation by $\mathbf{M}_2$:
 
 $$
-\begin{bmatrix} \mathbf{X}_1^T \mathbf{X}_1 & \mathbf{X}_1^T \mathbf{X}_2 \\ \mathbf{X}_2^T \mathbf{X}_1 & \mathbf{X}_2^T \mathbf{X}_2 \end{bmatrix} \begin{bmatrix} \hat{\boldsymbol{\beta}}_1 \\ \hat{\boldsymbol{\beta}}_2 \end{bmatrix} = \begin{bmatrix} \mathbf{X}_1^T \mathbf{y} \\ \mathbf{X}_2^T \mathbf{y} \end{bmatrix}
+\mathbf{M}_2 \mathbf{y} = \mathbf{M}_2 \mathbf{X}_1 \boldsymbol{\beta}_1 + \mathbf{M}_2 \mathbf{X}_2 \boldsymbol{\beta}_2 + \mathbf{M}_2 \boldsymbol{\varepsilon}
 $$
 
-### Step-by-Step Algebraic Derivation of FWL
-
-From the second row of the partitioned system:
+Because $\mathbf{M}_2 \mathbf{X}_2 = \mathbf{0}$, the second term vanishes completely:
 
 $$
-\mathbf{X}_2^T \mathbf{X}_1 \hat{\boldsymbol{\beta}}_1 + \mathbf{X}_2^T \mathbf{X}_2 \hat{\boldsymbol{\beta}}_2 = \mathbf{X}_2^T \mathbf{y}
+\tilde{\mathbf{y}} = \tilde{\mathbf{X}}_1 \boldsymbol{\beta}_1 + \tilde{\boldsymbol{\varepsilon}} \implies \hat{\boldsymbol{\beta}}_1 = (\tilde{\mathbf{X}}_1^T \tilde{\mathbf{X}}_1)^{-1} \tilde{\mathbf{X}}_1^T \tilde{\mathbf{y}}
 $$
 
-Assuming full column rank for $\mathbf{X}_2$, solve for $\hat{\boldsymbol{\beta}}_2$:
+where $\tilde{\mathbf{y}} = \mathbf{M}_2 \mathbf{y}$ and $\tilde{\mathbf{X}}_1 = \mathbf{M}_2 \mathbf{X}_1$ are the residual vectors obtained by regressing $\mathbf{y}$ and $\mathbf{X}_1$ on $\mathbf{X}_2$.
 
-$$
-\hat{\boldsymbol{\beta}}_2 = (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T \mathbf{y} - (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T \mathbf{X}_1 \hat{\boldsymbol{\beta}}_1
-$$
+### Why the Math Works Step-by-Step
 
-Substitute this solution into the first row of the partitioned system:
-
-$$
-\mathbf{X}_1^T \mathbf{X}_1 \hat{\boldsymbol{\beta}}_1 + \mathbf{X}_1^T \mathbf{X}_2 \left( (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T \mathbf{y} - (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T \mathbf{X}_1 \hat{\boldsymbol{\beta}}_1 \right) = \mathbf{X}_1^T \mathbf{y}
-$$
-
-Group terms involving $\hat{\boldsymbol{\beta}}_1$ on the left-hand side and $\mathbf{y}$ on the right-hand side:
-
-$$
-\mathbf{X}_1^T \left( \mathbf{I}_N - \mathbf{X}_2 (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T \right) \mathbf{X}_1 \hat{\boldsymbol{\beta}}_1 = \mathbf{X}_1^T \left( \mathbf{I}_N - \mathbf{X}_2 (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T \right) \mathbf{y}
-$$
-
-Recognizing the annihilator matrix $\mathbf{M}_2 \equiv \mathbf{I}_N - \mathbf{X}_2 (\mathbf{X}_2^T \mathbf{X}_2)^{-1}\mathbf{X}_2^T$:
-
-$$
-(\mathbf{X}_1^T \mathbf{M}_2 \mathbf{X}_1) \hat{\boldsymbol{\beta}}_1 = \mathbf{X}_1^T \mathbf{M}_2 \mathbf{y}
-$$
-
-Because $\mathbf{M}_2$ is symmetric and idempotent ($\mathbf{M}_2 = \mathbf{M}_2^T = \mathbf{M}_2^2$), we have $\mathbf{X}_1^T \mathbf{M}_2 \mathbf{X}_1 = (\mathbf{M}_2 \mathbf{X}_1)^T (\mathbf{M}_2 \mathbf{X}_1) = \tilde{\mathbf{X}}_1^T \tilde{\mathbf{X}}_1$, and $\mathbf{X}_1^T \mathbf{M}_2 \mathbf{y} = (\mathbf{M}_2 \mathbf{X}_1)^T (\mathbf{M}_2 \mathbf{y}) = \tilde{\mathbf{X}}_1^T \tilde{\mathbf{y}}$.
-
-Therefore, the estimator from bivariate regression of purified residuals matches the multiple regression coefficient exactly:
-
-$$
-\hat{\boldsymbol{\beta}}_1 = (\tilde{\mathbf{X}}_1^T \tilde{\mathbf{X}}_1)^{-1} \tilde{\mathbf{X}}_1^T \tilde{\mathbf{y}} = (\mathbf{X}_1^T \mathbf{M}_2 \mathbf{X}_1)^{-1} \mathbf{X}_1^T \mathbf{M}_2 \mathbf{y}
-$$
-
-Furthermore, the residuals from this partial regression are identical to the multiple regression residuals:
-
-$$
-\mathbf{e} = \tilde{\mathbf{y}} - \tilde{\mathbf{X}}_1 \hat{\boldsymbol{\beta}}_1 = \mathbf{y} - \mathbf{X}_1 \hat{\boldsymbol{\beta}}_1 - \mathbf{X}_2 \hat{\boldsymbol{\beta}}_2
-$$
+1. **Why does the Annihilator isolate $\boldsymbol{\beta}_1$?**
+   Because $\mathbf{M}_2$ projects every column of $\mathbf{X}_2$ onto zero, it strips away any variation in $\mathbf{y}$ and $\mathbf{X}_1$ that can be linearly predicted by $\mathbf{X}_2$. What remains in $\tilde{\mathbf{X}}_1$ is the unique, orthogonal variation of $\mathbf{X}_1$ independent of $\mathbf{X}_2$.
+2. **Equivalence of residuals:**
+   The residuals from the bivariate regression of $\tilde{\mathbf{y}}$ on $\tilde{\mathbf{X}}_1$ are mathematically identical to the full multiple regression residuals $\mathbf{e} = \mathbf{y} - \mathbf{X}_1\hat{\boldsymbol{\beta}}_1 - \mathbf{X}_2\hat{\boldsymbol{\beta}}_2$.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $\mathbf{X}_1 \in \mathbb{R}^{N \times K_1}$: Submatrix containing the regressor(s) whose causal impact is of primary interest.
-* $\mathbf{X}_2 \in \mathbb{R}^{N \times K_2}$: Submatrix of control covariates (e.g., demographic indicators, fixed effects, trends).
-* $\mathbf{M}_2 \in \mathbb{R}^{N \times N}$: Annihilator matrix for $\mathbf{X}_2$ with $\text{rank}(\mathbf{M}_2) = N - K_2$.
-* $\tilde{\mathbf{X}}_1 = \mathbf{M}_2 \mathbf{X}_1$: Regressor residuals purged of all linear associations with $\mathbf{X}_2$.
-* $\tilde{\mathbf{y}} = \mathbf{M}_2 \mathbf{y}$: Outcome residuals purged of all linear associations with $\mathbf{X}_2$.
-* $\hat{\boldsymbol{\beta}}_1$: The exact partial regression coefficient on $\mathbf{X}_1$ in the full joint model.
+* $\mathbf{X}_1$: Regressors of interest (e.g., policy treatment or gender).
+* $\mathbf{X}_2$: Matrix of control covariates (e.g., tenure, age, education).
+* $\mathbf{M}_2$: Annihilator matrix projecting onto the orthogonal complement of $\text{col}(\mathbf{X}_2)$.
+* $\tilde{\mathbf{X}}_1 = \mathbf{M}_2 \mathbf{X}_1$: Residualized regressors purged of all collinearity with $\mathbf{X}_2$.
+* $\tilde{\mathbf{y}} = \mathbf{M}_2 \mathbf{y}$: Residualized outcome purged of all variation explained by $\mathbf{X}_2$.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\mathbf{X}_1$ | المتغير محل الاهتمام | المتغير الذي نريد دراسة أثره الصافي المعزول (مثل برنامج التدريب أو الجنس). |
+| $\mathbf{X}_2$ | مصفوفة المتغيرات الضابطة | العوامل المربكة التي نريد تحييدها وتثبيتها (مثل العمر وسنوات الأقدمية). |
+| $\mathbf{M}_2$ | مصفوفة عزل المتغيرات الضابطة | المشغل الرياضي الذي يبيد تمامًا أثر المتغيرات $\mathbf{X}_2$ من أي متجه يضربه. |
+| $\tilde{\mathbf{X}}_1$ | المتغير المنقى | التباين الفريد النقي لـ $\mathbf{X}_1$ الذي لا تشترك فيه إطلاقًا مع $\mathbf{X}_2$. |
+| $\tilde{\mathbf{y}}$ | النتيجة المنقاة | تباين الهدف الصافي بعد تجريده من أثر المتغيرات الضابطة $\mathbf{X}_2$. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -134,44 +147,45 @@ test_cases:
 ```python
 import numpy as np
 
-def fwl_partial_regression(y: np.ndarray, X1: np.ndarray, X2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def fwl_partial_regression(y: np.ndarray, X1: np.ndarray, X2: np.ndarray) -> dict[str, np.ndarray | float]:
     """
-    Verifies the Frisch-Waugh-Lovell theorem by comparing partial regression with full OLS.
-    
+    Implements the Frisch-Waugh-Lovell (FWL) partialling-out theorem.
+
     Parameters
     ----------
     y : np.ndarray of shape (N,)
-        Observed target vector.
+        Target outcome vector.
     X1 : np.ndarray of shape (N, K1)
-        Target regressor block.
+        Regressors of primary interest.
     X2 : np.ndarray of shape (N, K2)
-        Control covariates block to partial out.
-        
+        Control covariates to partial out.
+
     Returns
     -------
-    tuple[np.ndarray, np.ndarray]
-        beta_partial: Coefficients from bivariate residual regression (K1,)
-        beta_full_X1: Corresponding coefficients from joint multiple regression (K1,)
+    dict with keys 'beta_1', 'residuals_1', 'y_tilde', 'X1_tilde'
     """
-    N = len(y)
-    
-    # Step 1: Compute annihilator matrix for X2: M2 = I - X2 (X2^T X2)^(-1) X2^T
-    XtX2 = X2.T @ X2
-    M2 = np.eye(N) - X2 @ np.linalg.inv(XtX2) @ X2.T
-    
-    # Step 2: Purge X2 out of y and X1
+    # Step 1: Form the Annihilator matrix M2 = I - X2 (X2^T X2)^(-1) X2^T
+    n = len(y)
+    M2 = np.eye(n) - X2 @ np.linalg.inv(X2.T @ X2) @ X2.T
+
+    # Step 2: Purge the control covariates from target y: y_tilde = M2 y
     y_tilde = M2 @ y
+
+    # Step 3: Purge the control covariates from regressors X1: X1_tilde = M2 X1
     X1_tilde = M2 @ X1
-    
-    # Step 3: Run partial regression of y_tilde on X1_tilde
-    beta_partial = np.linalg.solve(X1_tilde.T @ X1_tilde, X1_tilde.T @ y_tilde)
-    
-    # Step 4: Run full joint regression of y on [X1, X2] for verification
-    X_full = np.hstack([X1, X2])
-    beta_full = np.linalg.solve(X_full.T @ X_full, X_full.T @ y)
-    beta_full_X1 = beta_full[:X1.shape[1]]
-    
-    return beta_partial, beta_full_X1
+
+    # Step 4: Run simple regression of y_tilde on X1_tilde to get beta_1
+    beta_1 = np.linalg.solve(X1_tilde.T @ X1_tilde, X1_tilde.T @ y_tilde)
+
+    # Step 5: Compute clean residuals
+    residuals_1 = y_tilde - X1_tilde @ beta_1
+
+    return {
+        "beta_1": beta_1 if beta_1.ndim > 0 and len(beta_1) > 1 else float(beta_1.squeeze()),
+        "residuals_1": residuals_1,
+        "y_tilde": y_tilde,
+        "X1_tilde": X1_tilde,
+    }
 ```
 :::
 

@@ -31,6 +31,27 @@ The Spectral Theorem is the foundational engine behind optimization, statistics,
 
 ---
 
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Symmetric Matrix ($A = A^T$) | A matrix perfectly balanced across its main diagonal, like a mirror image | المصفوفة المتناظرة | مصفوفة متوازنة كمرآة حول قطرها الرئيسي؛ تتطابق مع منقولتها تماماً |
+| Spectral Theorem | The golden guarantee: symmetric matrices always have mutually perpendicular eigenvectors | المبرهنة الطيفية | الضمانة الذهبية: المصفوفات المتناظرة تمتلك دائماً متجهات ذاتية متعامدة |
+| Orthogonal Diagonalization | Factoring a matrix into pure rotation, axis stretching, and un-rotation: $Q \Lambda Q^T$ | التقطير المتعامد | تفكيك التحويل إلى دوران نقي، ثم تمدد على المحاور، ثم دوران عكسي |
+| Quadratic Form ($x^T A x$) | A smooth 3D energy bowl whose contours form concentric ellipses | الصيغة التربيعية | وعاء طاقة أملس ثلاثي الأبعاد تشكل مقاطعه العرضية قطوعاً ناقصة متحدة المركز |
+| Principal Axes | The longest and shortest perpendicular directions of the energy ellipsoid | المحاور الرئيسية | أطول وأقصر المحاور المتعامدة التي تحدد أبعاد الشكل البيضاوي |
+
+#### Geometric & Visual Flow
+
+```
+        Unit Circle                  Transformed Ellipse
+             ▲                              ▲         q2 (Minor axis, λ2)
+          q2 *                             │       *
+             │                             │      / \ 
+             └──*──► q1                    └─────*───*──► q1 (Major axis, λ1)
+          Circle (r=1)               Eigenvectors form orthogonal axes!
+```
+
 ### الحدس الفيزيائي والهندسي
 
 تخيل أنك تنقر على غشاء طبلة مشدود بإحكام، أو تعزف على وتر عود مشدود. في الطبيعة الفيزيائية، يُعد التوازن التبادلي قانوناً صارماً: فوفقاً لقانون نيوتن الثالث، عندما يؤثر الجسيم $i$ بقوة على الجسيم $j$، فإن الجسيم $j$ يرد بقوة مساوية لها في المقدار ومعاكسة لها في الاتجاه. في لغة الجبر الخطي، ينعكس هذا التوازن المتبادل في **المصفوفة المتناظرة** ($\mathbf{A} = \mathbf{A}^T$)، حيث يكون تأثير المركبة $i$ على المركبة $j$ مطابقاً تماماً لتأثير $j$ على $i$ عبر القطر الرئيسي للمصفوفة ($A_{ij} = A_{ji}$).
@@ -47,6 +68,27 @@ The Spectral Theorem is the foundational engine behind optimization, statistics,
 2. **تحسين دوال التعلم العميق ومصفوفة هيسيان (Hessian):** في الحساب متعدد المتغيرات، تكون مصفوفة المشتقات الجزئية الثانية $\mathbf{H}_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}$ متناظرة دائماً (وفق مبرهنة كليرو). تحدد متجهاتها الذاتية المتعامدة اتجاهات التقعر والانحناء الأقصى والأدنى، مما يوجه خوارزميات التحسين الذكية مثل نيوتن-رافسون.
 3. **ميكانيكا الكم:** في الفيزياء الكمومية، كل كمية فيزيائية قابلة للملاحظة والقياس (كالطاقة، والزخم، ولف الجسيمات) تُمثّل بمؤثر متناظر (Hermitian). المبرهنة الطيفية هي السبب الجوهري وراء ظهور نتائج القياسات المعملية دائماً كأرقام حقيقية وليست تخيلية.
 4. **نظرية المخططات الطيفية وتقسيم الشبكات:** مصفوفة لابلابسيان للمخططات $\mathbf{L} = \mathbf{D} - \mathbf{A}$ للشبكات غير الموجهة متناظرة. ويمكّننا المتجه الذاتي الثاني (متجه فيدلر) من تقسيم شبكات التواصل الاجتماعي وشبكات الويب المعقدة إلى مجتمعات وعناقيد مترابطة بدقة فائقة.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| المصفوفة المتناظرة | A matrix perfectly balanced across its main diagonal, like a mirror image | المصفوفة المتناظرة | مصفوفة متوازنة كمرآة حول قطرها الرئيسي؛ تتطابق مع منقولتها تماماً |
+| المبرهنة الطيفية | The golden guarantee: symmetric matrices always have mutually perpendicular eigenvectors | المبرهنة الطيفية | الضمانة الذهبية: المصفوفات المتناظرة تمتلك دائماً متجهات ذاتية متعامدة |
+| التقطير المتعامد | Factoring a matrix into pure rotation, axis stretching, and un-rotation: $Q \Lambda Q^T$ | التقطير المتعامد | تفكيك التحويل إلى دوران نقي، ثم تمدد على المحاور، ثم دوران عكسي |
+| الصيغة التربيعية | A smooth 3D energy bowl whose contours form concentric ellipses | الصيغة التربيعية | وعاء طاقة أملس ثلاثي الأبعاد تشكل مقاطعه العرضية قطوعاً ناقصة متحدة المركز |
+| المحاور الرئيسية | The longest and shortest perpendicular directions of the energy ellipsoid | المحاور الرئيسية | أطول وأقصر المحاور المتعامدة التي تحدد أبعاد الشكل البيضاوي |
+
+#### المخطط البصري الهندسي
+
+```
+        دائرة الوحدة                 القطع الناقص الناتج بعد التحويل
+             ▲                              ▲         q2 (المحور الأصغر، λ2)
+          q2 *                             │       *
+             │                             │      / \ 
+             └──*──► q1                    └─────*───*──► q1 (المحور الأكبر، λ1)
+         دائرة بنصف قطر 1             المتجهات الذاتية تشكل محاور متعامدة تماماً!
+```
 
 :::simulation-widget{engine="canvas2d" component="SpectralTheoremCanvas"}
 ---

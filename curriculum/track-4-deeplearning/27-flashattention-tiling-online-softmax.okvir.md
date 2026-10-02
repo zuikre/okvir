@@ -12,7 +12,7 @@ i18n:
 
 # FlashAttention: IO-Aware Tiling & Online Softmax
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
 Traditional self-attention on modern GPUs is severely bottlenecked by **Memory Bandwidth and IO Operations**, not raw arithmetic compute capability. Modern accelerator architectures feature a strict physical hierarchy of memory: massive but relatively slow external High-Bandwidth Memory (HBM, such as 80 GB at ~3 TB/s on an NVIDIA H100) and tiny, blistering-fast on-chip Static RAM (SRAM, roughly 228 KB per streaming multiprocessor at over 30 TB/s). When algorithms force data to shuttle repeatedly between HBM and the compute cores, the ultra-fast Tensor Cores spend up to 80% of their operational time idling, waiting for numbers to arrive across the memory bus.
 
@@ -32,6 +32,39 @@ The mathematical engine that enables this single-pass tiling without ever storin
 
 يشبه هذا تنظيم مسودة عمل صغيرة على مكتبك بدلاً من الركض المتكرر إلى خزانة الأرشيف في القبو في كل مرة تحتاج فيها إلى رقم وسيط! فتحتفظ ببطاقة فهرسة واحدة تسجل فيها الإجماليات التراكمية وتعدلها لحظياً مع وصول الأرقام الجديدة، مما يلغي تماماً الحاجة إلى دفاتر ورقية عملاقة ويوفر أكثر من $80\%$ من زمن الانتظار.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **High Bandwidth Memory (HBM)** (ذاكرة الفيديو العامة GPU VRAM) | The massive distant warehouse: large capacity (80 GB), but slow to access; standard attention clogs traffic by storing huge $N \times N$ matrices here. | المستودع البعيد الضخم: سعة تخزين هائلة لكنها بطيئة الوصول؛ يسبب الانتباه التقليدي اختناقاً بكتابة مصفوفات ضخمة فيها. |
+| **On-Chip SRAM** (ذاكرة المعالج السريعة الفائقة) | The chef's chopping board: tiny capacity (20 MB per chip), but $10\times$ faster; FlashAttention executes all math here without writing to HBM. | طاولة التحضير السريعة بجانب الطاهي: سعة صغيرة جداً لكنها فائقة السرعة؛ ينفذ FlashAttention كافة الحسابات فوقها مباشرة. |
+| **IO-Awareness** (الوعي بتكلفة نقل البيانات) | Designing for memory traffic: optimizing algorithms to minimize slow data transfers between HBM and SRAM rather than counting raw math operations. | هندسة نقل البيانات: تصميم الخوارزميات لتقليل زمن نقل البيانات بين الذاكرة والمعالج بدلاً من الاكتفاء بعد العمليات الحسابية. |
+| **Online Softmax** (التنعيم الأسي المتدفق عبر الإنترنت) | Calculating the class average on the fly: updating running maximums and sums block-by-block without ever needing to see all test scores at once. | حساب المتوسط التراكمي الفوري: تحديث القيمة العظمى ومجموع الأسس جزءاً بجزء دون الحاجة لرؤية مصفوفة البيانات كاملة في وقت واحد. |
+| **Tiling** (التقطيع القالبي) | Bite-sized portions: slicing giant $Q, K, V$ matrices into small tiles ($B_r \times B_c$) that fit snugly inside fast SRAM cache memory. | التقطيع إلى قوالب صغيرة: تجزئة المصفوفات العملاقة إلى كتل متناسقة تتسع بدقة داخل ذاكرة الكاش السريعة لتفادي الاختناق. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+STANDARD ATTENTION VS. FLASHATTENTION MEMORY TRAFFIC:
+=============================================================================
+STANDARD ATTENTION (Memory-Bound Bottleneck):
+GPU HBM (Slow)   ---> Load Q, K ---> Compute S = Q*K^T ---> Write S to HBM! (O(N^2) memory!)
+GPU HBM (Slow)   ---> Read S    ---> Compute A = Softmax(S) ---> Write A to HBM! (O(N^2) memory!)
+GPU HBM (Slow)   ---> Read A, V ---> Compute O = A*V   ---> Write Output O to HBM!
+Result: GPU Compute Cores sit idle waiting for slow HBM memory transfers!
+
+FLASHATTENTION (IO-Aware SRAM Tiling):
+Tile Q into blocks Q_i,  Tile K, V into blocks K_j, V_j
+Loop over blocks:
+    Load Q_i, K_j, V_j into ultra-fast on-chip SRAM cache (Small tiles!)
+    Compute S_ij = Q_i * K_j^T in SRAM
+    Update running Online Softmax stats (m_new, l_new) in SRAM
+    Incrementally accumulate Output block O_i in SRAM
+    (Never write any N x N intermediate matrices to HBM!)
+Write final Output O_i directly to HBM!
+Result: 2x - 4x end-to-end wall-clock speedup with ZERO extra memory overhead!
+```
+
 :::simulation-widget{engine="canvas2d" component="FlashAttentionTilingLab"}
 ---
 interactive: true
@@ -41,7 +74,7 @@ highlighted_metric: "loss"
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
 Online Softmax updates running row maximums, normalization denominators, and unnormalized output accumulators block by block without materializing the full attention matrix:
 
@@ -61,22 +94,21 @@ $$
 O_{\text{new}} = \alpha \cdot O_{\text{prev}} + P_{\text{block}} V_{\text{block}}, \quad \text{Final Output: } O = \frac{O_{\text{final}}}{l_{\text{final}}}
 $$
 
-### Comprehensive Symbol & Parameter Breakdown
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-| Symbol | Dimensionality | Mathematical Interpretation | Operational Role |
-| :--- | :--- | :--- | :--- |
-| $S_{\text{block}}$ | $\mathbb{R}^{B_r \times B_c}$ | Attention score tile computed in fast SRAM | Dot products between query block $Q_i$ and key block $K_j$. |
-| $m_{\text{prev}}, m_{\text{new}}$ | $\mathbb{R}^{B_r \times 1}$ | Row-wise running maximum values | Prevents exponential overflow in floating-point computations. |
-| $\alpha = \exp(m_{\text{prev}} - m_{\text{new}})$ | $\mathbb{R}^{B_r \times 1} \in (0, 1]$ | Dynamic rescaling correction factor | Rescales previous unnormalized sums when a larger maximum is discovered. |
-| $P_{\text{block}}$ | $\mathbb{R}^{B_r \times B_c}$ | Unnormalized exponential attention weights | Exponentials computed locally using the current global maximum $m_{\text{new}}$. |
-| $l_{\text{prev}}, l_{\text{new}}$ | $\mathbb{R}^{B_r \times 1}$ | Running accumulated denominator | Sum of exponentials across all historical tiles processed so far. |
-| $O_{\text{prev}}, O_{\text{new}}$ | $\mathbb{R}^{B_r \times d}$ | Running accumulated attention output numerator | Unnormalized weighted sum of value vectors updated in fast SRAM. |
-| $O = O_{\text{final}} / l_{\text{final}}$ | $\mathbb{R}^{B_r \times d}$ | Final normalized attention context matrix | Mathematically identical to standard Softmax attention. |
-| Memory IO | Complexity | Reduced from $\mathcal{O}(N^2)$ down to $\mathcal{O}(N \cdot d)$ | Completely eliminates intermediate attention matrix roundtrips to HBM. |
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $B_r, B_c$ | Block Row & Column Sizes / أبعاد القوالب | Tile dimensions sized specifically to fit blocks of $Q, K, V$ into SRAM cache (e.g. 64x64). |
+| $m^{(j)} \in \mathbb{R}$ | Running Row Maximum / القيمة العظمى التراكمية | Maximum logit observed so far across processed key blocks, preventing numeric overflow. |
+| $l^{(j)} \in \mathbb{R}$ | Running Normalization Sum / مجموع التنعيم التراكمي | Running denominator sum of exponents rescaled whenever the running maximum increases. |
+| $e^{m^{(j-1)} - m^{(j)}}$ | Rescaling Factor / معامل إعادة التوازن | Rescaling multiplier adjusting earlier accumulated terms to match the newly discovered maximum. |
+| $\mathbf{O}_i$ | Accumulated Output Tile / قالب المخرجات التراكمي | Running context block computed entirely in SRAM and written once to HBM upon completion. |
 
-تضمن آلية التصحيح الديناميكية عبر المعامل $\alpha$ تطابق الناتج الرياضي النهائي تماماً مع دالة Softmax الكلاسيكية، ولكن مع اختزال حركة البيانات بين الذاكرتين بنسبة تزيد عن $80\%$، مما يتيح تسريع زمن التدريب والاستدلال بمقدار $3\times$ إلى $5\times$.
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **The Online Softmax Invariance**: If you have two blocks with local maxes $m_1, m_2$, the global max is $m = \max(m_1, m_2)$. Prior unnormalized sums $l_1$ can be rescaled exactly by multiplying by $e^{m_1 - m}$, allowing exact mathematical equivalence without saving intermediate scores.
+2. **Elimination of the $O(N^2)$ Memory Footprint**: Standard attention materializes an $S \times S$ attention matrix in HBM (which for $S = 64,000$ requires $8$ GB of memory per head!). FlashAttention requires only $O(S)$ memory, enabling million-token context lengths.
+3. **Hardware-Kernel Fusion**: By fusing the QK multiplication, Softmax scaling, and Value multiplication into a single GPU CUDA SRAM kernel, memory bandwidth reads and writes are reduced by up to $10\times$.
 
----
 
 ## Beat 3: Python Challenge
 

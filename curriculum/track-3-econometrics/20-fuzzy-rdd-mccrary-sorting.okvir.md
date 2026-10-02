@@ -14,21 +14,70 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-In an ideal institutional laboratory, rules are executed with robotic perfection: cross the cutoff, and you receive treatment with $100\%$ certainty; miss it by a fraction of a millimeter, and you receive $0\%$. In real human institutions, however, compliance is rarely deterministic. Administrative thresholds frequently generate an **entitlement, voucher, or strong nudge**, but human beings retain free will. Some qualified individuals decline the benefit, while some who fell short successfully lobby administrators for a discretionary exception.
+### Intuition & Real-World Story
 
-Consider an elite STEM summer fellowship. High school students scoring $90$ or above on a standardized math assessment are mailed an official invitation ($Z_i = 1$). However, several invited students decline because of conflicting family summer travel plans. Meanwhile, a handful of students scoring $88$ or $89$ file hardship appeals through their guidance counselors and secure discretionary admittance ($D_i = 1$). When you plot treatment uptake against the test score, there is no longer a crisp jump from $0$ to $1$. Instead, the probability of attending jumps abruptly from $15\%$ immediately to the left of 90 up to $75\%$ immediately to the right.
+Suppose a municipal government offers a winter heating subsidy for low-income residents whose annual reported income falls below $30,000. 
 
-This is the domain of the **Fuzzy Regression Discontinuity Design (FRDD)**. Econometrically, crossing the cutoff is no longer treatment itself; rather, crossing the cutoff acts as an **Instrumental Variable (IV)** that exogenous nudges compliance upward! To calculate the true causal effect among students whose attendance was swayed by the cutoff (the **Local Average Treatment Effect, or LATE**), we take the observed vertical jump in downstream outcomes (e.g., college graduation) and divide it by the vertical jump in treatment uptake (the first-stage compliance jump). If college completion jumps by $6$ percentage points at the cutoff, but compliance only jumped by $60$ percentage points ($0.60$), the true causal impact on compliers is $6\% / 0.60 = +10\%$.
+Two messy real-world complications immediately arise:
+1. **Fuzzy Compliance:** Just because you earn $29,500 doesn't mean you automatically receive the subsidy. You still have to apply, submit paperwork, and follow up. Some eligible people don't apply, and some ineligible people get special exemptions. The probability of receiving treatment jumps at $30,000, but not from 0% to 100%—perhaps it jumps from 15% to 75%. This is **Fuzzy RDD**.
+2. **Cheating & Sorting:** What if people deliberately underreport cash income or ask their employer to delay a paycheck so their reported income lands at $29,950 instead of $30,100?
 
-However, this elegant identification rests on a razor's edge: **agents must not possess the ability to manipulate their score around the cutoff**. If math teachers know that 90 is the scholarship cutoff and generously bump students with an 89 up to 90, the students right above the threshold are no longer comparable to those below—they are students with more aggressive parents or sympathetic teachers! The **McCrary Density Test** serves as an indispensable forensic audit: it inspects the histogram density of the running variable. If the distribution displays a smooth, continuous curve, the quasi-experiment is clean. But if a towering spike of bunching appears at 90 followed by a vacant crater at 89, it exposes foul play, completely demolishing causal credibility.
+If people can manipulate their position around the cutoff, the 'random experiment' is destroyed! The people just below $30,000 are no longer identical twins to those just above—they are people who are clever, desperate, or dishonest enough to manipulate their paperwork!
 
-في الأنظمة الإدارية المثالية، تُطبق اللوائح بصرامة تامة: من يتجاوز العتبة يحصل على المعالجة حتماً بنسبة 100%، ومن يقل عنها يُحرم منها بنسبة 0%. لكن في العالم الحقيقي المعقد، نادراً ما يكون الامتثال حتمياً ومطلقاً؛ فالقواعد الإدارية غالباً ما تمنح **أهلية قانونية أو دعوة رسمية أو حافزاً مشجعاً**، مع بقاء حرية الاختيار للأفراد. يرفض بعض المؤهلين تلقي البرنامج لارتباطات أخرى، بينما ينجح بعض الراسبين في الحصول على استثناءات عبر التظلم والواسطة.
+How can an econometrician detect whether applicants manipulated their scores?
+Through the **McCrary Density Sorting Test**!
+If there is no cheating, people's exam scores or incomes should form a smooth, unbroken histogram. But if people are actively gaming the system, you will see an unnatural, massive spike in applicant density stacked just below $30,000, followed by a barren desert just above!
 
-تخيل منحة دراسية في معسكر صيفي للموهوبين: يحصل الطلاب الذين نالوا 90 درجة فما فوق في اختبار الرياضيات على بطاقة دعوة ($Z_i = 1$). لكن بعض هؤلاء يعتذرون عن الحضور بسبب السفر العائلي. وفي المقابل، يتقدم بعض الطلاب الحاصلين على 88 أو 89 بالتماسات خاصة لإدارات مدارسهم ويتم قبولهم استثنائياً ($D_i = 1$). إذا رسمنا نسبة الحضور الفعلي مقابل درجات الاختبار، فلن نرى قفزة حادة من 0 إلى 1، بل سنشهد قفزة مفاجئة في "احتمالية" الحضور: حيث ترتفع من 15% مباشرة قبل 90 إلى 75% مباشرة بعدها.
+#### Jargon Decoder
 
-هذا هو جوهر **تصميم انقطاع الانحدار الضبابي (Fuzzy RDD)**. من الناحية القياسية، لم يعد تجاوز العتبة هو المعالجة نفسها، بل أصبح تجاوز العتبة بمثابة **متغير أداة خارجي (Instrumental Variable)** يدفع احتمالية الامتثال للأعلى! ولاستعادة الأثر السببي الصافي للممتثلين (LATE)، نقسم القفزة الملاحظة في النتائج (المرحلة المختزلة) على القفزة الملاحظة في نسبة الامتثال (المرحلة الأولى). فإذا ارتفعت معدلات التخرج الجامعي بمقدار 6% عند العتبة، بينما ارتفعت نسبة الحضور الفعلي بمقدار 60% فقط، فإن الأثر الحقيقي للمعسكر على الممتثلين هو $6\% / 0.60 = +10\%$.
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Fuzzy RDD** | The dimmer switch: treatment probability jumps sharply at the cutoff, but imperfectly (e.g., 20% to 80%). |
+| **McCrary Density Test** | The fraud detector: checks whether people unnaturally clustered just on the winning side of the line. |
+| **Running Variable Manipulation** | Self-sorting: applicants gaming or faking their scores to guarantee receiving benefits. |
+| **Compliance Jump** | The change in treatment uptake rate observed right at the threshold. |
+| **Local Wald Ratio** | Fuzzy RDD estimate: dividing the outcome jump by the treatment probability jump. |
 
-غير أن هذا البناء الرياضي ينهار تماماً إذا كان بإمكان الأفراد **التلاعب بدرجاتهم والتسلل فوق العتبة (Strategic Sorting)**. فلو علم المعلمون أن 90 هي عتبة المنحة، وقاموا بتعديل درجات 89 إلى 90 بدافع الشفقة، لم يعد الطلاب فوق العتبة متطابقين مع زملائهم تحتها! هنا يأتي **اختبار مككراري للكثافة (McCrary Density Test)** كمدقق جنائي صارم: يفحص منحنى الكثافة الاحتمالية للمتغير؛ فإن كان المنحنى أملساً ومستمراً ثبتت سلامة التجربة، وإن ظهر تكدس فجائي غير طبيعي عند 90 مع فجوة فارغة عند 89، دل ذلك على تلاعب فاضح يبطل الاستدلال السببي بالكامل.
+```text
+    McCRARY FRAUD DETECTOR (DENSITY SORTING):
+
+    Number of Applicants (Density)
+      ^
+      |                               [SUSPICIOUS SPIKE!]
+      |                                     |===|
+      |                                     |===|
+      |                         |===|       |===|
+      |                   |===| |===|       |===|
+      |             |===| |===| |===|       |===| :   |===|
+      |       |===| |===| |===| |===|       |===| :   |===| |===|
+      0-------+-----+-----+-----+-----+-----+-----+---+-----+-----+---------> Income
+                                           $29.9k :  $30.1k
+                                           (Cutoff)
+```
+
+### الحدس والقصة الواقعية
+
+تخيل حكومة تقدم إعانة تدفئة شتوية للأسر محدودة الدخل التي يقل دخلها السنوي عن 30,000 دولار.
+
+يواجه هذا التحليل تعقيدين واقعيين:
+1. **الامتثال الضبابي (Fuzzy Compliance):** كون دخل الأسرة 29,500 دولار لا يعني تلقيها الإعانة تلقائيًا؛ إذ يجب تقديم أوراق ومتابعة الطلب. فبعض المؤهلين يتكاسلون، وبعض غير المؤهلين ينالون استثناءات. ترتفع نسبة تلقي الدعم عند عتبة 30,000 دولار، لكنها لا تقفز من 0% إلى 100%، بل تقفز مثلاً من 15% إلى 75%. هذا هو **انقطاع الانحدار الضبابي (Fuzzy RDD)**.
+2. **التلاعب والتمركز (Cheating & Sorting):** ماذا لو تعمد بعض الأفراد إخفاء جزء من دخلهم النقدي لكي يظهر دخلهم عند 29,950 دولار بدلاً من 30,100 دولار للاستفادة من الإعانة؟
+
+إذا كان الناس قادرين على التلاعب بمواقعهم، تنهار التجربة العشوائية! فالأشخاص أسفل الـ 30 ألف لن يعودوا توائم مطابقة لمن فوقها، بل سيصبحون فئة أكثر دهاءً وتلاعبًا بالأوراق!
+
+كيف يكشف الاقتصادي هذا التلاعب؟
+عبر **اختبار ماكراري لكثافة التوزيع (McCrary Density Test)**!
+في غياب التلاعب، تتوزع أعداد الناس بسلاسة دون فجوات. أما إذا كان هناك تلاعب، فسترى قمة جبلية مفاجئة وغير طبيعية في أعداد الناس المحتشدين تحت خط الـ 30 ألف مباشرة، يقابلها فراغ فجائي فوقه!
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **الانقطاع الضبابي (Fuzzy RDD)** | زر التعتيم: قفزة غير مكتملة في نسبة تلقي العلاج عند الحد الفاصل (مثل القفز من 20% إلى 80%). |
+| **اختبار ماكراري للكثافة** | كاشف التزوير: يفحص ما إذا كان الناس قد احتشدوا بصورة مصطنعة على الجانب الرابح من الخط. |
+| **التلاعب بالمتغير الفاصل** | التحايل والتمركز الذاتي: تزييف الدرجات أو الدخل لضمان السقوط في دائرة الاستحقاق. |
+| **قفزة الامتثال** | مقدار الارتفاع في نسبة الخضوع للمعالجة عند ملامسة العتبة الفاصلة. |
+| **نسبة فالد الموضعية** | حساب أثر Fuzzy RDD بقسمة قفزة النتيجة على قفزة الامتثال. |
 
 :::simulation-widget{engine="canvas2d" component="FuzzyRDDBandwidthLab"}
 ---
@@ -39,53 +88,47 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-In a Fuzzy Regression Discontinuity Design, treatment take-up $D_i \in \{0, 1\}$ is not deterministic, but its conditional probability jumps discontinuously at the institutional cutoff $c$:
+In a Fuzzy RDD, the probability of treatment jumps discontinuously at cutoff $c$, but strictly between 0 and 1:
 
 $$
-\lim_{x \downarrow c} \mathbb{P}(D_i = 1 \mid X_i = x) \ne \lim_{x \uparrow c} \mathbb{P}(D_i = 1 \mid X_i = x)
+\lim_{x \downarrow c} \mathbb{P}(D = 1 \mid X = x) \ne \lim_{x \uparrow c} \mathbb{P}(D = 1 \mid X = x)
 $$
 
-Define the threshold crossing eligibility indicator as the instrument: $Z_i = \mathbb{I}(X_i \ge c)$.
-
-The Fuzzy RDD estimand is the ratio of two local boundary discontinuities, equivalent to the **Local Wald Instrumental Variables Estimator** at the boundary:
+The Fuzzy RDD estimand is the local Wald ratio of the outcome discontinuity to the treatment probability discontinuity:
 
 $$
-\tau_{\text{FRD}} = \frac{\lim_{x \downarrow c} \mathbb{E}[Y_i \mid X_i = x] - \lim_{x \uparrow c} \mathbb{E}[Y_i \mid X_i = x]}{\lim_{x \downarrow c} \mathbb{E}[D_i \mid X_i = x] - \lim_{x \uparrow c} \mathbb{E}[D_i \mid X_i = x]} = \frac{\Delta \mathbb{E}[Y \mid X = c]}{\Delta \mathbb{E}[D \mid X = c]}
+\tau_{\text{FRDD}} = \frac{\lim_{x \downarrow c} \mathbb{E}[Y \mid X = x] - \lim_{x \uparrow c} \mathbb{E}[Y \mid X = x]}{\lim_{x \downarrow c} \mathbb{E}[D \mid X = x] - \lim_{x \uparrow c} \mathbb{E}[D \mid X = x]} = \frac{\Delta \mathbb{E}[Y \mid c]}{\Delta \mathbb{P}[D \mid c]}
 $$
 
-Under the monotonicity assumption (the cutoff encourages but never discourages treatment take-up, ruling out Defiers), $\tau_{\text{FRD}}$ identifies the **Local Average Treatment Effect (LATE)** for Compliers at the cutoff:
+**The McCrary (2008) Density Test:**
+Tests the continuity of the marginal density $f_X(x)$ of the running variable at cutoff $c$:
 
 $$
-\tau_{\text{FRD}} = \mathbb{E}\left[Y_i(1) - Y_i(0) \mid \text{Unit } i \text{ is a Complier at } X_i = c\right]
+H_0: \ln f_X(c^+) - \ln f_X(c^-) = 0 \quad \text{vs} \quad H_1: \ln f_X(c^+) - \ln f_X(c^-) \ne 0
 $$
 
-### The McCrary (2008) Density Diagnostic
-To test the core identifying assumption of local random assignment (absence of precise sorting around the threshold), Justin McCrary (2008) introduced an estimator for the log-difference in the marginal probability density function $f(x)$ of the running variable $X$ at cutoff $c$:
+A rejection of $H_0$ ($p < 0.05$) indicates manipulation of the running variable, invalidating causal identification.
 
-$$
-\theta \equiv \ln \left( \lim_{x \downarrow c} f(x) \right) - \ln \left( \lim_{x \uparrow c} f(x) \right)
-$$
+### Why the Math Works Step-by-Step
 
-We test the null hypothesis of continuity against the alternative of sorting/manipulation:
-
-$$
-H_0: \theta = 0 \quad \text{vs} \quad H_1: \theta \ne 0
-$$
-
-A statistically significant log-density gap ($\hat{\theta} \ne 0$) rejects $H_0$ and indicates that agents strategically clustered or manipulated their score to land immediately on the desired side of the threshold, violating exchangeability.
+1. **Why is Fuzzy RDD an Instrumental Variable?**
+   Cutoff crossing $\mathbf{1}(X_i \ge c)$ acts as the Instrument $Z$. The denominator is the First Stage (compliance jump). The numerator is the Reduced Form (outcome jump). The ratio is the Wald estimate of treatment on compliers right at the threshold!
+2. **McCrary Test Log Difference:**
+   Under true smoothness, the density ratio should equal 1 (log difference = 0). A discontinuity spike proves that units self-sorted across the boundary.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $X_i$: Continuous running variable determining eligibility.
-* $c$: Administrative threshold or eligibility cutoff.
-* $Z_i = \mathbb{I}(X_i \ge c)$: Binary eligibility instrument indicating threshold passage.
-* $D_i \in \{0, 1\}$: Actual endogenous treatment uptake or program participation.
-* $Y_i$: Observed outcome variable.
-* $\Delta \mathbb{E}[Y \mid X = c]$: Reduced-form outcome discontinuity at the cutoff (numerator).
-* $\Delta \mathbb{E}[D \mid X = c]$: First-stage compliance discontinuity in treatment uptake at the cutoff (denominator).
-* $\tau_{\text{FRD}}$: Fuzzy RDD causal estimand identifying LATE for compliers located at $X = c$.
-* $f(x)$: Marginal probability density function of the running variable.
-* $\theta$: McCrary log-density discontinuity parameter testing for strategic manipulation or bunching.
+* $\Delta \mathbb{E}[Y \mid c]$: Discontinuity jump in outcome at cutoff.
+* $\Delta \mathbb{P}[D \mid c]$: Compliance jump in treatment probability at cutoff.
+* $\ln f_X(c^+) - \ln f_X(c^-)$: McCrary log-density difference across threshold.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\tau_{\text{FRDD}}$ | مقدر الانقطاع الضبابي | نسبة فالد الموضعية التي تقيس الأثر السببي على الممتثلين عند العتبة. |
+| $\Delta \mathbb{P}[D \mid c]$ | قفزة احتمالية العلاج | مقام النسبة: التغير في نسبة المستفيدين الفعليين عند تجاوز الخط الفاصل. |
+| اختبار ماكراري | لوغاريتم فارق الكثافة | يقيس الانقطاع المفاجئ في أعداد الناس للتأكد من خلو العينة من الغش والتلاعب. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -113,64 +156,55 @@ def compute_fuzzy_rdd(
     y: np.ndarray,
     d: np.ndarray,
     x: np.ndarray,
-    cutoff: float,
-    bandwidth: float
+    c: float,
+    h: float
 ) -> dict[str, float]:
     """
-    Computes Fuzzy RDD Wald ratio via local linear regression for reduced form and first stage.
-    
+    Computes Fuzzy RDD local Wald estimator within bandwidth [c - h, c + h].
+
     Parameters
     ----------
     y : np.ndarray of shape (N,)
-        Observed outcome values.
+        Outcome.
     d : np.ndarray of shape (N,)
-        Observed treatment indicator or uptake fraction.
+        Treatment indicator (imperfect compliance).
     x : np.ndarray of shape (N,)
         Running variable.
-    cutoff : float
-        Discontinuity cutoff c.
-    bandwidth : float
-        Local estimation window half-width h.
-        
+    c : float
+        Cutoff threshold.
+    h : float
+        Bandwidth.
+
     Returns
     -------
-    dict with keys:
-        'jump_y': Numerator discontinuity in outcome.
-        'jump_d': Denominator discontinuity in treatment uptake (first-stage).
-        'tau_frd': Fuzzy RDD Wald estimate (jump_y / jump_d).
+    dict with keys 'tau_fuzzy', 'first_stage_jump'
     """
-    # Step 1: Select observations falling within local bandwidth window
-    mask = (x >= cutoff - bandwidth) & (x <= cutoff + bandwidth)
-    x_sub = x[mask]
+    mask = (x >= c - h) & (x <= c + h)
     y_sub = y[mask]
     d_sub = d[mask]
-    
-    # Step 2: Center running variable and compute triangular kernel weights
-    x_c = x_sub - cutoff
-    z = (x_sub >= cutoff).astype(float)
-    u = np.abs(x_c) / bandwidth
-    w = 1.0 - u
-    W = np.diag(w)
-    
-    # Step 3: Construct local linear design matrix: [1, Z, (X-c), Z*(X-c)]
-    X_mat = np.column_stack([np.ones_like(x_c), z, x_c, z * x_c])
-    XtWX = X_mat.T @ W @ X_mat
-    
-    # Step 4: Estimate reduced-form outcome jump at cutoff
-    beta_y = np.linalg.solve(XtWX, X_mat.T @ W @ y_sub)
-    jump_y = float(beta_y[1])
-    
-    # Step 5: Estimate first-stage treatment take-up jump at cutoff
-    beta_d = np.linalg.solve(XtWX, X_mat.T @ W @ d_sub)
-    jump_d = float(beta_d[1])
-    
-    # Step 6: Compute Fuzzy RDD Wald ratio
-    tau_frd = jump_y / jump_d if abs(jump_d) > 1e-8 else float('nan')
-    
+    x_sub = x[mask]
+    n_sub = len(y_sub)
+
+    x_centered = x_sub - c
+    z_instrument = (x_sub >= c).astype(float)
+
+    # Numerator (Reduced Form): Regress y on [1, x_centered, z, z*x_centered]
+    X_mat = np.column_stack([np.ones(n_sub), x_centered, z_instrument, z_instrument * x_centered])
+    beta_y = np.linalg.solve(X_mat.T @ X_mat, X_mat.T @ y_sub)
+    jump_y = float(beta_y[2])
+
+    # Denominator (First Stage): Regress d on X_mat
+    beta_d = np.linalg.solve(X_mat.T @ X_mat, X_mat.T @ d_sub)
+    jump_d = float(beta_d[2])
+
+    if abs(jump_d) < 1e-6:
+        raise ValueError("First stage jump is zero: No discontinuity in treatment probability.")
+
+    tau_fuzzy = jump_y / jump_d
+
     return {
-        "jump_y": jump_y,
-        "jump_d": jump_d,
-        "tau_frd": tau_frd,
+        "tau_fuzzy": float(tau_fuzzy),
+        "first_stage_jump": float(jump_d),
     }
 ```
 :::

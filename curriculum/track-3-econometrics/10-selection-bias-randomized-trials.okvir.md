@@ -14,39 +14,63 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Why was the simple act of tossing a coin or drawing lottery numbers celebrated as a Nobel-prize-winning breakthrough in economics and social science?
+### Intuition & Real-World Story
 
-Because in human societies, **nobody chooses actions at random**. Sick people visit doctors; ambitious and wealthy students enroll in prestigious universities; struggling, low-margin businesses apply for government relief subsidies. Whenever individuals select themselves into treatment, observed comparisons are poisoned by **Selection Bias**.
+Imagine an insurance company conducts a simple study: they compare the annual health scores of people who went to the hospital last year against people who did not. 
 
-A randomized lottery operates as a **causal scalpel**:
-By assigning treatment strictly through a random coin toss ($D_i \perp\!\!\perp (Y_i(0), Y_i(1))$), the lottery severs every pre-existing link between a participant's background health, wealth, drive, or genetic makeup and their receipt of treatment. 
+The raw data shows an alarming result: people who went to the hospital had significantly worse health outcomes and a higher mortality rate than people who stayed home! A naive analyst exclaims: *"Hospitals are making people sick! We should ban hospital visits to improve public health!"*
 
-Before the medicine is administered, the treated cohort and the control cohort are **statistical twins** across every observable and unobservable characteristic on Earth. In mathematical expectation, their baseline untreated outcomes are perfectly equal:
+What went wrong? **Selection Bias**.
+People who go to the hospital were already sick *before* they ever set foot through the hospital doors. You are not comparing apples to apples; you are comparing people with pneumonia to healthy joggers in the park. The baseline difference between the two groups overwhelms the true curative effect of the hospital.
 
-$$
-\mathbb{E}[Y_i(0) \mid D_i = 1] = \mathbb{E}[Y_i(0) \mid D_i = 0]
-$$
+How does modern science defeat selection bias? Through a **Randomized Controlled Trial (RCT)**.
+In an RCT, treatment is decided strictly by a coin flip. Because the coin flip does not care whether a patient is rich or poor, young or old, sick or healthy, both the treatment group and the control group end up with the exact same average characteristics before the experiment begins.
 
-The selection bias term evaporates to exactly zero! Any difference in post-treatment outcomes can now be attributed solely and unambiguously to the causal potency of the treatment itself.
+When baseline differences are completely neutralized, selection bias vanishes, and the raw difference in group averages becomes the unvarnished causal truth!
 
-This highlights the profound chasm between passive prediction and active policy intervention. Consider a mobile health app: an AI algorithm predicting user health will observe that users who log 30 workouts a month have resting heart rates 15 beats per minute lower than non-users. For a life insurance company pricing risk, this predictive score is completely valid—it identifies healthy people. But for a user deciding whether to pay for the subscription, the causal question is entirely different: *"If I, as a sedentary individual, start using this app, will my heart rate drop by 15 bpm?"* The answer is almost certainly no. A huge fraction of that 15 bpm gap reflects self-selection—the people who voluntarily exercise daily are already younger, leaner, and eat healthier diets. Prediction passively sorts individuals based on existing differences; RCTs actively intervene to measure true biological or economic transformation.
+#### Jargon Decoder
 
-لماذا اعتُبر الفعل البسيط المتمثل في رمي قطعة نقود أو السحب بالقرعة فتحًا علميًا استحق أرفع جوائز نوبل في الاقتصاد والعلوم الاجتماعية؟
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Selection Bias** | The baseline gap: differences in starting conditions between who chooses treatment and who doesn't. |
+| **RCT (Randomized Trial)** | The coin-flip shield: assigning treatment randomly so both groups start out as identical twins. |
+| **Propensity Score ($e(X)$)** | The probability of receiving treatment based on observable background traits. |
+| **Inverse Probability Weighting (IPW)** | Reweighting observational data to create a synthetic pseudo-population where treatment is balanced. |
+| **Internal Validity** | The guarantee that the measured effect is truly caused by the treatment, not by confounding. |
 
-لأنه في المجتمعات البشرية، **لا يتخذ أحد قراراته بصورة عشوائية**. فالمرضى هم من يقصدون الأطباء، والطلاب الأوسع طموحًا وثراءً هم من يلتحقون بالجامعات المرموقة، والشركات الأشد تعثرًا هي من تتقدم بطلبات الدعم الحكومي. وعندما يختار الأفراد مسارهم بأنفسهم، تتلوث المقارنات المباشرة بـ **انحياز الاختيار (Selection Bias)**.
+```text
+    OBSERVATIONAL VS RANDOMIZED TRIAL:
 
-تعمل القرعة العشوائية كـ **مشرط جراحي سببي**:
-بتوزيع المعالجة عبر يانصيب عشوائي بحت ($D_i \perp\!\!\perp (Y_i(0), Y_i(1))$)، تقطع القرعة أي صلة مسبقة بين صفات المشارك الذاتية (كالصحة أو الثروة أو الدافع الفطري) وقرار تلقيه العلاج.
+    Observational (Biased):
+      Treated (Sick at baseline)    ---- Hospital ----> Fair Health
+      Control (Healthy at baseline) ---- Stay Home ---> Great Health   => False Conclusion: Hospital hurts!
 
-وقبل إعطاء العلاج، تصبح المجموعة المعالجة والمجموعة الضابطة **توأمين إحصائيين متطابقين** في كافة الخصائص المرصودة وغير المرصودة. وفي التوقع الرياضي، تتطابق نتائجهما الأساسية تمامًا في غياب المعالجة:
+    Randomized Trial (RCT):
+      Treated (50% Sick, 50% Healthy) ---- Treatment ---> Better Health
+      Control (50% Sick, 50% Healthy) ---- Placebo   ---> Normal Baseline => Clean Causal Truth!
+```
 
-$$
-\mathbb{E}[Y_i(0) \mid D_i = 1] = \mathbb{E}[Y_i(0) \mid D_i = 0]
-$$
+### الحدس والقصة الواقعية
 
-يتلاشى انحياز الاختيار ليصبح صفرًا رياضيًا تامًا! وأي فارق يُرصد لاحقًا في النتائج يُنسب يقينًا إلى الأثر السببي الصافي للمعالجة وحدها دون أي تشويش.
+تخيل شركة تأمين تجري دراسة صحية: تقارن الحالة الصحية للأشخاص الذين زاروا المستشفيات العام الماضي بالذين لم يزوروها.
 
-وهنا يبرز الصدع العميق بين التنبؤ السلبي والتدخل السببي الفعلي: تأمل تطبيقًا للهواتف الذكية للياقة البدنية؛ يستطيع نموذج تنبؤي أن يرصد بدقة أن مستخدمي التطبيق الذين يمارسون الرياضة 30 يومًا شهريًا ينخفض معدل نبضات قلوبهم بمقدار 15 نبضة/دقيقة مقارنة بغيرهم. لشركة تأمين تسعى لتسعير البوالص، هذا التنبؤ ممتاز لتصنيف الأصحاء. لكن بالنسبة لشخص خامل يفكر في شراء التطبيق، فإن السؤال السببي مختلف تمامًا: *"إذا بدأتُ أنا في استخدام هذا التطبيق، هل سينخفض نبضي بمقدار 15 نبضة؟"* الإجابة هي لا؛ لأن جزءًا هائلاً من هذا الفارق يعود لانحياز الاختيار الذاتي؛ فالذين يمارسون الرياضة بانتظام هم في الأصل أصغر سنًا وأفضل تغذية ويمتلكون جينات رياضية مسبقة. التنبؤ يرصد الفروق القائمة، بينما التجارب العشوائية تصنع التغيير الحقيقي وتقيسه.
+تظهر البيانات نتيجة صادمة: الأشخاص الذين دخلوا المستشفيات لديهم معدلات وفاة وأمراض أعلى بكثير ممن بقوا في منازلهم! يتسرع محلل ساذج قائلاً: *"المستشفيات تنشر الأمراض وتقتل الناس! يجب إغلاقها فورًا لتعزيز الصحة العامة!"*
+
+ما الخطأ القاتل في هذا التفكير؟ **انحياز الاختيار (Selection Bias)**.
+المرضى الذين ذهبوا للمستشفى كانوا يعانون من أمراض خطيرة *قبل* أن تطأ أقدامهم عتبة المستشفى. أنت لا تقارن فئتين متماثلتين، بل تقارن مصابين بالالتهاب الرئوي برياضيين يركضون في الحديقة. هذا الفارق الهائل في نقطة البداية يطغى تمامًا على الأثر العلاجي الحقيقي للمستشفى.
+
+كيف يقضي العلم الحديث على انحياز الاختيار؟ عبر **التجارب العشوائية المنضبطة (RCT)**.
+في التجربة العشوائية، يتم توزيع العلاج عبر رمية عملة نقدية عشوائية. ولأن رمية العملة لا تبالي بكون المريض غنيًا أو فقيرًا، شابًا أو مسنًا، فإن المجموعتين تتطابقان تمامًا في المتوسط قبل بدء العلاج، فيتلاشى انحياز الاختيار ويظهر الأثر السببي الصافي.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **انحياز الاختيار** | فجوة نقطة البداية: الفروق الجوهرية المسبقة بين من اختاروا المعالجة ومن تركوها. |
+| **التجربة العشوائية (RCT)** | درع القرعة: توزيع المعالجة عشوائيًا لضمان تماثل المجموعتين كتوأم حقيقي. |
+| **درجة الميل (Propensity Score)** | احتمالية تلقي الفرد للمعالجة بالنظر إلى صفاته وخصائصه الخلفية. |
+| **الوزن باحتمال الميل العكسي (IPW)** | إعادة وزن البيانات لإنشاء مجتمع افتراضي متوازن يخلو من انحياز الاختيار. |
+| **الصلاحية الداخلية** | الثقة المطلقة بأن النتيجة ناتجة حقًا عن المعالجة وليست تشويشًا خارجيًا. |
 
 :::simulation-widget{engine="canvas2d" component="SelectionBiasPropensityLab"}
 ---
@@ -57,66 +81,49 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-In a **Randomized Controlled Trial (RCT)**, treatment assignment $D_i$ is statistically independent of potential outcomes:
+In observational studies where treatment assignment is confounded by observable covariates $\mathbf{X}$, the **Conditional Independence Assumption (CIA)** states:
 
 $$
-D_i \perp\!\!\perp \big(Y_i(0), Y_i(1)\big)
+(Y(1), Y(0)) \perp\!\!\perp D \mid \mathbf{X}
 $$
 
-This independence immediately guarantees balance in untreated counterfactuals:
+Define the propensity score as the conditional probability of treatment:
 
 $$
-\mathbb{E}[Y_i(0) \mid D_i = 1] = \mathbb{E}[Y_i(0) \mid D_i = 0] = \mathbb{E}[Y_i(0)]
+e(\mathbf{X}) \equiv \mathbb{P}(D = 1 \mid \mathbf{X})
 $$
 
-$$
-\mathbb{E}[Y_i(1) \mid D_i = 1] = \mathbb{E}[Y_i(1) \mid D_i = 0] = \mathbb{E}[Y_i(1)]
-$$
+Rosenbaum and Rubin (1983) proved that if CIA holds, then $(Y(1), Y(0)) \perp\!\!\perp D \mid e(\mathbf{X})$.
 
-Substituting this into the selection bias decomposition eliminates the bias term:
+The **Inverse Probability Weighting (IPW)** estimator recovers the population ATE by weighting each observation by the inverse of its probability of receiving its observed treatment:
 
 $$
-\Delta_{\text{naive}} = \mathbb{E}[Y_i \mid D_i = 1] - \mathbb{E}[Y_i \mid D_i = 0] = \mathbb{E}[Y_i(1)] - \mathbb{E}[Y_i(0)] \equiv \text{ATE} = \text{ATT}
+\tau_{\text{IPW}} = \mathbb{E}\left[ \frac{D Y}{e(\mathbf{X})} - \frac{(1 - D) Y}{1 - e(\mathbf{X})} \right]
 $$
 
-### Observational Identification: The Horvitz-Thompson IPW Proof
+### Why the Math Works Step-by-Step
 
-When working with observational data where random assignment is absent, we invoke the **Conditional Independence Assumption (CIA)**:
-
-$$
-D_i \perp\!\!\perp \big(Y_i(0), Y_i(1)\big) \mid \mathbf{X}_i
-$$
-
-along with the **Overlap / Positivity Assumption**: $0 < e(\mathbf{X}_i) < 1$, where the **Propensity Score** is:
-
-$$
-e(\mathbf{X}_i) \equiv \mathbb{P}(D_i = 1 \mid \mathbf{X}_i)
-$$
-
-We now rigorously prove that Inverse Probability Weighting (IPW) recovers $\mathbb{E}[Y_i(1)]$ using the Law of Iterated Expectations:
-
-$$
-\mathbb{E}\left[ \frac{D_i Y_i}{e(\mathbf{X}_i)} \right] = \mathbb{E}\left[ \mathbb{E}\left[ \frac{D_i Y_i(1)}{e(\mathbf{X}_i)} \;\Bigg|\; \mathbf{X}_i \right] \right] = \mathbb{E}\left[ \frac{\mathbb{E}[D_i \mid \mathbf{X}_i] \cdot \mathbb{E}[Y_i(1) \mid \mathbf{X}_i]}{e(\mathbf{X}_i)} \right]
-$$
-
-Because $\mathbb{E}[D_i \mid \mathbf{X}_i] \equiv e(\mathbf{X}_i)$, the propensity score in the numerator and denominator cancel out exactly:
-
-$$
-= \mathbb{E}\left[ \frac{e(\mathbf{X}_i) \mathbb{E}[Y_i(1) \mid \mathbf{X}_i]}{e(\mathbf{X}_i)} \right] = \mathbb{E}\big[\mathbb{E}[Y_i(1) \mid \mathbf{X}_i]\big] = \mathbb{E}[Y_i(1)]
-$$
-
-By an identical algebraic step, $\mathbb{E}\left[ \frac{(1 - D_i) Y_i}{1 - e(\mathbf{X}_i)} \right] = \mathbb{E}[Y_i(0)]$. Subtracting the two terms yields the consistent **IPW ATE Estimator**:
-
-$$
-\hat{\tau}_{\text{IPW}} = \frac{1}{N} \sum_{i=1}^N \left( \frac{D_i Y_i}{e(\mathbf{X}_i)} - \frac{(1 - D_i) Y_i}{1 - e(\mathbf{X}_i)} \right)
-$$
+1. **Why does dividing by $e(\mathbf{X})$ eliminate selection bias?**
+   Taking expectations of the treated term:
+   $$\mathbb{E}\left[ \frac{D Y}{e(\mathbf{X})} \right] = \mathbb{E}\left[ \mathbb{E}\left[ \frac{D Y(1)}{e(\mathbf{X})} \;\middle|\; \mathbf{X} \right] \right] = \mathbb{E}\left[ \frac{\mathbb{E}[D \mid \mathbf{X}] Y(1)}{e(\mathbf{X})} \right] = \mathbb{E}\left[ \frac{e(\mathbf{X}) Y(1)}{e(\mathbf{X})} \right] = \mathbb{E}[Y(1)]$$
+   Dividing by the propensity score creates a pseudo-population where treatment is completely decoupled from baseline traits!
+2. **The Positivity / Overlap Assumption:**
+   IPW requires that for all $\mathbf{X}$, $0 < e(\mathbf{X}) < 1$. If some individuals have $e(\mathbf{X}) = 0$ (no chance of treatment) or $e(\mathbf{X}) = 1$, the weights blow up to infinity, breaking the estimator.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $\perp\!\!\perp$: Orthogonal statistical independence relation between random variables.
-* $D_i \perp\!\!\perp (Y_i(0), Y_i(1))$: Random assignment invariant ensuring absence of unobserved confounding.
-* $e(\mathbf{X}_i) \in (0, 1)$: Propensity score representing the conditional probability of assignment to treatment given observable covariates $\mathbf{X}_i$.
-* $\hat{\tau}_{\text{IPW}}$: Horvitz-Thompson / Inverse Probability Weighting estimator which reconstructs an artificial randomized trial by weighting observational units by the inverse probability of their assigned status.
+* $e(\mathbf{X})$: Propensity score (probability of treatment given covariates).
+* $w_i = \frac{D_i}{e(\mathbf{X}_i)} + \frac{1 - D_i}{1 - e(\mathbf{X}_i)}$: IPW balancing weight for observation $i$.
+* $\tau_{\text{IPW}}$: Horvitz-Thompson / Inverse Probability Weighted Average Treatment Effect.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $e(\mathbf{X})$ | درجة الميل الاحتمالية | احتمال خضوع الشخص للمعالجة بناءً على سماته الديموغرافية والبيولوجية. |
+| $1/e(\mathbf{X})$ | وزن المعالجة العكسي | إعطاء وزن أكبر للحالات النادرة التي تلقت العلاج رغم تدني احتماليته. |
+| $\tau_{\text{IPW}}$ | مقدر IPW الموزون | المقدر الذي يعيد التوازن الإحصائي ليحاكي نتائج التجربة العشوائية. |
+| شرط التداخل (Overlap) | حتمية التكافؤ الاحتمالي | اشتراط وجود فرصة حقيقية (أكبر من 0 وأقل من 1) لكل فرد لتلقي العلاج. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -136,45 +143,35 @@ test_cases:
 ```python
 import numpy as np
 
-def compute_ipw_ate(y: np.ndarray, d: np.ndarray, ps: np.ndarray, normalized: bool = True) -> float:
+def compute_ipw_ate(y: np.ndarray, d: np.ndarray, ps: np.ndarray) -> float:
     """
-    Computes the Inverse Probability Weighted (IPW) Average Treatment Effect.
-    
+    Computes the Average Treatment Effect using Inverse Probability Weighting (IPW).
+
     Parameters
     ----------
     y : np.ndarray of shape (N,)
         Observed outcomes.
     d : np.ndarray of shape (N,)
-        Binary treatment assignment (1 = treated, 0 = control).
+        Binary treatment indicator (0 or 1).
     ps : np.ndarray of shape (N,)
-        Estimated propensity scores P(D=1|X) in (0, 1).
-    normalized : bool, default True
-        Whether to use Hajek self-normalized weights.
-        
+        Propensity scores (strictly bounded between 0 and 1).
+
     Returns
     -------
-    float: Estimated Average Treatment Effect (ATE)
+    float : Estimated ATE.
     """
-    # Step 1: Clip propensity scores to avoid division by zero or explosive weights
-    ps_clipped = np.clip(ps, 0.01, 0.99)
-    
-    # Step 2: Construct individual Horvitz-Thompson weights
-    w_treated = d / ps_clipped
-    w_control = (1.0 - d) / (1.0 - ps_clipped)
-    
-    if normalized:
-        # Hajek normalized estimator: divides by sum of weights
-        sum_w_t = np.sum(w_treated)
-        sum_w_c = np.sum(w_control)
-        
-        mean_y1 = np.sum(w_treated * y) / sum_w_t if sum_w_t > 0 else 0.0
-        mean_y0 = np.sum(w_control * y) / sum_w_c if sum_w_c > 0 else 0.0
-        ate = float(mean_y1 - mean_y0)
-    else:
-        # Standard Horvitz-Thompson sample average
-        N = len(y)
-        ate = float(np.sum(w_treated * y - w_control * y) / N)
-        
+    # Clip propensity scores defensively to prevent zero division
+    ps_clipped = np.clip(ps, 1e-4, 1.0 - 1e-4)
+
+    # Step 1: Compute weighted treated term: (D * Y) / ps
+    treated_term = (d * y) / ps_clipped
+
+    # Step 2: Compute weighted control term: ((1 - D) * Y) / (1 - ps)
+    control_term = ((1 - d) * y) / (1.0 - ps_clipped)
+
+    # Step 3: ATE is the difference in empirical means
+    ate = float(np.mean(treated_term) - np.mean(control_term))
+
     return ate
 ```
 :::

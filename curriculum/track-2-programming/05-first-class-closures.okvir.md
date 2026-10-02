@@ -12,6 +12,8 @@ i18n:
 
 # First-Class Functions & Lexical Closures
 
+## Beat 1: Intuition & Mental Model / الحدس والنموذج الذهني
+
 In many legacy programming languages, functions are treated as rigid, second-class subroutines—code carved into read-only program memory that can only be invoked by name. In Python, functions are elevated to **first-class citizens**. This means a function is an ordinary object on the heap, possessing the exact same privileges as an integer, string, or dictionary: you can assign it to a variable, pass it as an argument into another function, store it inside a list, or return it as the result of a function call.
 
 This capability unlocks one of the most powerful programming paradigms in modern computing: the **Lexical Closure**. But to truly grasp closures, you must confront a startling architectural mystery.
@@ -22,6 +24,64 @@ The answer is the **traveling backpack analogy**. When Python compiles an inner 
 
 Even after the outer function's execution terminates and its stack frame is completely dismantled, the inner function carries its backpack wherever it journeys across your program. Whenever the inner function needs to read or update the captured variable, it reaches into its backpack and accesses the cell directly. Closures thus enable lightweight state encapsulation, function factories, and elegant decorators without requiring full-blown class definitions.
 
+---
+
+في العديد من لغات البرمجة القديمة، تُعامل الدوال كإجراءات فرعية جامدة من الدرجة الثانية—شفرات برمجية محفورة في ذاكرة القراءة فقط ولا يمكن استخدامها إلا بالنداء المباشر باسمها. أما في بايثون، فالدوال **مواطنون من الرتبة الأولى** (First-Class Citizens). وهذا يعني أن الدالة كائن عادي يعيش على الكومة ويتمتع بنفس حقوق الأرقام والنصوص والقواميس: يمكنك إسنادها لمتغير، أو تمريرها كوسيط لدالة أخرى، أو حفظها داخل مصفوفة، أو إرجاعها كقيمة ناتجة من استدعاء دالة.
+
+تفتح هذه الميزة الباب أمام أحد أقوى الأنماط البرمجية الحديثة: **الغلاف المعجمي** (Lexical Closure). ولكن لفهم الغلاف المعجمي حقاً، يجب أن تواجه هذا اللغز المعماري المثير:
+
+في الحالة الطبيعية، عندما تنتهي الدالة الخارجية من عملها، يُهدم إطار المكدس الخاص بها وتتلاشى جميع متغيراتها المحلية من الذاكرة. فإذا كانت تلك الدالة قد عرّفت *دالة داخلية* تستخدم متغيرات الدالة الخارجية ثم أعادتها للمستدعي، فماذا يحدث حين تستدعي تلك الدالة الداخلية بعد دقائق أو ساعات؟ كيف تستطيع قراءة متغيرات لم يعد إطار مكدسها موجوداً في الوجود؟
+
+الإجابة تكمن في **تشبيه حقيبة السفر الدائمة**. عندما يترجم مفسر بايثون دالة داخلية تشير إلى متغيرات من النطاق الخارجي الحاضن لها (وتُعرف بالمتغيرات الحرة Free Variables)، فإنه لا يضع تلك المتغيرات على مكدس الاستدعاء المؤقت الزائل! بل ينشئ كائناً خاصاً على الكومة يُدعى `cell` (`PyCellObject`)، ويزود الدالة الداخلية بحقيبة سفر أبدية هي السمة `__closure__`.
+
+وحتى بعد انتهاء الدالة الخارجية وتفكيك إطار مكدسها بالكامل، تحمل الدالة الداخلية حقيبتها أينما ارتحلت في أرجاء البرنامج. وحين تحتاج لقراءة المتغير أو تحديثه، تمد يدها داخل الحقيبة لتصل إلى الخلية المشتركة على الكومة مباشرة. وبذلك تمكننا الأغلفة المعجمية من تغليف الحالة، وصناعة مصانع الدوال، وبناء المزينات الأنيقة (Decorators) بخفة فائقة ودون الحاجة لإنشاء أصناف معقدة.
+
+### Jargon Decoder / جدول فك شفرة المصطلحات
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **First-Class Citizen** (كائن من الرتبة الأولى) | A VIP object with full rights: assignable, passable, and returnable anywhere. | كائن ذو حقوق كاملة: يمكن إسناده، وتمريره، وإعادته من الدوال كأي متغير عادي. |
+| **Lexical Closure** (الغلاف المعجمي) | A function traveling with a permanent backpack that stores birth-scope variables. | دالة تحمل حقيبة سفر أبدية تحوي المتغيرات التي ولدت معها أينما ارتحلت في الكود. |
+| **Free Variable** (المتغير الحر) | A variable used inside a room that was originally defined in the hallway outside. | متغير مستخدم داخل الدالة لكنه عُرّف خارج نطاقها المحلي في الدالة الحاضنة. |
+| **Cell Object** (كائن الخلية) | A shared lockbox on the heap connecting the outer and inner scopes permanently. | صندوق أمانات مشترك على الكومة يربط النطاقين ويبقى حياً بعد زوال إطار المكدس. |
+| **Function Factory** (مصنع الدوال) | A custom stamping machine that stamps out specialized functions configured on demand. | آلة تصنيع ذكية تُنتج دوالاً متخصصة بناءً على معايير وضوابط محددة مسبقاً. |
+
+### Visual Step-by-Step Data Transformation / التحول البصري للبيانات
+
+```text
+Execution Flow: limiter = make_rate_limiter(max_calls=2)
+
+Step 1: Outer Function Execution (make_rate_limiter)
+Stack (Temporary Frame)                 Heap Memory (Persistent Cell)
++---------------------------+           +-------------------------------------+
+| max_calls: 2              |           | PyCellObject (Loc: 0x500)           |
+| calls: 0                  | --------> | ob_ref: 0                           |
++---------------------------+           +-------------------------------------+
+
+Step 2: Inner Function Compilation & Binding
+Inner Function Object (rate_limiter_guard):
+  __name__: "rate_limiter_guard"
+  __closure__: (<cell at 0x500: int 0>,)  <-- Backpack strapped on!
+
+Step 3: Outer Frame Termination (Stack Frame Destroyed!)
+Stack Frame [make_rate_limiter] -> POPPED & DESTROYED!
+Heap Cell at 0x500 SURVIVES because inner function's backpack holds a reference!
+
+Step 4: Invoking limiter() (First Call)
+  Reads Cell at 0x500: calls = 0 < 2 -> Allowed!
+  Updates Cell at 0x500: calls = 1
+  Returns True
+
+Step 5: Invoking limiter() (Second Call)
+  Reads Cell at 0x500: calls = 1 < 2 -> Allowed!
+  Updates Cell at 0x500: calls = 2
+  Returns True
+
+Step 6: Invoking limiter() (Third Call)
+  Reads Cell at 0x500: calls = 2 >= 2 -> Denied!
+  Returns False (Limit successfully enforced in private state!)
+```
+
 :::simulation-widget{engine="canvas2d" component="HigherOrderPipelineCanvas"}
 ---
 interactive: true
@@ -29,59 +89,46 @@ highlighted_metric: "loss"
 ---
 :::
 
-### Mathematical & Architectural Foundations / الأسس الرياضية والمعمارية
+## Beat 2: Formal Invariants Demystified / الأسس الرياضية واللامتغيرات الصارمة
 
 $$
-\text{Closure} = \langle \text{CodeObject}, (\text{cell}_1, \dots, \text{cell}_k) \rangle, \quad \text{cell.cell\_contents} = v \in \mathcal{E}_{\text{outer}}
+\text{Closure} = \langle f_{\text{code}}, \mathcal{E}_{\text{lexical}} \rangle, \quad \mathcal{E}_{\text{lexical}} = \{ v \mapsto \text{Cell}(\text{loc}_v) \mid v \in \text{FreeVars}(f) \}
 $$
 
-```text
-Heap Layout of a Lexical Closure:
-Function Object (rate_limiter)
-+------------------------------------+
-| __name__: "rate_limiter"           |
-| __code__: <code object>            |
-| __closure__: ( <cell_0>, )         |
-+-------------------|----------------+
-                    | (Pointer to captured cell)
-                    v
-            +---------------------------------+
-            | PyCellObject (Heap)             |
-            | ob_refcnt: 2                    |
-            | cell_contents: ---------> [ 0 ] | (Integer payload)
-            +---------------------------------+
-```
+### Opcode Mechanics & Architectural Mapping
 
-في العديد من لغات البرمجة التقليدية، تُعامل الدوال كإجراءات فرعية جامدة من الدرجة الثانية—مجرد شفرات مخزنة في ذاكرة التعليمات لا يمكن سوى استدعائها بالاسم. أما في بايثون، فقد رُقيت الدوال لتصبح **كائنات من الرتبة الأولى** (First-Class Citizens). وهذا يعني أن الدالة هي كائن حي مقيم في الكومة (Heap)، يتمتع بكافة حقوق الأرقام والنصوص: يمكنك تخزين الدالة في متغير، وتمريرها كوسيط لدوال أخرى، وحفظها داخل قوائم، بل وإعادتها كنتيجة من دالة أخرى.
+| Opcode / أمر شفرة البايت | Action on Stack & Heap | Architectural Role / الدور المعماري |
+| :--- | :--- | :--- |
+| `LOAD_CLOSURE <idx>` | Pushes a reference to the `cell` object onto evaluation stack | Prepares free variable cell pointers before creating inner function |
+| `MAKE_FUNCTION <flags>` | Pops code object and tuple of cells, packaging into `PyFunctionObject` | Binds the lexical backpack into `func.__closure__` |
+| `LOAD_DEREF <idx>` | Fetches pointer value directly out of `cell->ob_ref` | Ultra-fast single-pointer dereference reading free variable |
+| `STORE_DEREF <idx>` | Updates pointer inside `cell->ob_ref` in place | Mutates captured cell state across calls without outer stack frame |
 
-هذه المرونة تفتح الباب لأحد أقوى المفاهيم وأكثرها سحراً في هندسة البرمجيات: **الغلاف المعجمي** (Lexical Closure). ولكن لفهم الغلاف المعجمي فهماً حقيقياً، يجب أن نواجه لغزاً معمارياً محيراً.
+### Step-by-Step Execution Cost & Complexity Breakdown / تفكيك التكلفة الحسابية خطوة بخطوة
 
-في المعتاد، عندما تنتهي دالة خارجية من التنفيذ، يتحلل إطار مكدسها (Stack Frame) ويُمحى من الذاكرة وتتلاشى كافة متغيراتها المحلية. فإذا كانت تلك الدالة قد عرّفت في داخلها *دالة فرعية* تقرأ تلك المتغيرات المحلية ثم أعادتها للمستدعي، فما الذي يحدث حين نستدعي تلك الدالة الفرعية بعد ثوانٍ أو دقائق من موت الدالة الأصلية؟ كيف تقرأ الدالة الداخلية متغيرات قد مات إطارها وتلاشى من الوجود؟
+#### 1. Function Factory Closure Instantiation
+- **Step 1 (Cell Creation)**: Allocate `PyCellObject` header on heap: **~48 bytes** memory ($O(1)$).
+- **Step 2 (Function Packaging)**: Construct `PyFunctionObject` and link tuple of cells: **~144 bytes** memory ($O(1)$).
+- **Step 3 (Return Function Reference)**: Push function pointer to calling frame: **1 CPU cycle** ($O(1)$).
+- **Memory Footprint**: Total allocated state is under **200 bytes** (far lighter than a full class instance with `__dict__` overhead).
 
-يكمن الجواب في **تشبيه حقيبة الظهر السحرية**. عندما يترجم بايثون دالة داخلية تشير إلى متغيرات في النطاق الخارجي الحاضن لها (المتغيرات الحرة Free Variables)، فإنه لا يخزن تلك المتغيرات في مكدس الاستدعاء العابر! بل يخصص لها كائناً مستقلاً في الكومة يُدعى "الخلية" (`PyCellObject`). ويزود الدالة الداخلية بحقيبة ظهر دائمة ملحقة بالخاصية `__closure__`.
+#### 2. Calling the Inner Closure Function
+- **Step 1 (Opcode `LOAD_DEREF`)**: Follow cell pointer in `__closure__` directly to heap payload: **~5-10 CPU cycles** (cache-friendly dereference).
+- **Step 2 (State Mutation `STORE_DEREF`)**: Write updated integer pointer into `cell->ob_ref`: **1 memory write**.
+- **Time Complexity**: Identical to a standard function call ($O(1)$ overhead).
 
-وحتى بعد أن تموت الدالة الخارجية تماماً ويتحلل إطارها من الذاكرة، تظل الدالة الداخلية تحمل حقيبة ظهرها معها أينما ذهبت في أرجاء البرنامج. وكلما احتاجت قراءة أو تعديل المتغير، تمد يدها في الحقيبة لتصل إلى محتوى الخلية مباشرة. يمنحنا هذا المفهوم قدرة مذهلة على تغليف البيانات وبناء مصانع الدوال والمزخرفات (Decorators) بخفة متناهية ودون الحاجة لإنشاء أصناف وكائنات معقدة.
+---
 
-#### Architectural Breakdown & Cell Mechanics:
-- **Free Variables ($\text{FreeVars}(\text{code})$)**: Identifiers referenced in a function body that are neither local parameters nor assigned locally, resolved from enclosing lexical environments.
-- **`PyCellObject`**: A 24-byte CPython container with a single pointer `ob_ref` pointing to the shared object in the heap.
-- **`LOAD_DEREF` / `STORE_DEREF`**: Specialized CPython opcodes used inside closures. Instead of indexing local variables with `LOAD_FAST`, the VM dereferences the cell pointer directly.
-- **The `nonlocal` Keyword**: Informs the compiler that an assignment should update the captured cell in the outer scope rather than creating a new shadowing local variable.
-
-#### التحليل المعماري وميكانيكا الخلايا:
-- **المتغيرات الحرة ($\text{FreeVars}$)**: المتغيرات المستخدمة داخل الدالة دون أن تكون وسائط محلية أو معينة محلياً، وتُستبان من النطاقات الحاضنة.
-- **كائن الخلية (`PyCellObject`)**: وعاء مخصص في الكومة بحجم 24 بايت، يحمل مؤشراً يشير إلى القيمة المشتركة في الذاكرة.
-- **أوامر شفرة البايت `LOAD_DEREF` و `STORE_DEREF`**: أوامر مخصصة للتعامل مع الأغلفة المعجمية لقراءة وتعديل محتوى الخلايا بسرعة.
-- **الكلمة المفتاحية `nonlocal`**: تخبر المترجم بأن سطر التعيين يستهدف تعديل محتوى الخلية الخارجية المشتركة، بدلاً من إنشاء متغير محلي جديد يحجبها.
+## Beat 3: Guided Code Challenge / التحدي البرمجي الموجه
 
 :::python-challenge{id="py-first-class-closures"}
 ---
 timeout_ms: 3000
 test_cases:
-  - input: "(lambda l: [l(), l(), l()])(make_rate_limiter(2))"
+  - input: "limiter = make_rate_limiter(2); [limiter(), limiter(), limiter()]"
     expected: "[True, True, False]"
-  - input: "(lambda l: [l(), l(), l()])(make_rate_limiter(1))"
-    expected: "[True, False, False]"
+  - input: "l1 = make_rate_limiter(1); l2 = make_rate_limiter(1); [l1(), l2(), l1()]"
+    expected: "[True, True, False]"
   - input: "make_rate_limiter(0)()"
     expected: "False"
 ---
@@ -90,65 +137,70 @@ from typing import Callable
 
 def make_rate_limiter(max_calls: int) -> Callable[[], bool]:
     """
-    Constructs a closure-based stateful rate limiter that allows up to
-    `max_calls` invocations, returning True while allowed and False thereafter.
+    Creates and returns a stateful rate-limiter function encapsulating private
+    call counters within its lexical closure without using global state or classes.
 
     Args:
-        max_calls: Maximum allowable invocations.
+        max_calls: The maximum number of allowed calls before rejecting requests.
 
     Returns:
-        A parameterless function returning True if within rate limit, False otherwise.
+        A callable that returns True if the call is permitted, or False if exhausted.
     """
-    # Step 1: Initialize the state variable in the enclosing outer scope
-    calls_made = 0
+    # Step 1: Initialize local state variable to be captured in closure cell
+    call_count = 0
 
-    # Step 2: Define the inner closure function that captures calls_made
-    def rate_limiter() -> bool:
-        # Step 3: Declare calls_made as nonlocal to rebind the outer cell
-        nonlocal calls_made
+    # Step 2: Define the nested inner guard function
+    def rate_limiter_guard() -> bool:
+        # Declare nonlocal to rebind the outer closure cell variable
+        nonlocal call_count
 
-        # Step 4: Check limit, increment state if permitted, and return status
-        if calls_made < max_calls:
-            calls_made += 1
+        # Step 3: Check quota boundary condition
+        if call_count < max_calls:
+            call_count += 1
             return True
-        return False
+        else:
+            return False
 
-    # Step 5: Return the closure function equipped with its captured cell backpack
-    return rate_limiter
+    # Step 4: Return the inner function carrying its lexical closure backpack
+    return rate_limiter_guard
 ```
 :::
 
-### Transfer Quiz & Practical Debugging / أسئلة الفهم ونقل المعرفة
+## Beat 4: Real-World Transfer Scenario / سيناريو التطبيق ونقل المعرفة
+
+### Reality Check: The Late-Binding Loop Closure Bug
+
+A front-end API gateway developer attempts to build a list of callback validators:
+```python
+validators = []
+for i in range(3):
+    validators.append(lambda x: x + i)
+
+results = [v(10) for v in validators]
+```
+What is `results`, and what underlying closure mechanism causes this notorious result?
+
+*حاول مهندس بناء قائمة من الدوال التحققية داخل حلقة تكرار عبر شفرة لامبدا أعلاه. ما هي القيم الناتجة في مصفوفة `results` وما هو السلوك المعماري الكامن خلف هذه النتيجة الشهيرة؟*
 
 :::transfer-quiz
 **Question / السؤال:**
-Consider this classic closure loop snippet:
-```python
-multipliers = [lambda x: x * i for i in range(3)]
-results = [m(10) for m in multipliers]
-```
-What is `results`, and what is the underlying mechanic?
-*تأمل الكود الكلاسيكي التالي للأغلفة داخل الحلقات:
-```python
-multipliers = [lambda x: x * i for i in range(3)]
-results = [m(10) for m in multipliers]
-```
-ما هي قيمة `results` الناتجة، وما التفسير المعماري لذلك؟*
+What is contained in `results`, and why?
+*ما هي محتويات مصفوفة `results` ولماذا؟*
 
-- [x] [20, 20, 20] — Python closures bind variables by reference (late-binding); all lambdas share the same variable 'i', which equals 2 when the loop terminates.
-  *[20, 20, 20] — ترتبط المتغيرات في أغلفة بايثون بالمرجع (Late-Binding)؛ تشترك كافة الدوال في نفس الخلية 'i' التي استقرت عند القيمة 2.*
-- [ ] [0, 10, 20] — Each lambda captures an immutable snapshot of 'i' at its respective loop iteration.
-  *[0, 10, 20] — تلتقط كل دالة لقطة مجمدة غير قابلة للتغيير للمتغير 'i' أثناء دورتها الخاصة.*
-- [ ] [0, 0, 0] — The variable 'i' goes out of scope after the list comprehension and resets to 0.
-  *[0, 0, 0] — يخرج المتغير 'i' من النطاق بعد اكتمال القائمة ويعود للصفر.*
+- [x] [12, 12, 12] — Closures capture variables by reference (binding to the shared cell), not by value; when called, all lambdas read the final value of i (2).
+  *[12, 12, 12] — الأغلفة المعجمية تلتقط المتغيرات بالمرجع (ترتبط بنفس الخلية المشتركة) وليس بالنسخ؛ وعند الاستدعاء تقرأ جميع الدوال القيمة النهائية للمتغير i وهي 2.*
+- [ ] [10, 11, 12] — Each lambda freezes a snapshot copy of i at the exact instant the iteration step executed.
+  *[10, 11, 12] — كل دالة تلتقط نسخة مجمدة من قيمة i في لحظة إنشاء الحلقة بالتحديد.*
+- [ ] [0, 1, 2] — The parameter x is ignored and replaced by the captured closure index.
+  *[0, 1, 2] — يُتجاهل المعامل x ويُستبدل بفهرس الغلاف المعجمي الملتقط.*
 
 **Analysis & Architectural Explanation / التحليل والشرح المعماري:**
-**Correct / الإجابة الصحيحة:** In Python, closures capture **variables**, not static value snapshots. All three lambda functions capture the exact same cell object containing the identifier `i`. When the loop finishes, the value inside that cell is `2`. When `m(10)` is invoked later, every lambda dereferences that identical cell, evaluating `10 * 2 = 20`. To capture the current value at loop iteration time, use default argument binding: `lambda x, i=i: x * i`.
-*في بايثون، تلتقط الأغلفة المعجمية **المتغيرات بالمرجع** وليس لقطات ثابتة من القيم. تشترك الدوال الثلاث في الإشارة إلى نفس كائن الخلية للمتغير `i`. وعندما تنتهي الحلقة، تستقر القيمة داخل الخلية عند `2`. وحين تُستدعى الدوال لاحقاً، تقرأ جميعها القيمة 2 لتعطي `20`. والحل لتجميد القيمة هو ربطها كوسيط افتراضي: `lambda x, i=i: x * i`.*
+**Correct / الإجابة الصحيحة:** In Python, closures capture **name cells**, not immediate point-in-time value snapshots. All three lambdas point to the exact same cell object created for the loop variable `i`. When the loop finishes, `i` has reached its terminal value `2`. When the lambdas are later called via `v(10)`, every lambda dereferences that same cell and adds `10 + 2 = 12`. To achieve early binding, bind `i` as a default parameter: `lambda x, i=i: x + i` (which captures the value into the function's default arguments tuple at definition time).
+*في بايثون، تلتقط الأغلفة المعجمية **خلايا الرموز** وليس لقطات ثابتة للقيم. تشير الدوال الثلاث جميعاً إلى نفس كائن الخلية على الكومة للمتغير `i`. وحين تنتهي الحلقة تكون قيمة `i` قد استقرت عند `2`. وعند استدعاء الدوال لاحقاً تقرأ كلها القيمة 2 وتجمعها مع 10 لتنتج [12, 12, 12]. والحل لتجميد القيمة مبكراً هو تمريرها كوسيط افتراضي: `lambda x, i=i: x + i`.*
 
-**Incorrect / مشتت غير صحيح:** Python does not perform lexical value copying (early binding snapshotting) unless explicitly instructed via default parameters.
-*بايثون لا ينسخ القيم لحظياً عند تعريف الدالة، بل يربطها بالخلية المشتركة.*
+**Incorrect / مشتت غير صحيح:** Python does not perform implicit snapshot copies of loop variables when constructing closures.
+*بايثون لا ينسخ قيم متغيرات الحلقات تلقائياً عند إنشاء الأغلفة المعجمية.*
 
-**Incorrect / مشتت غير صحيح:** The variable `i` remains in its cell and does not reset to zero after the loop concludes.
-*المتغير لا يعود للصفر، بل يحتفظ بآخر قيمة استقر عندها في دورة التكرار.*
+**Incorrect / مشتت غير صحيح:** The argument `x = 10` is properly passed to the parameter; the issue stems solely from late resolution of `i`.
+*المعامل x يُمرر بشكل صحيح تماماً وتُجمع عليه القيمة 2.*
 :::

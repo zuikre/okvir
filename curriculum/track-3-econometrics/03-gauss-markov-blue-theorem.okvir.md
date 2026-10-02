@@ -14,29 +14,66 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Why do empirical researchers and econometricians almost universally start their investigations with Ordinary Least Squares rather than some alternative estimator? Is OLS somehow magical?
+### Intuition & Real-World Story
 
-The **Gauss-Markov Theorem** gives the definitive mathematical answer: under five structural conditions (Linearity, Full Rank, Strict Exogeneity, Homoskedasticity, and No Serial Correlation), the OLS estimator is **BLUE: Best Linear Unbiased Estimator**.
+Suppose a company wants to measure the return on employee training: *how much does an extra hour of coding bootcamp increase worker productivity?* You have thousands of employee records. There are infinite ways you could estimate this relationship. You could take the average difference between the top 10% and bottom 10%, you could draw a line through just the endpoints, or you could use Ordinary Least Squares (OLS). 
 
-Think of a competitive archery tournament where the archers are trying to hit the true population parameter bullseye $\boldsymbol{\beta}$.
-* **Unbiased** means that across repeated random samples from the population, an archer's arrows don't systematically drift to the left, right, high, or low—the center of gravity of all their shots lands squarely on the center of the bullseye ($\mathbb{E}[\hat{\boldsymbol{\beta}}] = \boldsymbol{\beta}$).
-* **Best** means minimum variance. Among all conceivable estimators that are linear in $\mathbf{y}$ and unbiased, OLS has the tightest possible grouping of arrows. Any other linear unbiased estimator (such as throwing away half the data or taking simple endpoint slopes) will have a larger spread.
+Which method should you trust with real money and corporate policy?
 
-Crucially, **the Gauss-Markov Theorem does not assume or require that errors follow a normal distribution!** The error terms can be skewed, multimodal, or uniform; as long as the five Gauss-Markov moments hold, OLS reigns supreme as the most efficient linear unbiased estimator possible.
+The **Gauss-Markov Theorem** gives the definitive answer: under five classical conditions, OLS is the undisputed heavyweight champion among all linear estimators. It is **BLUE**: the **Best Linear Unbiased Estimator**.
 
-Yet we must draw a vital line between statistical optimality and causal validity. In predictive machine learning, unbiasedness is often sacrificed deliberately: techniques like Ridge regression and LASSO intentionally introduce bias to shrink variance and improve out-of-sample predictions. In econometrics, however, unbiasedness is sacred because our primary goal is not merely forecasting $\hat{y}$, but uncovering the causal mechanism $\beta = \frac{\partial \mathbb{E}[y \mid do(x)]}{\partial x}$. If strict exogeneity $\mathbb{E}[\boldsymbol{\varepsilon} \mid \mathbf{X}] = \mathbf{0}$ fails because of omitted confounders or reverse feedback, OLS loses its unbiasedness entirely. An estimator that is biased is not BLUE—it is simply shooting at the wrong target with false confidence.
+Think of an archery tournament where estimators shoot arrows at a target bullseye $\beta$ (the true effect):
+1. **Unbiased** means accuracy without drift: if you repeat the experiment over 1,000 different samples, the average of your shots lands squarely in the center of the bullseye ($\mathbb{E}[\hat{\beta}] = \beta$). The bow is not tilted left or right.
+2. **Best (Minimum Variance)** means precision and consistency: among all archers who hit the bullseye on average, the OLS archer has the tightest, most repeatable cluster of arrows. Any alternative linear unbiased method will scatter arrows more widely.
 
-لماذا يبدأ علماء الاقتصاد القياسي والباحثون التطبيقيون دراساتهم دائمًا بمقدر المربعات الصغرى OLS بدلاً من أي مقدر آخر؟ هل يمتلك OLS قدرات خارقة؟
+Crucially, Gauss-Markov does **not** assume errors are normally distributed! Errors can be skewed or chunky; as long as the 5 Gauss-Markov assumptions hold, OLS has the lowest possible variance. However, statistical efficiency does not guarantee causal truth: if an unobserved variable (like innate employee motivation) confounds training and productivity, the archer is aiming at the completely wrong target!
 
-تجيب **مبرهنة غاوس-ماركوف (Gauss-Markov Theorem)** عن هذا التساؤل إجابة رياضية حاسمة: في ظل خمسة شروط هيكلية (الخطية، الرتبة الكاملة، الاستقلال الخارجي الصارم، تجانس التباين، وغياب الارتباط الذاتي للأخطاء)، يكون مقدر OLS هو **BLUE: Best Linear Unbiased Estimator** (أفضل مقدر خطي غير متحيّز).
+#### Jargon Decoder
 
-تخيل بطولة رماية بالسهام حيث يحاول الرماة إصابة نقطة الهدف الحقيقية للمجتمع $\boldsymbol{\beta}$:
-* **غير متحيّز (Unbiased)** تعني أنه عبر العينات العشوائية المتكررة، لا تنحرف سهام الرامي بانتظام نحو اليمين أو اليسار أو الأعلى أو الأسفل؛ مركز ثقل جميع تسديداته يقع تمامًا في قلب الهدف ($\mathbb{E}[\hat{\boldsymbol{\beta}}] = \boldsymbol{\beta}$).
-* **الأفضل (Best)** تعني أصغر تباين إحصائي ممكن (Minimum Variance). من بين جميع المقدرات الخطية غير المتحيزة التي يمكن ابتكارها، يمتلك OLS التجمع الأكثر إحكامًا وتماسكًا للسهام. وأي مقدر خطي بديل غير متحيّز سيكون أكثر تشتتًا وتذبذبًا.
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Estimator ($\hat{eta}$)** | A mathematical recipe or formula applied to sample data to guess a hidden truth. |
+| **Unbiasedness** | Centered on truth: the estimator does not systematically overshoot or undershoot. |
+| **Efficiency (Best)** | Tightest grouping: the lowest possible sampling variance (smallest scatter of guesses). |
+| **BLUE** | **B**est **L**inear **U**nbiased **E**stimator: the gold-standard champion among linear formulas. |
+| **Homoskedasticity** | Equal error spread: every observation has the same noise variance regardless of feature values. |
 
-والأمر الأكثر إثارة للإعجاب أن **مبرهنة غاوس-ماركوف لا تفترض إطلاقًا أن الأخطاء تتبع التوزيع الطبيعي!** يمكن للأخطاء أن تكون ملتوية أو ثنائية المنوال؛ فما دامت شروط غاوس-ماركوف الخمسة متحققة، يظل OLS المقدر الخطي الأكثر كفاءة ودقة بلا منازع.
+```text
+    DARTBOARD ACCURACY & PRECISION:
+    
+       Biased (Off-Target)         Unbiased but Inefficient             OLS: BLUE Champion
+        (Systematic Drift)              (High Variance)             (Unbiased + Minimum Variance)
+            +-------+                      +-------+                         +-------+
+            | * *   |                      | *     |                         |       |
+            |  ***  |                      |   *   |                         |  ***  |
+            |   *   |  (Bullseye)          | * O * |  (Bullseye)             |  *O*  |  (Bullseye)
+            |       |                      |     * |                         |  ***  |
+            +-------+                      +-------+                         +-------+
+```
 
-ومع ذلك، يجب أن نميز بدقة متناهية بين الكفاءة الإحصائية والصلاحية السببية. في تعلم الآلة التنبؤي، يضحي المهندسون بشرط عدم التحيز عمدًا (كما في انحدار ريدج ولوسو) لتقليل التباين وتحسين دقة التنبؤ خارج العينة. أما في الاقتصاد القياسي، فإن عدم التحيز هو حجر الزاوية؛ لأن غايتنا ليست مجرد توقع المستقبل السلبي، بل قياس أثر التدخل والسياسات ($\beta$). وإذا اختل شرط الاستقلال الخارجي الصارم $\mathbb{E}[\boldsymbol{\varepsilon} \mid \mathbf{X}] = \mathbf{0}$ بسبب متغيرات محذوفة أو سببية عكسية، يسقط عدم التحيز تمامًا، وحينها لا يكون المقدر "أفضل" ولا "غير متحيّز"، بل يصبح راميًا يسدد بدقة متناهية نحو الهدف الخاطئ!
+### الحدس والقصة الواقعية
+
+تخيل أن شركة تقنية ترغب في قياس العائد من تدريب الموظفين: *كم تزيد كل ساعة تدريب إضافية في مهارات البرمجة من إنتاجية الموظف؟* لديك سجلات آلاف الموظفين، وهناك طرق لا حصر لها لحساب هذا الأثر: يمكنك أخذ متوسط الفروق بين أعلى وأدنى 10%، أو توصيل خط بين أول وآخر نقطة، أو استخدام طريقة المربعات الصغرى (OLS).
+
+أي هذه الطرق ينبغي الاعتماد عليها عند اتخاذ قرارات استثمارية حقيقية؟
+
+تقدم **مبرهنة غاوس-ماركوف (Gauss-Markov Theorem)** الإجابة الحاسمة: في ظل خمسة شروط قياسية، يعتبر مقدر OLS هو البطل المتوج بلا منازع بين جميع الطرق الخطية؛ فهو **BLUE** (أفضل مقدر خطي غير متحيّز).
+
+تخيل بطولة رماية بالسهام نحو الهدف المركزي $\beta$ (الأثر الحقيقي للتدريب):
+1. **غير متحيّز (Unbiased)** تعني دقة التوجيه: إذا كررت التجربة على 1000 عينة مختلفة، فإن متوسط تسديداتك يقع تمامًا في قلب الهدف دون أي انحراف نظامي نحو اليمين أو اليسار.
+2. **الأفضل / الأدنى تباينًا (Best)** تعني إحكام التجمع: من بين جميع الرماة الذين يصيبون الهدف في المتوسط، يمتلك OLS التجمع الأكثر تماسكًا وتقاربًا للسهام.
+
+والأمر المدهش أن مبرهنة غاوس-ماركوف **لا تشترط التوزيع الطبيعي للأخطاء**! ولكن تذكر دائمًا: الكفاءة الإحصائية لا تعني السببية؛ فلو كان هناك متغير خفي محذوف (مثل الشغف الفطري للموظف) يربط بين التدريب والإنتاجية، فإن الرامي يسدد بدقة متناهية نحو الهدف الخاطئ!
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **المُقدِّر (Estimator)** | الوصفة أو القاعدة الحسابية المستخدمة لاستخراج التخمين من عينة البيانات. |
+| **عدم التحيز (Unbiasedness)** | إصابة قلب الهدف: غياب أي ميل نظامي للمبالغة بالزيادة أو النقصان عبر العينات. |
+| **الكفاءة (Efficiency)** | إحكام التسديد: الحصول على أصغر تشتت وتباين ممكن للتخمينات حول الهدف. |
+| **BLUE** | اختصار لـ "أفضل مقدر خطي غير متحيّز"، وهو المعيار الذهبي لجودة التقدير. |
+| **تجانس التباين (Homoskedasticity)** | ثبات التشتت: تساوي مقدار التشويش والخطأ العشوائي لجميع المشاهدات. |
 
 :::simulation-widget{engine="canvas2d" component="GaussMarkovEfficiencyLab"}
 ---
@@ -72,61 +109,32 @@ $$
 \mathbb{V}[\hat{\boldsymbol{\beta}} \mid \mathbf{X}] = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T (\sigma^2 \mathbf{I}_N) \mathbf{X} (\mathbf{X}^T \mathbf{X})^{-1} = \sigma^2 (\mathbf{X}^T \mathbf{X})^{-1}
 $$
 
-### Mathematical Proof of the Gauss-Markov Optimality (BLUE)
+### Why the Math Works Step-by-Step
 
-Let $\tilde{\boldsymbol{\beta}} = \mathbf{C}\mathbf{y}$ be any alternative linear estimator, where $\mathbf{C}$ is a $K \times N$ matrix. Define $\mathbf{D} \equiv \mathbf{C} - (\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T$, so that:
-
-$$
-\tilde{\boldsymbol{\beta}} = \left( (\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T + \mathbf{D} \right) \mathbf{y}
-$$
-
-Taking conditional expectations:
-
-$$
-\mathbb{E}[\tilde{\boldsymbol{\beta}} \mid \mathbf{X}] = \left( (\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T + \mathbf{D} \right)\mathbf{X}\boldsymbol{\beta} = \boldsymbol{\beta} + \mathbf{D}\mathbf{X}\boldsymbol{\beta}
-$$
-
-For $\tilde{\boldsymbol{\beta}}$ to be unbiased for all possible parameter vectors $\boldsymbol{\beta}$, we must have $\mathbf{D}\mathbf{X} = \mathbf{0}_{K \times K}$.
-
-Now compute the conditional variance-covariance matrix of $\tilde{\boldsymbol{\beta}}$:
-
-$$
-\mathbb{V}[\tilde{\boldsymbol{\beta}} \mid \mathbf{X}] = \mathbf{C} (\sigma^2 \mathbf{I}_N) \mathbf{C}^T = \sigma^2 \mathbf{C}\mathbf{C}^T
-$$
-
-Expanding $\mathbf{C}\mathbf{C}^T$:
-
-$$
-\mathbf{C}\mathbf{C}^T = \left( (\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T + \mathbf{D} \right)\left( \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1} + \mathbf{D}^T \right)
-$$
-
-$$
-= (\mathbf{X}^T \mathbf{X})^{-1} + (\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T \mathbf{D}^T + \mathbf{D}\mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1} + \mathbf{D}\mathbf{D}^T
-$$
-
-Since $\mathbf{D}\mathbf{X} = \mathbf{0}$, the cross-terms vanish completely ($\mathbf{D}\mathbf{X} = \mathbf{0} \implies \mathbf{X}^T \mathbf{D}^T = \mathbf{0}$):
-
-$$
-\mathbb{V}[\tilde{\boldsymbol{\beta}} \mid \mathbf{X}] = \sigma^2 (\mathbf{X}^T \mathbf{X})^{-1} + \sigma^2 \mathbf{D}\mathbf{D}^T = \mathbb{V}[\hat{\boldsymbol{\beta}} \mid \mathbf{X}] + \sigma^2 \mathbf{D}\mathbf{D}^T
-$$
-
-Because $\mathbf{D}\mathbf{D}^T$ is a Gram matrix, it is guaranteed to be positive semi-definite ($\mathbf{z}^T \mathbf{D}\mathbf{D}^T \mathbf{z} = \|\mathbf{D}^T \mathbf{z}\|_2^2 \ge 0$ for any vector $\mathbf{z}$). Thus, $\mathbb{V}[\tilde{\boldsymbol{\beta}} \mid \mathbf{X}] \ge \mathbb{V}[\hat{\boldsymbol{\beta}} \mid \mathbf{X}]$ in the Loewner ordering, with equality holding if and only if $\mathbf{D} = \mathbf{0}$ (i.e. $\tilde{\boldsymbol{\beta}} \equiv \hat{\boldsymbol{\beta}}$). OLS is uniquely the Best Linear Unbiased Estimator!
-
-Since the population variance $\sigma^2$ is unknown, we estimate it with the sample residual variance $s^2$:
-
-$$
-s^2 = \frac{\mathbf{e}^T \mathbf{e}}{N - K}, \quad \widehat{\mathbb{V}}(\hat{\boldsymbol{\beta}}) = s^2 (\mathbf{X}^T \mathbf{X})^{-1}, \quad \text{SE}(\hat{\beta}_j) = \sqrt{\big[\widehat{\mathbb{V}}(\hat{\boldsymbol{\beta}})\big]_{jj}}
-$$
+1. **Why is OLS guaranteed to beat any alternative linear unbiased estimator?**
+   Consider any other linear estimator $\tilde{\boldsymbol{\beta}} = \mathbf{C} \mathbf{y}$. Let $\mathbf{C} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T + \mathbf{D}$. For $\tilde{\boldsymbol{\beta}}$ to be unbiased, we must have $\mathbf{D}\mathbf{X} = \mathbf{0}$. Computing its variance yields:
+   $$
+   \mathbb{V}[\tilde{\boldsymbol{\beta}}] = \sigma^2 (\mathbf{X}^T \mathbf{X})^{-1} + \sigma^2 \mathbf{D} \mathbf{D}^T = \mathbb{V}[\hat{\boldsymbol{\beta}}_{OLS}] + \sigma^2 \mathbf{D} \mathbf{D}^T
+   $$
+   Because $\mathbf{D} \mathbf{D}^T$ is a positive semi-definite matrix, any non-zero $\mathbf{D}$ strictly increases variance! OLS (where $\mathbf{D} = \mathbf{0}$) achieves the absolute theoretical minimum variance.
+2. **Why does unbiasedness require strict exogeneity?**
+   Notice that $\mathbb{E}[\hat{\boldsymbol{\beta}}] = \boldsymbol{\beta} + (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbb{E}[\boldsymbol{\varepsilon} \mid \mathbf{X}]$. If features are correlated with errors (omitted variables or reverse causality), $\mathbb{E}[\boldsymbol{\varepsilon} \mid \mathbf{X}] \ne \mathbf{0}$, biasing the estimates permanently.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $\boldsymbol{\varepsilon} \in \mathbb{R}^N$: Unobservable population error term vector.
-* $\sigma^2$: Constant population error variance ($\sigma^2 = \mathbb{E}[\varepsilon_i^2 \mid \mathbf{X}]$).
-* $\mathbf{I}_N$: $N \times N$ identity matrix representing spherical disturbance covariance.
-* $s^2$: Unbiased sample estimator of $\sigma^2$ with $N - K$ degrees of freedom in the denominator.
-* $\mathbb{V}[\hat{\boldsymbol{\beta}} \mid \mathbf{X}]$: $K \times K$ variance-covariance matrix of the estimated regression parameters.
-* $\text{SE}(\hat{\beta}_j)$: Estimated standard error of the $j$-th coefficient, measuring sampling volatility.
-* $t_j = \hat{\beta}_j / \text{SE}(\hat{\beta}_j)$: Empirical $t$-statistic for testing the null hypothesis $H_0: \beta_j = 0$.
+* $\hat{\boldsymbol{\beta}}$: The vector of OLS estimates across $K$ parameters.
+* $s^2 = \frac{\mathbf{e}^T \mathbf{e}}{N - K}$: Unbiased sample estimator of error variance $\sigma^2$.
+* $\mathbb{V}[\hat{\boldsymbol{\beta}}] = s^2 (\mathbf{X}^T \mathbf{X})^{-1}$: Estimated variance-covariance matrix of coefficients.
+* $\text{SE}(\hat{\beta}_j) = \sqrt{\mathbb{V}[\hat{\boldsymbol{\beta}}]_{jj}}$: Standard error of the $j$-th coefficient.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\sigma^2$ | تباين أخطاء المجتمع | التشتت الطبيعي الكامن غير القابل للتفسير في أخطاء الظاهرة المدروسة. |
+| $s^2$ | مقدر تباين الأخطاء العيني | تباين البواقي المحسوب من العينة مقسومًا على درجات الحرية $N-K$. |
+| $\mathbb{V}[\hat{\boldsymbol{\beta}}]$ | مصفوفة التباين والتباين المشترك | مصفوفة تقيس مدى تذبذب تقديرات المعاملات عبر العينات العشوائية. |
+| $\text{SE}$ | الخطأ المعياري | الانحراف المعياري لتقدير المعلمة؛ كلما صغر زادت ثقتنا بدقة التقدير. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -146,51 +154,43 @@ test_cases:
 ```python
 import numpy as np
 
-def compute_ols_vcov(X: np.ndarray, y: np.ndarray) -> dict[str, object]:
+def compute_ols_vcov(X: np.ndarray, y: np.ndarray) -> dict[str, np.ndarray | float]:
     """
-    Computes homoskedastic OLS parameter variance-covariance, SEs, and t-stats.
-    
+    Computes OLS estimates, unbiased residual variance s^2, and covariance matrix.
+
     Parameters
     ----------
     X : np.ndarray of shape (N, K)
-        Design matrix (full column rank).
+        Design matrix of regressors.
     y : np.ndarray of shape (N,)
-        Response vector.
-        
+        Observed target vector.
+
     Returns
     -------
-    dict with keys:
-        'beta': np.ndarray of shape (K,)
-        's2': float, unbiased residual variance estimate
-        'vcov': np.ndarray of shape (K, K), parameter covariance matrix
-        'se': np.ndarray of shape (K,), standard errors of coefficients
-        't_stats': np.ndarray of shape (K,), t-statistics against zero
+    dict with keys 'beta', 's2', 'vcov', 'se', 't_stats'
     """
-    N, K = X.shape
-    
-    # Step 1: Solve for OLS beta coefficients
-    XtX = X.T @ X
-    Xty = X.T @ y
-    beta = np.linalg.solve(XtX, Xty)
-    
-    # Step 2: Compute sample residuals and residual sum of squares
+    n, k = X.shape
+
+    # Step 1: Solve for beta coefficients stably using normal equations
+    gram_matrix = X.T @ X
+    proj_vector = X.T @ y
+    beta = np.linalg.solve(gram_matrix, proj_vector)
+
+    # Step 2: Compute sample residuals and unbiased error variance s^2
     residuals = y - X @ beta
-    ssr = float(np.sum(residuals ** 2))
-    
-    # Step 3: Compute unbiased error variance s^2 with N - K degrees of freedom
-    df = N - K
-    s2 = ssr / df if df > 0 else 0.0
-    
-    # Step 4: Compute parameter variance-covariance matrix s^2 * (X^T X)^(-1)
-    XtX_inv = np.linalg.inv(XtX)
-    vcov = s2 * XtX_inv
-    
-    # Step 5: Extract standard errors (square root of diagonal elements)
+    degrees_of_freedom = n - k
+    s2 = float(np.sum(residuals ** 2) / degrees_of_freedom)
+
+    # Step 3: Compute parameter variance-covariance matrix s^2 * (X^T X)^(-1)
+    gram_inv = np.linalg.inv(gram_matrix)
+    vcov = s2 * gram_inv
+
+    # Step 4: Extract standard errors (square root of diagonal elements)
     se = np.sqrt(np.maximum(np.diag(vcov), 0.0))
-    
-    # Step 6: Compute t-statistics
+
+    # Step 5: Compute t-statistics for hypothesis testing (t = beta / se)
     t_stats = np.where(se > 0, beta / se, 0.0)
-    
+
     return {
         "beta": beta,
         "s2": s2,

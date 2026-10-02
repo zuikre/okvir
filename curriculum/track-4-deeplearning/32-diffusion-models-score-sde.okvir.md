@@ -12,7 +12,7 @@ i18n:
 
 # Denoising Diffusion Probabilistic Models (DDPM) & Score-Based Matching
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
 Generative modeling historically struggled with a fundamental architectural dilemma: Generative Adversarial Networks (GANs) generate crisp samples in a single step but suffer from notorious training instability and mode collapse, while Variational Autoencoders (VAEs) train stably with variational lower bounds but produce blurry images due to intractable likelihood approximations.
 
@@ -32,6 +32,42 @@ Generative modeling historically struggled with a fundamental architectural dile
 
 نماذج الانتشار تشبه نحاتاً بارعاً ينحت تمثالاً مذهلاً من صخرة صماء عبر إزالة الشوائب طبقة تلو الأخرى! يبدأ النحات بكتلة حجرية خام غير متشكلة، ومع كل ضربة إزميل دقيقة، يُزيل غبار الحجر الفائض حتى تتجلى الملامح البديعة للتمثال المكتمل.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Diffusion Process** (عملية الانتشار العشوائي) | Ink dropping in water: gradually dissolving a crisp image with random Gaussian noise until it becomes pure uniform fog. | قطرة حبر في الماء: تذويب معالم الصورة الواضحة تدريجياً عبر إضافة ضوضاء عشوائية حتى تتحول إلى ضباب رمادي خالص. |
+| **Forward Process ($q$)** (المسار الأمامي للتشتيت) | The noising trajectory: a parameter-free Markov chain adding noise over $T=1000$ steps until all original structure is erased. | مسار التشويش التراكمي: سلسلة ماركوفية لا تحتاج لتدريب تضيف ضوضاء غاوسية عبر 1000 خطوة حتى تنمحي الصورة تماماً. |
+| **Reverse Process ($p_\theta$)** (المسار العكسي للتوليد) | The sculptors undoing chaos: a neural network trained to inspect noisy fog and predict what noise was added, sculpting reality back. | النحات المعاكس للفوضى: شبكة عصبية تفحص الضباب وتتنبأ بالضوضاء المضافة بدقة لتعيد استخراج الصورة الصافية الأصلية. |
+| **Score Function ($\nabla_x \log p(x)$)** (دالة الدرجة الاحتمالية) | The vector wind of realism: a vector field pointing in the direction of higher data density (toward clean, realistic images). | بوصلة الواقعية: حقل اتجاهي يرشد العينات نحو الفضاء الأكثر كثافة واحتمالية في عالم الصور الحقيقية. |
+| **Closed-Form Jump ($\bar{\alpha}_t$)** (القفز اللحظي المباشر للضوضاء) | Skipping 500 steps: mathematical formula allowing you to generate the noisy image at step $t=500$ in one single calculation! | القفز المباشر عبر الزمن: معادلة جبرية تتيح توليد مستوى الضوضاء عند الخطوة 500 مباشرة دون محاكاة الخطوات السابقة. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+FORWARD NOISING & REVERSE DENOISING PROCESS:
+=============================================================================
+FORWARD PROCESS q(x_t | x_{t-1}): (Fixed, Parameter-free degradation)
+Clean Image x_0 ---> Add \epsilon_1 ---> x_1 ---> ... ---> x_t ---> ... ---> Pure Noise x_T ~ \mathcal{N}(0, I)
+=============================================================================
+ONE-STEP FORWARD JUMP FORMULA:
+x_t = \sqrt{\bar{\alpha}_t} * x_0 + \sqrt{1 - \bar{\alpha}_t} * \epsilon,   where \epsilon ~ \mathcal{N}(0, I)
+=============================================================================
+REVERSE GENERATION PROCESS p_\theta(x_{t-1} | x_t): (Learned Neural Denoising)
+Pure Random Gaussian Noise x_T
+      |
+      v
+[ Denoising U-Net / DiT: Predicts added noise \epsilon_\theta(x_t, t) ]
+      |
+      v
+Subtract Scaled Noise: x_{t-1} = (1/\sqrt{\alpha_t}) * (x_t - \frac{\beta_t}{\sqrt{1 - \bar{\alpha}_t}} \epsilon_\theta) + \sigma_t z
+      |
+Repeat for t = T down to 1...
+      |
+      v
+Final Synthetic Masterpiece: x_0!
+```
+
 :::simulation-widget{engine="canvas2d" component="AutogradGraphLab"}
 ---
 interactive: true
@@ -41,7 +77,7 @@ highlighted_metric: "loss"
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
 The forward Markov diffusion transition allows closed-form sampling of any latent state $\mathbf{x}_t$ directly from original data $\mathbf{x}_0$:
 
@@ -67,21 +103,22 @@ $$
 \nabla_{\mathbf{x}_t} \log p(\mathbf{x}_t) = -\frac{\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)}{\sqrt{1 - \bar{\alpha}_t}}
 $$
 
-### Comprehensive Symbol & Parameter Breakdown
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-| Symbol | Dimensionality | Mathematical Interpretation | Operational Role |
-| :--- | :--- | :--- | :--- |
-| $\mathbf{x}_0$ | Tensor | Clean uncorrupted data sample (e.g. image) | Ground truth target anchoring the diffusion trajectory. |
-| $\beta_t \in (0, 1)$ | Scalar | Variance schedule coefficient at timestep $t$ | Controls the rate of Gaussian noise injection per step. |
-| $\alpha_t = 1 - \beta_t$ | Scalar | Proportion of signal preserved at timestep $t$ | Complementary signal retention multiplier. |
-| $\bar{\alpha}_t = \prod_{s=1}^t \alpha_s$ | Scalar | Cumulative signal retention product | Governs the relative ratio of signal to noise at arbitrary step $t$. |
-| $\boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})$ | Tensor | Ground truth isotropic Gaussian noise | Standard normal perturbation sampled during training. |
-| $\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)$ | Tensor | Neural network noise predictor (U-Net or DiT) | Learns to estimate the precise perturbation corrupting $\mathbf{x}_t$. |
-| $\sigma_t = \sqrt{\beta_t}$ | Scalar | Reverse transition standard deviation | Re-injects controlled stochastic variance during reverse sampling. |
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $\mathbf{x}_0$ | Clean Ground Truth Data / الصورة النقية الأصلية | Original sample drawn from the true data distribution $q(\mathbf{x}_0)$. |
+| $\mathbf{x}_t$ | Noisy Intermediate State / الصورة المشوشة عند الزمن t | Partially corrupted representation at diffusion step $t \in \{1, \dots, T\}$. |
+| $\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ | Gaussian Noise Sample / عينة الضوضاء الغاوسية | Random standard normal perturbation injected during the forward process. |
+| $\beta_t \in (0, 1)$ | Variance Schedule / جدول تباين الضوضاء | Variance scale controlling how much noise is added at step $t$. |
+| $\alpha_t = 1 - \beta_t, \bar{\alpha}_t = \prod_{s=1}^t \alpha_s$ | Cumulative Signal Retention / نسبة بقاء الإشارة الأصلية | Cumulative fraction of clean signal variance surviving up to step $t$. |
+| $\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)$ | Noise Prediction Network / شبكة التنبؤ بالضوضاء | Neural network (U-Net or DiT) estimating the exact noise vector injected into $\mathbf{x}_t$. |
 
-تضمن هذه الصياغة الرياضية استقرار عملية التدريب عبر مطابقة درجات الاحتمال (Score Matching)، حيث يتعلم النموذج اتجاهات التدفق نحو التوزيع الحقيقي للبيانات، مما يلغي تماماً مخاطر انهيار الأنماط الشائعة في شبكات GAN.
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **The Closed-Form Gaussian Convolution**: Because adding independent Gaussians produces another Gaussian, composing $t$ forward transitions simplifies into $\mathbf{x}_t \sim \mathcal{N}(\sqrt{\bar{\alpha}_t} \mathbf{x}_0, (1 - \bar{\alpha}_t) \mathbf{I})$. This allows training on random step $t$ without running steps $1$ to $t-1$.
+2. **The Simplified Denoising Objective**: Ho et al. (2020) proved that optimizing the complex Variational Lower Bound (VLB) reduces to simple mean squared error between true noise and predicted noise: $\mathcal{L}_{\text{simple}} = \|\boldsymbol{\epsilon} - \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)\|^2$.
+3. **Score Matching Duality**: Predicting noise is mathematically equivalent to estimating the score of the data distribution: $\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t) \propto -\sqrt{1 - \bar{\alpha}_t} \nabla_{\mathbf{x}_t} \log p(\mathbf{x}_t)$, connecting diffusion directly to Langevin dynamics.
 
----
 
 ## Beat 3: Python Challenge
 

@@ -22,7 +22,28 @@ Why does this cosmic convergence occur? Think of it through the lens of high-dim
 
 In machine learning, data science, and econometrics, the Central Limit Theorem is the foundational bedrock that makes empirical inference possible. When an algorithm estimates model parameters or computes a confidence interval, you do not need to know the true, hidden probability distribution of the real-world data generating process. The CLT guarantees that sample mean estimators and test statistics (such as Z-scores and t-statistics) asymptotically follow a standard normal distribution. From analyzing mini-batch gradient noise in stochastic gradient descent (SGD) to aggregating sensor noise in self-driving cars, the Central Limit Theorem transforms microscopic chaos into predictable macroscopic order.
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Central Limit Theorem (CLT) | The universal law of nature: adding up many small random wobbles always creates a bell curve | مبرهنة النهاية المركزية | القانون الكوني العظيم: جمع العديد من الصدف العشوائية المستقلة يفرز دوماً منحنى جرسي |
+| Gaussian / Normal Distribution | The symmetrical bell curve shape where most values cluster near the center | التوزيع الطبيعي / الغاوسي | منحنى الجرس المتناظر الذي تتجمع أغلب القيم حول وسطه وتتلاشى تدريجياً على الأطراف |
+| Sample Mean ($\bar{X}_n$) | The average calculated across a batch of $n$ independent observations | متوسط العينة ($\bar{X}_n$) | المعدل الحسابي المحسوب من دفعة تضم n من المشاهدات المستقلة |
+| Standard Error ($\sigma / \sqrt{n}$) | The uncertainty band shrinking narrower as you collect more observations | الخطأ المعياري ($\sigma / \sqrt{n}$) | نطاق الشك الذي يضيق وينكمش كلما جمعت عدداً أكبر من الملاحظات |
+| Galton Board | A pegboard where dropping marbles bounce randomly left and right, forming a bell curve | لوحة غالتون | لوح مسامير تتصادم فيه الكرات يمنة ويسرة عشوائياً لتشكل جرساً منتظماً في الأسفل |
+
+#### Geometric & Visual Flow
+
+```
+      Single Die (Flat)          Sum of 2 Dice (Triangle)       Sum of 30 Dice (Bell Curve)
+        ┌──────────┐                     ▲                             ▲
+        │          │                    / \                           /   \
+        │          │                   /   \                         /     \
+        └──────────┘                  /     \                      .'       '.
+         Uniform noise              Early clustering               Pure Gaussian Normal!
+```
+
+### الحدس الفيزيائي والهندسي
 
 تخيل نفسك واقفاً أمام لوحة خشبية مائلة بزاوية طفيفة، مثبتة عليها مئات الصفوف المتتالية من المسامير النحاسية المتداخلة—وهي الآلة الشهيرة المعروفة بـ "لوحة غالتون" (Galton Board). إذا أسقطت كرة فولاذية صغيرة من قمع ضيق في الأعلى، فإنها ترتطم بأول مسمار، لترتد بعشوائية تامة إما نحو اليمين ($+1$) أو نحو اليسار ($-1$) باحتمال متساوٍ قدره $50\%$، وتواصل تدحرجها عبر عشرات الاصطدامات الفوضوية المتتالية. مسار الكرة الواحدة متقطع، وخشن، وغير متوقع على الإطلاق؛ ومكان استقرارها في قاع اللوحة يبدو ضرباً من المصادفة المحضة. لكن الآن، افتح صمام القمع بالكامل وأطلق عشرة آلاف كرة فولاذية دفعة واحدة! مع تدفق هذا السيل الهائل وتراكم مئات الارتدادات العشوائية المستقلة لكل كرة، تسقط الكرات في الأعمدة الزجاجية الرأسية في الأسفل. ماذا يتشكل أمام عينيك؟ معجزة هندسية باهرة: يتراكم ركام الكرات ليشكل **منحنى غاوسياً أملس، متناظراً تماماً، على هيئة جرس رائع الجمال**!
 
@@ -31,6 +52,27 @@ In machine learning, data science, and econometrics, the Central Limit Theorem i
 لماذا تحدث هذه المعجزة الكونية الحتمية؟ تأمل الأمر من منظور الهندسة فائقة الأبعاد. إن سحب $N$ من المشاهدات العشوائية المستقلة يعادل رياضياً اختيار نقطة عشوائية واحدة داخل مكعب فائق الأبعاد ذي $N$ بعداً. وعندما يكون $N$ كبيراً، تؤدي هندسة الفضاءات عالية الأبعاد إلى ظاهرة تُعرف بـ *تركيز القياس* (Concentration of Measure): حيث تتركز كل كتلة وحجم الفضاء تقريباً داخل قشرة كروية رقيقة للغاية حول مركز الكتلة. أما النتائج المتطرفة (مثل الحصول على الرقم 6 مئة مرة متتالية) فتقبع في الزوايا البعيدة الضئيلة جداً من المكعب الفائق وتكاد تستحيل واقعياً. بل على العكس، فإن الانحرافات الإيجابية والسلبية الفردية تلغي بعضها بعضاً بضراوة. وعندما تُسقط إحداثيات هذه القشرة الكروية عالية الأبعاد على القطر الرئيسي الذي يمثل متوسط العينة، فإن ظلها الهندسي أحادي البعد هو التوزيع الغاوسي الطبيعي بدقة متناهية.
 
 وفي علم البيانات، وتعلم الآلة، والاقتصاد القياسي، تمثل مبرهنة النهاية المركزية حجر الأساس الذي لا غنى عنه لكل استدلال إحصائي رصين. فعندما تُقدّر خوارزمية معاملات نموذج تنبؤي أو تحسب فترات الثقة لمعلمة ما، فلست بحاجة على الإطلاق إلى معرفة التوزيع الاحتمالي التفصيلي المجهول للبيانات في الطبيعة؛ لأن مبرهنة النهاية المركزية تضمن لك أن مقدرات متوسط العينة وإحصاءات الاختبار (مثل درجات Z و t) تتقارب بالضرورة مع التوزيع الطبيعي المعياري. ومن نمذجة ضوضاء الحساسات في سيارات القيادة الذاتية إلى تحليل تذبذبات التدرج في خوارزمية الانحدار التدريجي العشوائي (SGD)، تحول مبرهنة النهاية المركزية الفوضى المجهرية إلى نظام هندسي بديع يمكن التنبؤ به بدقة.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| مبرهنة النهاية المركزية | The universal law of nature: adding up many small random wobbles always creates a bell curve | مبرهنة النهاية المركزية | القانون الكوني العظيم: جمع العديد من الصدف العشوائية المستقلة يفرز دوماً منحنى جرسي |
+| التوزيع الطبيعي / الغاوسي | The symmetrical bell curve shape where most values cluster near the center | التوزيع الطبيعي / الغاوسي | منحنى الجرس المتناظر الذي تتجمع أغلب القيم حول وسطه وتتلاشى تدريجياً على الأطراف |
+| متوسط العينة ($\bar{X}_n$) | The average calculated across a batch of $n$ independent observations | متوسط العينة ($\bar{X}_n$) | المعدل الحسابي المحسوب من دفعة تضم n من المشاهدات المستقلة |
+| الخطأ المعياري ($\sigma / \sqrt{n}$) | The uncertainty band shrinking narrower as you collect more observations | الخطأ المعياري ($\sigma / \sqrt{n}$) | نطاق الشك الذي يضيق وينكمش كلما جمعت عدداً أكبر من الملاحظات |
+| لوحة غالتون | A pegboard where dropping marbles bounce randomly left and right, forming a bell curve | لوحة غالتون | لوح مسامير تتصادم فيه الكرات يمنة ويسرة عشوائياً لتشكل جرساً منتظماً في الأسفل |
+
+#### المخطط البصري الهندسي
+
+```
+      نرد واحد (توزيع مسطح)       مجموع نردين (مثلث)             مجموع 30 نرداً (منحنى جرسي)
+        ┌──────────┐                     ▲                             ▲
+        │          │                    / \                           /   \
+        │          │                   /   \                         /     \
+        └──────────┘                  /     \                      .'       '.
+         ضجيج عشوائي منتظم            بداية التجمع المركزي           توزيع طبيعي غاوسي نقي!
+```
 
 :::simulation-widget{engine="canvas2d" component="GaltonBoardCltLab"}
 ---

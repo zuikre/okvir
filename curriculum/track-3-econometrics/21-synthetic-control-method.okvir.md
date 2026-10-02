@@ -14,21 +14,84 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-When transformative geopolitical events, historic economic reforms, or major regional policies occur, they almost always affect a single aggregate unit—a single nation, an entire state, or a metropolitan economy ($N=1$). In 1988, California passed Proposition 99, a groundbreaking tobacco control measure funded by an unprecedented 25-cent cigarette excise tax. In 1990, West Germany absorbed the former East Germany in a momentous reunification. In 1975, the Basque Country was plunged into decades of regional conflict. How can an empirical economist credibly evaluate the causal impact of such singular events?
+### Intuition & Real-World Story
 
-Traditional micro-econometric tools immediately run aground. You cannot run a randomized trial on an entire state. You cannot compare California to Texas alone (their demographic compositions, cultural attitudes, and economic climates are worlds apart). Nor can you compare California to a simple, unweighted average of the other 49 US states (such a blunt national average dilutes California's distinct pre-existing trajectory and includes states completely dissimilar to California). 
+In November 1988, California voters passed **Proposition 99**, an aggressive anti-tobacco initiative that increased cigarette excise taxes by 25 cents per pack and funded statewide anti-smoking campaigns.
 
-The **Synthetic Control Method (SCM)**, pioneered by Alberto Abadie and co-authors (2003, 2010, 2015), solves this dilemma like a master perfumer blending an exact replica fragrance. Instead of searching for an elusive single "twin" state that does not exist in nature, SCM constructs an optimal **convex combination**—a bespoke, weighted cocktail—of unaffected "donor" states (for instance: $25\%$ Utah, $35\%$ Montana, and $40\%$ Colorado). The weights are chosen algorithmically so that the synthetic twin mirrors California's pre-1988 cigarette consumption trends and economic drivers (income per capita, age distribution, retail beer consumption) with uncanny precision.
+Public health researchers immediately wanted to know: *did Proposition 99 cause a drop in cigarette consumption, and by how much?*
 
-Once the policy takes effect in 1988, the synthetic twin continues to simulate what would have happened to California had Proposition 99 never been passed. Any visible post-1988 divergence between the real California and its synthetic twin cleanly isolates the causal treatment effect. Crucially, SCM restricts donor weights to the **probability simplex**: weights must be strictly non-negative ($w_j \ge 0$) and sum to one ($\sum w_j = 1$). Unlike standard linear regression—which extrapolates wildly into impossible fictional combinations (such as predicting a counterfactual using $-3 \times \text{Texas} + 4 \times \text{New York}$)—the simplex constraints guarantee that the synthetic twin lies strictly inside the **convex hull** of real, observable donor units.
+Standard comparative methods failed:
+* You cannot use a randomized trial because you cannot randomly assign statewide tax hikes to California.
+* You cannot just compare California before and after 1988 because smoking was already trending downward nationwide.
+* You cannot just pick a single control state like Texas or New York because California has a unique economy, climate, and demographic makeup. No other single state is California's twin!
 
-عندما تقع تحولات جيوسياسية كبرى أو تُقر إصلاحات اقتصادية جذرية، فإنها تؤثر في الغالب على وحدة كبرى واحدة—دولة بأكملها، أو ولاية منفردة، أو إقليم اقتصادي مستقل ($N=1$). في عام 1988، أقرت ولاية كاليفورنيا "المقترح 99"، وهو تشريع غير مسبوق لمكافحة التدخين موّلته ضريبة مبيعات بقيمة 25 سنتاً على علب السجائر. وفي عام 1990، اندمجت ألمانيا الغربية مع الشرقية في إعادة توحيد تاريخية. كيف يمكن لخبير القياس الاقتصادي تقييم الأثر السببي الصافي لمثل هذه السياسات التاريخية الاستثنائية؟
+In 2003, Alberto Abadie, Alexis Diamond, and Jens Hainmueller created an extraordinary solution: the **Synthetic Control Method (SCM)**.
 
-تعجز أدوات الاقتصاد القياسي الكلاسيكية عن الإجابة أمام هذه الحالات؛ فلا يمكن إجراء تجربة عشوائية على ولاية كاملة، ولا يمكن مقارنة كاليفورنيا بولاية تكساس وحدها لاختلاف العوامل الثقافية والديموغرافية والضريبية، كما لا يصح مقارنتها بمتوسط الولايات الـ 49 الأخرى؛ لأن ذلك المتوسط الساذج يطمس خصوصية كاليفورنيا ومسارها التاريخي الفريد.
+They asked: *what if no single state is California's twin, but a carefully weighted RECIPE of states is?*
+By finding optimal non-negative weights that sum to 100%, SCM cooks up a **Synthetic California**:
+$$\text{Synthetic California} = 0.25(\text{Utah}) + 0.35(\text{Montana}) + 0.15(\text{Nevada}) + 0.25(\text{Connecticut})$$
+Throughout the 1970s and 1980s, this synthetic recipe tracked actual California cigarette sales with uncanny, millimeter precision!
 
-تقدم **طريقة الشبيه الاصطناعي (Synthetic Control Method - SCM)** التي ابتكرها ألبيرتو أباديا وزملاؤه (Abadie et al.) حلاً عبقرياً يشبه عمل صانع عطور ماهر يركب عطراً مخصصاً مطابقاً للأصل. فبدلاً من البحث المستحيل عن ولاية "توأم" وحيدة في الطبيعة، تصنع الخوارزمية **تركيبة محدبة موزونة**—مزيجاً خاصاً—من مجموعة ولايات مانحة لم تتأثر بالسياسة (مثل: 25% يوتا، و35% مونتانا، و40% كولورادو). تُحدد هذه الأوزان حسابياً بحيث يتطابق هذا الشبيه الاصطناعي بدقة متناهية مع مسار كاليفورنيا التاريخي في استهلاك السجائر ومؤشراتها الاقتصادية والديموغرافية قبل عام 1988.
+Then 1988 arrives. Real California passes Proposition 99, and its cigarette sales plunge downward. Synthetic California (which never had the tax) continues along the old trend. The growing gap between real California and synthetic California is the pure causal effect of the policy!
 
-وعندما يبدأ تطبيق القانون في 1988، يستمر الشبيه الاصطناعي في تمثيل السيناريو المقابل للواقع (Counterfactual)—أي ما كان سيحدث لكاليفورنيا لولا القانون. ويمثل أي انفصال بين مسار كاليفورنيا الحقيقي وتوأمها الاصطناعي الأثر السببي الحقيقي للسياسة. والسر الجوهري لـ SCM هو تقييد الأوزان داخل **فضاء البساطة الاحتمالي (Simplex)**: فالأوزان موجبة دائماً ($w_j \ge 0$) ومجموعها يساوي واحداً تماماً ($\sum w_j = 1$). وهذا يمنع الانحدار الخطي العادي من السقوط في فخ الاستقراء الخيالي (كالاستقراء بأوزان سالبة وهمية مثل $-3 \times \text{تكساس}$)، مما يضمن بقاء التوأم الاصطناعي داخل الغلاف المحدب (Convex Hull) للبيانات الحقيقية.
+#### Jargon Decoder
+
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Synthetic Control (SCM)** | The digital twin: a weighted blend of untreated peers that mimics the treated unit. |
+| **Donor Pool** | The pantry of ingredients: all candidate control states that never implemented the policy. |
+| **Convex Combination** | Honest blending: weights are non-negative and sum to 1.0 (no crazy extrapolation). |
+| **Pre-Treatment Fit** | The mirror test: how tightly the synthetic twin tracked the treated unit before the law passed. |
+| **Treatment Trajectory** | The divergent path: the post-law gap between the real unit and its synthetic twin. |
+
+```text
+    THE SYNTHETIC CONTROL DIVERGENCE:
+
+    Cigarette Sales (Packs per Capita)
+      ^
+      |    Actual California  :    Synthetic California (The Untreated Twin)
+      |    - - - - - - - - -  :    =========================================
+  120 |      *               :
+      |       \  *           :       *
+  100 |        \   \ *       :      / \  *               * (Synthetic California Trend)
+      |         \     \      :     /   \   \  *        *
+   80 |          *     *     :    *     *    *   *   *
+      |                 \    :                      \
+   60 |                  \   :                       * Actual California (Prop 99 Plunge!)
+      |                   \  :                        \
+   40 0--------------------+---------------------------*---------------------> Year
+                         1988 (Prop 99 Passed)
+```
+
+### الحدس والقصة الواقعية
+
+في نوفمبر 1988، أقر الناخبون في ولاية كاليفورنيا الأمريكية **المقترح 99 (Proposition 99)**؛ وهو قانون صارم لمكافحة التبغ فرض ضريبة باهظة على علب السجائر وموّل حملات توعية عامة واسعة النطاق.
+
+أراد مسؤولو الصحة العامة معرفة النتيجة الحتمية: *هل نجح المقترح في خفض استهلاك السجائر فعليًا، وبأي مقدار؟*
+
+فشلت كل المناهج الإحصائية المعتادة:
+* لا يمكنك إجراء تجربة عشوائية على ولاية عملاقة ككاليفورنيا.
+* لا يمكنك الاكتفاء بمقارنة كاليفورنيا قبل وبعد 1988 لأن التدخين كان ينخفض تدريجيًا على مستوى البلاد بأسرها.
+* لا يمكنك اختيار ولاية واحدة كضابط (مثل تكساس أو نيويورك)؛ فلا توجد ولاية واحدة تشبه كاليفورنيا في اقتصادها ومناخها وسكانها.
+
+في عام 2003، ابتكر ألبرتو أباديا وزملاؤه حلاً عبقريًا مذهلاً: **منهج الضابط الاصطناعي (Synthetic Control Method - SCM)**.
+
+طرح أباديا تساؤلاً ذكيًا: *إذا كانت كاليفورنيا لا تملك توأمًا واحدًا، فماذا لو صنعنا لها توأمًا عبر وصفة موزونة من عدة ولايات؟*
+قام الباحثون بحساب أوزان رياضية موجبة مجموعها 100% لبناء **كاليفورنيا اصطناعية**:
+$$\text{كاليفورنيا الاصطناعية} = 25\%(\text{يوتا}) + 35\%(\text{مونتانا}) + 15\%(\text{نيفادا}) + 25\%(\text{كونيتيكت})$$
+طوال عقدي السبعينيات والثمانينيات، تطابقت مبيعات السجائر في كاليفورنيا الاصطناعية مع كاليفورنيا الحقيقية بدقة مذهلة!
+
+وعندما حل عام 1988 وطُبق القانون، انحدر استهلاك السجائر في كاليفورنيا الحقيقية انحدارًا حادًا، بينما واصلت كاليفورنيا الاصطناعية مسارها الطبيعي. والفجوة المتسعة بين الخطين بعد 1988 هي الأثر السببي الصافي للقانون!
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **الضابط الاصطناعي (SCM)** | التوأم الرقمي: مزيج موزون من وحدات لم تخضع للمعالجة يحاكي سلوك الوحدة المعالجة. |
+| **حوض المانحين (Donor Pool)** | سلة الخيارات: مجموعة الولايات التي لم تطبق القانون مطلقًا لتشكيل التوأم منها. |
+| **التركيبة المحدبة (Convex)** | الخلط النزيه: أوزان موجبة مجموعها 1.0 لتفادي التخمين الخارجي غير الواقعي. |
+| **التطابق المسبق** | اختبار المرآة: مدى دقة تطابق التوأم الاصطناعي مع الوحدة الحقيقية قبل صدور القانون. |
+| **فجوة المسار السببي** | التباعد بعد القرار: المسافة الفاصلة بين الواقع الحقيقي وتوأمه الاصطناعي بعد التدخل. |
 
 :::simulation-widget{engine="canvas2d" component="SyntheticControlDonorLab"}
 ---
@@ -39,45 +102,52 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-Consider a balanced panel of $J+1$ aggregate units observed across periods $t \in \{1, \dots, T\}$. Without loss of generality, let unit $j = 1$ denote the single treated unit, while units $j \in \{2, \dots, J+1\}$ constitute the untreated **donor pool**. The policy is introduced at time $T_0 + 1$, where $1 \le T_0 < T$.
+Let unit $1$ be the treated unit, and units $j = 2, \dots, J+1$ be the donor pool of unexposed control units.
 
-Let $\mathbf{X}_1 \in \mathbb{R}^{K \times 1}$ denote a vector of $K$ pre-treatment characteristics and pre-intervention outcome values for the treated unit. Let $\mathbf{X}_0 \in \mathbb{R}^{K \times J}$ represent the corresponding matrix of the same $K$ predictors across all $J$ untreated donor units.
+Let pre-intervention period be $t = 1, \dots, T_0$, and post-intervention period be $t = T_0 + 1, \dots, T$.
 
-The Synthetic Control Method seeks an optimal donor weight vector $\mathbf{W}^* = [w_2^*, \dots, w_{J+1}^*]^T$ that minimizes the weighted distance between the treated unit and the synthetic twin:
-
-$$
-\min_{\mathbf{W}} \|\mathbf{X}_1 - \mathbf{X}_0 \mathbf{W}\|_{\mathbf{V}}^2 = (\mathbf{X}_1 - \mathbf{X}_0 \mathbf{W})^T \mathbf{V} (\mathbf{X}_1 - \mathbf{X}_0 \mathbf{W})
-$$
-
-subject to the canonical **Simplex Constraints**:
+The synthetic control is defined by a weight vector $\mathbf{W} = (w_2, \dots, w_{J+1})^T$ constrained to the unit simplex:
 
 $$
-w_j \ge 0 \quad \forall j \in \{2, \dots, J+1\} \quad \text{and} \quad \sum_{j=2}^{J+1} w_j = 1
+\mathcal{W} = \left\{ \mathbf{W} \in \mathbb{R}^J \;\middle|\; w_j \ge 0, \quad \sum_{j=2}^{J+1} w_j = 1 \right\}
 $$
 
-where $\mathbf{V} \in \mathbb{R}^{K \times K}$ is a symmetric, positive semi-definite diagonal matrix reflecting the relative predictive importance assigned to each of the $K$ covariates.
-
-The simplex constraints enforce two foundational econometric properties:
-1. **Convex Hull Restriction ($w_j \ge 0$):** Precludes negative weights, preventing unconstrained OLS extrapolation outside the support of the donor data.
-2. **Affine Invariance ($\sum w_j = 1$):** Ensures the synthetic unit is a genuine weighted average, safeguarding against scale distortions.
-
-For each post-intervention period $t \in \{T_0 + 1, \dots, T\}$, the estimated causal treatment effect on the treated unit is:
+The optimal weights minimize the pre-intervention predictor distance:
 
 $$
-\hat{\tau}_{1t} = Y_{1t} - \hat{Y}_{1t}^{\text{synthetic}} = Y_{1t} - \sum_{j=2}^{J+1} w_j^* Y_{jt}
+\min_{\mathbf{W} \in \mathcal{W}} \|\mathbf{X}_1 - \mathbf{X}_0 \mathbf{W}\|_V^2 = (\mathbf{X}_1 - \mathbf{X}_0 \mathbf{W})^T \mathbf{V} (\mathbf{X}_1 - \mathbf{X}_0 \mathbf{W})
 $$
+
+where $\mathbf{V}$ is a positive semi-definite predictor importance weighting matrix.
+
+The treatment effect trajectory for any post-intervention period $t > T_0$ is:
+
+$$
+\hat{\tau}_{1t} = Y_{1t} - \sum_{j=2}^{J+1} w_j^* Y_{jt}
+$$
+
+### Why the Math Works Step-by-Step
+
+1. **Why constrain weights to the unit simplex ($w_j \ge 0, \sum w_j = 1$)?**
+   Non-negative weights prevent **extrapolation**. In standard linear regression, coefficients can be negative or giant numbers, predicting synthetic outcomes outside the realm of physical possibility. The simplex constraint guarantees pure interpolation within the support of the donor pool!
+2. **Sparsity of the Solution:**
+   Because the objective is optimized over a simplex polytope, the optimal weight vector $\mathbf{W}^*$ is naturally sparse: only a small handful of donor units receive positive weights, making the synthetic twin fully transparent and interpretable.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $j = 1$: The single aggregate unit receiving policy intervention (e.g., California, West Germany).
-* $j \in \{2, \dots, J+1\}$: Untreated donor pool of comparable units unexposed to the intervention.
-* $T_0$: Number of pre-intervention time periods observed prior to policy enactment.
-* $\mathbf{X}_1 \in \mathbb{R}^{K \times 1}$: Vector of pre-treatment characteristics and lagged outcome variables for the treated unit.
-* $\mathbf{X}_0 \in \mathbb{R}^{K \times J}$: Matrix assembling the same pre-treatment characteristics for all $J$ donor units.
-* $\mathbf{W}^* \in \Delta^J$: Optimal weight vector restricted to the probability simplex ($\sum w_j = 1$, $w_j \ge 0$).
-* $\mathbf{V}$: Positive semi-definite weighting matrix tuning the relative importance of predictor covariates.
-* $\hat{Y}_{1t}^{\text{synthetic}} = \sum_{j=2}^{J+1} w_j^* Y_{jt}$: Synthetically constructed counterfactual outcome path.
-* $\hat{\tau}_{1t}$: Time-varying causal treatment effect estimated for period $t > T_0$.
+* $\mathbf{X}_1 \in \mathbb{R}^{K \times 1}$: Pre-intervention characteristics vector of treated unit.
+* $\mathbf{X}_0 \in \mathbb{R}^{K \times J}$: Pre-intervention characteristics matrix of donor pool.
+* $\mathbf{W}^* \in \mathcal{W}$: Optimal simplex weight vector cooking up the synthetic twin.
+* $\hat{\tau}_{1t}$: Estimated causal gap at post-intervention time $t$.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\mathcal{W}$ | فضاء البساطة المحدبة (Simplex) | قيد رياضي يفرض أوزانًا موجبة مجموعها 1 لضمان المزج المنطقي الواقعي. |
+| $\mathbf{X}_1 - \mathbf{X}_0 \mathbf{W}$ | فجوة التطابق المسبق | الفارق بين صفات الوحدة الحقيقية وتوأمها الاصطناعي خلال سنوات ما قبل القرار. |
+| $\mathbf{V}$ | مصفوفة أهمية الميزات | مصفوفة ترجيحية تعطي وزنًا أكبر للخصائص الأكثر قدرة على التنبؤ بالمستقبل. |
+| $\hat{\tau}_{1t}$ | الفجوة السببية التراكمية | الأثر السببي الصافي المقاس كفارق بين مسار الواقع ومسار التوأم الاصطناعي. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -101,56 +171,43 @@ test_cases:
 import numpy as np
 
 def fit_synthetic_control_simplex(
-    X1: np.ndarray,
-    X0: np.ndarray,
-    lr: float = 0.05,
-    max_iter: int = 500
-) -> dict[str, object]:
+    y_treated_pre: np.ndarray,
+    Y_donor_pre: np.ndarray,
+    max_iter: int = 1000,
+    lr: float = 0.01
+) -> np.ndarray:
     """
-    Computes optimal Synthetic Control weights via Projected Gradient Descent on the probability simplex.
-    
+    Solves for non-negative Synthetic Control weights summing to 1 (projected gradient descent).
+
     Parameters
     ----------
-    X1 : np.ndarray of shape (K,)
-        Predictor characteristics of the treated unit.
-    X0 : np.ndarray of shape (K, J)
-        Predictor characteristics of the J donor units.
-    lr : float
-        Learning rate for gradient steps.
-    max_iter : int
-        Maximum iterations.
-        
+    y_treated_pre : np.ndarray of shape (T0,)
+        Pre-treatment outcome trajectory of treated unit.
+    Y_donor_pre : np.ndarray of shape (T0, J)
+        Pre-treatment trajectories of J donor control units.
+
     Returns
     -------
-    dict with keys:
-        'w': Optimal non-negative weight vector summing to 1.
-        'loss': Final squared Euclidean distance ||X1 - X0 w||^2.
+    np.ndarray of shape (J,) : Simplex weights w.
     """
-    K, J = X0.shape
-    # Step 1: Initialize weights uniformly on the simplex
+    t0, J = Y_donor_pre.shape
+    # Initialize weights uniformly on the simplex
     w = np.full(J, 1.0 / J)
-    
-    def project_simplex(v: np.ndarray) -> np.ndarray:
-        """Projects a vector v onto the probability simplex: sum(w) = 1, w >= 0."""
-        u = np.sort(v)[::-1]
-        cssv = np.cumsum(u)
-        rho = np.nonzero(u * np.arange(1, J + 1) > (cssv - 1))[0][-1]
-        theta = (cssv[rho] - 1.0) / (rho + 1.0)
-        return np.maximum(v - theta, 0.0)
 
-    # Step 2: Projected gradient descent loop
+    # Projected gradient descent to minimize ||y - Y w||^2
     for _ in range(max_iter):
-        diff = X1 - X0 @ w
-        grad = -X0.T @ diff
-        # Gradient step followed by Euclidean projection onto simplex
-        w = project_simplex(w - lr * grad)
-        
-    # Step 3: Compute final pre-treatment fit loss
-    loss = float(np.sum((X1 - X0 @ w) ** 2))
-    return {
-        "w": w,
-        "loss": loss
-    }
+        error = y_treated_pre - Y_donor_pre @ w
+        grad = -2.0 * Y_donor_pre.T @ error
+
+        # Step
+        w = w - lr * grad
+        # Project onto non-negative orthant
+        w = np.maximum(w, 0.0)
+        # Normalize to sum to 1
+        s = np.sum(w)
+        w = w / s if s > 0 else np.full(J, 1.0 / J)
+
+    return w
 ```
 :::
 

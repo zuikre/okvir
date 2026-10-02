@@ -14,21 +14,79 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Remember playing the classic parlor game **"20 Questions"** as a child? You do not attempt to guess an opponent's secret animal by multiplying arbitrary numbers or solving a system of simultaneous equations. Instead, you pose sharp, hierarchical, binary questions designed to cut ambiguity in half: *"Is it warm-blooded?"* If yes: *"Does it live on land?"* If yes: *"Does it have orange fur with black stripes?"* With fewer than ten well-crafted yes-or-no questions, you can effortlessly isolate a Bengal tiger out of millions of candidate organisms on Earth.
+### Intuition & Real-World Story
 
-This hierarchical process mirrors the architecture of **Decision Trees (CART - Classification and Regression Trees)**, pioneered by Leo Breiman, Jerome Friedman, Richard Olshen, and Charles Stone (1984). While linear models force the world into rigid additive formulas—assuming every feature acts independently—real-world phenomena are intensely conditional and interaction-heavy. In emergency medicine, elevated heart rate is benign in a marathon runner, but life-threatening in an elderly patient experiencing chest trauma. A decision tree naturally captures these non-linear logical interactions by partitioning feature space into a patchwork of orthogonal, axis-aligned rectangular boxes.
+Remember playing the classic game **"20 Questions"** as a child?
 
-At every internal node of the tree, the algorithm acts as an impatient, greedy optimizer. Imagine having a bucket filled with 50 red marbles and 50 blue marbles. The bucket is thoroughly mixed, disordered, and **impure**: if you reach in blindfolded and draw two marbles, there is a $50\%$ chance they will have different colors. The tree's mission is to search across every available feature $j$ and every possible numerical threshold $s$ (e.g., *"Is Systolic BP $> 140$?"*) to find the single dividing cut that splits the bucket into two child groups that are as pure and homogeneous as possible. This degree of purity is quantified mathematically using **Gini Impurity** or **Shannon Entropy**.
+You don't guess your friend's secret animal by multiplying arbitrary numbers or fitting matrix calculus equations. Instead, you ask sharp, hierarchical yes/no questions designed to cut uncertainty in half:
+*"Is it warm-blooded?"* $\to$ Yes $\to$ *"Does it live on land?"* $\to$ Yes $\to$ *"Does it have orange fur with black stripes?"* $\to$ Yes $\to$ *"It's a tiger!"*
 
-However, an unconstrained decision tree is like an overgrown, invasive weed. If left to grow unchecked, the tree will continue sprouting bifurcating branches until every single historical training sample rests in its own isolated leaf node. The resulting tree will boast a flawless $100\%$ training accuracy, but it has simply memorized idiosyncratic noise and measurement artifacts—the textbook definition of **overfitting**. To cultivate an interpretable, generalizable tree, **Cost-Complexity Pruning** introduces mathematical gardening shears: it penalizes the tree by a complexity factor $\alpha |\tilde{\mathcal{T}}|$ for every additional leaf, pruning away brittle outer twigs whose marginal gain in purity fails to justify their structural complexity.
+With fewer than ten well-crafted binary questions, you can effortlessly identify one creature out of millions.
 
-تذكر لعبة الطفولة الشهيرة **"20 سؤالاً"**: عندما تحاول تخمين حيوان سري يفكر فيه صديقك، فإنك لا تلجأ لمعادلات جبرية معقدة، بل تطرح أسئلة ثنائية هرمية ذكية تقسم دائرة الاحتمالات إلى النصف في كل خطوة: *"هل هو ذو دم حار؟"* فإذا كانت الإجابة نعم: *"هل يعيش على اليابسة؟"* فإذا كانت نعم: *"هل يمتلك فراءً مخططاً؟"*. ومن خلال بضعة أسئلة محكمة، تستطيع تمييز النمر البنغالي من بين ملايين الكائنات الحية على وجه الأرض بسهولة مدهشة.
+This intuitive flowchart logic is the essence of **Decision Trees (CART - Classification and Regression Trees)**, formulated by Leo Breiman and colleagues in 1984.
 
-هذه البنية الهرمية الذكية هي جوهر **أشجار القرار (Classification and Regression Trees - CART)** التي ابتكرها ليو بريمان وزملاؤه (1984). في حين تجبر النماذج الخطية العالم الحقيقي على الخضوع لعلاقات جمعية صلبة تفترض استقلال المتغيرات، فإن الواقع الإنساني والبيولوجي حافل بالتفاعلات الشرطية المتشابكة؛ فارتفاع نبضات القلب أمر طبيعي تماماً لدى رياضي يمارس الجري، ولكنه مؤشر خطر داهم لدى مريض مسن يعاني من آلام في الصدر. تلتقط أشجار القرار هذه الشروط المنطقية المعقدة بصورة فطرية عبر تقسيم فضاء المتغيرات إلى مربعات ومكعبات متعامدة هندسياً.
+While linear regression forces the world into rigid additive equations—assuming every variable acts independently—reality is packed with conditional interactions. In emergency medicine, a heart rate of 140 bpm is perfectly normal for an athlete finishing a marathon, but terrifying in an elderly patient complaining of chest pressure! A decision tree captures these conditional branches naturally by slicing the feature space into a clean patchwork of rectangular boxes.
 
-عند كل عقدة داخلية، تعمل الشجرة كمحسن طماع يبحث عن النقاء المطلق. تخيل وعاءً يحتوي على 50 كرة حمراء و 50 كرة زرقاء؛ هذا الوعاء مفرط في الفوضى والخلط واللايقين؛ فإذا سحبت كرتين عشوائياً وأنت معصوب العينين، فهناك احتمال $50\%$ ألا تتطابق ألوانهما. هدف الشجرة عند كل تفرع هو مسح جميع المتغيرات وكافة العتبات الرقمية الممكنة لاكتشاف السؤال القاطع الذي يقسم الوعاء إلى مجموعتين فرعيتين بأعلى درجة ممكنة من النقاء والصفاء (Impurity Reduction)، ويتم قياس هذا النقاء رياضياً عبر **لايقين جيني (Gini Impurity)** أو **إنتروبيا شانون (Shannon Entropy)**.
+At every step, the tree acts as a greedy purity seeker:
+Imagine having a bowl filled with **50 red marbles and 50 blue marbles**. The bowl is thoroughly mixed and **impure**: if you reach in blindfolded and draw two marbles, there is a 50% chance they won't match.
+The tree tests every single feature and every numerical threshold (e.g., *"Is Blood Pressure $> 140$?"*) to find the split that separates the marbles into child bowls that are as pure and monochromatic as possible. Purity is measured using **Gini Impurity** or **Shannon Entropy**.
 
-لكن الشجرة التي تُترك تنمو بلا قيود تشبه نباتاً برياً طفيلياً؛ حيث ستواصل التفرع بلا نهاية حتى تنعزل كل نقطة تدريب واحدة في ورقة مستقلة خاصة بها. ستحقق الشجرة دقة تدريب كاذبة بنسبة $100\%$، لكنها لم تتعلم شيئاً سوى حفظ الضجيج العشوائي للعينة (Overfitting). ولتهذيب هذا النمو الجامح، يطبق **تقليم التكلفة والتعقيد (Cost-Complexity Pruning)** مقصاً رياضياً حاسماً: يفرض جزاءً عقابياً $\alpha |\tilde{\mathcal{T}}|$ على كل ورقة شجرية إضافية، ليقص الفروع الهشة والزوائد الهامشية التي لا يقدم نقاؤها إضافة حقيقية تبرر تعقيد هيكل الشجرة.
+However, an unchecked decision tree behaves like a wild weed. If left unconstrained, it will keep branching until every single training sample lives in its own private leaf node. The tree boasts 100% training accuracy, but it has simply memorized accidental noise—the textbook definition of **overfitting**.
+To build a resilient tree, **Cost-Complexity Pruning** uses mathematical pruning shears: it penalizes the tree for every extra leaf ($\alpha |\mathcal{T}|$), lopping off weak outer twigs that don't earn their keep.
+
+#### Jargon Decoder
+
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **CART** | Classification and Regression Trees: binary tree algorithm that splits data into pure subsets. |
+| **Gini Impurity** | Disorder score: probability that two randomly drawn samples from a leaf have different labels. |
+| **Shannon Entropy** | Information deficit: measures bit-level chaos and uncertainty in a distribution. |
+| **Greedy Split** | Myopic choice: picks the best immediate split right now, without looking steps ahead. |
+| **Cost-Complexity Pruning** | Gardening shears: chops off brittle outer leaves that add complexity without real predictive value. |
+
+```text
+    THE CART BINARY DECISION TREE:
+
+                    [Chest Pain > 0?]
+                       /          \
+                    No/            \Yes
+                     v              v
+               [Low Risk]    [Age > 60?]
+                               /     \
+                            No/       \Yes
+                             v         v
+                      [Moderate]   [High Risk: ECG]
+```
+
+### الحدس والقصة الواقعية
+
+تذكر لعبة الطفولة الشهيرة **"20 سؤالاً"**:
+
+عندما تحاول تخمين الحيوان السري الذي يفكر فيه صديقك، فإنك لا تلجأ لمعادلات جبرية معقدة، بل تطرح أسئلة ثنائية ذكية تقسم دائرة الشك إلى النصف في كل خطوة:
+*"هل هو ذو دم حار؟"* $\to$ نعم $\to$ *"هل يعيش على اليابسة؟"* $\to$ نعم $\to$ *"هل يمتلك فراءً برتقالياً بخطوط سوداء؟"* $\to$ نعم $\to$ *"إنه النمر!"*
+
+ومن خلال بضعة أسئلة محكمة، تستطيع تمييز كائن واحد من بين ملايين الكائنات الحية بسهولة مدهشة.
+
+هذا المخطط الانسيابي الذكي هو جوهر **أشجار القرار (CART - أشجار التصنيف والانحدار)** التي ابتكرها ليو بريمان وزملاؤه عام 1984.
+
+في حين تجبر النماذج الخطية البيانات على الخضوع لمعادلات جمعية صلبة تفترض استقلال المتغيرات، فإن الواقع حافل بالتفاعلات الشرطية المتشابكة؛ فارتفاع نبضات القلب إلى 140 نبضة أمر طبيعي لعداء أنهى سباقه، ولكنه مؤشر خطر داهم لمسن يعاني من آلام في الصدر! تلتقط أشجار القرار هذه الشروط المنطقية بصورة فطرية عبر تقسيم فضاء البيانات إلى مكعبات ومربعات متعامدة هندسياً.
+
+عند كل خطوة، تبحث الشجرة بنهم عن النقاء التام:
+تخيل وعاءً يحتوي على **50 كرة حمراء و 50 كرة زرقاء**. هذا الوعاء مفرط في الخلط واللايقين؛ فإذا سحبت كرتين عشوائياً، فهناك احتمال 50% ألا تتطابق ألوانهما.
+تمسح الشجرة كافة المتغيرات وكل العتبات الرقمية الممكنة لاكتشاف السؤال القاطع الذي يقسم الكرات إلى مجموعتين بأعلى درجة ممكنة من النقاء والصفاء، ويتم قياس هذا النقاء رياضياً عبر **لايقين جيني (Gini Impurity)** أو **إنتروبيا شانون (Entropy)**.
+
+لكن الشجرة التي تُترك تنمو بلا قيود تشبه نباتاً برياً طفيلياً؛ حيث ستواصل التفرع حتى تنعزل كل نقطة تدريب واحدة في ورقة مستقلة. ستحقق الشجرة دقة تدريب كاذبة 100%، لكنها حفظت الضجيج العشوائي فقط (Overfitting).
+ولتهذيب هذا النمو، يطبق **تقليم التكلفة والتعقيد (Cost-Complexity Pruning)** مقصاً رياضياً حاسماً: يفرض عقوبة على كل ورقة إضافية ($\alpha |\mathcal{T}|$)، ليقص الفروع الهشة التي لا تقدم إضافة حقيقية تبرر تعقيد هيكل الشجرة.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **أشجار CART** | أشجار التصنيف والانحدار: خوارزمية هرمية ثنائية تقسم البيانات إلى مجموعات نقية. |
+| **لايقين جيني (Gini)** | مقياس الفوضى: احتمال أن تسحب عينتين عشوائياً من نفس العقدة وتجدهما من فئتين مختلفتين. |
+| **إنتروبيا شانون** | عجز المعلومات: يقيس مستوى الفوضى والغموض في التوزيع الاحتمالي. |
+| **التقسيم الطماع** | الاختيار قصير النظر: يختار أفضل تقسيم متاح حالياً دون النظر للعواقب اللاحقة. |
+| **تقليم التكلفة والتعقيد** | مقص البستاني: يقطع الفروع الرقيقة التي تضيف تعقيداً هيكلياً دون فائدة تنبؤية حقيقية. |
 
 :::simulation-widget{engine="canvas2d" component="DecisionTreeLaser"}
 ---
@@ -58,55 +116,47 @@ To evaluate the heterogeneity of node $m$, CART relies on concave uncertainty me
    $$
    H(m) = -\sum_{k=1}^K p_{mk} \log_2(p_{mk})
    $$
-   Measured in bits of uncertainty, reaching a maximum of $\log_2(K)$ under uniform class dispersion.
 
-### Greedy Bipartition Splitting Criterion
-At node $m$, CART performs an exhaustive search across every feature $j \in \{1, \dots, P\}$ and every candidate split threshold $s \in \mathbb{R}$. A candidate split divides $\mathcal{S}_m$ into left and right children:
-
-$$
-\mathcal{S}_L(j, s) = \{i \in \mathcal{S}_m : X_{ij} \le s\}, \quad \mathcal{S}_R(j, s) = \{i \in \mathcal{S}_m : X_{ij} > s\}
-$$
-
-The optimal split $(j^*, s^*)$ maximizes the **Impurity Reduction (Information Gain)**:
+### The Greedy Best-Split Objective
+A candidate split $\theta = (j, s)$ on feature $j$ at threshold $s$ partitions node $m$ into left and right children:
 
 $$
-\Delta I(m, j, s) = I(m) - \left[ \frac{N_L}{N_m} I\left(\mathcal{S}_L(j, s)\right) + \frac{N_R}{N_m} I\left(\mathcal{S}_R(j, s)\right) \right]
+\mathcal{S}_{m, L}(\theta) = \{i \in \mathcal{S}_m : x_{ij} \le s\}, \quad \mathcal{S}_{m, R}(\theta) = \{i \in \mathcal{S}_m : x_{ij} > s\}
 $$
 
-### Minimal Cost-Complexity Pruning
-Let $\mathcal{T}_{\max}$ denote the fully expanded, unconstrained tree. For any sub-tree $\mathcal{T} \subseteq \mathcal{T}_{\max}$, let $\tilde{\mathcal{T}}$ denote its set of terminal leaf nodes. The cost-complexity criterion defines an objective that penalizes tree size:
+The impurity reduction (split gain) is:
 
 $$
-\mathcal{R}_\alpha(\mathcal{T}) = \sum_{m \in \tilde{\mathcal{T}}} N_m I(m) + \alpha |\tilde{\mathcal{T}}|
+\Delta I(m, \theta) = I(m) - \left[ \frac{N_{m, L}}{N_m} I(m, L) + \frac{N_{m, R}}{N_m} I(m, R) \right]
 $$
 
-where:
-- $\sum_{m \in \tilde{\mathcal{T}}} N_m I(m)$: Total empirical misclassification or impurity across all terminal leaves.
-- $|\tilde{\mathcal{T}}|$: Total leaf count parameterizing tree structural complexity.
-- $\alpha \ge 0$: Regularization hyperparameter governing the penalty per additional leaf node.
-
-Breiman proved that as $\alpha$ increases from $0$ to $\infty$, there exists a unique, nested sequence of subtrees $\mathcal{T}_{\max} = \mathcal{T}_0 \supset \mathcal{T}_1 \supset \mathcal{T}_2 \supset \dots \supset \text{root}$. For each internal branch node $t$, the weakest-link collapsing threshold is:
+CART chooses the optimal split $\theta^*$ by maximizing impurity reduction:
 
 $$
-\alpha_{\text{eff}}(t) = \frac{R(t) - R(\mathcal{T}_t)}{|\tilde{\mathcal{T}}_t| - 1}
+\theta^* = \arg\max_\theta \Delta I(m, \theta)
 $$
 
-The branch with the smallest $\alpha_{\text{eff}}$ is pruned first, providing a principled path to tune tree size via held-out cross-validation.
+### Cost-Complexity Pruning (Breiman et al., 1984)
+Given a fully grown tree $\mathcal{T}_{\max}$, we minimize the penalized cost-complexity criterion:
+
+$$
+R_\alpha(\mathcal{T}) = R(\mathcal{T}) + \alpha |\tilde{\mathcal{T}}|
+$$
+
+where $R(\mathcal{T}) = \sum_{m \in \tilde{\mathcal{T}}} \frac{N_m}{N} I(m)$ is total misclassification loss, $|\tilde{\mathcal{T}}|$ is the number of terminal leaves, and $\alpha \ge 0$ is the complexity penalty parameter.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $m$: Current tree node indexing regional feature subset $\mathcal{S}_m$.
-* $N_m = |\mathcal{S}_m|$: Number of training samples residing inside node $m$.
-* $p_{mk}$: Proportion of samples in node $m$ that belong to class $k$.
-* $I_G(m)$: Gini impurity quantifying the variance of class indicators.
-* $H(m)$: Shannon entropy quantifying average information content in bits.
-* $j, s$: Candidate feature dimension and numerical threshold defining a coordinate cutting hyperplane.
-* $\Delta I(m, j, s)$: Impurity reduction (information gain) achieved by splitting node $m$ on $(j, s)$.
-* $\mathcal{T}$: Any candidate subtree obtained by collapsing internal branches.
-* $\tilde{\mathcal{T}}$: Set of terminal leaf nodes representing final prediction partitions.
-* $|\tilde{\mathcal{T}}|$: Integer leaf count quantifying structural tree complexity.
-* $\alpha \ge 0$: Cost-complexity regularization penalty per terminal leaf.
-* $\alpha_{\text{eff}}(t)$: Effective threshold value at which collapsing internal branch $t$ minimizes cost-complexity.
+| Symbol / Term | Formal Definition | Intuitive Meaning / Role | المعنى والمدلول بالعربية |
+| :--- | :--- | :--- | :--- |
+| $\mathcal{S}_m$ | Data subset at node $m$ | Training observations falling into region $m$ | عينات التدريب الواقعة ضمن نطاق العقدة $m$ |
+| $p_{mk}$ | $\frac{1}{N_m}\sum \mathbb{I}(y_i=k)$ | Empirical class probability in node $m$ | الاحتمال التجريبي للفئة $k$ في العقدة $m$ |
+| $I_G(m)$ | $1 - \sum p_{mk}^2$ | Gini impurity: variance of class assignments | لايقين جيني: مقياس التشتت وعدم التجانس |
+| $H(m)$ | $-\sum p_{mk} \log_2(p_{mk})$ | Shannon entropy: information deficit | إنتروبيا شانون: مقياس الفوضى المعلوماتية |
+| $\theta = (j, s)$ | Feature $j$, threshold $s$ | Decision rule splitting a node in two | قاعدة القرار الفاصلة للمتغير والعتبة |
+| $\Delta I(m, \theta)$ | Impurity gain | Purity improvement achieved by split $\theta$ | التحسن في نقاء البيانات الناتج عن التقسيم |
+| $|\tilde{\mathcal{T}}|$ | Terminal leaf count | Structural complexity of the tree | عدد الأوراق الطرفية ومقياس تعقيد الشجرة |
+| $\alpha$ | Pruning penalty | Tuning parameter balancing accuracy vs tree size | معامل جزاء التقليم الموازن بين الدقة والحجم |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 

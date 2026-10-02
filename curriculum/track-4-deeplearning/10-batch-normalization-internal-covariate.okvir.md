@@ -27,6 +27,42 @@ In 2015, Sergey Ioffe and Christian Szegedy introduced a transformative stabiliz
 * **During Training:** BatchNorm calculates statistics dynamically from the active mini-batch. Simultaneously, it maintains non-differentiable running averages (`running_mean` and `running_var`) using exponential smoothing.
 * **During Evaluation / Inference:** Mini-batch calculation is completely frozen! The layer normalizes incoming samples using the stored population running statistics. This guarantees that when deploying a model to evaluate a single customer request ($B=1$), the prediction is completely deterministic and stable.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Internal Covariate Shift** (إزاحة التباين الداخلي) | The moving target problem: deeper layers constantly struggle to learn because upstream layers keep changing their output distributions. | مشكلة الهدف المتحرك: صعوبة تعلم الطبقات العميقة بسبب التغير المستمر في توزيع مخرجات الطبقات السابقة. |
+| **Batch Normalization (BatchNorm)** (معايرة الدفعة) | Factory quality control: every batch of parts is recalibrated to zero mean and unit spread before entering the next station. | محطة ضبط الجودة: تتم موازنة مخرجات كل دفعة ليكون متوسطها صفراً وتباينها واحداً قبل دخول المحطة التالية. |
+| **Batch Statistics ($\mu_B, \sigma_B^2$)** (إحصائيات الدفعة) | The empirical mean and variance calculated strictly across the current mini-batch ($B$) for each channel. | المتوسط والتباين المحسوبان حصرياً عبر عينات الدفعة الحالية لكل قناة مستقلة. |
+| **Learnable Affine Knobs ($\gamma, \beta$)** (معاملا التكيّف القابلان للتعلم) | The restoration dials: allow the network to learn back non-zero means or custom scales if optimal performance requires it. | مفتاحا الاستعادة: يسمحان للشبكة باستعادة المتوسط أو التباين المناسب إذا اقتضت مصلحة التعلم ذلك. |
+| **Running Statistics** (الإحصائيات التراكمية المستمرة) | Frozen memory for test time: running averages of mean and variance stored during training so single inference samples work reliably. | ذاكرة مجمدة لوقت الاختبار: متوسطات تراكمية تحفظ أثناء التدريب لتمكين تقييم العينات الفردية بدقة. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+BATCH NORMALIZATION OPERATION (Across Batch Axis B for each Channel D):
+=============================================================================
+Batch Input Tensor X [Shape: (B, D)]:
+Sample 1: [ x_{1,1}, x_{1,2}, ..., x_{1,D} ]
+Sample 2: [ x_{2,1}, x_{2,2}, ..., x_{2,D} ]
+   ...
+Sample B: [ x_{B,1}, x_{B,2}, ..., x_{B,D} ]
+    |
+    v (Compute column-wise statistics along vertical axis B)
+Mean:     \mu_B = (1/B) \sum_{i=1}^B x_{i,j}        [Shape: (1, D)]
+Variance: \sigma_B^2 = (1/B) \sum_{i=1}^B (x_{i,j} - \mu_B)^2 [Shape: (1, D)]
+    |
+    v (Standardize each entry)
+\hat{x}_{i,j} = (x_{i,j} - \mu_B) / \sqrt{\sigma_B^2 + \epsilon}
+    |
+    v (Learnable Affine Scale & Shift)
+y_{i,j} = \gamma_j * \hat{x}_{i,j} + \beta_j       [Shape: (B, D)]
+=============================================================================
+CRITICAL DRAWBACK FOR LLMs:
+- Requires batch size B > 1 (fails completely on single-token generation B=1).
+- Samples interact across batch elements, creating artificial dependencies!
+```
+
 :::simulation-widget{engine="canvas2d" component="NeuralActivationCanvas"}
 ---
 interactive: true

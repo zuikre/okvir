@@ -31,6 +31,17 @@ To understand why Pandas provides two separate indexing paradigms—`loc` and `i
 ### The Secret of Automatic Index Alignment
 When you perform arithmetic between two Pandas Series, such as `revenue - expenses`, Pandas does not blindly subtract position 0 from position 0 like NumPy! It inspects their Name Tags (`loc`). If `revenue` has data for `"AAPL"`, `"MSFT"`, and `"GOOG"`, while `expenses` has data for `"AAPL"` and `"MSFT"`, Pandas automatically aligns the matching companies and inserts `NaN` (Missing Value) for `"GOOG"` to preserve relational integrity!
 
+### Jargon Decoder / قاموس المصطلحات المعمارية
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **`loc` (Label-Based Indexing)** / الفهرسة بالتسمية | Accessing rows and columns by their external semantic name tags. Analogy: Calling someone by their full name in a crowded room. | الوصول للصفوف والأعمدة عبر أسمائها الدلالية الواضحة. التشبيه: مناداة شخص باسمه الكامل داخل قاعة مزدحمة. |
+| **`iloc` (Positional Indexing)** / الفهرسة بالموقع الرقمي | Accessing rows and columns strictly by their 0-indexed integer memory offset. Analogy: Pointing at "the 3rd chair from the left". | الوصول للصفوف والأعمدة حصرياً عبر موقعها الرقمي بدءاً من الصفر. التشبيه: الإشارة إلى "المقعد الثالث من جهة اليسار". |
+| **BlockManager** / مدير الكتل | The internal Pandas engine partitioning columns into contiguous 2D NumPy arrays by dtype. Analogy: Filing cabinets sorted by folder color. | المحرك الداخلي في Pandas الذي يجمع الأعمدة في كتل مصفوفات متجانسة حسب نوع البيانات. التشبيه: خزائن أرشيف مصنفة بألوان الملفات. |
+| **Index Alignment** / المحاذاة التلقائية للفهارس | Automatically matching records sharing the same label during arithmetic operations. Analogy: Pairing students by ID cards regardless of desk order. | مطابقة السجلات التي تشترك في نفس التسمية تلقائياً أثناء الحساب. التشبيه: مطابقة الطلاب وفق أرقامهم الجامعية بصرف النظر عن أماكن جلوسهم. |
+| **Outer Label Union** / اتحاد فضاء التسميات | The combined set of all unique keys from both operands, padding missing entries with `NaN`. Analogy: Merging two guest lists into one master roster. | جمع كافة المفاتيح الفريدة من الطرفين مع تعويض الغائب بـ `NaN`. التشبيه: دمج قائمتي مدعوين مختلفتين في جدول رئيسي واحد. |
+| **Sentinel Value (`NaN`)** / القيمة الدلالية للمفقود | IEEE-754 special floating-point representation marking undefined or missing numeric values. Analogy: An empty seat labeled "Reserved / No Show". | قيمة خاصة في معيار الأرقام العشرية تشير إلى بيانات مفقودة أو غير معرّفة. التشبيه: مقعد شاغر كُتب عليه "محجوز / لم يحضر أحد". |
+
 :::simulation-widget{engine="canvas2d" component="DataFrameBlockManagerLab"}
 ---
 interactive: true
@@ -61,6 +72,37 @@ $$
 \mathcal{D} = \langle \mathcal{I}_{\text{row}}, \mathcal{I}_{\text{col}}, \mathbf{T}, \mathbf{M} \rangle, \quad \text{loc}(r, c) = \mathbf{M}[\mathcal{I}_{\text{row}}(r), \mathcal{I}_{\text{col}}(c)], \quad \text{iloc}(i, j) = \mathbf{M}[i, j]
 $$
 
+```text
+Visual ASCII Transformation: loc vs iloc Resolution & Automatic Index Alignment:
+
+1. Subsystem Layout of a DataFrame:
+   Row Index (Hash Map):      Columns Index:           BlockManager Buffer:
+   "AAPL" -> 0                "revenue" -> 0           Block 0 (float64):
+   "MSFT" -> 1                "cost"    -> 1           [ [ 150.0,  90.0 ],   <- Row 0
+   "GOOG" -> 2                                           [ 300.0, 180.0 ],   <- Row 1
+                                                         [ 2800.0, 1400.0 ] ] <- Row 2
+
+   df.loc["MSFT", "revenue"]:
+     Step 1: Hash lookup "MSFT" in Row Index -> Integer row 1
+     Step 2: Hash lookup "revenue" in Col Index -> Integer col 0
+     Step 3: Retrieve BlockManager[1, 0] -> 300.0
+
+   df.iloc[1, 0]:
+     Step 1: Skip all hash tables! Direct memory offset [1, 0] -> 300.0
+
+2. Automatic Index Alignment in Action:
+   Series A: { "AAPL": 150.0, "MSFT": 300.0 }
+   Series B: { "AAPL": 140.0, "GOOG": 2800.0 }
+
+   Operation: Series A - Series B
+   Step 1: Construct outer union of labels: { "AAPL", "GOOG", "MSFT" }
+   Step 2: Align values:
+     "AAPL": 150.0 - 140.0 = 10.0
+     "GOOG":   NaN - 2800.0 = NaN  (Missing in Series A!)
+     "MSFT": 300.0 -   NaN = NaN  (Missing in Series B!)
+   Result: { "AAPL": 10.0, "GOOG": NaN, "MSFT": NaN }
+```
+
 ### Mathematical Invariants & Symbol Breakdown
 
 | الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
@@ -73,9 +115,18 @@ $$
 | $\text{iloc}(i, j)$ | Position space indexing | Direct array offset dereference bypassing hash index tables | الوصول المباشر عبر الإحداثيات الرقمية متجاوزاً جداول التجزئة |
 | $\oplus$ | Relational binary op | Evaluates across label domain union $\text{dom}(A) \cup \text{dom}(B)$ | العملية الثنائية التي تُنفذ على اتحاد فضاء التسميات للسلسلتين |
 
-When an arithmetic operation $\mathcal{S}_A \oplus \mathcal{S}_B$ is evaluated, Pandas constructs the outer union of the label sets: $\mathcal{L}_{\text{out}} = \text{dom}(\mathcal{S}_A) \cup \text{dom}(\mathcal{S}_B)$. For any label $\ell$ present in only one operand, the missing value is imputed with $\bot_{\text{NaN}}$, ensuring that mathematical alignment is governed by identity rather than accidental positional ordering.
-
-عند تقييم عملية حسابية بين سلسلتين $\mathcal{S}_A \oplus \mathcal{S}_B$، تبني Pandas الاتحاد الخارجي لمجموعتي التسميات: $\mathcal{L}_{\text{out}} = \text{dom}(\mathcal{S}_A) \cup \text{dom}(\mathcal{S}_B)$. وأي تسمية $\ell$ تظهر في طرف وتغيب عن الآخر، يُعوض مكانها بالقيمة $\bot_{\text{NaN}}$، مما يضمن أن تكون المحاذاة محكومة بهوية الكيان الاسمية وليس بترتيبه الفيزيائي العرضي.
+#### Step-by-Step Arithmetic Cost & Invariant Breakdown:
+1. **Positional Access Latency (`iloc`)**:
+   - Access cost: $\mathcal{O}(1)$ direct CPU pointer indexing ($\approx 10\text{ ns}$).
+   - No string hashing or dictionary key lookups.
+2. **Label Access Latency (`loc`)**:
+   - Access cost: $\mathcal{O}(1)$ average hash map lookup per index ($\approx 50 - 100\text{ ns}$).
+   - String key hash code calculation + collision probing + pointer chase.
+3. **Index Alignment Invariant**:
+   For operation $\mathcal{S}_A \oplus \mathcal{S}_B$:
+   $$\mathcal{L}_{\text{out}} = \text{dom}(\mathcal{S}_A) \cup \text{dom}(\mathcal{S}_B)$$
+   Time complexity $= \mathcal{O}(|\text{dom}(A)| + |\text{dom}(B)|)$ to construct union and reindex blocks.
+   Any label present in only one Series propagates $\text{NaN}$ unless explicit `fill_value` imputation is specified.
 
 ## Beat 3: Interactive Code Challenge
 
@@ -107,11 +158,18 @@ def align_and_compute_spread(
         Dictionary mapping each unique label to (val_a - val_b) rounded to 6 decimal places,
         sorted alphabetically by key.
     """
-    # Step 1: Collect sorted union of all keys across series_a and series_b
-    # Step 2: For each key, extract val_a (with fill_value fallback) and val_b (with fill_value fallback)
-    # Step 3: Compute diff = round(val_a - val_b, 6)
-    # Step 4: Return dictionary mapping key -> diff
-    raise NotImplementedError("Implement align_and_compute_spread")
+    # Step 1: Collect sorted union of all unique keys across series_a and series_b
+    all_keys = sorted(set(series_a.keys()) | set(series_b.keys()))
+
+    # Step 2: Compute element-wise difference with default fill_value imputation
+    result: dict[str, float] = {}
+    for key in all_keys:
+        val_a = series_a.get(key, fill_value)
+        val_b = series_b.get(key, fill_value)
+        result[key] = round(val_a - val_b, 6)
+
+    # Step 3: Return aligned spread dictionary
+    return result
 ```
 :::
 
@@ -138,10 +196,10 @@ In an automated quantitative hedge fund, a trading algorithm calculates the dail
 - **Why Option (A) is correct:** Applying binary arithmetic operators like `-` directly between Pandas Series invokes an outer join on their respective Index objects. When a date exists in `stock_a` but is missing in `stock_b`, the calculation becomes `value - NaN`, which evaluates to `NaN`. In robust production pipelines, engineers prevent unintended NaNs by calling the explicit method `stock_a.sub(stock_b, fill_value=...)` or aligning date indices with `reindex(..., method='ffill')` to propagate the last traded closing price.
 - **Why Option (B) is incorrect:** Pandas was explicitly built around DateTimeIndex and String Index structures; index alignment functions identically across all index types.
 - **Why Option (C) is incorrect:** Underflow produces subnormal floating-point values or $0.0$, not `NaN`. `NaN` is an IEEE-754 sentinel for undefined or missing numeric values.
-- **Why Option (D) is incorrect:** Converting to Python lists strips index labels and blindly pairs elements by position, causing catastrophic misalignment where Monday of stock A is subtracted from Wednesday of stock B!
+- **Why Option (D) is incorrect:** Converting to lists discards index alignment completely, causing silent positional misalignment where prices from completely different calendar dates are subtracted!
 
 *التفسير الهندسي المعمق وتحليل الخيارات:*
-- **لماذا الخيار (A) صحيح:** تطبيق مُعاملات الحساب المباشرة مثل `-` بين سلاسل Pandas يُجري ربطاً خارجياً (Outer Join) على فهارس التواريخ. وإذا وُجد تاريخ في السهم الأول وغاب عن الثاني، تصبح العملية `value - NaN` والتي تعيد دائماً `NaN`. في الأنظمة الحساسة، يتفادى المهندسون ذلك باستخدام التابع الصريح `stock_a.sub(stock_b, fill_value=...)` أو ملء الأسعار السابقة باستخدام `.ffill()` لضمان استمرار السعر الأخير للتداول.
-- **لماذا الخيار (B) خاطئ:** صُممت مكتبة Pandas خصيصاً للتعامل مع فهارس التواريخ والنصوص، وتعمل محاذاة الفهارس بنفس الكفاءة مع جميع الأنواع.
-- **لماذا الخيار (C) خاطئ:** الفيضان السفلي للدقة (Underflow) ينتج عنه أرقام بالغة الصغر تقترب من الصفر $0.0$ وليس `NaN`؛ حيث أن `NaN` قيمة معيارية تمثل البيانات المفقودة.
-- **لماذا الخيار (D) خاطئ:** تحويل البيانات إلى قوائم بايثون عادية يحذف بطاقات التواريخ تماماً ويطرح العناصر حسب ترتيب المقاعد الفيزيائي المجرد، مما يتسبب في كارثة محاذاة حيث يُطرح سعر يوم الإثنين للسهم الأول من سعر يوم الأربعاء للسهم الثاني!
+- **لماذا الخيار (A) صحيح:** تطبيق عمليات الطرح المباشرة `-` بين سلاسل Pandas يستدعي دمجاً خارجياً (Outer Join) على كائنات الفهرس. وعندما يتواجد تاريخ في `stock_a` ويغيب عن `stock_b`، تتحول العملية إلى `قيمة - NaN` والتي تعيد `NaN` حتماً. في الأنظمة الإنتاجية، يتفادى المهندسون ذلك باستدعاء الدالة الصريحة `stock_a.sub(stock_b, fill_value=...)` أو ملء القيم المفقودة من آخر سعر تداول عبر `ffill()` قبل الطرح.
+- **لماذا الخيار (B) خاطئ:** بنيت Pandas في الأصل للتعامل مع السلاسل الزمنية وفهارس التواريخ والنصوص، وتعمل المحاذاة بذات الدقة عبر كافة أنواع الفهارس.
+- **لماذا الخيار (C) خاطئ:** الفيضان السفلي للدقة العشرية ينتج أرقاماً متناهية الصغر أو صفراً $0.0$، وليس `NaN`. قيمة `NaN` هي علامة معيارية تدل على بيانات مفقودة.
+- **لماذا الخيار (D) خاطئ:** تحويل السلاسل إلى قوائم بايثون عادية يلغي فهارس التواريخ تماماً، مما يسبب كارثة طرح أسعار أيام مختلفة عن بعضها لمجرد تطابق ترتيبها الموضعي في القائمة!

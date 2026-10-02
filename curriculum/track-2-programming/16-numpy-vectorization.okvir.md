@@ -25,6 +25,17 @@ To visualize this physical hardware disparity, imagine a restaurant kitchen task
 
 By packing raw numeric bytes into contiguous memory, NumPy allows the CPU hardware prefetcher to stream sequential 64-byte cache lines directly into L1/L2 caches at memory bus speeds, feeding vector execution units without a single wasted cycle.
 
+### Jargon Decoder / قاموس المصطلحات المعمارية
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **SIMD (Single Instruction, Multiple Data)** / تعليمة واحدة لبيانات متعددة | CPU capability to perform the exact same mathematical operation on multiple numbers simultaneously in one cycle. Analogy: An ice cube tray that fills 8 slots at once from a single tap. | قدرة المعالج على تنفيذ نفس العملية الرياضية على عدة أرقام في نبضة ساعة واحدة. التشبيه: قالب ثلج يُملأ فيه 8 مكعبات دفعة واحدة من صنبور واحد. |
+| **Contiguous C-Buffer** / مخزن ذاكري متصل | Packing unboxed primitive bytes consecutively in RAM without padding or pointers. Analogy: A carton of eggs packed snug and flush side by side. | رصف الأرقام الخام كبايتات متتالية مباشرة في الذاكرة دون مؤشرات أو فواصل. التشبيه: كرتونة بيض مرتبة بتراص تام جنباً إلى جنب. |
+| **Hardware Prefetcher** / وحدة الجلب المسبق العتادية | Silicon circuit predicting sequential reads and streaming data into CPU cache lines before instructions ask for it. Analogy: A proactive assistant placing the next document on your desk before you ask. | دائرة إلكترونية في المعالج تتوقع القراءة المتتابعة وتسحب البيانات مسبقاً إلى الكاش. التشبيه: مساعد استباقي يضع الملف التالي على مكتبك قبل أن تطلبه. |
+| **Vector Registers (AVX2 / AVX-512)** / سجلات المتجهات العتادية | Ultra-wide CPU registers (256-bit or 512-bit) holding 4 to 8 64-bit numbers at once. Analogy: A wide snowplow clearing 4 highway lanes in a single drive. | مسجلات فائقة العرض في المعالج (256 أو 512 بت) تتسع لـ 4 إلى 8 أرقام حقيقية معاً. التشبيه: كاسحة ثلوج عريضة تجرف 4 مسارات طريق دفعة واحدة. |
+| **PyObject Boxing/Unboxing** / تغليف وفك تغليف الكائنات | Wrapping raw bytes into a CPython object header or extracting primitive values from it. Analogy: Placing a tiny USB drive in a nested wooden Russian doll and opening it every time. | تغليف البايتات الخام بترويسة كائن بايثون أو استخراج القيمة العددية منها. التشبيه: وضع شريحة ذاكرة صغيرة داخل دمية خشبية روسية وفتحها عند كل استخدام. |
+| **Scalar vs Vector ALU** / وحدة الحساب السلمية والمتجهة | Computing one number pair at a time (scalar) versus processing an entire batch of pairs in parallel (vector). Analogy: Chopping one carrot at a time vs using an 8-blade food processor. | إجراء الحساب لزوج واحد من الأرقام في كل دورة مقابل معالجة حزمة كاملة بالتوازي. التشبيه: تقطيع جزرة واحدة بسكين عادي مقابل قطاعة آلية بـ 8 شفرات. |
+
 :::simulation-widget{engine="canvas2d" component="SimdVsLoopBenchmarkLab"}
 ---
 interactive: true
@@ -49,6 +60,30 @@ $$
 T_{\text{CPython}} = N \cdot \left( \tau_{\text{dispatch}} + \tau_{\text{deref}} + \tau_{\text{typecheck}} + \tau_{\text{unbox}} + \tau_{\text{alu}} + \tau_{\text{box}} \right) \quad \gg \quad T_{\text{SIMD}} = \left\lceil \frac{N}{W_{\text{SIMD}}} \right\rceil \cdot \tau_{\text{vector\_alu}} + \tau_{\text{load}}
 $$
 
+```text
+Visual ASCII Transformation: Scalar CPython Loop vs SIMD Vector Register Execution:
+
+Pure Python Scalar Addition (Item-by-Item Pointer Chasing):
+Step 1: list_a[i] -> Fetch pointer (0x1A40) -> Read PyFloat (24 bytes) -> Unbox to float
+Step 2: list_b[i] -> Fetch pointer (0x8F90) -> Read PyFloat (24 bytes) -> Unbox to float
+Step 3: Scalar ALU executes 1 addition (1 cycle)
+Step 4: Allocate new PyFloatObject on heap (24 bytes) -> Box result -> Store pointer
+===> Cost: ~120 clock cycles per scalar element!
+
+NumPy SIMD Vectorized Addition (AVX2 256-bit Register):
+Memory: Contiguous 64-bit IEEE-754 Floats in RAM
+Buffer A: [  1.0  |  2.0  |  3.0  |  4.0  ]   (Loaded into YMM0 in 1 memory stream)
+Buffer B: [ 10.0  | 20.0  | 30.0  | 40.0  ]   (Loaded into YMM1 in 1 memory stream)
+
+Vector Register YMM0: |  1.0  |  2.0  |  3.0  |  4.0  |
+Vector Register YMM1: | 10.0  | 20.0  | 30.0  | 40.0  |
+                             v       v       v       v
+Instruction: _mm256_add_pd (Single SIMD Instruction in 1 CPU Clock Cycle!)
+                             v       v       v       v
+Output Register YMM2: | 11.0  | 22.0  | 33.0  | 44.0  |
+===> Cost: 1 clock cycle for 4 floats simultaneously = 0.25 cycles per element!
+```
+
 ### Mathematical Invariants & Symbol Breakdown
 
 | الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
@@ -62,9 +97,16 @@ $$
 | $\tau_{\text{vector\_alu}}$ | $\sim 1 \text{ CPU cycle}$ | Fused throughput latency of SIMD execution port (e.g. `_mm256_add_pd`) | زمن نبضة المعالج لتنفيذ العملية المتوازية الواحدة على كل السجل |
 | $\tau_{\text{load}}$ | Streaming bandwidth | Continuous hardware prefetch streaming from L1/L2 cache lines | زمن بث خطوط الذاكرة المخبأة المتصلة سعة 64 بايت للمعالج |
 
-In CPython, calculating an element-wise sum requires executing the full administrative chain $(\tau_{\text{dispatch}} + \tau_{\text{deref}} + \dots + \tau_{\text{box}})$ for each element independently, totaling over 100 CPU cycles per scalar. In contrast, SIMD vectorization loads an entire 256-bit or 512-bit register line containing $W_{\text{SIMD}}$ numbers in contiguous memory, executes the arithmetic kernel in a single clock cycle, and streams the result directly into output buffers without intermediate object allocations.
-
-رياضياً ومعمارياً، تفرض بايثون دورة إدارية كاملة تستهلك ما يزيد عن 100 دورة معالج لكل عنصر على حدة بسبب الفحص والتغليف. في المقابل، تقوم معمارية SIMD بتحميل خط ذاكرة كامل في سجل متجهي سعته 256 أو 512 بت يحوي $W_{\text{SIMD}}$ رقماً متلاصقاً فيزيائياً، وتجري العملية الحسابية في دورة ساعة واحدة، ثم تبث الناتج مباشرة إلى مخزن الذاكرة المتصل دون أي كائنات وسيطة.
+#### Step-by-Step Arithmetic Cost & Invariant Breakdown:
+1. **Scalar CPython Arithmetic Overhead**:
+   $$\tau_{\text{scalar}} = \tau_{\text{dispatch}} (20) + \tau_{\text{deref}} (50) + \tau_{\text{typecheck}} (10) + \tau_{\text{unbox}} (15) + \tau_{\text{alu}} (1) + \tau_{\text{box}} (25) \approx 121 \text{ cycles/element}$$
+   For $N = 10,000,000$: $10^7 \times 121 = 1.21 \times 10^9 \text{ cycles} \approx 403\text{ ms}$ on a 3.0 GHz CPU core.
+2. **SIMD AVX2 Vectorized Cost**:
+   AVX2 register width $= 256\text{ bits} = 4 \times \text{float64}$ numbers ($W_{\text{SIMD}} = 4$).
+   Vector instructions needed $= \lceil 10^7 / 4 \rceil = 2,500,000\text{ operations}$.
+   At 1 cycle throughput $= 2.5 \times 10^6 \text{ cycles} \approx 2.5\text{ ms}$.
+3. **Speedup Factor**:
+   $$\text{Speedup} = \frac{T_{\text{CPython}}}{T_{\text{SIMD}}} = \frac{403\text{ ms}}{2.5\text{ ms}} \approx 161\times \text{ Acceleration!}$$
 
 ## Beat 3: Interactive Code Challenge
 
@@ -97,12 +139,20 @@ def vectorized_huber_loss(y_true: np.ndarray, y_pred: np.ndarray, delta: float =
     Returns:
         Scalar float representing mean Huber loss across all samples.
     """
-    # Step 1: Ensure contiguous float64 NumPy arrays
-    # Step 2: Compute absolute residuals: errors = np.abs(y_true - y_pred)
-    # Step 3: Compute quadratic branch: 0.5 * (errors ** 2)
-    # Step 4: Compute linear branch: delta * (errors - 0.5 * delta)
-    # Step 5: Combine branches branchlessly via np.where, and return mean as float
-    raise NotImplementedError("Implement vectorized_huber_loss")
+    # Step 1: Ensure contiguous float64 NumPy arrays and compute absolute residuals
+    errors = np.abs(y_true - y_pred)
+
+    # Step 2: Compute quadratic loss regime: 0.5 * (errors ** 2)
+    quadratic_branch = 0.5 * (errors ** 2)
+
+    # Step 3: Compute linear loss regime: delta * (errors - 0.5 * delta)
+    linear_branch = delta * (errors - 0.5 * delta)
+
+    # Step 4: Combine branches branchlessly via np.where without Python loops
+    loss = np.where(errors <= delta, quadratic_branch, linear_branch)
+
+    # Step 5: Return mean loss as a native float scalar
+    return float(np.mean(loss))
 ```
 :::
 

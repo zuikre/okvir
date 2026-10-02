@@ -14,21 +14,77 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Imagine two airplanes—Flight A (our treated flight) and Flight B (our control flight)—cruising side by side at cruising altitude. Flight A flies at 30,000 feet, while Flight B flies at 25,000 feet. Suddenly, both planes enter a massive turbulent headwind. At that exact split second, the pilot of Flight A activates an experimental high-efficiency booster engine. After thirty minutes, Flight A is traveling at 520 knots, whereas before the booster it was traveling at 500 knots. Can we conclude that the experimental booster added $+20$ knots? 
+### Intuition & Real-World Story
 
-Certainly not! Without knowing how severely the atmospheric headwind slowed down aircraft in that sector, a simple before-and-after comparison is hopelessly confounded by macroeconomic weather shocks. If Flight B (which never engaged the booster) saw its airspeed plummet by 30 knots (from 480 knots to 450 knots) solely due to the storm, Flight A would have plunged by 30 knots as well in the absence of treatment. The true causal lift provided by the booster is not $+20$ knots, but $+50$ knots: the $+20$ observed change minus the $-30$ counterfactual environmental drag.
+In April 1992, the state of New Jersey raised its minimum wage from $4.25 to $5.05 per hour. Neighboring Pennsylvania kept its minimum wage frozen at $4.25.
 
-This is the timeless core of **Difference-in-Differences (DiD)**, the premier quasi-experimental design of empirical economics. Popularized in David Card and Alan Krueger's seminal 1994 study of the New Jersey minimum wage hike, DiD circumvents two fatal analytical traps simultaneously. A naive **before-and-after study** confounds policy effects with secular macro trends (inflation, holiday shopping surges, regional recessions). Conversely, a naive **cross-sectional comparison** (comparing New Jersey to neighboring Pennsylvania on a single afternoon) confounds the policy with persistent, historical state-level differences (different tax codes, industrial bases, and local demographics).
+Standard economic theory predicted that raising the minimum wage would force fast-food restaurants to lay off workers. To find out, economists David Card and Alan Krueger surveyed 410 fast-food restaurants across New Jersey and eastern Pennsylvania before and after the wage increase.
 
-DiD achieves causal identification by comparing **trajectories over time** rather than static levels. By subtracting the control group's temporal trajectory from the treated group's trajectory, any common aggregate shock that hits both groups equally is annihilated. The linchpin of this entire architecture is the **Parallel Trends Assumption**: in the hypothetical counterfactual universe where treatment never occurred, the average outcome of the treated group would have moved in parallel with the control group.
+Why couldn't they simply look at New Jersey restaurants before and after?
+Because if employment changed in New Jersey between April and December, that change could be driven by the nationwide economic recovery, changing consumer tastes, or holiday shopping! A simple before-after comparison mixes the policy impact with background economic trends.
 
-تخيل طائرتين تحلقان جنبًا إلى جنب على ارتفاعين مختلفين: الرحلة (أ) على ارتفاع 30,000 قدم، والرحلة (ب) على ارتفاع 25,000 قدم. وفجأة، تدخل الطائرتان في عاصفة جوية معاكسة عنيفة. في تلك اللحظة بالذات، يشغل قبطان الرحلة (أ) محركًا نفاثًا تجريبيًا لزيادة السرعة. بعد نصف ساعة، سجلت الرحلة (أ) سرعة 520 عقدة مقارنة بـ 500 عقدة قبل تشغيل المحرك. فهل يمكننا الجزم بأن المحرك الجديد أضاف 20 عقدة إلى سرعة الطائرة؟
+This is the brilliance of **Difference-in-Differences (DiD)**:
+1. **First Difference:** Measure the employment change in New Jersey (Treated Group).
+2. **Second Difference:** Measure the employment change in Pennsylvania (Control Group).
+3. **Difference-in-Differences:** Subtract Pennsylvania's background trend from New Jersey's change!
 
-قطعًا لا! إن المقارنة الساذجة بين حال الطائرة "قبل" و"بعد" تخلط بين أثر المحرك والرياح المعاكسة الشديدة. فلو نظرنا إلى الرحلة (ب) التي لم تشغل أي محرك إضافي، لوجدنا أن سرعتها انحدرت بمقدار 30 عقدة (من 480 إلى 450 عقدة) بفعل العاصفة وحدها. هذا يعني أنه لولا المحرك الجديد، لكانت سرعة الرحلة (أ) قد انخفضت هي الأخرى بمقدار 30 عقدة. وبالتالي، فإن الأثر السببي الحقيقي للمحرك التجريبي ليس 20 عقدة فقط، بل هو 50 عقدة كاملة: التغير الملاحظ (+20) مطروحًا منه الأثر السلبي للعاصفة (-30).
+By using Pennsylvania to measure what *would have happened* in the region anyway, DiD isolates the pure causal effect of the policy! 
 
-هذا هو الجوهر البصري لأسلوب **الفرق في الفروق (Difference-in-Differences - DiD)**، وهو الأداة التجريبية الأكثر انتشارًا وتأثيرًا في الاقتصاد القياسي الحديث. اشتهرت هذه المنهجية عالميًا في دراسة ديفيد كارد وآلان كروغر (1994) لتقييم أثر رفع الحد الأدنى للأجور في نيوجيرسي مقارنة بمطاعم الوجبات السريعة في ولاية بنسلفانيا المجاورة. يتفادى أسلوب DiD فخين قاتلين: المقارنة الزمنية البسيطة (قبل وبعد) التي تخلط بين السياسة والتقلبات الاقتصادية العامة، والمقارنة المقطعية البسيطة (بين ولايتين في لحظة واحدة) التي تخلط بين السياسة والفروق الهيكلية التاريخية المتجذرة بين المناطق.
+The entire validity of DiD hinges on the **Parallel Trends Assumption**: that in the absence of the law, New Jersey and Pennsylvania would have moved along parallel paths.
 
-يعتمد مقدر DiD على مقارنة **المسارات الديناميكية عبر الزمن** بدلاً من مقارنة المستويات الثابتة. ومن خلال طرح مسار نمو المجموعة الضابطة من مسار نمو المجموعة المعالجة، تتلاشى جميع الصدمات الخارجية المشتركة التي تؤثر في المجموعتين بالتساوي. ويرتكز هذا البناء بالكامل على **فرضية مسار التوازي (Parallel Trends Assumption)**: وهي أنه في السيناريو الافتراضي المقابل للواقع (Counterfactual)—أي لولا تطبيق السياسة—لكان مسار المجموعة المعالجة قد تطور بمعدل موازٍ تمامًا لمسار المجموعة الضابطة.
+#### Jargon Decoder
+
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Difference-in-Differences (DiD)** | The double subtraction: policy group change minus control group background trend. |
+| **Parallel Trends Assumption** | The bedrock premise: treatment and control groups would have moved in parallel without the policy. |
+| **Counterfactual Trend** | The alternate world: what the treated group would have experienced if policy never happened. |
+| **Interaction Term ($D \times Post$)** | The regression knob: the single coefficient that measures the DiD treatment effect. |
+| **Macro Shock** | A widespread economic wave (like a recession) that affects both groups simultaneously. |
+
+```text
+    THE CLASSIC 2x2 DiD TRAJECTORY:
+
+    Outcome (Employment)
+      ^
+      |                                * New Jersey (Actual Post-Treatment)
+      |                               / |
+      |                              /  | DiD Treatment Effect (tau)
+      |                             /   v
+      |  NJ Pre * - - - - - - - - - - - * Counterfactual NJ (Follows PA's Trend!)
+      |          \                     /
+      |           \                   /
+      |            \                 /
+      |  PA Pre * - \ - - - - - - - * PA Post (Measures Background Trend)
+      0-------------+---------------+-------------------------------------> Time
+                  Pre-Policy      Post-Policy
+```
+
+### الحدس والقصة الواقعية
+
+في أبريل 1992، رفعت ولاية نيوجيرسي الأمريكية الحد الأدنى للأجور من 4.25 إلى 5.05 دولار في الساعة، بينما أبقت ولاية بنسلفانيا المجاورة حدها الأدنى ثابتًا عند 4.25 دولار.
+
+توقعت النظريات الاقتصادية الكلاسيكية أن رفع الأجور سيجبر مطاعم الوجبات السريعة على تسريح العمال. ولاختبار ذلك، أجرى الاقتصاديان ديفيد كارد وآلان كروجر مسحًا لـ 410 مطاعم في نيوجيرسي وبنسلفانيا قبل تطبيق القانون وبعده.
+
+لماذا لم يكتفِ الباحثان بمقارنة نيوجيرسي قبل القرار وبعده فحسب؟
+لأنه لو تغير التوظيف في نيوجيرسي، فقد يكون التغير ناتجًا عن تعافي الاقتصاد العام أو مواسم التسوق! فالمقارنة الزمنية البسيطة تخلط أثر السياسة بالتقلبات الاقتصادية العامة.
+
+هنا تتجلى عبقرية **منهج الفروق في الفروق (Difference-in-Differences - DiD)**:
+1. **الفرق الأول:** قياس التغير الزمني في نيوجيرسي (مجموعة المعالجة).
+2. **الفرق الثاني:** قياس التغير الزمني في بنسلفانيا (المجموعة الضابطة).
+3. **فارق الفارقين:** طرح المسار الاقتصادي العام لبنسلفانيا من التغير الحاصل في نيوجيرسي!
+
+تعتمد مصداقية هذا المنهج بالكامل على **فرضية المسارات المتوازية (Parallel Trends)**: أي افتراض أنه لولا صدور القانون، لكانت الولايتان قد تحركتا في مسارين متوازيين تمامًا.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **الفروق في الفروق (DiD)** | الطرح المزدوج: خصم التغير الطبيعي للمجموعة الضابطة من تغير مجموعة المعالجة. |
+| **فرضية المسارات المتوازية** | الركيزة الأساسية: افتراض سير المجموعتين في خطين متوازيين لولا تطبيق السياسة. |
+| **المسار الافتراضي البديل** | خط الواقع المضاد: مسار مجموعة المعالجة المتوقع لو لم يصدر القرار قط. |
+| **حد التفاعل ($D \times Post$)** | المعامل المرجو: المتغير التفاعلي في الانحدار الذي يلتقط الأثر السببي الصافي. |
+| **الصدمات الاقتصادية الكلية** | موجات عامة (كالركود الاقتصادي أو المواسم) تؤثر على المجموعتين معًا في آن واحد. |
 
 :::simulation-widget{engine="canvas2d" component="DiDParallelTrendsLab"}
 ---
@@ -39,75 +95,48 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-The canonical $2 \times 2$ Difference-in-Differences setting observes individuals $i$ belonging to a group $G_i \in \{0, 1\}$ ($1 =$ Treated, $0 =$ Control) across two discrete time periods $T_t \in \{0, 1\}$ ($0 =$ Pre-treatment baseline, $1 =$ Post-treatment window).
-
-Let $Y_{it}$ denote the observed outcome. Define the four population cell expectations:
+In the canonical $2 \times 2$ design with treatment group $T \in \{0, 1\}$ and post-treatment period $P \in \{0, 1\}$:
 
 $$
-\bar{Y}_{g, t} \equiv \mathbb{E}[Y_{it} \mid G_i = g, T_t = t], \quad \text{for } g \in \{0, 1\}, t \in \{0, 1\}
+\tau_{\text{DiD}} = \left( \mathbb{E}[Y \mid T=1, P=1] - \mathbb{E}[Y \mid T=1, P=0] \right) - \left( \mathbb{E}[Y \mid T=0, P=1] - \mathbb{E}[Y \mid T=0, P=0] \right)
 $$
 
-The sample Difference-in-Differences estimator evaluates the double difference of these expectations:
+This estimator is estimated via OLS using the interaction regression:
 
 $$
-\hat{\delta}_{\text{DiD}} = \left(\bar{Y}_{1, 1} - \bar{Y}_{1, 0}\right) - \left(\bar{Y}_{0, 1} - \bar{Y}_{0, 0}\right)
+y_{it} = \beta_0 + \beta_1 T_i + \beta_2 P_t + \tau (T_i \times P_t) + \varepsilon_{it}
 $$
 
-This estimator is recovered identically via Ordinary Least Squares (OLS) from the classic two-way interaction regression:
+where:
+* $\beta_1$: Baseline difference between treated and control groups before policy.
+* $\beta_2$: Common macroeconomic time trend shared by both groups.
+* $\tau$: The causal treatment effect of interest.
 
-$$
-Y_{it} = \beta_0 + \beta_1 G_i + \beta_2 T_t + \delta (G_i \times T_t) + \varepsilon_{it}
-$$
+### Why the Math Works Step-by-Step
 
-Evaluating the conditional expectation for each of the four cells:
-- **Control Group Pre-Period ($G=0, T=0$):**
-  $$\mathbb{E}[Y_{it} \mid 0, 0] = \beta_0$$
-- **Control Group Post-Period ($G=0, T=1$):**
-  $$\mathbb{E}[Y_{it} \mid 0, 1] = \beta_0 + \beta_2$$
-- **Treated Group Pre-Period ($G=1, T=0$):**
-  $$\mathbb{E}[Y_{it} \mid 1, 0] = \beta_0 + \beta_1$$
-- **Treated Group Post-Period ($G=1, T=1$):**
-  $$\mathbb{E}[Y_{it} \mid 1, 1] = \beta_0 + \beta_1 + \beta_2 + \delta$$
-
-Taking the difference of within-group changes over time:
-
-$$
-\Delta \bar{Y}_{\text{Treated}} = \mathbb{E}[Y \mid 1, 1] - \mathbb{E}[Y \mid 1, 0] = (\beta_0 + \beta_1 + \beta_2 + \delta) - (\beta_0 + \beta_1) = \beta_2 + \delta
-$$
-
-$$
-\Delta \bar{Y}_{\text{Control}} = \mathbb{E}[Y \mid 0, 1] - \mathbb{E}[Y \mid 0, 0] = (\beta_0 + \beta_2) - \beta_0 = \beta_2
-$$
-
-Subtracting the control change from the treated change isolates the causal interaction parameter:
-
-$$
-\Delta \bar{Y}_{\text{Treated}} - \Delta \bar{Y}_{\text{Control}} = (\beta_2 + \delta) - \beta_2 = \delta
-$$
-
-Under the Rubin Potential Outcomes framework, let $Y_{it}(1)$ and $Y_{it}(0)$ represent potential outcomes with and without treatment. The unobservable post-treatment counterfactual for the treated group is formally identified by:
-
-$$
-\mathbb{E}[Y_{i1}(0) \mid G_i = 1] = \bar{Y}_{1, 0} + (\bar{Y}_{0, 1} - \bar{Y}_{0, 0})
-$$
-
-Identification of the Average Treatment Effect on the Treated ($\tau_{\text{ATT}} = \mathbb{E}[Y_{i1}(1) - Y_{i1}(0) \mid G_i = 1]$) holds if and only if the **Parallel Trends Assumption** is satisfied:
-
-$$
-\mathbb{E}[Y_{i1}(0) - Y_{i0}(0) \mid G_i = 1] = \mathbb{E}[Y_{i1}(0) - Y_{i0}(0) \mid G_i = 0]
-$$
+1. **Algebraic Proof of Equivalence:**
+   * $\mathbb{E}[Y \mid T=0, P=0] = \beta_0$
+   * $\mathbb{E}[Y \mid T=0, P=1] = \beta_0 + \beta_2$ (Control change $= \beta_2$)
+   * $\mathbb{E}[Y \mid T=1, P=0] = \beta_0 + \beta_1$
+   * $\mathbb{E}[Y \mid T=1, P=1] = \beta_0 + \beta_1 + \beta_2 + \tau$ (Treated change $= \beta_2 + \tau$)
+   Subtracting control change from treated change: $(\beta_2 + \tau) - \beta_2 = \tau$!
+2. **Testing Parallel Trends via Pre-Treatment Event Studies:**
+   If multiple pre-policy periods exist, researchers estimate coefficients on leads: $\sum_{k < 0} \tau_k (T_i \times \text{Year}_k)$. If pre-treatment coefficients are statistically indistinguishable from zero, the parallel trends assumption is validated.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $Y_{it}$: Observed scalar outcome for observation $i$ at time period $t$.
-* $G_i \in \{0, 1\}$: Binary treatment group indicator ($1$ for treated group, $0$ for untreated control group).
-* $T_t \in \{0, 1\}$: Binary time indicator ($1$ for post-treatment observation, $0$ for pre-treatment baseline).
-* $\bar{Y}_{g, t}$: Conditional population mean of the outcome for group $g$ in period $t$.
-* $\beta_0$: Expected baseline level of the control group prior to treatment ($\bar{Y}_{0, 0}$).
-* $\beta_1$: Permanent baseline divergence between treated and control groups prior to treatment ($\bar{Y}_{1, 0} - \bar{Y}_{0, 0}$).
-* $\beta_2$: Common macroeconomic or secular time trend experienced by the control group ($\bar{Y}_{0, 1} - \bar{Y}_{0, 0}$).
-* $\delta \equiv \tau_{\text{ATT}}$: Difference-in-Differences interaction coefficient quantifying the causal Average Treatment Effect on the Treated.
-* $\mathbb{E}[Y_{i1}(0) \mid G_i = 1]$: The unobservable counterfactual path—what would have happened to the treated group in period 1 had the policy never been introduced.
+* $T_i \in \{0, 1\}$: Group indicator (1 for treated units, 0 for control units).
+* $P_t \in \{0, 1\}$: Time indicator (1 for post-intervention periods, 0 for pre-intervention).
+* $T_i \times P_t$: Policy interaction dummy switching to 1 only for treated units after launch.
+* $\tau$: True Difference-in-Differences treatment effect.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\beta_1$ | الفارق الأساسي المسبق | الفجوة الدائمة الأصلية في المستوى بين المجموعتين قبل تطبيق أي قرار. |
+| $\beta_2$ | المسار الزمني المشترك | مقدار التغير الطبيعي الذي طرأ عبر الزمن على الجميع بسبب الظروف العامة. |
+| $\tau$ | أثر المعالجة السببي الصافي | معامل التفاعل الذي يقيس بدقة القفزة الإضافية الخاصة بمجموعة القرار وحدها. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -128,44 +157,40 @@ test_cases:
 ```python
 import numpy as np
 
-def compute_did_2x2(y: np.ndarray, treat: np.ndarray, post: np.ndarray) -> dict[str, float]:
+def compute_did_2x2(y: np.ndarray, treated: np.ndarray, post: np.ndarray) -> dict[str, float]:
     """
-    Computes canonical 2x2 Difference-in-Differences and checks regression equivalence.
-    
+    Computes canonical 2x2 Difference-in-Differences using OLS interaction regression.
+
     Parameters
     ----------
     y : np.ndarray of shape (N,)
-        Observed outcomes.
-    treat : np.ndarray of shape (N,)
-        Binary treatment group indicator (1 = Treated, 0 = Control).
+        Outcome observations.
+    treated : np.ndarray of shape (N,)
+        Binary indicator: 1 if unit is in treated group, 0 if control.
     post : np.ndarray of shape (N,)
-        Binary post-period indicator (1 = Post-treatment, 0 = Pre-treatment).
-        
+        Binary indicator: 1 if observation is post-treatment, 0 if pre.
+
     Returns
     -------
-    dict with keys:
-        'delta_did': Sample 2x2 difference-in-differences estimate.
-        'beta_interaction': Interaction coefficient from OLS regression [1, treat, post, treat*post].
-        'counterfactual': Unobserved counterfactual level for treated group in post period.
+    dict with keys 'did_tau', 'pre_diff', 'post_diff'
     """
-    # Step 1: Compute 4 group-period cell means: y11, y10, y01, y00
-    y11 = float(np.mean(y[(treat == 1) & (post == 1)]))
-    y10 = float(np.mean(y[(treat == 1) & (post == 0)]))
-    y01 = float(np.mean(y[(treat == 0) & (post == 1)]))
-    y00 = float(np.mean(y[(treat == 0) & (post == 0)]))
-    
-    # Step 2: Compute double difference and counterfactual trajectory
-    delta_did = (y11 - y10) - (y01 - y00)
-    counterfactual = y10 + (y01 - y00)
-    
-    # Step 3: OLS regression: Y = beta_0 + beta_1*treat + beta_2*post + delta*(treat*post)
-    X = np.column_stack([np.ones_like(y), treat, post, treat * post])
-    beta_reg = np.linalg.solve(X.T @ X, X.T @ y)
-    
+    n = len(y)
+    interaction = treated * post
+
+    # Construct design matrix: [1, treated, post, treated*post]
+    X = np.column_stack([np.ones(n), treated, post, interaction])
+
+    # Fit OLS
+    beta = np.linalg.solve(X.T @ X, X.T @ y)
+
+    did_tau = float(beta[3])
+    pre_diff = float(np.mean(y[(treated == 1) & (post == 0)]) - np.mean(y[(treated == 0) & (post == 0)]))
+    post_diff = float(np.mean(y[(treated == 1) & (post == 1)]) - np.mean(y[(treated == 0) & (post == 1)]))
+
     return {
-        "delta_did": delta_did,
-        "beta_interaction": float(beta_reg[3]),
-        "counterfactual": counterfactual,
+        "did_tau": did_tau,
+        "pre_diff": pre_diff,
+        "post_diff": post_diff,
     }
 ```
 :::

@@ -25,7 +25,26 @@ To classify these flat landscapes, you must summon the **Hessian Matrix** $\math
 
 In high-dimensional machine learning (where models have millions or billions of parameters), true local minima and maxima are actually exceedingly rare! Instead, high-dimensional loss landscapes are vast, labyrinthine fields of **saddle points**. Navigating optimization algorithms like Adam and momentum-based gradient descent safely through this ocean of saddle points is one of the grand triumphs of modern AI.
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Hessian Matrix ($H$) | A grid of all second partial derivatives capturing 3D curvature and twisting in every direction | مصفوفة هيسيان ($H$) | جدول يضم كافة المشتقات الجزئية الثانية ليصف انحناء والتواء السطح كروياً |
+| Positive Definite ($H \succ 0$) | Curving upward in all directions like a salad bowl; signals a local minimum | موجبة تماماً ($H \succ 0$) | انحناء للأعلى في كافة الاتجاهات كوعاء الشوربة؛ يضمن وجود نهاية صغرى |
+| Negative Definite ($H \prec 0$) | Curving downward in all directions like an umbrella dome; signals a local maximum | سالبة تماماً ($H \prec 0$) | انحناء للأسفل في كافة الاتجاهات كالقبة؛ يضمن وجود نهاية عظمى |
+| Saddle Point (Indefinite) | Curving up in one direction and down in another, exactly like a horse saddle or potato chip | نقطة السرج | انحناء للأعلى في اتجاه وللأسفل في اتجاه آخر كسرج الحصان أو رقاقة البطاطس |
+
+#### Geometric & Visual Flow
+
+```
+       Bowl (Minimum)            Dome (Maximum)             Saddle Point
+          \     /                     .-.                      UP in x,
+           \___/                     /   \                    DOWN in y
+        H is Positive             H is Negative             H is Indefinite
+          Definite                  Definite              (Neither min nor max)
+```
+
+### الحدس الفيزيائي والهندسي
 
 يمثل متجه التدرج بوصلتك الموثوقة: فهو يخبرك بميل التضاريس واتجاهها تحت باطن حذائك مباشرة. ولكن لنفترض أنك واصلت السير حتى توقف مقياس الارتفاع عن التغير، وأصبحت الأرض تحت قدميك مستوية تماماً وينعدم عندها الميل: $\nabla f = \mathbf{0}$. قد تبتهج ظناً منك أنك وصلت إلى أدنى قاع للوادي. ولكن ما هو الشكل الهندسي الحقيقي للأرض التي تقف عليها؟
 
@@ -37,6 +56,25 @@ In high-dimensional machine learning (where models have millions or billions of 
 - أما إذا كانت بعض القيم الذاتية موجبة والأخرى سالبة، فأنت عالق فوق **نقطة سرجية** (Saddle Point): ممر جبلي يمثل قاعاً في مسار، وقمة في مسار آخر متعامد معه.
 
 وفي فضاءات تعلم الآلة عالية الأبعاد (حيث تضم النماذج ملايين أو مليارات المعاملات)، تكاد النهايات الصغرى والعظمى الحقيقية تكون نادرة الوجود! بل إن أسطح دوال الخسارة في الشبكات العصبية هي متاهات شاسعة تكتظ بملايين **النقاط السرجية**. ويُعد توجيه خوارزميات الاستمثال—مثل خوارزمية آدم والزخم—لتفادي الوقوع في فخ هذه النقاط السرجية أحد أعظم الإنجازات في الذكاء الاصطناعي الحديث.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| مصفوفة هيسيان ($H$) | A grid of all second partial derivatives capturing 3D curvature and twisting in every direction | مصفوفة هيسيان ($H$) | جدول يضم كافة المشتقات الجزئية الثانية ليصف انحناء والتواء السطح كروياً |
+| موجبة تماماً ($H \succ 0$) | Curving upward in all directions like a salad bowl; signals a local minimum | موجبة تماماً ($H \succ 0$) | انحناء للأعلى في كافة الاتجاهات كوعاء الشوربة؛ يضمن وجود نهاية صغرى |
+| سالبة تماماً ($H \prec 0$) | Curving downward in all directions like an umbrella dome; signals a local maximum | سالبة تماماً ($H \prec 0$) | انحناء للأسفل في كافة الاتجاهات كالقبة؛ يضمن وجود نهاية عظمى |
+| نقطة السرج | Curving up in one direction and down in another, exactly like a horse saddle or potato chip | نقطة السرج | انحناء للأعلى في اتجاه وللأسفل في اتجاه آخر كسرج الحصان أو رقاقة البطاطس |
+
+#### المخطط البصري الهندسي
+
+```
+       وعاء (نهاية صغرى)          قبة (نهاية عظمى)          نقطة سرج
+          \     /                     .-.                      صعود في x
+           \___/                     /   \                    وهبوط في y
+        هيسيان موجبة              هيسيان سالبة              هيسيان غير معينة
+          تماماً                    تماماً                 (ليست عظمى ولا صغرى)
+```
 
 :::simulation-widget{engine="canvas2d" component="HessianCurvatureCanvas"}
 ---

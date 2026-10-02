@@ -14,21 +14,71 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Imagine driving a precision mechanical lever. In Ordinary Least Squares (OLS), the lever works flawlessly when each control knob moves an independent gear. But when two or more explanatory features are heavily collinear (such as measuring both body weight in kilograms and body weight in pounds), the underlying design matrix $\mathbf{X}^T \mathbf{X}$ becomes near-singular (ill-conditioned). Its determinant collapses toward zero, and the inverse matrix $(\mathbf{X}^T \mathbf{X})^{-1}$ explodes into astronomical numbers. The regression lever turns into an unstable, vibrating pendulum: the tiniest whisper of noise in the training data causes the estimated coefficients to swing wildly into massive, canceling extremes—assigning $+2,400$ to weight-in-kg and $-2,398$ to weight-in-lbs!
+### Intuition & Real-World Story
 
-To tame this numerical chaos, Arthur Hoerl and Robert Kennard (1970) introduced **Ridge Regression ($L_2$ regularization)**. The most intuitive way to visualize Ridge is to imagine **attaching an elastic rubber cord or spring between every single parameter $\beta_j$ and the origin at zero**. When OLS attempts to fling collinear coefficients into outer space to overfit idiosyncratic training noise, the elastic tethers stretch, generating a powerful restoring tension that yanks all parameters back toward zero.
+Imagine you are tasked with predicting home sale prices using 120 detailed property features: square footage, number of bedrooms, number of bathrooms, ceiling height, distance to highway, square footage of each bedroom, hallway width, and garden area.
 
-Notice the mathematical subtlety of this elastic spring: because the $L_2$ penalty is quadratic ($\lambda \|\boldsymbol{\beta}\|_2^2 = \lambda \sum \beta_j^2$), the restoring force is proportional to the size of the parameter. A massive coefficient experiences an overwhelming pull toward the center, while a small coefficient close to zero feels only a gentle tug. As a result, Ridge smoothly compresses and shrinks all coefficients together, but the quadratic curvature ensures that **no coefficient is ever pulled all the way to absolute zero**. Every feature remains in the model with a shrunken, stabilized weight.
+Many of these features are heavily correlated with each other. When regressors are collinear, the $(X^T X)$ matrix is on the verge of collapsing into non-invertibility. Standard OLS panics: it tries to balance tiny differences by assigning wild, exploding coefficients—like predicting +$1,500,000 for total square footage and -$1,480,000 for living room square footage! Your model becomes a fragile, overfitted house of cards that collapses on fresh test data.
 
-Through the lens of the **Singular Value Decomposition (SVD)**, Ridge operates as a sophisticated noise filter or audio equalizer. High-variance principal directions in your data (directions with large singular values $\sigma_j$) pass through the Ridge filter almost untouched. In contrast, collinear directions that capture negligible genuine variation (directions with tiny singular values $\sigma_j \approx 0$) are heavily attenuated and squashed. Ridge deliberately accepts a tiny amount of asymptotic bias in exchange for a massive, game-changing reduction in variance—the quintessential manifestation of the **bias-variance tradeoff**.
+How do we tame this wild behavior? Through **Regularization** and **Ridge Regression (L2)**.
 
-تخيل رافعة ميكانيكية دقيقة: في انحدار المربعات الصغرى العادي (OLS)، تعمل الرافعة بسلاسة عندما يتحرك كل مقبض بشكل مستقل. لكن عندما تتداخل المتغيرات التفسيرية بشدة وتتطابق فيما بينها (Multicollinearity—كأن نقيس وزن المريض بالكيلوغرام وبالرطل معاً)، تقترب مصفوفة البيانات $\mathbf{X}^T \mathbf{X}$ من الشذوذ الرياضي والانعدام. يقترب محدد المصفوفة من الصفر، وتنفجر قيم مقلوبها نحو أرقام فلكية. تتحول رافعة OLS إلى بندول مهتز بعنف؛ فأي تذبذب طفيف أو ضجيج عابر في العينة يدفع المعاملات إلى قيم موجبة وسالبة متطرفة ومتناقضة تماماً (مثل $+2,400$ للكيلوغرام و $-2,398$ للرطل!).
+Think of Ridge Regression as putting a **flexible dog leash** on your coefficients.
+Instead of minimizing squared errors alone, Ridge adds a penalty proportional to the sum of squared weights: $\lambda \sum \beta_j^2$.
+* When $\lambda = 0$, the leash is unclipped: you get wild, overfitted OLS.
+* When $\lambda > 0$, the leash tugs gently inward: it shrinks all coefficients smoothly toward zero.
 
-لترويض هذا التذبذب الكارثي، ابتكر آرثر هورل وروبرت كينارد (1970) **انحدار ريدج (Ridge Regression - تنظيم $L_2$)**. وأفضل طريقة لتخيل هذا الأسلوب هندسياً هي تخيل **حبل مطاطي مرن مربوط بين كل معامل $\beta_j$ ونقطة الصفر في المركز**. كلما حاولت خوارزمية OLS دفع المعاملات إلى قيم عملاقة لفرط تخصيص الضجيج، تمدد الحبل المطاطي ومارس قوة جذب مرنة تشد كافة المعاملات بقوة نحو المركز.
+Geometrically, the L2 constraint forms a **smooth circular ball** centered at zero. As the expanding OLS loss ellipses touch this circular ball, coefficients are shrunk in proportion to how noisy and redundant their feature directions are. By accepting a tiny amount of bias, Ridge dramatically slashes coefficient variance!
 
-تأمل البراعة الهندسية لهذا الحبل المرن: نظراً لأن جزاء $L_2$ تربيعي ($\lambda \|\boldsymbol{\beta}\|_2^2 = \lambda \sum \beta_j^2$)، فإن قوة الشد تتناسب طردياً مع حجم المعامل؛ فالمعامل الضخم يتعرض لقوة سحب جبارة تدفعه نحو الصفر، بينما المعامل الصغير القريب من الصفر يشعر بلمسة سحب خفيفة. والنتيجة هي انكماش تدريجي سلس لجميع المعاملات بالتوازي دون أن يُحذف أي متغير أو يصل معامل إلى الصفر المطلق.
+#### Jargon Decoder
 
-من منظور **تفكيك القيم المنفردة (SVD)**، يعمل انحدار ريدج كمعادل صوتي فائق الذكاء: الاتجاهات البيانية القوية ذات التباين العالي (القيم المنفردة الكبيرة $\sigma_j$) تعبر الفلتر بحرية دون أي انكماش تقريباً، بينما الاتجاهات الضعيفة الملوثة بالارتباط الخطي والضجيج (القيم المنفردة القريبة من الصفر) تُكبح بقوة وتُسحق نحو الصفر. يقبل انحدار ريدج قدراً ضئيلاً جداً من الانحياز الحسابي في مقابل تقليص هائل في تباين التقدير—وهو التجسيد الأسمى لـ **معضلة الانحياز والتباين (Bias-Variance Tradeoff)**.
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Regularization** | The leash: adding a mathematical penalty to stop a model from memorizing noise. |
+| **Ridge Regression (L2)** | Shrinkage penalty: penalizing the sum of squared weights ($\beta_1^2 + \beta_2^2$). |
+| **Hyperparameter ($\lambda$)** | The leash tension: controls how aggressively coefficients are pulled toward zero. |
+| **Bias-Variance Trade-Off** | The grand bargain: accepting a tiny bit of training error to achieve massive test accuracy. |
+| **SVD Shrinkage Factor** | How Ridge shrinks: directions with tiny eigenvalues (high noise) get shrunk the most. |
+
+```text
+    THE RIDGE L2 GEOMETRY:
+
+       beta_2
+         ^                   Contours of OLS Loss Ellipses
+         |                              / \
+         |                            /  .  \
+         |       +-----------+       |  (OLS)|
+         |      /             \       \     /
+         |     |   L2 Ball     |        \ /
+         |     |  ||beta|| <= C|=======> * RIDGE SOLUTION (Point of Contact!)
+         |      \             /
+    -----+-------+-----------+-------------------------> beta_1
+         |
+```
+
+### الحدس والقصة الواقعية
+
+تخيل أنك تبني نموذجًا للتنبؤ بأسعار المنازل باستخدام 120 ميزة دقيقة: المساحة الإجمالية، عدد الغرف، عدد الحمامات، ارتفاع السقف، مساحة الحديقة، ومساحة كل غرفة نوم على حدة.
+
+ترتبط هذه الميزات ببعضها ارتباطًا وثيقًا. وعندما تتشابك المتغيرات وتتعدد خطيًا، تقترب مصفوفة الحساب من الانهيار الرياضي. وحينها تصاب طريقة OLS الكلاسيكية بالجنون: تحاول موازنة الفروق الطفيفة بوضع معاملات عملاقة متناقضة—مثل وضع معامل +1,500,000 لمساحة المنزل، يقابله -1,480,000 لمساحة الصالة! ويتحول نموذجك إلى قصر من ورق ينهار فور اختباره على بيانات جديدة.
+
+كيف نروّض هذا التمرد الإحصائي؟ عبر **التقييد المنتظم (Regularization)** و**انحدار ريدج (Ridge L2)**.
+
+تخيل انحدار ريدج كـ **طوق مطاطي مرن** يُقيد حركة المعاملات.
+فبدلاً من تقليل أخطاء التنبؤ وحدها، يضيف ريدج غرامة رياضية تتناسب مع مجموع مربعات المعاملات: $\lambda \sum \beta_j^2$.
+* عندما يكون $\lambda = 0$، ينفك القيد ونحصل على انحدار OLS المفرط في التعقيد.
+* وعندما يرتفع $\lambda > 0$، يشد الطوق المعاملات بلطف نحو الصفر.
+
+هندسيًا، يشكل قيد L2 **كرة دائرية ملساء** مركزها نقطة الأصل. وكلما لامست منحنيات الخطأ هذه الكرة، انكمشت المعاملات وتلاشت عشوائيتها. وعبر التضحية بقدر ضئيل جدًا من عدم التحيز، ينجح ريدج في خفض التشتت والخطأ التنبؤي خفضًا هائلاً!
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **التقييد المنتظم (Regularization)** | الطوق الواقي: عقوبة رياضية تمنع النموذج من حفظ التشويش العشوائي للبيانات. |
+| **انحدار ريدج (L2)** | غرامة الانكماش: فرض عقوبة على مجموع مربعات الأوزان ($\beta_1^2 + \beta_2^2$). |
+| **معامل التقييد ($\lambda$)** | شدة الطوق: مقياس يتحكم في قوة سحب المعاملات نحو نقطة الصفر. |
+| **مقايضة الانحياز والتباين** | الصفقة الرابحة: قبول انحياز طفيف في التدريب مقابل تفوق كاسح في بيانات الاختبار. |
+| **انكماش القيم المفردة (SVD)** | آلية عمل ريدج: قمع الاتجاهات الضعيفة المليئة بالتشويش بأقصى قوة. |
 
 :::simulation-widget{engine="canvas2d" component="RegularizationGeometryCanvas"}
 ---
@@ -39,56 +89,50 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-Ridge regression supplements the empirical Mean Squared Error loss with a quadratic $L_2$ Euclidean norm penalty on the parameter vector $\boldsymbol{\beta} \in \mathbb{R}^p$:
+The Ridge regression objective adds an $L_2$ Tikhonov regularization penalty to the residual sum of squares:
 
 $$
-\min_{\boldsymbol{\beta}} \mathcal{L}_{\text{Ridge}}(\boldsymbol{\beta}) = \frac{1}{2n}\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \|\boldsymbol{\beta}\|_2^2 = \frac{1}{2n}(\mathbf{y} - \mathbf{X}\boldsymbol{\beta})^T (\mathbf{y} - \mathbf{X}\boldsymbol{\beta}) + \lambda \boldsymbol{\beta}^T \boldsymbol{\beta}
+S_{\text{ridge}}(\boldsymbol{\beta}) = \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \|\boldsymbol{\beta}\|_2^2 = (\mathbf{y} - \mathbf{X}\boldsymbol{\beta})^T (\mathbf{y} - \mathbf{X}\boldsymbol{\beta}) + \lambda \boldsymbol{\beta}^T \boldsymbol{\beta}
 $$
 
-where:
-- $\frac{1}{2n}\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2$: The empirical data loss measuring goodness-of-fit on training samples.
-- $\lambda \ge 0$: Regularization hyperparameter governing the penalty strength (at $\lambda = 0$, Ridge simplifies to OLS; as $\lambda \to \infty$, $\hat{\boldsymbol{\beta}} \to \mathbf{0}$).
-- $\|\boldsymbol{\beta}\|_2^2 = \sum_{j=1}^p \beta_j^2$: Squared Euclidean $L_2$ norm.
-
-Taking the matrix gradient with respect to $\boldsymbol{\beta}$ and setting it to zero:
+Taking the gradient with respect to $\boldsymbol{\beta}$ and setting to zero:
 
 $$
-\nabla_{\boldsymbol{\beta}} \mathcal{L}_{\text{Ridge}} = -\frac{1}{n}\mathbf{X}^T (\mathbf{y} - \mathbf{X}\boldsymbol{\beta}) + 2\lambda \boldsymbol{\beta} = \mathbf{0}
+\nabla_{\boldsymbol{\beta}} S_{\text{ridge}}(\boldsymbol{\beta}) = -2\mathbf{X}^T \mathbf{y} + 2\mathbf{X}^T \mathbf{X}\boldsymbol{\beta} + 2\lambda \boldsymbol{\beta} = \mathbf{0}
 $$
 
-Multiplying by $n$ and grouping terms yields the Ridge normal equations:
-
 $$
-\left(\mathbf{X}^T \mathbf{X} + 2n\lambda \mathbf{I}_p\right) \hat{\boldsymbol{\beta}}_{\text{Ridge}} = \mathbf{X}^T \mathbf{y} \implies \hat{\boldsymbol{\beta}}_{\text{Ridge}} = \left(\mathbf{X}^T \mathbf{X} + 2n\lambda \mathbf{I}_p\right)^{-1} \mathbf{X}^T \mathbf{y}
+(\mathbf{X}^T \mathbf{X} + \lambda \mathbf{I}_K)\hat{\boldsymbol{\beta}}_{\text{ridge}} = \mathbf{X}^T \mathbf{y} \implies \hat{\boldsymbol{\beta}}_{\text{ridge}} = (\mathbf{X}^T \mathbf{X} + \lambda \mathbf{I}_K)^{-1} \mathbf{X}^T \mathbf{y}
 $$
 
-Because $2n\lambda \mathbf{I}_p$ adds a strictly positive quantity $2n\lambda > 0$ to every eigenvalue along the diagonal, the regularized Gram matrix $(\mathbf{X}^T \mathbf{X} + 2n\lambda \mathbf{I}_p)$ is guaranteed to be strictly positive-definite and nonsingular, ensuring an invertibility guarantee even when $p > n$.
-
-### SVD Spectral Shrinkage
-Let $\mathbf{X} = \mathbf{U}\mathbf{\Sigma}\mathbf{V}^T$ be the compact Singular Value Decomposition of the centered design matrix, where $\mathbf{U} \in \mathbb{R}^{n \times p}$, $\mathbf{\Sigma} = \text{diag}(\sigma_1, \dots, \sigma_p)$, and $\mathbf{V} \in \mathbb{R}^{p \times p}$. Substituting the SVD into the prediction equation:
+Using the Singular Value Decomposition (SVD) $\mathbf{X} = \mathbf{U} \boldsymbol{\Sigma} \mathbf{V}^T$, the ridge predictions decompose into singular component shrinkage factors:
 
 $$
-\hat{\mathbf{y}}_{\text{Ridge}} = \mathbf{X}\hat{\boldsymbol{\beta}}_{\text{Ridge}} = \sum_{j=1}^p \mathbf{u}_j \left( \frac{\sigma_j^2}{\sigma_j^2 + 2n\lambda} \right) \mathbf{u}_j^T \mathbf{y}
+\hat{\mathbf{y}}_{\text{ridge}} = \sum_{j=1}^K \mathbf{u}_j \left( \frac{\sigma_j^2}{\sigma_j^2 + \lambda} \right) \mathbf{u}_j^T \mathbf{y}
 $$
 
-The factor $f_j = \frac{\sigma_j^2}{\sigma_j^2 + 2n\lambda} \in (0, 1]$ represents the **spectral shrinkage factor**. Directions in column space corresponding to dominant singular values ($\sigma_j^2 \gg 2n\lambda$) experience almost zero shrinkage ($f_j \approx 1$), whereas noisy, collinear directions with small singular values ($\sigma_j^2 \ll 2n\lambda$) are shrunk aggressively toward zero ($f_j \approx 0$).
+### Why the Math Works Step-by-Step
 
-The **effective degrees of freedom** of Ridge regression is continuous in $\lambda$:
-
-$$
-\text{df}(\lambda) = \text{tr}\left( \mathbf{X}(\mathbf{X}^T \mathbf{X} + 2n\lambda \mathbf{I}_p)^{-1}\mathbf{X}^T \right) = \sum_{j=1}^p \frac{\sigma_j^2}{\sigma_j^2 + 2n\lambda}
-$$
+1. **Why does adding $\lambda \mathbf{I}$ guarantee invertibility?**
+   Even if columns of $\mathbf{X}$ are perfectly collinear and $\mathbf{X}^T \mathbf{X}$ is singular (has zero eigenvalues), adding $\lambda > 0$ shifts every eigenvalue up by $\lambda$: $\text{eig}(\mathbf{X}^T \mathbf{X} + \lambda \mathbf{I}) = \sigma_j^2 + \lambda > 0$. The matrix becomes strictly positive definite and always invertible!
+2. **SVD Shrinkage Factor:**
+   * When singular value $\sigma_j$ is large (strong signal): $\frac{\sigma_j^2}{\sigma_j^2 + \lambda} \approx 1$ (barely shrunk).
+   * When $\sigma_j$ is tiny (collinear noise): $\frac{\sigma_j^2}{\sigma_j^2 + \lambda} \approx 0$ (heavily suppressed).
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $\mathbf{X} \in \mathbb{R}^{n \times p}$: Standardized feature matrix with $n$ samples and $p$ regressors.
-* $\mathbf{y} \in \mathbb{R}^n$: Centered target vector.
-* $\lambda$: Non-negative regularization hyperparameter controlling the degree of shrinkage.
-* $\mathbf{I}_p$: $p \times p$ identity matrix serving as the isotropic $L_2$ regularization regularizer.
-* $\hat{\boldsymbol{\beta}}_{\text{Ridge}}$: Closed-form regularized coefficient estimator.
-* $\sigma_j$: The $j$-th singular value of matrix $\mathbf{X}$, quantifying variance along the $j$-th principal axis.
-* $f_j = \frac{\sigma_j^2}{\sigma_j^2 + 2n\lambda}$: SVD spectral shrinkage coefficient filtering out collinear directions.
-* $\text{df}(\lambda)$: Effective degrees of freedom parameterizing continuous model complexity.
+* $\lambda \ge 0$: Tuning hyperparameter governing penalty strength.
+* $\mathbf{I}_K$: $K \times K$ identity matrix regularizing parameter slopes.
+* $\hat{\boldsymbol{\beta}}_{\text{ridge}}$: Closed-form L2 regularized coefficient vector.
+* $\frac{\sigma_j^2}{\sigma_j^2 + \lambda}$: Shrinkage multiplier applied to singular component $j$.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\lambda \|\boldsymbol{\beta}\|_2^2$ | عقوبة L2 التربيعية | الغرامة المضافة لدالة الخسارة لسحب كافة المعاملات سحبًا تدريجيًا نحو الصفر. |
+| $\mathbf{X}^T \mathbf{X} + \lambda \mathbf{I}$ | مصفوفة غرام المعدلة | إضافة $\lambda$ للقطر الرئيسي لضمان قابلية المصفوفة للعكس دائمًا واستقرارها. |
+| $\frac{\sigma_j^2}{\sigma_j^2 + \lambda}$ | معامل انكماش المكونات | نسبة الاحتفاظ بكل إشارة؛ حيث تُحفظ الإشارات القوية وتُقمع المتغيرات الهزيلة. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -110,48 +154,33 @@ test_cases:
 ```python
 import numpy as np
 
-def fit_ridge_svd(X: np.ndarray, y: np.ndarray, lmbda: float) -> dict[str, object]:
+def fit_ridge_svd(X: np.ndarray, y: np.ndarray, lmbda: float) -> np.ndarray:
     """
-    Fits Ridge regression using closed-form Normal Equations and computes SVD spectral shrinkage.
-    
+    Fits Ridge Regression (L2) using Singular Value Decomposition (SVD).
+
     Parameters
     ----------
-    X : np.ndarray of shape (N, P)
-        Design matrix.
+    X : np.ndarray of shape (N, K)
+        Design matrix of regressors.
     y : np.ndarray of shape (N,)
-        Target response vector.
+        Observed target vector.
     lmbda : float
-        Regularization strength lambda >= 0.
-        
+        L2 regularization parameter >= 0.
+
     Returns
     -------
-    dict with keys:
-        'beta': Estimated Ridge coefficient vector of shape (P,).
-        'singular_values': Singular values of X.
-        'shrinkage_factors': SVD spectral shrinkage factors per component.
-        'df_effective': Effective degrees of freedom df(lambda).
+    np.ndarray of shape (K,) : Ridge coefficients beta.
     """
-    N, P = X.shape
-    
-    # Step 1: Form regularized normal equations: (X^T X + 2*N*lambda * I) beta = X^T y
-    XtX = X.T @ X
-    penalty_diag = 2.0 * N * lmbda * np.eye(P)
-    beta = np.linalg.solve(XtX + penalty_diag, X.T @ y)
-    
-    # Step 2: SVD of X to obtain singular values
+    # SVD: X = U Sigma V^T
     U, s, Vt = np.linalg.svd(X, full_matrices=False)
-    
-    # Step 3: Compute spectral shrinkage factors: s_j^2 / (s_j^2 + 2*N*lambda)
-    s_squared = s ** 2
-    shrinkage = s_squared / (s_squared + 2.0 * N * lmbda)
-    df_effective = float(np.sum(shrinkage))
-    
-    return {
-        "beta": beta,
-        "singular_values": s,
-        "shrinkage_factors": shrinkage,
-        "df_effective": df_effective
-    }
+
+    # Shrinkage factor: s_j / (s_j^2 + lambda)
+    shrinkage = s / (s ** 2 + lmbda)
+
+    # beta_ridge = V @ diag(shrinkage) @ U^T y
+    beta_ridge = Vt.T @ (shrinkage * (U.T @ y))
+
+    return beta_ridge
 ```
 :::
 

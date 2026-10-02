@@ -12,7 +12,7 @@ i18n:
 
 # Autonomous AI Agents: ReAct Reasoning & Action Execution Loop
 
-## Beat 1: Tactile Intuition
+## Beat 1: Tactile Intuition | الحدس الفيزيائي والبصري
 
 Standard foundation models confined to passive, single-turn text generation are inherently brittle: they cannot inspect external databases, verify real-time facts, run code, or self-correct reasoning mistakes when assumptions fail. If you ask a raw language model to analyze a live database or compute complex numbers, it simply hallucinates plausible-sounding but completely fabricated results.
 
@@ -36,6 +36,52 @@ In real-world production environments, deploying autonomous agents requires engi
 
 الوكيل المستقل يشبه محققاً بارعاً يحل لغزاً جنائياً غامضاً: فهو لا يلقي التخمينات عشوائياً، بل يكتب ملاحظاته الاستنتاجية في مفكرته (التفكير)، ثم يجمع الأدلة الجنائية ويفحص البصمات (الفعل والملاحظة)، ويعدل نظريته حتى يكتمل بناء الحقيقة دون أي ثغرة.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **ReAct Paradigm (Reasoning + Acting)** (نمط التفكير والعمل التفاعلي) | The detective's journal: interleaves internal thinking ("I need to verify this claim") with physical actions ("Query database") to solve problems. | يوميات المحقق الذكي: يدمج التفكير الداخلي بالخطوات التنفيذية في العالم الخارجي لحل المسائل المعقدة بدقة. |
+| **Agent Execution Loop** (حلقة تنفيذ الوكيل الذاتي) | The relentless feedback cycle: keeps running the Thought $\to$ Action $\to$ Observation loop until the final objective is completely accomplished. | الدورة التفاعلية المستمرة: حلقة تكرارية تنفذ (التفكير ثم العمل ثم الملاحظة) حتى إنجاز الهدف المطلوب بالكامل. |
+| **Tool / Function Calling** (استدعاء الأدوات والدوال البرمجية) | Handing the AI a wrench: enabling the language model to emit structured JSON commands that execute real code, search engines, or APIs. | تزويد النموذج بمفاتيح العمل: تمكين الذكاء الاصطناعي من استدعاء دوال حقيقية والبحث في الإنترنت وقواعد البيانات. |
+| **Grounding & Anti-Hallucination** (التثبيت المعرفي ومكافحة الهلوسة) | Checking the mirror: grounding every thought in verifiable observation outputs rather than daydreaming unreliable answers from memory. | الارتكاز على الشواهد الحقيقية: إلزام النموذج ببناء استنتاجاته على نتائج الأدوات الحقيقية بدلاً من الهلوسة والتخمين. |
+| **Stopping / Termination Criterion** (معيار التوقف وإنهاء المهمة) | Case closed: recognizing when the goal is achieved and emitting the final answer rather than looping infinitely. | إغلاق القضية بنجاح: تمييز اللحظة التي تكتمل فيها الإجابة وإصدار النتيجة النهائية للمستخدم دون دوران مفرغ. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+AUTONOMOUS REACT AGENT EXECUTION TRAJECTORY:
+=============================================================================
+User Prompt / Goal: "What is the population of Tokyo divided by the area of Paris?"
+      |
+      v
++--> [ STEP 1: THOUGHT (LLM Reasoning) ]
+|    "I need to first find the population of Tokyo, then find the area of Paris."
+|     |
+|     v
+|    [ STEP 2: ACTION (External Tool Call) ]
+|    Call Tool: Search[query="Tokyo population 2024"]
+|     |
+|     v
+|    [ ENVIRONMENT EXECUTION ] (Outside LLM sandbox)
+|    Tool returns raw factual text
+|     |
+|     v
+|    [ STEP 3: OBSERVATION (Feedback injected into Context) ]
+|    Observation: "Tokyo population is approximately 14.1 million."
+|     |
++----+ [ STEP 4: NEXT ITERATION ]
+     Thought: "Now I need the area of Paris in square kilometers."
+     Action: Search[query="Paris area sq km"]
+     Observation: "The area of Paris is 105.4 square kilometers."
+     ...
+     Thought: "Now I will compute 14,100,000 / 105.4 using the Calculator tool."
+     Action: Calculator[expr="14100000 / 105.4"]
+     Observation: "133776.09"
+     ...
+     Thought: "I have gathered all facts. I am ready to conclude."
+     Action: Finish[answer="The population density ratio is approximately 133,776 people per sq km."]
+```
+
 :::simulation-widget{engine="canvas2d" component="AutogradGraphLab"}
 ---
 interactive: true
@@ -45,7 +91,7 @@ highlighted_metric: "loss"
 
 ---
 
-## Beat 2: Formal Mathematical Anchor
+## Beat 2: Formal Mathematical Anchor | الإرساء الرياضي الدقيق
 
 The autonomous agent's execution is formalized as a discrete-time Markov decision process operating over an interaction trajectory $\tau_t$:
 
@@ -65,22 +111,22 @@ $$
 \text{Stopping Invariant: } a_t = \text{Finish} \lor t \ge T_{\max} \lor \text{hash}(a_t) \in \mathcal{H}_{\text{cycle}}
 $$
 
-### Comprehensive Symbol & Parameter Breakdown
+### Demystifying the Equation | تفكيك الرموز والمعادلات
 
-| Symbol | Dimensionality | Mathematical Interpretation | Operational Role |
-| :--- | :--- | :--- | :--- |
-| $c$ | Text | High-level user goal / system instructions | The root task definition grounding the entire trajectory. |
-| $\tau_t$ | Sequence | Accumulated interaction context history | The active working memory prompt fed into the LLM at step $t$. |
-| $\pi_\theta$ | Distribution | Autoregressive foundation language model | Evaluates context and samples the next cognitive thought or action. |
-| $a_t = (\text{tool}, \text{args})$ | Tuple | Structured action invocation | Dispatches parameter payload to external software runtime. |
-| $\mathcal{E}$ | Environment | External software execution environment | Executes API calls, Python sandboxes, or database engines. |
-| $o_t$ | String | Raw execution observation | Feedback appended to trajectory $\tau_{t+1} = (\tau_t, a_t, o_t)$. |
-| $T_{\max}$ | Integer | Maximum execution step budget | Hard computational circuit breaker preventing infinite loops. |
-| $\mathcal{H}_{\text{cycle}}$ | Set | Hash history of previous actions | Detects repetitive identical actions and triggers corrective replanning. |
+| Symbol / الرمز | Mathematical Term / المصطلح الرياضي | Plain English Meaning & Role / المعنى الفيزيائي والدور التطبيقي |
+| :--- | :--- | :--- |
+| $\tau_t = (c_1, a_1, o_1, \dots, c_t, a_t, o_t)$ | Trajectory History / سجل مسار الوكيل | The accumulated sequence of thoughts, actions, and observations up to step $t$. |
+| $c_t \in \mathcal{C}$ | Thought / Internal Reasoning / خطوة التفكير والتحليل | Natural language reasoning string clarifying intent, tracking progress, and deciding next steps. |
+| $a_t \in \mathcal{A}$ | Action / Tool Invocation / الأمر التنفيذي للأداة | Concrete action emitted by the agent (e.g. `Search[query]`, `Calculator[expr]`, or `Finish[ans]`). |
+| $o_t \in \mathcal{O}$ | Observation / Environment Feedback / الملاحظة الراجعة | Raw output string returned by the external execution environment or API tool. |
+| $\pi(c_t, a_t \mid \tau_{t-1}, o_{t-1})$ | Agent Policy Distribution / نموذج سياسة الوكيل | The autoregressive language model conditioned on the full conversation trajectory. |
+| $\text{Finish}(y)$ | Termination Primitive / أمر إنهاء المهمة | Terminal action extracting final answer $y$ and halting the loop. |
 
-تضمن هذه الصياغة الرياضية ضبط سلوك الوكيل الذكي عبر ربط تفكيره الداخلي بالأفعال الفيزيائية في بيئة التشغيل، مع توفير ضمانات أمان حتمية تمنع الوقوع في فخ الحلقات اللانهائية وهدر موارد السحابة.
+#### Why the Math Works Step-by-Step | لماذا تعمل هذه الصياغة رياضياً؟
+1. **Synergy of Reasoning and Action**: Yao et al. (2022) demonstrated that reasoning without action (Chain-of-Thought) suffers from factual hallucinations and knowledge cutoffs. Action without reasoning (direct Act) suffers from trial-and-error thrashing. Interleaving both creates robust, explainable goal completion.
+2. **Context Window Expansion as Dynamic State**: The trajectory $\tau_t = \tau_{t-1} \cup \{c_t, a_t, o_t\}$ converts external tool results into in-context learning tokens, allowing standard autoregressive decoders to act as stateful POMDP agents.
+3. **Error Recovery & Self-Correction**: When an action fails or returns an error observation (e.g. `"HTTP 404: Page not found"`), the subsequent thought $c_{t+1}$ diagnoses the failure and formulates an alternative query, enabling autonomous resilience.
 
----
 
 ## Beat 3: Python Challenge
 

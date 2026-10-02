@@ -24,6 +24,41 @@ Beyond sample independence, LayerNorm provides two critical mathematical invaria
 
 Finally, to preserve the network's expressive capacity, LayerNorm introduces channel-wise learnable affine parameters: gain $\boldsymbol{\gamma} \in \mathbb{R}^d$ and bias $\boldsymbol{\beta} \in \mathbb{R}^d$. While the standardization step pulls all hidden dimensions into a disciplined Gaussian-like bell, the learnable parameters allow the network to selectively amplify important semantic dimensions or shift thresholds. The forward pass normalizes across features, while the backward pass flows local adjoint sensitivities back through both the affine gates and the inward statistical moments.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Layer Normalization (LayerNorm)** (معايرة الطبقة) | Student-centric grading: standardizes each student's exam profile across their own subject scores, totally ignoring classmates. | تقييم الطالب بالنسبة لدرجاته هو: معايرة ميزات كل عينة بشكل مستقل تماماً عن بقية العينات في الدفعة. |
+| **Batch Independence** (الاستقلالية التامة عن الدفعة) | Operates identically whether you feed $1$ sample (online streaming generation) or $10,000$ samples in parallel. | تعمل بنفس الكفاءة والدقة سواء كان حجم الدفعة عينة واحدة في التوليد الآني أو آلاف العينات في التدريب. |
+| **Feature / Hidden Axis ($D$)** (بعد الخصائص / التضمين) | The horizontal dimension across which statistics are gathered (e.g., the 4096 hidden dimensions of an LLM token). | البعد الأفقي الذي تجمع عبره الإحصائيات (مثل أبعاد التضمين البالغة 4096 في نماذج المحولات). |
+| **Scale and Shift Invariance** (صمود المقياس والإزاحة) | Resilience to input scaling and shifting: multiplying weights or inputs by a constant $c$ does not destabilize normalization. | مناعة ضد التضخم: ضرب المدخلات أو الأوزان في معامل ثابت لا يغير من النتيجة المعايرة النهائية. |
+| **Sequential Primacy** (الريادة في النماذج المتسلسلة) | The foundational reason Transformers replaced BatchNorm with LayerNorm: variable text lengths and single-token decoding require it. | السبب الجوهري لاعتماد نماذج المحولات لـ LayerNorm: ملاءمتها للأطوال المتغيرة والتوليد الذاتي رمزاً برمز. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+BATCHNORM VS. LAYERNORM: THE GEOMETRIC AXIS DIFFERENCE
+=============================================================================
+Input Tensor Shape: [Batch B, Features D]
+
+BATCH NORMALIZATION: (Vertical Slices)
+         Feature 1   Feature 2   ...   Feature D
+Sample 1:  [ * ]       [ * ]             [ * ]
+Sample 2:  [ * ]       [ * ]             [ * ]
+           ...         ...               ...
+Sample B:  [ * ]       [ * ]             [ * ]
+             |           |                 |
+             v           v                 v
+          (Mean \mu_1) (Mean \mu_2)      (Mean \mu_D) -> Normalized ACROSS Samples!
+
+LAYER NORMALIZATION: (Horizontal Slices)
+         Feature 1   Feature 2   ...   Feature D
+Sample 1:  [ * ]  - -  [ * ]  - - ... - - [ * ]  --> Compute \mu_1, \sigma_1^2 ACROSS Features!
+Sample 2:  [ * ]  - -  [ * ]  - - ... - - [ * ]  --> Compute \mu_2, \sigma_2^2 ACROSS Features!
+           ...                                    --> Completely independent samples!
+Sample B:  [ * ]  - -  [ * ]  - - ... - - [ * ]  --> Works identically at B=1 (Inference)!
+```
+
 :::simulation-widget{engine="canvas2d" component="NeuralActivationCanvas"}
 ---
 interactive: true

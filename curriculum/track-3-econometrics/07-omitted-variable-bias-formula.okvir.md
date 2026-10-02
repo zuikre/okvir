@@ -14,41 +14,65 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Confusing correlation with causation is the original sin of empirical data analysis.
+### Intuition & Real-World Story
 
-Imagine a peaceful countryside village where, every morning at 5:00 AM sharp, the village rooster crows loudly. At 5:05 AM, the sun rises over the horizon. If an algorithm runs a regression of *Sunrise* on *Rooster Crowing*, it will find a stunningly strong, statistically significant positive relationship with $R^2 \approx 1$. But does the rooster summon the dawn? If you silence the rooster, will eternal darkness engulf the village?
+Imagine an economist measuring the financial return of an MBA degree: *how much does earning an MBA increase future salary?* 
 
-Of course not. The planetary rotation of the Earth is the true common cause that brings the sunrise while simultaneously triggering the rooster's biological circadian rhythm. Omitting the Earth's rotation forces the statistical model to attribute the solar event to the bird's vocal cords! This is **Omitted Variable Bias (OVB)**.
+You collect survey data on 5,000 corporate professionals, run a simple regression of salary on MBA completion, and discover a massive coefficient: +$45,000 per year! You are tempted to conclude that getting an MBA causes your salary to surge by $45,000.
 
-The OVB formula is celebrated because it dissects this error with surgical precision. The bias of a naive "short" regression is the exact product of two distinct mechanisms:
+But consider **Unobserved Drive & Ambition**. People who spend years studying for exams, applying to elite business schools, and networking late into the night possess exceptional natural drive. Even if they had never set foot in business school, their sheer ambition and work ethic would have propelled them into executive roles and earned them substantial salaries anyway!
 
-$$
-\text{Bias} = (\text{Direct Impact of the Omitted Variable on } Y) \times (\text{Statistical Correlation between Omitted Variable and } X)
-$$
+When you omit ambition from the regression, the MBA variable does not just capture the value of the degree; it acts as a magnet, soaking up the unmeasured credit for the person's innate drive. This distortion is **Omitted Variable Bias (OVB)**.
 
-If either of these two bridges is zero, the bias collapses to zero:
-1. If the omitted factor has no true effect on the outcome ($\beta_2 = 0$), omitting it causes no bias.
-2. If the omitted factor is completely uncorrelated with the treatment ($\delta_{21} = 0$, as in a randomized experiment), omitting it causes no bias!
+The celebrated OVB formula shows that the bias equals two distinct ingredients multiplied together:
+$$\text{Bias} = (\text{Impact of Ambition on Salary}) \times (\text{Relationship between Ambition and MBA})$$
+If both are positive, your simple regression produces a massively exaggerated, upward-biased estimate.
 
-Here lies the quintessential fork between prediction and policymaking. To an automated prediction system—such as a bank scoring credit applicants or a tech firm sorting job resumes—omitted variable bias is completely harmless. If a candidate holds an elite college degree, that degree accurately predicts high productivity, regardless of whether the university imparted valuable skills or simply admitted inherently talented students. But for a government ministry deciding whether to invest billions in subsidized higher education, the difference between prediction and causation is existential: if the wage premium is purely driven by omitted innate talent, expanding college access will not transform low-skilled workers into economic dynamos. Prediction asks: *"What does schooling signal?"* Causation asks: *"What does schooling create?"*
+#### Jargon Decoder
 
-الخلط بين الارتباط والسببية هو الخطيئة الكبرى في تحليل البيانات التجريبية.
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Omitted Variable Bias (OVB)** | Credit theft: when an unmeasured factor distorts the coefficient of an included feature. |
+| **Confounder ($Z$)** | A hidden third variable that influences both the treatment and the final outcome. |
+| **Short Regression** | The naive, incomplete model leaving out the crucial confounder. |
+| **Long Regression** | The complete, ideal model containing both the treatment and the confounder. |
+| **Upward / Downward Bias** | Overestimating (upward) or underestimating (downward) the true causal impact. |
 
-تخيل قرية ريفية هادئة يصيح فيها ديك المزرعة كل صباح عند الساعة 5:00 تمامًا، وعند الساعة 5:05 تشرق الشمس في الأفق. إذا أجرى نموذج إحصائي انحدارًا لـ *شروق الشمس* على *صياح الديك*، فسيخرج بمعامل ارتباط موجب هائل ودلالة إحصائية قاطعة بـ $R^2 \approx 1$. ولكن هل صياح الديك هو الذي يستدعي خيوط الفجر؟ وهل سيعم الظلام الأبدي لو أسكتنا الديك؟
+```text
+    THE CAUSAL TRIANGLE (OVB):
 
-بالتأكيد لا. إن دوران كوكب الأرض حول محوره هو السبب الحقيقي المشترك الذي يأتي بالشروق ويحفز في الوقت ذاته الساعة البيولوجية للديك. إن إغفال دوران الأرض يجبر النموذج الإحصائي على نسبة شروق الشمس إلى حبال الديك الصوتية! هذا هو **انحياز المتغير المغفَل (Omitted Variable Bias - OVB)**.
+          Unobserved Ambition (Z)
+              /              \
+             / (+)            \ (+)
+            v                  v
+     MBA Degree (X) ---------> Salary (y)
+                   True Effect: beta_1
+             (Naive Estimate absorbs Z's effect!)
+```
 
-تكتسب صيغة OVB مكانتها التاريخية لأنها تفكك هذا الخطأ بدقة جراحية متناهية. فالانحياز في الانحدار "القصير" هو حاصل ضرب مسارين محددين:
+### الحدس والقصة الواقعية
 
-$$
-\text{الانحياز} = (\text{الأثر المباشر للمتغير المغفل على النتيجة } Y) \times (\text{الارتباط الإحصائي بين المتغير المغفل والمعالجة } X)
-$$
+تخيل باحثًا اقتصاديًا يقيس العائد المالي للحصول على درجة الماجستير في إدارة الأعمال (MBA): *كم تزيد هذه الشهادة من الراتب السنوي؟*
 
-فإذا انقطع أي من هذين الجسرين، يتلاشى الانحياز تمامًا ليصبح صفرًا:
-1. إذا لم يكن للمتغير المغفل أثر حقيقي على النتيجة ($\beta_2 = 0$)، فلا انحياز في إغفاله.
-2. إذا كان المتغير المغفل مستقلاً تمامًا عن المعالجة ($\delta_{21} = 0$، كما في التجارب العشوائية)، فلا انحياز إطلاقًا!
+تجمع بيانات 5,000 موظف، وتجري انحدارًا بسيطًا للراتب على حصول الموظف على الشهادة، فتجد نتيجة مذهلة: زيادة قدرها 45,000 دولار سنويًا! قد تتسرع وتعلن أن الحصول على الشهادة هو السبب المباشر لهذه القفزة في الراتب.
 
-وهنا يكمن المفترق الحاسم بين نماذج التنبؤ وصنع السياسات العامة. بالنسبة لخوارزمية تنبؤية في بنك أو شركة توظيف، لا يشكل انحياز المتغير المغفل أي مشكلة؛ فالحصول على شهادة من جامعة عريقة يتنبأ بدقة بإنتاجية الموظف، بصرف النظر عما إذا كانت الجامعة هي التي صقلت مهاراته أم أنها مجرد مرشح استقطب العباقرة أصلاً! لكن بالنسبة لوزير تعليم يقرر إنفاق مليارات الدولارات لدعم التعليم العالي، فإن التمييز بين التنبؤ والسببية مسألة حياة أو موت للمال العام: إذا كان عائد التعليم ناتجًا عن انحياز الموهبة الفطرية المغفلة، فإن مضاعفة خريجي الجامعات لن تخلق عباقرة جدد! التنبؤ يسأل: *"ما الذي تشير إليه الشهادة؟"* بينما السببية تسأل: *"ما الذي تصنعه الشهادة فعلاً؟"*
+ولكن فكر في **الطموح والشغف الفطري**. الأشخاص المستعدون للسهر والدراسة والمثابرة للحصول على الشهادة يملكون بطبيعتهم طاقة وطموحًا استثنائيين. وحتى لو لم يدخلوا كلية الأعمال قط، فإن طموحهم واجتهادهم كان كفيلاً بإيصالهم لمناصب قيادية ورواتب عالية!
+
+عندما تحذف متغير الطموح من النموذج، لا يقتصر معامل الشهادة على قياس قيمتها الذاتية، بل يعمل كمغناطيس يسرق الفضل من الطموح الفطري وينسبه زيفًا إلى الشهادة. هذا التشويه الخطير يسمى **انحياز المتغير المحذوف (Omitted Variable Bias - OVB)**.
+
+تثبت معادلة OVB الشهيرة أن مقدار الانحياز يساوي حاصل ضرب أمرين:
+$$\text{الانحياز} = (\text{أثر الطموح على الراتب}) \times (\text{ارتباط الطموح بالالتحاق بالشهادة})$$
+ولأن كلاهما موجب، فإن الانحدار البسيط يضخم أثر الشهادة تضخيمًا هائلاً يفوق الواقع.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **انحياز المتغير المحذوف** | سرقة الفضل: تشوه تقدير المعلمة لأن عاملاً غير مقاس تسلل وأعطى وزنه للمتغير. |
+| **المتغير المربك (Confounder)** | عامل ثالث خفي يؤثر في سبب الظاهرة وفي نتيجتها معًا في آن واحد. |
+| **الانحدار القصير (Short)** | النموذج الناقص الذي أسقط المتغير المربك عن غير قصد أو لتعذر قياسه. |
+| **الانحدار الطويل (Long)** | النموذج الكامل المثالي الذي يضبط ويقيس المتغير المربك إلى جانب المعالجة. |
+| **الانحياز الصاعد والهابط** | تضخيم الأثر الحقيقي بالزيادة (صاعد) أو التقليل منه بالنقصان (هابط). |
 
 :::simulation-widget{engine="canvas2d" component="OmittedVariableBiasCanvas"}
 ---
@@ -59,68 +83,61 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-Suppose the true data generating process is the **Long Model**:
+Consider the true 'long' data generating process and the estimated 'short' regression:
 
 $$
-\mathbf{y} = \mathbf{X}_1 \boldsymbol{\beta}_1 + \mathbf{X}_2 \boldsymbol{\beta}_2 + \boldsymbol{\varepsilon}, \quad \text{with } \mathbb{E}[\boldsymbol{\varepsilon} \mid \mathbf{X}_1, \mathbf{X}_2] = \mathbf{0}
-$$
-
-where $\boldsymbol{\beta}_1$ is the true causal effect vector of primary interest. A researcher fails to observe $\mathbf{X}_2$ and fits the **Short Model**:
-
-$$
-\mathbf{y} = \mathbf{X}_1 \boldsymbol{\beta}_{\text{short}} + \mathbf{u}
-$$
-
-### Mathematical Derivation of the OVB Formula
-
-The OLS estimator of the short regression is:
-
-$$
-\hat{\boldsymbol{\beta}}_{\text{short}} = (\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T \mathbf{y} = (\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T (\mathbf{X}_1 \boldsymbol{\beta}_1 + \mathbf{X}_2 \boldsymbol{\beta}_2 + \boldsymbol{\varepsilon})
-$$
-
-Expanding this product:
-
-$$
-\hat{\boldsymbol{\beta}}_{\text{short}} = (\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T \mathbf{X}_1 \boldsymbol{\beta}_1 + (\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T \mathbf{X}_2 \boldsymbol{\beta}_2 + (\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T \boldsymbol{\varepsilon}
+\text{Long Regression:} \quad \mathbf{y} = \mathbf{X}_1 \beta_1 + \mathbf{X}_2 \beta_2 + \boldsymbol{\varepsilon}
 $$
 
 $$
-\hat{\boldsymbol{\beta}}_{\text{short}} = \boldsymbol{\beta}_1 + \underbrace{(\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T \mathbf{X}_2}_{\hat{\boldsymbol{\delta}}_{21}} \boldsymbol{\beta}_2 + (\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T \boldsymbol{\varepsilon}
+\text{Short Regression:} \quad \mathbf{y} = \mathbf{X}_1 \tilde{\beta}_1 + \mathbf{u}
 $$
 
-Taking expectations conditional on the observed regressors $\mathbf{X}_1$ and unobserved confounders $\mathbf{X}_2$:
+The OLS estimator from the short regression is:
 
 $$
-\mathbb{E}[\hat{\boldsymbol{\beta}}_{\text{short}} \mid \mathbf{X}_1, \mathbf{X}_2] = \boldsymbol{\beta}_1 + \hat{\boldsymbol{\delta}}_{21} \boldsymbol{\beta}_2 + (\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T \mathbb{E}[\boldsymbol{\varepsilon} \mid \mathbf{X}_1, \mathbf{X}_2]
+\tilde{\beta}_1 = (\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T \mathbf{y} = (\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T (\mathbf{X}_1 \beta_1 + \mathbf{X}_2 \beta_2 + \boldsymbol{\varepsilon})
 $$
 
-Since $\mathbb{E}[\boldsymbol{\varepsilon} \mid \mathbf{X}_1, \mathbf{X}_2] = \mathbf{0}$, the residual disturbance term vanishes, establishing the matrix **Omitted Variable Bias Formula**:
+Taking conditional expectations yields the celebrated **Omitted Variable Bias Formula**:
 
 $$
-\mathbb{E}[\hat{\boldsymbol{\beta}}_{\text{short}} \mid \mathbf{X}_1, \mathbf{X}_2] = \boldsymbol{\beta}_1 + \hat{\boldsymbol{\delta}}_{21} \boldsymbol{\beta}_2 \iff \text{Bias} \equiv \hat{\boldsymbol{\delta}}_{21} \boldsymbol{\beta}_2
+\mathbb{E}[\tilde{\beta}_1 \mid \mathbf{X}_1, \mathbf{X}_2] = \beta_1 + \beta_2 \cdot (\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T \mathbf{X}_2 \equiv \beta_1 + \beta_2 \cdot \tilde{\delta}_1
 $$
 
-In scalar bivariate notation where $x_1$ is a single treatment and $x_2$ is a single omitted confounder:
+where $\tilde{\delta}_1$ is the slope coefficient from an auxiliary regression of omitted variable $\mathbf{X}_2$ on included variable $\mathbf{X}_1$.
 
-$$
-\text{plim} \, \hat{\beta}_{\text{short}} = \beta_1 + \beta_2 \cdot \frac{\text{Cov}(x_1, x_2)}{\text{Var}(x_1)}
-$$
+### Why the Math Works Step-by-Step
 
-### The Directional Bias Matrix | مصفوفة تحديد اتجاه الانحياز
-
-| Correlation of Omitted with Treatment ($\delta_{21}$) | Impact of Omitted on Outcome ($\beta_2 > 0$) | Impact of Omitted on Outcome ($\beta_2 < 0$) |
-| :--- | :--- | :--- |
-| **Positive Correlation** ($\delta_{21} > 0$) | **Positive Bias** (Overestimation: $\hat{\beta} > \beta$) | **Negative Bias** (Underestimation: $\hat{\beta} < \beta$) |
-| **Negative Correlation** ($\delta_{21} < 0$) | **Negative Bias** (Underestimation: $\hat{\beta} < \beta$) | **Positive Bias** (Overestimation: $\hat{\beta} > \beta$) |
+1. **The Anatomy of the Bias:**
+   Notice that the bias term is the exact product of two parameters:
+   $$\text{Bias} = \beta_2 \times \tilde{\delta}_1$$
+   * $\beta_2$: The structural impact of the omitted variable on the outcome in the long regression.
+   * $\tilde{\delta}_1$: The regression projection of the omitted variable onto the included variable.
+2. **When is OVB equal to zero?**
+   The short regression is unbiased ($\mathbb{E}[\tilde{\beta}_1] = \beta_1$) if and only if at least one of two conditions holds:
+   * $\beta_2 = 0$: The omitted variable has zero effect on the outcome.
+   * $\tilde{\delta}_1 = 0$: The omitted variable is completely uncorrelated with the included regressor $\mathbf{X}_1$.
+3. **The Direction of Bias:**
+   * If $\beta_2 > 0$ and $\tilde{\delta}_1 > 0 \implies \text{Bias} > 0$ (Upward bias).
+   * If $\beta_2 > 0$ and $\tilde{\delta}_1 < 0 \implies \text{Bias} < 0$ (Downward bias).
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $\beta_1$: True structural parameter representing the causal effect of treatment $\mathbf{X}_1$ on $\mathbf{y}$.
-* $\beta_2$: True partial effect of the unobserved omitted confounder $\mathbf{X}_2$ on $\mathbf{y}$ holding $\mathbf{X}_1$ fixed.
-* $\beta_{\text{short}}$: Population parameter recovered by naive short regression omitting $\mathbf{X}_2$.
-* $\hat{\delta}_{21} = (\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T \mathbf{X}_2$: Auxiliary regression coefficient from projecting the omitted confounder onto the treatment.
-* $\text{Bias} = \beta_2 \cdot \delta_{21}$: The exact magnitude and sign of causal distortion.
+* $\beta_1$: True causal coefficient in the complete structural long equation.
+* $\tilde{\beta}_1$: Naive slope estimate obtained from the short bivariate regression.
+* $\beta_2$: The omitted variable's structural impact on $\mathbf{y}$.
+* $\tilde{\delta}_1 = (\mathbf{X}_1^T \mathbf{X}_1)^{-1} \mathbf{X}_1^T \mathbf{X}_2$: Auxiliary regression coefficient of $\mathbf{X}_2$ on $\mathbf{X}_1$.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\beta_1$ | الأثر السببي الحقيقي | المعامل الحقيقي للمتغير المدروس في النموذج الكامل طويل الأجل. |
+| $\tilde{\beta}_1$ | التقدير الساذج للنموذج القصير | التقدير المشوه الذي نحصل عليه عند حذف المتغير المربك. |
+| $\beta_2$ | وزن المتغير المحذوف | مدى قوة تأثير المتغير المحذوف على النتيجة النهائية $y$. |
+| $\tilde{\delta}_1$ | معامل الانحدار المساعد | مدى الارتباط بين المتغير المحذوف والمتغير المستقل المدرج. |
+| $\beta_2 \tilde{\delta}_1$ | حد الانحياز الصافي | المقدار العددي الدقيق للتشويه الذي أصاب التقدير بسبب الحذف. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -140,51 +157,36 @@ test_cases:
 ```python
 import numpy as np
 
-def compute_ovb(y: np.ndarray, X1: np.ndarray, X2: np.ndarray) -> dict[str, np.ndarray]:
+def compute_ovb(X1: np.ndarray, X2: np.ndarray, y: np.ndarray) -> dict[str, float]:
     """
-    Computes long OLS, short OLS, auxiliary projection, and exact omitted variable bias.
+    Computes the Omitted Variable Bias (OVB) decomposition.
     
-    Parameters
-    ----------
-    y : np.ndarray of shape (N,)
-        Outcome vector.
-    X1 : np.ndarray of shape (N, K1)
-        Included regressor block (treatment + controls).
-    X2 : np.ndarray of shape (N, K2)
-        Omitted confounder block.
-        
-    Returns
-    -------
-    dict with keys:
-        'beta_long_1': long regression coefficients for X1 (K1,)
-        'beta_long_2': long regression coefficients for X2 (K2,)
-        'beta_short': short regression coefficients for X1 (K1,)
-        'delta_aux': auxiliary regression coefficients projecting X2 on X1 (K1, K2)
-        'ovb_calculated': product delta_aux @ beta_long_2 (K1,)
+    Verifies that: beta_short = beta_long_1 + beta_long_2 * delta_aux
     """
-    # Step 1: Fit the long regression y on [X1, X2]
-    X_long = np.hstack([X1, X2])
+    # Step 1: Fit the short regression (y on X1) to get beta_short
+    X1_col = X1 if X1.ndim == 2 else X1[:, np.newaxis]
+    X2_col = X2 if X2.ndim == 2 else X2[:, np.newaxis]
+    
+    beta_short = float(np.linalg.solve(X1_col.T @ X1_col, X1_col.T @ y).squeeze())
+
+    # Step 2: Fit the long regression (y on [X1, X2]) to get beta_long
+    X_long = np.column_stack([X1_col, X2_col])
     beta_long = np.linalg.solve(X_long.T @ X_long, X_long.T @ y)
-    K1 = X1.shape[1]
-    beta_long_1 = beta_long[:K1]
-    beta_long_2 = beta_long[K1:]
-    
-    # Step 2: Fit the short regression y on X1
-    beta_short = np.linalg.solve(X1.T @ X1, X1.T @ y)
-    
-    # Step 3: Fit the auxiliary regression X2 on X1
-    # Solves (X1^T X1) delta = X1^T X2
-    delta_aux = np.linalg.solve(X1.T @ X1, X1.T @ X2)
-    
-    # Step 4: Compute exact theoretical OVB: delta_aux @ beta_long_2
-    ovb_calculated = delta_aux @ beta_long_2
-    
+    beta_long_1 = float(beta_long[0])
+    beta_long_2 = float(beta_long[1])
+
+    # Step 3: Fit the auxiliary regression (X2 on X1) to get delta_aux
+    delta_aux = float(np.linalg.solve(X1_col.T @ X1_col, X1_col.T @ X2_col).squeeze())
+
+    # Step 4: Compute theoretical bias and verify exact identity
+    bias = beta_long_2 * delta_aux
+
     return {
+        "beta_short": beta_short,
         "beta_long_1": beta_long_1,
         "beta_long_2": beta_long_2,
-        "beta_short": beta_short,
         "delta_aux": delta_aux,
-        "ovb_calculated": ovb_calculated,
+        "bias": bias,
     }
 ```
 :::

@@ -14,21 +14,89 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-In applied machine learning, celebrating raw classification "accuracy" is one of the most dangerous analytical traps in data science. Imagine an automated airport security scanner inspecting 100,000 pieces of luggage each day, where exactly 10 bags contain dangerous contraband. A defective scanner that is completely disconnected from power—and mechanically stamps "CLEAN" on every single piece of luggage without examining it—will achieve an astonishing $99.99\%$ accuracy! It will receive glowing performance reports while letting every single threat pass undetected through the terminal. In the real world, where catastrophic events (credit card fraud, metastatic tumors, structural dam failures) are inherently rare, raw accuracy is thoroughly blinded by the overwhelming majority class.
+### Intuition & Real-World Story
 
-To see through this illusion, we partition classification outcomes into a **four-room grid known as the Confusion Matrix**. True Positives ($TP$) are genuine alarms that catch real threats; True Negatives ($TN$) are peaceful, correct clearances. The friction occurs in the error rooms: False Positives ($FP$) are nuisance false alarms that trigger needless panic and wasted labor, while False Negatives ($FN$) are silent, deadly misses. Two rival metrics govern this tension. **Precision** asks: *"When the alarm blares, what is the probability there is an actual fire?"* **Recall (Sensitivity)** asks: *"Out of all the actual fires that broke out in the building, what fraction did our alarm detect?"* Improving one almost inevitably degrades the other.
+In applied machine learning, celebrating high raw "accuracy" is one of the most perilous traps in data science.
 
-A probabilistic classifier does not output rigid binary decisions; it emits continuous risk scores $\hat{s}_i \in [0, 1]$. Transforming these continuous scores into hard decisions requires choosing an operational threshold $\tau$. Think of $\tau$ as an adjustable volume knob on an alarm system. If you dial $\tau$ all the way down to $0.0$, the alarm sounds continuously: you achieve $100\%$ Recall (no danger is missed), but your Precision collapses as False Positives flood the operations center. If you crank $\tau$ up to $1.0$, the alarm remains dead silent: zero false alarms, but complete blindness to reality. The **Receiver Operating Characteristic (ROC)** curve sweeps this threshold across its full continuum from $1.0$ down to $0.0$, plotting the True Positive Rate against the False Positive Rate to map the model's fundamental diagnostic frontier.
+Imagine an automated airport baggage scanner screening 100,000 pieces of luggage every day, where exactly 10 bags contain dangerous contraband. A broken scanner that is unplugged from the wall—mechanically stamping "CLEAN" on every single bag without scanning it—will achieve a jaw-dropping **99.99% accuracy!**
+The airport board might celebrate this stellar metric, while every single weapon and bomb passes completely undetected into the aircraft.
 
-This brings us to the profound mathematical beauty of the **Area Under the ROC Curve (ROC-AUC)**. The AUC is not merely an abstract geometric area under a graph; it possesses an exact, non-parametric probabilistic meaning known as the **Wilcoxon-Mann-Whitney U equivalence**. Imagine staging a pairwise tournament: you randomly draw one positive observation (a patient confirmed to have the disease) and one negative observation (a healthy individual). The ROC-AUC is the exact mathematical probability that your model will assign a higher risk score to the sick patient than to the healthy individual! An AUC of $0.5$ represents pure coin-flipping randomness, while an AUC of $1.0$ represents a flawless sorting engine that never ranks a healthy instance above an afflicted one.
+When catastrophic events (credit card fraud, cancerous tumors, bridge collapses) are inherently rare, raw accuracy is thoroughly blinded by the overwhelming majority of ordinary events.
 
-في تعلم الآلة التطبيقي، يُعد الاحتفال بنسبة "الدقة البسيطة" (Accuracy) أحد أخطر الفخاخ الإحصائية التي قد يقع فيها مهندس البيانات. تخيل جهاز فحص أمني آلي في مطار دولي يفحص 100,000 حقيبة يومياً، من بينها 10 حقائب فقط تحتوي على مواد محظورة. لو أن هذا الجهاز كان عاطلاً ومفصولاً تماماً عن الكهرباء، ويقوم بطباعة عبارة "سليمة" على كل الحقائب دون أي فحص، لحقق دقة مذهلة تبلغ $99.99\%$! سيحصل هذا الجهاز على إشادة شكلية كاذبة بينما تمر كافة الأخطار الحقيقية دون رصد. في الواقع العملي، وحيث تكون الأحداث الحرجة نادرة للغاية (مثل الاحتيال المالي، أو تشخيص الأورام السرطانية، أو انهيار السدود)، تصبح الدقة البسيطة مقياساً أعمى تشوهه الأغلبية الساحقة للحالات العادية.
+To cut through this illusion, we partition classification decisions into a **four-room grid known as the Confusion Matrix**:
+- **True Positives ($TP$):** The alarm rings, and there is a real fire.
+- **True Negatives ($TN$):** Quiet peace: no alarm, and no fire.
+- **False Positives ($FP$):** False alarms that panic people and waste valuable time.
+- **False Negatives ($FN$):** Silent disasters: the house is burning down, but the alarm never rings!
 
-لكشف هذا التضليل، نقسم نتائج التصنيف إلى **مصفوفة الارتباك (Confusion Matrix)** المكونة من أربع حجرات. الحالات الإيجابية الحقيقية ($TP$) هي إنذارات صادقة رصدت الخطر الفعلي؛ والحالات السلبية الحقيقية ($TN$) هي عمليات فحص صحيحة مرت بسلام. أما الفجوة فتكمن في حجرتي الخطأ: الحالات الإيجابية الزائفة ($FP$) هي إنذارات كاذبة تسبب الذعر وتستنزف الجهد، بينما الحالات السلبية الزائفة ($FN$) هي إخفاق صامت وخطير في رصد الكارثة. وهنا يبرز صراع بين مقياسين: **الدقة التنبؤية (Precision)** التي تسأل: *"عندما يطلق جهاز الإنذار صوته، ما احتمال وجود حريق حقيقي؟"*، ومقياس **الاستدعاء أو الحساسية (Recall)** الذي يسأل: *"من بين جميع الحرائق التي اندلعت بالفعل، كم حريقاً نجح النظام في اكتشافه؟"*.
+Two rival metrics battle for supremacy:
+- **Precision:** *"When our alarm blares, what is the probability of an actual fire?"* ($TP / (TP + FP)$)
+- **Recall (Sensitivity):** *"Out of all the actual fires that started, what fraction did we detect?"* ($TP / (TP + FN)$)
 
-لا ينتج النموذج الاحتمالي قرارات قاطعة، بل يولد درجات خطورة مستمرة $\hat{s}_i \in [0, 1]$. وتحويل هذه الدرجات إلى قرارات يتطلب اختيار عتبة تشغيلية $\tau$. تخيل العتبة $\tau$ كمقبض لضبط حساسية جهاز الإنذار: لو خفضت العتبة إلى $0.0$، فسيطلق الجهاز صفارته باستمرار، وبذلك تضمن استدعاءً بنسبة $100\%$ دون إفلات أي خطر، ولكنك ستغرق في آلاف الإنذارات الكاذبة وتنهار الدقة التنبؤية. ولو رفعت العتبة إلى $1.0$، فسيصمت الجهاز تماماً ولن تصدر أي إنذارات كاذبة، لكنك ستفوت كل الكوارث الفعلية. يقوم **منحنى خصائص تشغيل المستقبل (ROC Curve)** بمسح هذه العتبة عبر جميع قيمها الممكنة من $1.0$ إلى $0.0$، راسماً الحساسية مقابل معدل الإنذارات الكاذبة ليحدد الأفق التشغيلي الكامل للنموذج.
+To turn a continuous risk score ($0.0$ to $1.0$) into an alarm, you must pick a decision threshold $\tau$. Think of $\tau$ as a sensitivity knob. Lowering $\tau$ catches every fire ($100\%$ Recall) but floods you with false alarms. Raising $\tau$ eliminates false alarms but lets buildings burn down. The **Receiver Operating Characteristic (ROC)** curve sweeps $\tau$ across all values, tracing the True Positive Rate against the False Positive Rate.
 
-وهنا يكمن الجمال الرياضي لـ **المساحة تحت منحنى ROC (المعروفة بـ ROC-AUC)**. إن الـ AUC ليس مجرد مساحة هندسية صامتة تحت منحنى بياني، بل يحمل تفسيراً احتمالياً مطابقاً لـ **إحصاء مان-ويتني اللامعلمي (Wilcoxon-Mann-Whitney U)**: تخيل مواجهة فردية؛ حيث تسحب عشوائياً مريضاً مصاباً وشخصاً سليماً تماماً. يمثل ROC-AUC الاحتمال الرياضي الدقيق لأن يمنح نموذجك درجة خطورة للمريض المصاب أعلى من درجة الشخص السليم! تمثل قيمة $0.5$ نموذجاً عشوائياً يعادل رمي قطعة نقدية، بينما تمثل $1.0$ قدرة فرز خارقة لا تخطئ في ترتيب الأولويات أبداً.
+The **Area Under the ROC Curve (ROC-AUC)** has an astonishing, intuitive meaning via the **Mann-Whitney U Test**:
+If you randomly pick one sick patient and one healthy person, ROC-AUC is the exact probability that your model will assign a higher risk score to the sick patient than to the healthy person! An AUC of $0.5$ is pure coin flipping; an AUC of $1.0$ is a flawless ranking engine.
+
+#### Jargon Decoder
+
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Accuracy Trap** | The false cheerleader: achieves 99% accuracy on imbalanced data by guessing majority class. |
+| **Precision** | Alarm reliability: out of all alarms raised, how many were genuine fires? |
+| **Recall / Sensitivity** | Net coverage: out of all true fires in the city, how many did our alarm catch? |
+| **ROC Curve** | The diagnostic frontier: plots True Positive Rate vs False Positive Rate across all thresholds. |
+| **ROC-AUC** | The pairwise sorting tournament: probability that a positive case outscores a negative case. |
+
+```text
+    THE FOUR-ROOM CONFUSION MATRIX:
+
+                        GROUND TRUTH REALITY
+                        Actual Positive (1)    Actual Negative (0)
+                     +----------------------+----------------------+
+      Predicted      |    TRUE POSITIVE     |    FALSE POSITIVE    |
+      Positive (1)   |        (TP)          |         (FP)         |
+  M                  | Real Fire Caught!    | False Alarm Panic    |
+  O                  +----------------------+----------------------+
+  D   Predicted      |    FALSE NEGATIVE    |    TRUE NEGATIVE     |
+  E   Negative (0)   |        (FN)          |         (TN)         |
+  L                  | Silent Catastrophe!  | Peaceful Clearance   |
+                     +----------------------+----------------------+
+```
+
+### الحدس والقصة الواقعية
+
+في تعلم الآلة التطبيقي، يُعد الاحتفال بنسبة "الدقة البسيطة" (Accuracy) أحد أخطر الفخاخ الإحصائية التي قد يقع فيها مهندس البيانات.
+
+تخيل جهاز فحص أمني في مطار دولي يفحص 100,000 حقيبة يومياً، من بينها 10 حقائب فقط تحتوي على مواد محظورة. لو كان هذا الجهاز عاطلاً ومفصولاً عن الكهرباء، ويطبع عبارة "سليمة" على كل الحقائب دون فحص، لحقق دقة مذهلة تبلغ **99.99%!**
+قد تفرح إدارة المطار بهذه النسبة الخيالية، بينما تمر كافة الأسلحة والمواد الخطرة دون أدنى اعتراض إلى الطائرات!
+
+عندما تكون الأحداث الكارثية نادرة بطبيعتها (كالاحتيال المالي، أو الأورام السرطانية، أو انهيار الجسور)، تصبح الدقة البسيطة مقياساً أعمى تشوهه الأغلبية الساحقة للحالات العادية.
+
+لكشف هذا الخداع، نقسم قرارات التصنيف إلى **مصفوفة الارتباك (Confusion Matrix)** ذات الحجرات الأربع:
+- **إيجابي حقيقي ($TP$):** انطلق الإنذار، وهناك حريق حقيقي بالفعل!
+- **سلبي حقيقي ($TN$):** هدوء وسلام: لم ينطلق الإنذار، ولا يوجد أي حريق.
+- **إيجابي زائف ($FP$):** إنذار كاذب يثير الهلع ويهدر الوقت والجهد.
+- **سلبي زائف ($FN$):** كارثة صامتة: المبنى يحترق، لكن جهاز الإنذار لم يصدر صوتاً!
+
+ويشتعل صراع دائم بين مقياسين متنافسين:
+- **الدقة التنبؤية (Precision):** *"عندما يصرخ جهاز الإنذار، ما احتمال وجود حريق حقيقي؟"* ($TP / (TP + FP)$)
+- **الاستدعاء أو الحساسية (Recall):** *"من بين جميع الحرائق التي اندلعت في المدينة، كم حريقاً نجحنا في رصده؟"* ($TP / (TP + FN)$)
+
+ولتحويل درجة الخطورة المستمرة (من 0 إلى 1) إلى قرار، نختار عتبة تشغيلية $\tau$. خفض العتبة يضمن اكتشاف كل الحرائق لكنه يغرقك بالإنذارات الكاذبة؛ ورفعها يمحو الإنذارات الكاذبة لكنه يترك المباني تحترق. يرسم **منحنى ROC** هذه المقايضة الكاملة.
+
+أما **المساحة تحت المنحنى (ROC-AUC)** فتحمل معنى حدسياً مبهراً عبر **اختبار مان-ويتني**:
+لو اخترت عشوائياً مريضاً مصاباً وشخصاً سليماً، فإن ROC-AUC هو الاحتمال الدقيق لأن يمنح نموذجك المريض درجة خطورة أعلى من الشخص السليم!
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **فخ الدقة البسيطة** | المشجع الكاذب: يحقق 99% دقة في البيانات غير المتوازنة بمجرد التنبؤ بالفئة الأكثر شيوعاً. |
+| **الدقة التنبؤية (Precision)** | موثوقية الإنذار: من بين كل الإنذارات التي أطلقناها، كم منها كان حريقاً حقيقياً؟ |
+| **الاستدعاء (Recall)** | التغطية الشاملة: من بين كل الحرائق الفعلية، كم حريقاً تمكنا من الإمساك به؟ |
+| **منحنى ROC** | الأفق التشغيلي: يرسم نسبة الإيجابيات الحقيقية مقابل الزائفة عند شتى العتبات. |
+| **المساحة تحت المنحنى (AUC)** | بطولة الترتيب الثنائي: احتمال أن يتفوق المريض الفعلي على السليم في درجة التقييم. |
 
 :::simulation-widget{engine="canvas2d" component="ROCAUCCurveLab"}
 ---
@@ -58,51 +126,48 @@ $$
 From these cardinalities, we evaluate:
 - **True Positive Rate (Sensitivity / Recall):**
   $$
-  \text{TPR}(\tau) = \frac{TP(\tau)}{TP(\tau) + FN(\tau)} = \frac{TP(\tau)}{n_+} = \mathbb{P}(\hat{s}_i \ge \tau \mid Y_i = 1)
+  \text{TPR}(\tau) = \frac{TP(\tau)}{TP(\tau) + FN(\tau)} = \frac{TP(\tau)}{N_+}
   $$
-- **False Positive Rate ($1 - \text{Specificity}$):**
+- **False Positive Rate (Fall-out / $1 - \text{Specificity}$):**
   $$
-  \text{FPR}(\tau) = \frac{FP(\tau)}{FP(\tau) + TN(\tau)} = \frac{FP(\tau)}{n_-} = \mathbb{P}(\hat{s}_i \ge \tau \mid Y_i = 0)
+  \text{FPR}(\tau) = \frac{FP(\tau)}{FP(\tau) + TN(\tau)} = \frac{FP(\tau)}{N_-}
   $$
 - **Precision (Positive Predictive Value):**
   $$
-  \text{Precision}(\tau) = \frac{TP(\tau)}{TP(\tau) + FP(\tau)} = \mathbb{P}(Y_i = 1 \mid \hat{s}_i \ge \tau)
+  \text{PPV}(\tau) = \frac{TP(\tau)}{TP(\tau) + FP(\tau)}
   $$
-- **$F_\beta$-Score (Harmonic Mean):**
+- **$F_1$-Score (Harmonic Mean of Precision and Recall):**
   $$
-  F_\beta = (1 + \beta^2) \frac{\text{Precision} \cdot \text{Recall}}{\beta^2 \text{Precision} + \text{Recall}} \implies F_1 = \frac{2 \cdot TP}{2 \cdot TP + FP + FN}
+  F_1(\tau) = 2 \cdot \frac{\text{PPV}(\tau) \cdot \text{TPR}(\tau)}{\text{PPV}(\tau) + \text{TPR}(\tau)} = \frac{2 TP(\tau)}{2 TP(\tau) + FP(\tau) + FN(\tau)}
   $$
 
-### The Wilcoxon-Mann-Whitney ROC-AUC Equivalence
-The parametric ROC curve is defined by the set of coordinates $\{(\text{FPR}(\tau), \text{TPR}(\tau)) : \tau \in [0, 1]\}$. The Area Under the Curve is formally defined as:
+### The Mann-Whitney U Equivalence of ROC-AUC
+The ROC curve traces the parametric locus $(\text{FPR}(\tau), \text{TPR}(\tau))$ as threshold $\tau$ traverses $[1, 0]$. The Area Under the Curve (AUC) is formalized as:
 
 $$
-\text{AUC} = \int_0^1 \text{TPR}(\tau) \, d\text{FPR}(\tau)
+\text{AUC} = \int_0^1 \text{TPR}(\text{FPR}^{-1}(u)) \, du
 $$
 
-By integration by parts and Fubini's theorem, this geometric integral is mathematically identical to the normalized Wilcoxon-Mann-Whitney rank-sum test statistic:
+By the **Wilcoxon-Mann-Whitney theorem**, the geometric area under the ROC curve is mathematically identical to the normalized Mann-Whitney $U$ statistic:
 
 $$
-\text{AUC} = \mathbb{P}\left(\hat{s}_i > \hat{s}_j \mid y_i = 1, y_j = 0\right) = \frac{1}{n_+ n_-} \sum_{i: y_i = 1} \sum_{j: y_j = 0} \left[ \mathbb{I}(\hat{s}_i > \hat{s}_j) + \frac{1}{2} \mathbb{I}(\hat{s}_i = \hat{s}_j) \right]
+\text{AUC} = \mathbb{P}(\hat{s}_i > \hat{s}_j \mid y_i = 1, y_j = 0) = \frac{1}{N_+ N_-} \sum_{i: y_i=1} \sum_{j: y_j=0} \left[ \mathbb{I}(\hat{s}_i > \hat{s}_j) + \frac{1}{2}\mathbb{I}(\hat{s}_i = \hat{s}_j) \right]
 $$
-
-### Fundamental Invariance Properties:
-1. **Threshold Independence:** ROC-AUC evaluates the classifier across all possible operating thresholds simultaneously, making it an intrinsic measure of score calibration and separability.
-2. **Monotonic Transformation Invariance:** Any strictly monotonic transformation $g(\hat{s})$ (such as taking logarithms or scaling by positive constants) preserves the pairwise ordering $\hat{s}_i > \hat{s}_j$, leaving the ROC curve and the AUC value strictly unchanged.
-3. **Class Prevalence Invariance:** Because $\text{TPR}$ is normalized strictly by $n_+$ and $\text{FPR}$ is normalized strictly by $n_-$, changing the proportion of positive to negative samples in the testing cohort leaves the theoretical ROC curve invariant.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $y_i \in \{0, 1\}$: Ground truth binary state ($1$ for target condition/positive, $0$ for baseline/negative).
-* $\hat{s}_i \in [0, 1]$: Continuous predicted risk score or probability assigned to observation $i$.
-* $\tau \in [0, 1]$: Decision threshold separating positive classifications from negative classifications.
-* $n_+, n_-$: Total count of actual positive ($n_+ = \sum y_i$) and negative ($n_- = N - n_+$) instances.
-* $TP, FP, TN, FN$: Cardinalities of the four confusion matrix quadrants.
-* $\text{TPR}(\tau)$: True Positive Rate measuring sensitivity to detecting genuine positive cases.
-* $\text{FPR}(\tau)$: False Positive Rate measuring the frequency of erroneous false alarms among healthy cases.
-* $\text{Precision}(\tau)$: Probability that a flagged instance is genuinely afflicted.
-* $F_1$: Harmonic mean reconciling the inherent trade-off between Precision and Recall.
-* $\text{AUC}$: Area Under the Receiver Operating Characteristic curve, measuring pairwise ranking accuracy.
+| Symbol / Term | Formal Definition | Intuitive Meaning / Role | المعنى والمدلول بالعربية |
+| :--- | :--- | :--- | :--- |
+| $\hat{s}_i \in [0, 1]$ | $\hat{\mathbb{P}}(Y=1 \mid \mathbf{x}_i)$ | Continuous model risk score | درجة الخطورة الاحتمالية المستمرة |
+| $\tau \in [0, 1]$ | Decision threshold | Operating knob cutting positive from negative | العتبة التشغيلية الفاصلة بين الفئات |
+| $TP, TN$ | True Positives / Negatives | Correct alarms and peaceful correct clearances | الإنذارات الصادقة والتبرئة السليمة |
+| $FP, FN$ | False Positives / Negatives | False alarms and silent unflagged catastrophes | الإنذارات الكاذبة والتفويت الكارثي |
+| $\text{TPR}(\tau)$ | $TP / (TP + FN)$ | Recall / Sensitivity: caught positive fraction | نسبة الاستدعاء والحساسية الشاملة |
+| $\text{FPR}(\tau)$ | $FP / (FP + TN)$ | Fall-out: fraction of healthy falsely flagged | نسبة الإنذارات الخاطئة للأصحاء |
+| $\text{PPV}(\tau)$ | $TP / (TP + FP)$ | Precision: credibility when alarm triggers | الدقة التنبؤية وموثوقية الإنذار |
+| $F_1(\tau)$ | Harmonic mean | Balance between Precision and Recall | المقياس التوافقي الموازن للدقة والاستدعاء |
+| $\text{AUC}$ | Area under ROC curve | Pairwise sorting probability of sick over healthy | المساحة تحت منحنى الفرز التشغيلي |
+| $N_+, N_-$ | $\sum y_i, \sum (1-y_i)$ | Total counts of positive and negative classes | إجمالي الحالات الإيجابية والسلبية |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 

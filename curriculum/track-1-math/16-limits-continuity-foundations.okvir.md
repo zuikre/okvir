@@ -22,7 +22,30 @@ In our physical universe, limits are the secret engine that transforms static sn
 
 In computational data science and machine learning, limits and continuity are what keep our algorithms from falling apart. Every gradient update, every learning rate step, and every loss calculation implicitly assumes that our objective function is well-behaved: that a tiny nudge to a weight produces a tiny, predictable nudge in the error, rather than blasting the model into numerical infinity or NaN.
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Limit ($\lim_{x \to c} f(x)$) | The destination your footsteps predict as you get infinitely close to a spot | النهاية (Limit) | الوجهة التي تتنبأ بها خطواتك كلما اقتربت اقتراباً متناهياً من نقطة |
+| Continuity | Drawing a smooth curve without lifting your pen; no sudden trapdoors or teleport jumps | الاتصال (Continuity) | رسم المنحنى بخط انسيابي واحد دون رفع القلم أو قفزات مفاجئة |
+| Infinitesimal Neighborhood | A microscopic safety bubble centered around a target coordinate | الجوار المتناهي في الصغر | فقاعة أمان مجهرية ضيقة للغاية تحيط بنقطة الإسناد |
+| Epsilon-Delta ($\epsilon, \delta$) | A guarantee game: specify output tolerance $\epsilon$, find required input tolerance $\delta$ | إبسيلون ودلتا ($\epsilon, \delta$) | لعبة ضمان هندسية: حدد هامش تسامح المخرج إبسيلون، لأعطيك نطاق أمان المدخل دلتا |
+| Punctured Neighborhood | Focusing strictly on approaching a point while ignoring what happens at the point itself | الجوار المثقوب | التركيز على مسار الاقتراب من النقطة مع تجاهل ما يحدث عندها تماماً |
+
+#### Geometric & Visual Flow
+
+```
+        f(x)
+          ▲
+        L ┼ - - - - - - o (Hole at x=c, value undefined!)
+          │            / \
+          │           /   \  Footsteps from left (c-) and right (c+)
+          │          /     \ both predict arrival at height L!
+          └─────────┴───────┴──────► x
+                   c-   c   c+
+```
+
+### الحدس الفيزيائي والهندسي
 
 تخيل أنك تسير في مسار جبلي وعر عند الغسق، متجهاً نحو جسر معلق يمتد فوق وادٍ سحيق. مع كل خطوة تخطوها للأمام، يقترب منسوب حذائك باطراد من ارتفاع خشب الجسر. ولكن لنفترض أن عاصفة البارحة قد انتزعت لوحاً خشبياً في منتصف الجسر تماماً، تاركة فجوة لا قرار لها. إذا وضعت قدمك في تلك النقطة تحديداً، ستسقط في العدم (كمية غير معينة مثل $0/0$). ومع ذلك، وأنت تقترب من تلك الفجوة سواء من جهة الشرق أو الغرب، فإن مسار خطواتك يخبرك بارتفاع محدد بدقة متناهية. المفهوم التأسيسي لـ **النهاية** (Limit) في الرياضيات لا يكترث على الإطلاق بما يحدث *عند* النقطة المنعدمة ذاتها؛ بل يركز كلياً على الوجهة التي تتنبأ بها خطواتك كلما اقتربت اقتراباً متناهياً في الصغر من الحافة.
 
@@ -31,6 +54,29 @@ In computational data science and machine learning, limits and continuity are wh
 في عالمنا الفيزيائي، تمثل النهايات الأداة السحرية التي تحول اللقطات الساكنة المجمدة إلى قوانين حركة متدفقة. تأمل سيارة سباق سريعة: يشير عداد السرعة أمام السائق إلى $120\text{ كم/س}$ في اللحظة الزمنية $t = 4.0\text{ ث}$ بدقة. لكن ماذا تعني "اللحظة الزمنية المجمدة"؟ في لحظة متوقفة تماماً لا يمر فيها أي زمن ($\Delta t = 0$)، لا تقطع السيارة أي مسافة إطلاقاً ($\Delta s = 0$). الحساب التقليدي يعجز تماماً هنا؛ فقسمة الصفر على الصفر $0/0$ لا معنى لها. عداد السرعة لا يقسم صفراً على صفر، بل يحسب **نهاية**: نسبة المسافة إلى الزمن عبر نوافذ زمنية متناهية في الصغر تقترب بلا توقف من الصفر. المشتقة في جوهرها ليست سوى عداد سرعة يقيس مدى سرعة تغير الظاهرة في هذا الجزء من الثانية تحديداً.
 
 وفي عصر الذكاء الاصطناعي وتعلم الآلة، تشكل النهايات والاتصال صمام الأمان الذي يحمي النماذج الحاسوبية من الانهيار. فكل خطوة تحديث للأوزان، وكل تقييم لدالة الخسارة، يفترض ضمناً أن دالتنا متصلة وسلسة: أي أن أي تعديل طفيف جداً في مدخلات النموذج سيقابله تعديل طفيف ومستقر في المخرجات، بدلاً من إلقاء الخوارزمية في هاوية القيم غير المعرفة (NaN) أو اللانهاية.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| النهاية (Limit) | The destination your footsteps predict as you get infinitely close to a spot | النهاية (Limit) | الوجهة التي تتنبأ بها خطواتك كلما اقتربت اقتراباً متناهياً من نقطة |
+| الاتصال (Continuity) | Drawing a smooth curve without lifting your pen; no sudden trapdoors or teleport jumps | الاتصال (Continuity) | رسم المنحنى بخط انسيابي واحد دون رفع القلم أو قفزات مفاجئة |
+| الجوار المتناهي في الصغر | A microscopic safety bubble centered around a target coordinate | الجوار المتناهي في الصغر | فقاعة أمان مجهرية ضيقة للغاية تحيط بنقطة الإسناد |
+| إبسيلون ودلتا ($\epsilon, \delta$) | A guarantee game: specify output tolerance $\epsilon$, find required input tolerance $\delta$ | إبسيلون ودلتا ($\epsilon, \delta$) | لعبة ضمان هندسية: حدد هامش تسامح المخرج إبسيلون، لأعطيك نطاق أمان المدخل دلتا |
+| الجوار المثقوب | Focusing strictly on approaching a point while ignoring what happens at the point itself | الجوار المثقوب | التركيز على مسار الاقتراب من النقطة مع تجاهل ما يحدث عندها تماماً |
+
+#### المخطط البصري الهندسي
+
+```
+        f(x)
+          ▲
+        L ┼ - - - - - - o (فجوة عند x=c، القيمة غير معرّفة!)
+          │            / \
+          │           /   \  خطوات الاقتراب من اليسار ومن اليمين
+          │          /     \ تتنبأ كلاهما بالوصول للارتفاع L بدقة!
+          └─────────┴───────┴──────► x
+                   c-   c   c+
+```
 
 :::simulation-widget{engine="canvas2d" component="SecantTangentLimitCanvas"}
 ---

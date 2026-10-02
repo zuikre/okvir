@@ -26,6 +26,37 @@ Instead of treating each optimization step as an isolated, massless teleportatio
 2. **RMSprop (Adaptive Shock Absorbers):**
 Conceived by Geoffrey Hinton, RMSprop introduces coordinate-wise adaptive learning rates. It acts like an intelligent shock absorber on each parameter axle. RMSprop maintains an exponential moving average of squared gradients ($s_t = \rho s_{t-1} + (1-\rho) g_t^2$). When updating parameters, it divides each coordinate's gradient by $\sqrt{s_t + \epsilon}$. For dimensions with violent, high-frequency oscillations, $s_t$ grows huge, aggressively shrinking their effective step size and calming the bounces. For dimensions with quiet, sluggish gradients, $s_t$ stays tiny, boosting their effective step size and accelerating progress along the canyon floor.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Momentum Velocity ($v_t$)** (سرعة الزخم الحركي) | A heavy rolling bowling ball: builds forward inertia down flat canyons and ignores rapid back-and-forth oscillations. | كرة بولينغ ثقيلة تتدحرج لأسفل: تبني عطالة حركية في المسار الصحيح وتهمل التذبذبات الجانبية السريعة. |
+| **Momentum Friction ($\beta$)** (معامل الاحتكاك والزخم) | The retention dial (typically $0.9$): keeps $90\%$ of yesterday's velocity while adding $10\%$ of today's push. | مقبض حفظ السرعة: يحتفظ بـ 90% من سرعة الأمس ويضيف إليها 10% من دفعة اليوم. |
+| **Ravine Problem** (معضلة الوادي الضيق) | An ill-conditioned valley where canyon walls are $1000\times$ steeper than the gentle downhill floor. | وادٍ جبلي ضيق تكون جدرانه أكثر انحداراً بآلاف المرات من انحدار قاعه نحو الهدف. |
+| **RMSProp** (جذر متوسط المربعات التكيفي) | Shock-absorbing suspension: automatically dials down learning rates on turbulent dimensions and boosts flat ones. | ممتص صدمات ذكي: يخفض خطوة التعلم تلقائياً في الأبعاد كثيرة الاهتزاز ويرفعها في المسارات الهادئة. |
+| **Second-Moment EMA ($s_t$)** (العزم الثاني للتدرجات) | A running speedometer tracking how violently each parameter has been shaking ($g_t^2$). | مقياس تذبذب تراكمي: يرصد مدى عنف وتكرار الاهتزاز لكل معامل عبر متوسط مربعات التدرجات. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+TRAVERSING AN ILL-CONDITIONED RAVINE:
+=============================================================================
+Vanilla SGD:       Oscillates wildly between steep canyon walls (+, -, +, -),
+                   making almost ZERO forward progress along the gentle floor!
+                   
+                   \   /\   /\   /
+                    \ /  \ /  \ /  --> (Bouncing across walls)
+                   -----------------
+                   
+Momentum:          Opposite wall bounces cancel out (+g + -g \approx 0)!
+                   Floor forces add up consistently (+f + +f + ...)!
+                   Result: The heavy ball accelerates smoothly down the canyon floor.
+                   
+RMSProp:           Calculates variance s_t for each coordinate independently:
+                   Steep Wall Axis:  Huge gradients -> Large s_t -> Divide by \sqrt{s_t} -> Tamed step!
+                   Gentle Floor Axis: Small gradients -> Tiny s_t  -> Divide by \sqrt{s_t} -> Boosted step!
+```
+
 :::simulation-widget{engine="canvas2d" component="GradientDescentCanvas"}
 ---
 interactive: true

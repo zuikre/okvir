@@ -26,7 +26,28 @@ Pay close attention to how contour lines are drawn on a map:
 
 In artificial intelligence and data science, the loss surface of a neural network parameterized by weights $(w_1, w_2)$ is precisely a multivariable scalar field. Optimization algorithms like gradient descent are the hikers navigating this invisible high-dimensional landscape, searching through deep canyons, narrow ravines, and wide plateaus to find the lowest possible basin of error.
 
----
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Scalar Field ($f(\mathbf{x})$) | A landscape map assigning a single number (elevation, heat, pressure) to every coordinate | الحقل القياسي | خريطة تضاريس تسند قيمة رقمية واحدة (كالارتفاع أو الحرارة) لكل موقع |
+| Contour Line (Level Set) | A hiking trail on a mountain that stays at the exact same elevation; zero climbing | خط الكنتور (مجموعة المستوى) | مسار مشي جبلي يحافظ على نفس الارتفاع تماماً دون أي صعود أو هبوط |
+| Multivariable Domain | Having multiple knobs (e.g. latitude and longitude) that feed into a single result | النطاق متعدد المتغيرات | امتلاك عدة مفاتيح تحكم مستقلة (مثل خط الطول والعرض) تحدد مخرجاً واحداً |
+| Topographic Map | A flat 2D bird's-eye view showing rings of elevation; dense rings mean a steep cliff | الخريطة الطبوغرافية | مسقط رأسي ثنائي الأبعاد لحلقات الارتفاع؛ تقارب الحلقات يعني جرفاً شديد الانحدار |
+
+#### Geometric & Visual Flow
+
+```
+        3D Mountain Landscape          2D Topographic Contours
+               Peak (z=100)                     (100)  Peak
+                  ▲                           ( 80 )
+                 / \                         (  60  )
+               .'   '.                      (   40   )
+             .'       '.                   (    20    )
+            ─────────────►                  Rings of equal height!
+```
+
+### الحدس الفيزيائي والهندسي
 
 تخيل أنك تخوض رحلة استكشافية في محمية جبلية شاسعة في صباح خريفي منعش. عند كل نقطة جغرافية تضع عليها حذاءك—والمحددة بدقة عبر خط العرض $x$ وخط الطول $y$ على جهاز الملاحة GPS—هناك قراءة عددية قياسية وحيدة يسجلها مقياس الارتفاع الرقمي: **ارتفاعك عن مستوى سطح البحر**، $z = f(x, y)$. ومع مواصلتك السير، ترتفع الأرض بك نحو قمم صخرية شاهقة، أو تنحدر بك نحو أودية زمردية عميقة.
 
@@ -39,6 +60,27 @@ In artificial intelligence and data science, the loss surface of a neural networ
 - وعندما تتباعد خطوط الكنتور بسخاء وتتسع المسافات بينها، يتغير الارتفاع بهدوء وبطء شديد: أنت تتجول في **مرج أخضر منبسط ومريح**.
 
 وفي هندسة الذكاء الاصطناعي وعلم البيانات، يمثل سطح دالة الخسارة لأي شبكة عصبية تعتمد على أوزان $(w_1, w_2)$ حقلاً عددياً حقيقياً فائق الأبعاد. وخوارزميات التحسين والاستمثال—مثل خوارزمية الانحدار التدريجي—ليست سوى متسلقين يسترشدون بهذه الخريطة التضاريسية غير المرئية، باحثين بين الأخاديد والوديان الضيقة عن أعمق قاع ممكن تقل عنده نسبة الخطأ إلى أدنى مستوياتها.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| الحقل القياسي | A landscape map assigning a single number (elevation, heat, pressure) to every coordinate | الحقل القياسي | خريطة تضاريس تسند قيمة رقمية واحدة (كالارتفاع أو الحرارة) لكل موقع |
+| خط الكنتور (مجموعة المستوى) | A hiking trail on a mountain that stays at the exact same elevation; zero climbing | خط الكنتور (مجموعة المستوى) | مسار مشي جبلي يحافظ على نفس الارتفاع تماماً دون أي صعود أو هبوط |
+| النطاق متعدد المتغيرات | Having multiple knobs (e.g. latitude and longitude) that feed into a single result | النطاق متعدد المتغيرات | امتلاك عدة مفاتيح تحكم مستقلة (مثل خط الطول والعرض) تحدد مخرجاً واحداً |
+| الخريطة الطبوغرافية | A flat 2D bird's-eye view showing rings of elevation; dense rings mean a steep cliff | الخريطة الطبوغرافية | مسقط رأسي ثنائي الأبعاد لحلقات الارتفاع؛ تقارب الحلقات يعني جرفاً شديد الانحدار |
+
+#### المخطط البصري الهندسي
+
+```
+        تضاريس الجبل ثلاثية الأبعاد      خطوط الكنتور الطبوغرافية ثنائية الأبعاد
+               القمة (z=100)                    (100)  القمة
+                  ▲                           ( 80 )
+                 / \                         (  60  )
+               .'   '.                      (   40   )
+             .'       '.                   (    20    )
+            ─────────────►                  حلقات متحدة تمثل نفس الارتفاع!
+```
 
 :::simulation-widget{engine="canvas2d" component="ContourElevationCanvas"}
 ---

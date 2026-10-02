@@ -39,6 +39,17 @@ To master query mechanics, imagine the operational workflow of a Michelin-starre
 
 You cannot filter raw tomatoes in `WHERE` based on the decorative garnish name tag (`AS total_revenue`), because that tag won't even be created until Step 5 at the plating station!
 
+### Jargon Decoder / قاموس المصطلحات المعمارية
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Declarative Query Execution** / التنفيذ التقريري للاستعلام | Specifying the desired mathematical result without programming the physical iteration loops. Analogy: Ordering a customized car from a catalog. | تحديد النتيجة المطلوبة دون برمجة خطوات القراءة والحلقات الفيزيائية. التشبيه: طلب مواصفات سيارة مخصصة من كتالوج دون بناء محركها بنفسك. |
+| **Lexical vs Logical Order** / الترتيب النحوي مقابل الترتيب المنطقي | The grammatical written sequence of keywords vs the physical order the CPU executes them. Analogy: Writing "dessert and dinner" on a menu vs cooking dinner first. | الترتيب الظاهري لكتابة الكلمات البرمجية مقابل الترتيب الداخلي الفعلي للتنفيذ. التشبيه: كتابة "الحلوى ثم العشاء" في قائمة الطعام، بينما يُطهى العشاء أولاً. |
+| **Projection Aliasing (`AS alias`)** / إطلاق الأسماء المستعارة في الإسقاط | Naming a computed column during the `SELECT` phase, binding it to the symbol table. Analogy: Pinning a name badge on a finished dish before serving. | تسمية الأعمدة المحسوبة أثناء مرحلة `SELECT` وإضافتها لجدول رموز الاستعلام. التشبيه: وضع شارة اسم على طبق الطعام النهائي قبل تقديمه للزبون. |
+| **Symbol Visibility Scope** / نطاق رؤية الرموز | Which pipeline stages can see and reference column aliases (only downstream stages). Analogy: Downstream river stations can see what upstream stations dropped in. | المراحل المسموح لها بقراءة واستخدام أسماء الأعمدة المستعارة. التشبيه: محطات النهر السفلية ترى ما ألقته المحطات العلوية، بينما تعجز العلوية عن رؤية المستقبل. |
+| **Pipeline Function Composition ($\circ$)** / تركيب دوال مسار المعالجة | Modeling the database engine as a mathematical chain of nested functions: $f_8(f_7(\dots f_1(\mathcal{D})))$. Analogy: An industrial car manufacturing assembly line. | نمذجة محرك قواعد البيانات كسلسلة رياضية من الدوال المتداخلة الصارمة. التشبيه: خط تجميع صناعي لتصنيع السيارات يمر بمحطات متتالية ثابتة. |
+| **Top-$K$ Heap Slicing (`LIMIT`)** / اقتطاع تيار المخرجات عبر الكومة | Using a bounded heap of size $K$ to find top rows in $\mathcal{O}(N \log K)$ instead of sorting everything $\mathcal{O}(N \log N)$. Analogy: Keeping only the 3 heaviest gold nuggets in your pocket while panning. | استخدام بنية كومة بحجم $K$ لاستخراج أفضل العناصر دون الحاجة لفرز كامل الجدول. التشبيه: الاحتفاظ بأثقل 3 قطع ذهبية فقط في جيبك أثناء التنقيب في النهر. |
+
 :::simulation-widget{engine="canvas2d" component="RelationalJoinGeometryLab"}
 ---
 interactive: true
@@ -77,6 +88,36 @@ $$
 \text{Pipeline}(\mathcal{D}) = (\lambda_{\text{LIMIT}} \circ \omega_{\text{ORDER}} \circ \delta_{\text{DISTINCT}} \circ \pi_{\text{SELECT}} \circ \sigma_{\text{HAVING}} \circ \gamma_{\text{GROUP}} \circ \sigma_{\text{WHERE}} \circ \bowtie_{\text{FROM}})(\mathcal{D})
 $$
 
+```text
+Visual ASCII Transformation: Human Syntax vs Relational Engine Physical Execution Pipeline:
+
+Human Grammatical Order:
+  [1] SELECT dept, SUM(sales) AS total_revenue   <- Written FIRST!
+  [2] FROM transactions                          <- Written SECOND!
+  [3] WHERE total_revenue > 100000               <- FAILS! 'total_revenue' is NOT bound!
+  [4] GROUP BY dept                              <- Written FOURTH!
+  [5] HAVING COUNT(*) >= 5                       <- Written FIFTH!
+  [6] ORDER BY total_revenue DESC                <- SUCCEEDS! 'total_revenue' is bound!
+  [7] LIMIT 5                                    <- Written LAST!
+
+Relational Engine Physical Execution Order:
+  Step 1: FROM / JOIN      (Pantry: Pull and stream raw tuples from storage)
+             |
+  Step 2: WHERE            (Wash: Filter individual rows - 'total_revenue' is UNKNOWN here!)
+             |
+  Step 3: GROUP BY         (Pots: Partition rows into hash buckets)
+             |
+  Step 4: HAVING           (Taste: Filter whole buckets based on aggregate metrics)
+             |
+  Step 5: SELECT           (Plate: Compute formulas & BIND 'total_revenue' to symbol table!)
+             |
+  Step 6: DISTINCT         (Deduplicate identical projected rows)
+             |
+  Step 7: ORDER BY         (Tray: Sort projected rows - 'total_revenue' is FULLY VISIBLE!)
+             |
+  Step 8: LIMIT            (Serve: Truncate output to top-K rows via priority queue)
+```
+
 ### Mathematical Invariants & Symbol Breakdown
 
 | الرمز / Symbol | المرحلة / Pipeline Stage | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
@@ -91,9 +132,18 @@ $$
 | $\lambda_{\text{LIMIT}}$ | Stage 8: Stream Slicing | Truncates stream to top-$K$ rows via bounded priority queue | اقتطاع أول $K$ من الصفوف لإرجاعها فوراً إلى تطبيق المستخدم |
 | $\circ$ | Function composition | Strict non-commutative mathematical execution pipeline ordering | مشغل تركيب الدوال الرياضي الدال على الترتيب الصارم غير التبادلي |
 
-The strict mathematical order of composition $\circ$ dictates symbol visibility scope: any variable or expression alias introduced in stage $k$ is completely invisible to all stages $j < k$. Consequently, `ORDER BY` (Stage 7) can freely reference column aliases created by `SELECT` (Stage 5), while `WHERE` (Stage 2) and `GROUP BY` (Stage 3) cannot, requiring subqueries or CTEs when filtering on computed projection expressions.
-
-الترتيب الرياضي الصارم لتركيب الدوال $\circ$ يحدد نطاق رؤية الرموز والمتغيرات: أي اسم مستعار أو تعبير حسابي يُعرف في المرحلة $k$ يكون مجهولاً تماماً لجميع المراحل السابقة له $j < k$. وبناءً على ذلك، تستطيع عبارة `ORDER BY` (المرحلة 7) استخدام أسماء الأعمدة المعرفة في `SELECT` (المرحلة 5) بكل سلاسة، بينما يعجز شرط `WHERE` (المرحلة 2) و `GROUP BY` (المرحلة 3) عن رؤيتها، مما يفرض استخدام استعلامات فرعية أو تعبيرات CTE.
+#### Step-by-Step Arithmetic Cost & Invariant Breakdown:
+1. **Symbol Visibility Invariant**:
+   For any attribute alias $\alpha$ bound in Stage $k$, its scope is:
+   $$\text{Scope}(\alpha) = \{ \text{Stage } j \mid j > k \}$$
+   Because $\pi_{\text{SELECT}}$ is Stage 5:
+   - Stage 2 (`WHERE`): $\alpha \notin \text{Scope} \implies \text{Compile-Time Error!}$
+   - Stage 3 (`GROUP BY`): $\alpha \notin \text{Scope} \implies \text{Compile-Time Error!}$
+   - Stage 7 (`ORDER BY`): $\alpha \in \text{Scope} \implies \text{Valid Reference!}$
+2. **Top-$K$ Priority Queue Optimization**:
+   When evaluating `ORDER BY ... LIMIT K`, the engine does NOT perform a full $\mathcal{O}(N \log N)$ sort. It maintains a bounded min-heap of size $K$, processing $N$ records in:
+   $$\text{Time Complexity} = \mathcal{O}(N \log K) \quad \ll \quad \mathcal{O}(N \log N)$$
+   For $N = 10,000,000$ and $K = 10$: $10^7 \times \log_2(10) \approx 3.3 \times 10^7$ operations vs $10^7 \times 23.3 \approx 2.3 \times 10^8$ operations (**7x faster with minimal RAM!**).
 
 ## Beat 3: Interactive Code Challenge
 
@@ -112,15 +162,16 @@ test_cases:
 -- Schema: sales(sale_id, dept_name, sale_date, revenue)
 
 SELECT
-    -- Step 1: dept_name
-    -- Step 2: Pivoted quarters:
-    --         ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 1 THEN revenue ELSE 0 END), 2) AS q1_revenue
-    -- Step 3: Compute q2_revenue, q3_revenue, q4_revenue, and ROUND(SUM(revenue), 2) AS annual_total
+    dept_name,
+    ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 1 THEN revenue ELSE 0 END), 2) AS q1_revenue,
+    ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 2 THEN revenue ELSE 0 END), 2) AS q2_revenue,
+    ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 3 THEN revenue ELSE 0 END), 2) AS q3_revenue,
+    ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 4 THEN revenue ELSE 0 END), 2) AS q4_revenue,
+    ROUND(SUM(revenue), 2) AS annual_total
 FROM sales
--- Step 4: Filter sales in 2024: WHERE EXTRACT(YEAR FROM sale_date) = 2024
--- Step 5: GROUP BY dept_name
--- Step 6: ORDER BY annual_total DESC, dept_name ASC
-;
+WHERE EXTRACT(YEAR FROM sale_date) = 2024
+GROUP BY dept_name
+ORDER BY annual_total DESC, dept_name ASC;
 ```
 :::
 

@@ -26,6 +26,48 @@ Why is this so profoundly effective? If a layer turns out to be unhelpful, it do
 
 > **Frontier Analogy:** Imagine an audio recording studio with a chain of 100 distortion effect pedals. If you route the guitar signal solely through the pedals in series, the sound dissolves into unrecognizable static. A residual connection is a "dry/wet mix" cable: you send the pristine, pure audio signal straight to the amplifier, and the pedals merely add a subtle, harmonic seasoning $\mathcal{F}(\mathbf{x})$ on top of the original sound.
 
+### Jargon Decoder | قاموس تفكيك المصطلحات
+
+| Term / المصطلح | Plain English Translation & Metaphor | الشرح المبسط بالعربية والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Residual Block ($\mathcal{F}(x) + x$)** (كتلة البواقي) | Learning minor touch-ups: rather than rebuilding an image from scratch, the network only learns the small residual adjustment needed. | تعلم التعديلات الطفيفة: بدلاً من بناء الإشارة من الصفر، تركز الطبقة فقط على تعلم الفارق البسيط المتبقي. |
+| **Identity Shortcut Connection** (وصلة الهوية المباشرة) | An express zero-resistance wire: bridges the input directly across the layer, costing zero parameters and zero floating-point operations. | سلك مباشر فائق التوصيل: ينقل المدخل كما هو دون أي استهلاك لمعاملات إضافية أو حسابات معقدة. |
+| **Degradation Problem** (معضلة تدهور الشبكات العميقة) | The paradox of depth: before ResNet, adding more layers caused training error to get worse due to optimization roadblocks. | مفارقة العمق: قبل ResNet، كانت زيادة عدد الطبقات تؤدي لزيادة نسبة خطأ التدريب بسبب صعوبة تحسين المعاملات. |
+| **Gradient Highway** (طريق التدرجات السريع) | The backward elevator: the $+ \mathbf{I}$ term in the chain rule ensures gradients can flow back 1000 layers without diminishing. | مصعد التدرجات العكسي: حد مصفوفة الوحدة الرياضي يضمن تدفق تدرجات اللوم عبر آلاف الطبقات دون أن تتلاشى. |
+| **Bottleneck Architecture** (معمارية عنق الزجاجة) | Squeeze-and-expand: using $1 \times 1$ convolutions to temporarily compress channel width before $3 \times 3$ processing, slashing FLOPs. | الضغط والتوسيع: استخدام التفاف 1×1 لتقليص عدد القنوات مؤقتاً قبل معالجة 3×3، مما يوفر جهداً حوسبياً كبيراً. |
+
+### Visual Architecture Flow | مخطط تدفق البيانات والمعمارية
+
+```text
+RESIDUAL BLOCK WITH IDENTITY SHORTCUT HIGHWAY:
+=============================================================================
+Input Tensor: x
+      |
+      +-------------------------------------------------\ (Identity Highway: x)
+      |                                                 |
+      v                                                 |
+[ Conv2D (3x3) ]                                        |
+      |                                                 |
+      v                                                 |
+[ BatchNorm + ReLU ]                                    |
+      |                                                 |
+      v                                                 |
+[ Conv2D (3x3) + BatchNorm ]                            |
+      |                                                 |
+      v                                                 |
+Residual Output: \mathcal{F}(x)                         |
+      |                                                 |
+      +----------------------- (+) <--------------------+ (Element-wise Addition)
+                                |
+                                v
+                   Post-Addition Activation: ReLU( \mathcal{F}(x) + x )
+=============================================================================
+BACKWARD GRADIENT MULTIPLICATION:
+dL/dx = (dL/dy) * [ d\mathcal{F}/dx + I ] = (dL/dy)*(d\mathcal{F}/dx)  +  (dL/dy)*I
+                                                                         ^
+                                         (Direct unimpeded gradient flow!)
+```
+
 :::simulation-widget{engine="canvas2d" component="ConvolutionFilterCanvas"}
 ---
 interactive: true

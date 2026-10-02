@@ -14,21 +14,82 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Imagine standing before an overwhelming control console in a modern power plant with 10,000 indicator needles. You need to forecast peak energy load, but reading all 10,000 gauges simultaneously is humanly impossible and statistically disastrous. If you fit Ordinary Least Squares (OLS), the model will eagerly construct an intricate formula that assigns tiny, noisy weights to every twitching needle—memorizing idiosyncratic static rather than true physics. This is **overfitting**: when a model becomes so obsessed with fitting every random ripple in the training sample that it fails completely when deployed on unseen data.
+### Intuition & Real-World Story
 
-In the previous lesson, we saw how Ridge regression ($L_2$) attaches an elastic rubber tether to every dial, pulling extreme weights toward zero. Yet Ridge suffers from a stubborn philosophical limitation: because its quadratic rubber band pulls gently as a weight nears zero, it shrinks coefficients smoothly without ever letting them touch absolute zero. Every single needle remains plugged into your prediction equation! When dealing with high-dimensional problems—such as genomics with 30,000 genes or quantitative finance with thousands of noisy market signals—what you truly crave is not mere shrinkage, but ruthless, automated triage.
+Suppose a medical genetics laboratory sequences 20,000 genetic markers from patient blood samples to predict the risk of developing a rare autoimmune condition.
 
-Robert Tibshirani (1996) revolutionized statistical learning by introducing the **Lasso ($L_1$ regularization)**. If Ridge is an elastic tether that gently restrains runaway weights, **Lasso is an uncompromising guillotine that snaps zero-importance features to absolute mathematical zero**. Instead of penalizing the sum of squared weights ($\sum \beta_j^2$), Lasso penalizes the sum of absolute values ($\sum |\beta_j|$). This seemingly innocent substitution radically transforms the geometric landscape. In geometric space, the $L_1$ constraint boundary is not a smooth, round ball, but a sharp, diamond-shaped polyhedron (a cross-polytope) whose pointed corners stick out squarely along the coordinate axes.
+From biological science, we know that out of these 20,000 genes, only **3 or 4 specific mutations** actually trigger the disease; the other 19,996 genes are innocent bystanders.
 
-When the expanding elliptical contours of the least-squares error search for the lowest-cost compromise, they almost always crash into one of these sharp diamond corners first. Because a corner on a coordinate axis has coordinates where the orthogonal axes are exactly zero, Lasso effortlessly performs **feature selection**: it silences irrelevant predictors entirely, producing a clean, sparse, interpretable model. To tackle situations where groups of predictors are highly correlated, Hui Zou and Trevor Hastie (2005) forged the **Elastic Net**, blending Lasso's razor-sharp diamond corners with Ridge's smooth quadratic shoulders to select entire cooperative clusters of features at once.
+If you run Ridge regression (L2) on this dataset, what happens?
+Ridge shrinks all 20,000 coefficients down to tiny numbers (like 0.00004 or 0.00012). But it leaves **every single gene inside the model!** A doctor cannot inspect a model with 20,000 tiny decimal numbers and understand which genes cause the disease.
 
-تخيل أنك تقف أمام لوحة تحكم عملاقة في محطة توليد طاقة تضم 10,000 مؤشر ومقياس. مهمتك هي التنبؤ بذروة استهلاك الكهرباء، ولكن محاولة قراءة وتتبع 10,000 مؤشر في آن واحد هي مهمة مستحيلة بشرياً وكارثية إحصائياً. إذا استخدمت انحدار المربعات الصغرى العادي (OLS)، فسيقوم النموذج بابتكار معادلة معقدة تعطي وزناً طفيفاً ومشوهاً لكل مؤشر يهتز عشوائياً—مما يعني حفظ الضوضاء والتقلبات العابرة بدلاً من فهم القوانين الحقيقية. هذه هي معضلة **فرط التخصيص (Overfitting)**: عندما يغرق النموذج في تفاصيل عينة التدريب لدرجة تجعله يعجز تماماً عن التنبؤ بالبيانات الجديدة.
+We need a method that can automatically perform **Feature Selection**: setting irrelevant genes to **EXACTLY ZERO**.
 
-رأينا في الدرس السابق كيف يربط انحدار ريدج ($L_2$) حبلاً مطاطياً مرناً بكل معامل ليشبه نابضاً يشده نحو المركز. لكن انحدار ريدج يعاني من عيب جوهري: نظراً لأن قوة شد النابض التربيعي تضعف جداً كلما اقترب المعامل من الصفر، فإنه يقلص الأوزان بسلاسة دون أن يجعل أياً منها صفراً مطلقاً. سيبقى كل مؤشر من الـ 10,000 حاضراً في معادلة التنبؤ! وفي التطبيقات الحديثة عالية الأبعاد—مثل تحليل الجينوم البشري الذي يحتوي على عشرات الآلاف من الجينات، أو النماذج المالية التي تراقب آلاف المؤشرات—فإننا نحتاج إلى تصفية صارمة وانتقاء تلقائي لأهم المتغيرات، وليس مجرد تقليص مستمر لجميع الأوزان.
+This is the superpower of **Lasso Regression (L1)**.
+Instead of squaring coefficients, Lasso penalizes the sum of their **absolute values**: $\lambda \sum |\beta_j|$.
 
-أحدث روبرت تيبشيراني (1996) ثورة في التعلم الإحصائي بابتكار **انحدار لاسو (Lasso - تنظيم $L_1$)**. إذا كان انحدار ريدج حبلاً مطاطياً يمنع انفلات المعاملات، فإن **انحدار لاسو هو مقصلة حاسمة تقطع دابر المتغيرات غير المهمة وتصفر معاملاتها تماماً**. وبدلاً من معاقبة مجموع مربعات المعاملات، يفرض لاسو جزاءً على مجموع القيم المطلقة لها ($\sum |\beta_j|$). هذا التغيير الطفيف يبدل الهندسة بالكامل: فمنطقة قيد $L_1$ ليست كرة دائرية ملساء، بل هي متعدد سطوح ماسي ذو زوايا ورؤوس مدببة تقع تماماً فوق محاور الإحداثيات.
+Why does taking absolute values make coefficients become exactly zero?
+Because the geometric constraint of the L1 penalty is a **diamond with sharp, pointed corners** lying directly on the coordinate axes! When the expanding loss ellipses expand outward, they almost always touch the diamond at one of its sharp corners. At that sharp corner, the other coordinate is identically zero!
 
-وعندما تتمدد قطوع خطأ المربعات الصغرى البيضاوية بحثاً عن نقطة التماس المثلى، فإنها تصطدم حتماً بإحدى هذه الزوايا الحادة المدببة. وحيث إن أي نقطة على زاوية المحور تمتلك إحداثيات متعامدة تساوي صفراً مطلقاً، يحقق لاسو **انتقاء المتغيرات (Feature Selection)** تلقائياً وبكفاءة رياضية مذهلة. ولتجاوز عجز لاسو عند التعامل مع المتغيرات شديدة الترابط، ابتكر زو وهاستي (2005) **شبكة المرونة (Elastic Net)** التي تدمج بين زوايا لاسو الحادة وانحناءات ريدج الملساء لتنتقي مجموعات المتغيرات المترابطة معاً كحزمة وظيفية واحدة.
+Lasso acts like an automatic scalpel: it slices away the 19,996 irrelevant features and leaves you with a sparse, interpretable model.
+
+#### Jargon Decoder
+
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Lasso (L1)** | The scalpel: penalizes absolute values, forcing irrelevant features to become exactly zero. |
+| **Sparsity** | Clean simplicity: a model where most coefficients are zero, leaving only key drivers. |
+| **Soft Thresholding** | The pulling operator: shrinks values toward zero and snaps small values to exact zero. |
+| **Elastic Net** | The hybrid: blends L1 (feature selection) and L2 (group stability) penalties together. |
+| **Coordinate Descent** | Solving one by one: cycling through features and optimizing one knob at a time. |
+
+```text
+    THE LASSO L1 DIAMOND GEOMETRY:
+
+       beta_2
+         ^                   Contours of OLS Loss Ellipses
+         |                              / \
+         |            /\              /  .  \
+         |           /  \            |  (OLS)|
+         |          /    \            \     /
+         |         /  L1  \             \ /
+         |        /Diamond \             |
+    -----+-------+----------*------------+---------------------> beta_1
+         |        \        /  (Touches exact corner tip! beta_2 = 0)
+         |         \      /
+         |          \    /
+         |           \  /
+         |            \/
+```
+
+### الحدس والقصة الواقعية
+
+تخيل مختبرًا للجينات يحلل 20,000 علامة وراثية في عينات دم المرضى للتنبؤ بمخاطر الإصابة بمرض مناعي نادر.
+
+نعلم بيولوجيًا أنه من بين الـ 20,000 جين، هناك **3 أو 4 طفرات جينية محددة فقط** هي المسؤولة فعليًا عن المرض؛ بينما الـ 19,996 جينًا المتبقية بريئة تمامًا.
+
+إذا طبقت انحدار ريدج (L2) على هذه البيانات، فماذا سيحدث؟
+سيقوم ريدج بتقليص جميع الـ 20,000 معامل إلى كسور عشرية دقيقة (مثل 0.00004)، لكنه سيبقي عليها جميعًا في النموذج! يستحيل على الطبيب فحص 20 ألف جين لمعرفة السبب الحقيقي.
+
+نحتاج إلى خوارزمية تملك مهارة **انتقاء الميزات (Feature Selection)**: أي تصفير الجينات غير المؤثرة وجعل معاملاتها **صفرًا صريحًا**!
+
+هذه هي القوة الخارقة لـ **انحدار لاسو (Lasso L1)**.
+فبدلاً من تربيع المعاملات، يفرض لاسو غرامة على **قيمها المطلقة**: $\lambda \sum |\beta_j|$.
+
+لماذا تؤدي القيمة المطلقة إلى تصفير المعاملات تمامًا؟
+لأن القيد الهندسي لمعيار L1 هو **معين ذو زوايا وأطراف حادة** تقع مباشرة على محاور الإحداثيات! وعندما تتسع منحنيات دالة الخطأ، فإن أول نقطة تلامسها تكون غالبًا أحد هذه الأطراف المدببة الحادة. وعند هذا الطرف الحاد، تكون الميزات الأخرى مساوية للصفر الحقيقي تمامًا!
+
+يعمل لاسو كمشرط جراحي ذكي: يستأصل 19,996 متغيرًا غير مفيد، ويترك لك نموذجًا نقيًا وواضحًا يسهل تفسيره طبيًا وعلميًا.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **انحدار لاسو (L1)** | المشرط الجراحي: يعاقب القيم المطلقة ويجبر الميزات غير المجدية على التحول لصفر تام. |
+| **الندرة (Sparsity)** | النقاء والاختصار: نموذج تكون أغلب معاملاته أصفارًا ليبقى الأثر للأسباب الحقيقية. |
+| **العتبة اللينة (Soft Thresholding)** | مشغل السحب: يسحب المعامل نحو الصفر، فإن كان صغيرًا أسقطه على الصفر فورًا. |
+| **الشبكة المرنة (Elastic Net)** | النموذج الهجين: يدمج بين مشرط لاسو لانتقاء الميزات وطوق ريدج لتحقيق الاستقرار. |
+| **هبوط الإحداثيات (Coordinate Descent)** | الحل خطوة بخطوة: تحسين معامل متغير واحد في كل خطوة مع تثبيت بقية المتغيرات. |
 
 :::simulation-widget{engine="canvas2d" component="RegularizationGeometryCanvas"}
 ---
@@ -39,71 +100,49 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-The Elastic Net balances the sparsity-inducing $L_1$ norm and the curvature-stabilizing $L_2$ norm via a convex combination governed by mixing parameter $\alpha \in [0, 1]$ and regularization strength $\lambda \ge 0$:
+The Elastic Net objective combines $L_1$ (Lasso) and $L_2$ (Ridge) penalties:
 
 $$
-\min_{\boldsymbol{\beta} \in \mathbb{R}^p} \mathcal{L}_{\text{EN}}(\boldsymbol{\beta}) = \frac{1}{2n}\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \left[ \alpha \|\boldsymbol{\beta}\|_1 + \frac{1 - \alpha}{2} \|\boldsymbol{\beta}\|_2^2 \right]
+S_{\text{enet}}(\boldsymbol{\beta}) = \frac{1}{2N} \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \left[ \alpha \|\boldsymbol{\beta}\|_1 + \frac{1 - \alpha}{2} \|\boldsymbol{\beta}\|_2^2 \right]
 $$
 
-Expanding the norms into scalar components:
+where $\alpha \in [0, 1]$ balances Lasso ($\alpha = 1$) and Ridge ($\alpha = 0$).
+
+For pure Lasso ($\alpha = 1$) with standardized orthogonal regressors, the subgradient condition yields the **Soft-Thresholding Operator**:
 
 $$
-\min_{\boldsymbol{\beta}} \frac{1}{2n} \sum_{i=1}^n \left( y_i - \sum_{j=1}^p X_{ij}\beta_j \right)^2 + \lambda \alpha \sum_{j=1}^p |\beta_j| + \frac{\lambda (1 - \alpha)}{2} \sum_{j=1}^p \beta_j^2
+\hat{\beta}_j = \mathcal{S}_{\lambda}(z_j) \equiv \text{sign}(z_j) \cdot \max(0, |z_j| - \lambda)
 $$
 
-### Parameter Regimes:
-- **$\alpha = 1$ (Pure Lasso):** Eliminates the $L_2$ term, yielding the $L_1$ objective $\frac{1}{2n}\|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \|\boldsymbol{\beta}\|_1$. Produces exact sparsity, setting uninformative parameters to zero.
-- **$\alpha = 0$ (Pure Ridge):** Eliminates the $L_1$ penalty, reducing to strictly convex $L_2$ shrinkage. Coefficients are smoothed, but none equal zero.
-- **$0 < \alpha < 1$ (Elastic Net):** The strictly convex $L_2$ penalty enforces unique solutions and groups correlated regressors, while the $L_1$ diamond edges drive unimportant coefficients to zero.
+where $z_j = \mathbf{x}_j^T (\mathbf{y} - \sum_{k \ne j} \mathbf{x}_k \beta_k)$ is the partial residual correlation for feature $j$.
 
-### Subgradient Calculus & Soft-Thresholding
-Because the $L_1$ norm $|\beta_j|$ has a sharp "V" crease at $\beta_j = 0$, its derivative does not exist at the origin. Instead, we compute its **subdifferential**:
+In Coordinate Descent, each coefficient is updated sequentially:
 
 $$
-\partial |\beta_j| = \begin{cases} \{1\} & \text{if } \beta_j > 0 \\ [-1, 1] & \text{if } \beta_j = 0 \\ \{-1\} & \text{if } \beta_j < 0 \end{cases}
+\beta_j^{(t+1)} \leftarrow \frac{\mathcal{S}_{\lambda \alpha}\left( \mathbf{x}_j^T (\mathbf{y} - \mathbf{X}_{-j} \boldsymbol{\beta}_{-j}) \right)}{\mathbf{x}_j^T \mathbf{x}_j + \lambda(1 - \alpha)}
 $$
 
-The scalar solution to this non-smooth convex subdifferential is the celebrated **Soft-Thresholding Operator** $\mathcal{S}(z, \gamma)$:
+### Why the Math Works Step-by-Step
 
-$$
-\mathcal{S}(z, \gamma) \equiv \text{sign}(z) \max(|z| - \gamma, 0) = \begin{cases} z - \gamma & \text{if } z > \gamma \\ 0 & \text{if } |z| \le \gamma \\ z + \gamma & \text{if } z < -\gamma \end{cases}
-$$
-
-### Cyclical Coordinate Descent
-Instead of trying to update all $p$ coefficients at once, coordinate descent optimizes one scalar coefficient $\beta_j$ at a time while holding all other $p - 1$ parameters fixed. 
-
-Assuming column-standardized predictors ($\frac{1}{n} \mathbf{x}_j^T \mathbf{x}_j = 1$), define the partial residual without feature $j$:
-
-$$
-\mathbf{r}^{(-j)} = \mathbf{y} - \sum_{k \ne j} \mathbf{x}_k \beta_k = \mathbf{y} - \mathbf{X}\boldsymbol{\beta} + \mathbf{x}_j \beta_j
-$$
-
-The unconstrained projection of feature $j$ onto this partial residual is:
-
-$$
-z_j = \frac{1}{n} \mathbf{x}_j^T \mathbf{r}^{(-j)}
-$$
-
-Applying soft-thresholding and the quadratic Elastic Net denominator gives the exact scalar closed-form update:
-
-$$
-\beta_j \leftarrow \frac{\mathcal{S}\left(z_j, \lambda \alpha\right)}{1 + \lambda (1 - \alpha)}
-$$
-
-Repeatedly sweeping through features $j = 1, \dots, p$ converges monotonically to the exact global optimum.
+1. **Why does Lasso produce exact zeros while Ridge does not?**
+   The derivative of $\beta^2$ at zero is $2(0) = 0$; the slope flattens out, so the penalty exerts zero pull right at the origin.
+   In contrast, the subgradient of $|\beta|$ at zero is the set $[-1, 1]$; it maintains a constant, steep cliff of force right up to the boundary, snapping any coefficient whose correlation is less than $\lambda$ directly onto zero!
+2. **Coordinate Descent Efficiency:**
+   Because the objective is non-differentiable only along the coordinate axes, optimizing each coordinate one by one via soft thresholding is guaranteed to converge to the global minimum.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $\mathbf{X} \in \mathbb{R}^{n \times p}$: Matrix of standardized predictors ($n$ samples, $p$ features).
-* $\mathbf{y} \in \mathbb{R}^n$: Target response vector.
-* $\boldsymbol{\beta} \in \mathbb{R}^p$: Parameter coefficient vector to be estimated.
-* $\lambda \ge 0$: Regularization hyperparameter governing overall penalty magnitude.
-* $\alpha \in [0, 1]$: Elastic Net mixing parameter ($\alpha = 1 \implies \text{Lasso}$, $\alpha = 0 \implies \text{Ridge}$).
-* $\|\boldsymbol{\beta}\|_1 = \sum_{j=1}^p |\beta_j|$: $L_1$ tax that forces sparsity via non-differentiable diamond vertices.
-* $\|\boldsymbol{\beta}\|_2^2 = \sum_{j=1}^p \beta_j^2$: $L_2$ squared Euclidean norm ensuring strong convexity and grouped selection.
-* $\mathcal{S}(z, \gamma)$: Soft-thresholding operator collapsing values within $[-\gamma, \gamma]$ to absolute zero.
-* $\mathbf{r}^{(-j)}$: Partial residual vector isolating variation unexplained by all features except regressor $j$.
-* $z_j = \frac{1}{n}\mathbf{x}_j^T \mathbf{r}^{(-j)}$: OLS correlation between regressor $j$ and the partial residual.
+* $\|\boldsymbol{\beta}\|_1 = \sum |\beta_j|$: L1 norm penalty inducing coefficient sparsity.
+* $\alpha \in [0, 1]$: Elastic Net mixing parameter ($\alpha = 1$ is Lasso; $\alpha = 0$ is Ridge).
+* $\mathcal{S}_\lambda(z)$: Soft-thresholding operator snapping small correlations to zero.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\|\boldsymbol{\beta}\|_1$ | معيار L1 المطلق | مجموع القيم المطلقة للأوزان؛ يشكل الأطراف المدببة التي تصفر الميزات الزائدة. |
+| $\mathcal{S}_\lambda(z)$ | مشغل العتبة اللينة | المشغل الرياضي الذي يقتطع $\lambda$ من القيمة ويسقط ما دونها على الصفر الصريح. |
+| $\alpha$ | معامل الموازنة الهجين | نسبة الخلط بين مشرط انتقاء لاسو وقوة استقرار ريدج في الشبكة المرنة. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -129,66 +168,62 @@ def fit_elastic_net(
     X: np.ndarray,
     y: np.ndarray,
     lmbda: float,
-    alpha: float,
-    max_iter: int = 100,
-    tol: float = 1e-5
+    alpha: float = 0.5,
+    max_iter: int = 500,
+    tol: float = 1e-4
 ) -> np.ndarray:
     """
-    Fits Elastic Net regression via cyclical coordinate descent with soft-thresholding.
-    
+    Fits Elastic Net / Lasso using Coordinate Descent and Soft Thresholding.
+
     Parameters
     ----------
-    X : np.ndarray of shape (N, P)
-        Design matrix (assumed normalized/standardized).
+    X : np.ndarray of shape (N, K)
+        Standardized design matrix.
     y : np.ndarray of shape (N,)
         Response vector.
     lmbda : float
-        Regularization parameter lambda >= 0.
-    alpha : float
-        Mixing parameter in [0, 1] (1 = Lasso, 0 = Ridge).
+        Regularization strength.
+    alpha : float, default 0.5
+        1.0 = Pure Lasso (L1), 0.0 = Pure Ridge (L2).
     max_iter : int
         Maximum coordinate descent cycles.
     tol : float
-        Convergence tolerance on coefficient changes.
-        
+        Convergence tolerance.
+
     Returns
     -------
-    np.ndarray of shape (P,)
-        Sparse estimated coefficient vector.
+    np.ndarray of shape (K,) : Elastic net coefficients beta.
     """
-    N, P = X.shape
-    beta = np.zeros(P)
-    
-    # Precompute column norms (assumes columns have unit variance: x_j^T x_j / N = 1)
-    norm_sq = np.sum(X ** 2, axis=0) / N
-    
-    def soft_threshold(z: float, gamma: float) -> float:
-        if z > gamma:
-            return z - gamma
-        elif z < -gamma:
-            return z + gamma
-        else:
-            return 0.0
+    n, k = X.shape
+    beta = np.zeros(k)
+    X_sq = np.sum(X ** 2, axis=0)
 
-    for iteration in range(max_iter):
-        beta_old = beta.copy()
-        
-        for j in range(P):
-            # Step 1: Compute partial residual: r_j = y - X @ beta + X[:, j] * beta[j]
-            y_pred = X @ beta
-            residual = y - y_pred + X[:, j] * beta[j]
-            z_j = float(X[:, j] @ residual) / N
-            
-            # Step 2: Apply soft thresholding and Elastic Net denominator
-            gamma = lmbda * alpha
-            numerator = soft_threshold(z_j, gamma)
-            denominator = norm_sq[j] + lmbda * (1.0 - alpha)
-            
-            beta[j] = numerator / denominator if denominator > 1e-8 else 0.0
-            
-        if np.max(np.abs(beta - beta_old)) < tol:
+    l1_penalty = lmbda * alpha
+    l2_penalty = lmbda * (1.0 - alpha)
+
+    for _ in range(max_iter):
+        beta_prev = beta.copy()
+
+        for j in range(k):
+            # Partial residual: y - sum_{m != j} X_m beta_m
+            r_j = y - (X @ beta - X[:, j] * beta[j])
+            rho_j = float(X[:, j] @ r_j)
+
+            # Soft thresholding of rho_j by l1_penalty
+            if rho_j > l1_penalty:
+                val = rho_j - l1_penalty
+            elif rho_j < -l1_penalty:
+                val = rho_j + l1_penalty
+            else:
+                val = 0.0
+
+            # Update with L2 denominator
+            denom = X_sq[j] + l2_penalty
+            beta[j] = val / denom if denom > 0 else 0.0
+
+        if np.max(np.abs(beta - beta_prev)) < tol:
             break
-            
+
     return beta
 ```
 :::

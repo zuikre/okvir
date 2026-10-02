@@ -32,6 +32,17 @@ The most dangerous and subtle source of data distortion in production analytical
 - **`ROWS` (The Physical Caliper)**: Counts literal row slots in memory buffer order. If your table records data only for business days (Monday through Friday), a rolling frame of `ROWS BETWEEN 6 PRECEDING AND CURRENT ROW` grabs the previous 6 records, stretching across 8 to 10 actual calendar days because it is completely blind to calendar weekends and holidays!
 - **`RANGE` (The Chronological Clock)**: Measures true value-based coordinate intervals along the ordering axis (e.g., `RANGE BETWEEN INTERVAL 7 DAYS PRECEDING AND CURRENT ROW`). It guarantees that only events falling within the true 7-day chronological span are included, gracefully handling missing days and bursty transaction streams!
 
+### Jargon Decoder / قاموس المصطلحات المعمارية
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **`LAG(col, k)`** / دالة الإزاحة الخلفية | Looking backward by $k$ rows within the sorted partition. Analogy: Glancing in your car's rearview mirror at the mile marker behind you. | جلب قيمة العمود من صف سابق بمقدار $k$ داخل نفس القسم. التشبيه: النظر في مرآة الرؤية الخلفية لرؤية لافتة الطريق التي تجاوزتها للتو. |
+| **`LEAD(col, k)`** / دالة الإزاحة الأمامية | Peeking forward by $k$ rows within the sorted partition. Analogy: Looking ahead through the front windshield at the approaching exit. | جلب قيمة العمود من صف لاحق بمقدار $k$ داخل نفس القسم. التشبيه: التطلع للأمام عبر الزجاج الأمامي لاستكشاف المنعطف القادم. |
+| **Physical `ROWS` Frame** / الإطار الموضعي الفيزيائي | Slicing a fixed count of literal rows in memory regardless of timestamp gaps. Analogy: Measuring distance by counting steps, even if stepping over potholes. | تحديد نافذة الحساب بعدد صفوف مجرد في الذاكرة بصرف النظر عن الفجوات الزمنية. التشبيه: قياس المسافة بعدد الخطوات حتى لو قفزت فوق حفر في الطريق. |
+| **Logical `RANGE` Frame** / الإطار المنطقي الزمني | Slicing data by actual numerical/chronological value distances ($t \pm \Delta$). Analogy: Using a stopwatch timer that ticks at actual calendar seconds. | تحديد نافذة الحساب بالفارق الزمني أو العددي الحقيقي على محور الترتيب. التشبيه: استخدام ساعة توقيت تقيس الثواني التقويمية الحقيقية بدقة. |
+| **Boundary Clamping** / معالجة ملامسة الحدود | Emitting `NULL` when an offset reaches beyond partition boundaries instead of wrapping. Analogy: Looking in the rearview mirror when parked at the very edge of a cliff. | إرجاع القيمة الفارغة `NULL` عند محاولة قراءة ما قبل البداية أو بعد النهاية. التشبيه: النظر في المرآة الخلفية عند الوقوف في نقطة بداية الطريق السريع. |
+| **Sliding Accumulator** / المجمع الانزلاقي السريع | Updating running window sum in $\mathcal{O}(1)$ by adding the entering row and subtracting the exiting row ($S_i = S_{i-1} + r_{\text{in}} - r_{\text{out}}$). | تحديث مجموع النافذة في زمن ثابت بإضافة الصف الجديد وطرح الصف الخارج من الإطار. التشبيه: عد ركاب حافلة بتسجيل الداخلين من الباب الأمامي والخارجين من الخلفي. |
+
 :::simulation-widget{engine="canvas2d" component="PositionalWindowOffsetLab"}
 ---
 interactive: true
@@ -71,6 +82,33 @@ $$
 \text{Frame}_{\text{RANGE}}(t, \Delta_1, \Delta_2) = \{ s \in \mathcal{P} \mid t.\text{val} - \Delta_1 \le s.\text{val} \le t.\text{val} + \Delta_2 \}
 $$
 
+```text
+Visual ASCII Transformation: LAG Offset & Rolling Frame Boundary Geometry:
+
+Input Time-Series Stream: (date, revenue)
+  Row 1: (2024-01-01, 100.0)
+  Row 2: (2024-01-02, 150.0)
+  Row 3: (2024-01-05, 200.0)  <- 3-day weekend gap (Jan 3 and Jan 4 missing!)
+
+LAG(revenue, 1) OVER (ORDER BY date):
+  Row 1 (Jan 1): LAG(1) -> NULL   (No predecessor -> Emits NULL sentinel!)
+  Row 2 (Jan 2): LAG(1) -> 100.0  (Yesterday's revenue)
+  Row 3 (Jan 5): LAG(1) -> 150.0  (Immediate predecessor tuple in memory)
+
+Comparing Physical ROWS vs Logical RANGE Trailing Window at Row 3 (Jan 5):
+  
+  Physical Frame: ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+  Buffer Scan: [ Row 1, Row 2, Row 3 ]
+  Sum = 100.0 + 150.0 + 200.0 = 450.0  
+  ===> Spans Jan 1 to Jan 5 (5 calendar days, NOT 3! Distorted by weekend gap!)
+
+  Logical Frame: RANGE BETWEEN INTERVAL 2 DAYS PRECEDING AND CURRENT ROW
+  Value Range: [ Jan 5 - 2 Days, Jan 5 ] = [ Jan 3, Jan 5 ]
+  Buffer Scan: Only Row 3 (Jan 5) falls within [Jan 3, Jan 5]!
+  Sum = 200.0  
+  ===> True 3-day calendar window respected without weekend distortion!
+```
+
 ### Mathematical Invariants & Symbol Breakdown
 
 | الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
@@ -84,13 +122,18 @@ $$
 | $\Delta_1, \Delta_2$ | Domain metric interval | Continuous delta offset (e.g. `INTERVAL '7 DAYS'`) along sort dimension | مقدار الفارق الزمني أو العددي المقاس على محور الترتيب |
 | $\text{DOD}$ | $\frac{v(r_i) - v(r_{i-1})}{v(r_{i-1})} \times 100$ | Normalized day-over-day growth velocity metric | نسبة تسارع النمو اليومي المعيارية المحسوبة عبر الإزاحة |
 
-The fundamental formal invariant of positional offsets is **Boundary Clamping with Sentinel Emission**: whenever an index offset evaluates outside the valid partition domain ($i - k < 1$ or $i + k > N$), the engine must emit the absorption element $\bot_{\text{NULL}}$ rather than wrapping around or accessing uninitialized heap memory. 
-
-Furthermore, while `ROWS` evaluation requires only pointer arithmetic over contiguous tuple pointers ($O(1)$ amortized frame updates using sliding accumulator subtraction: $S_i = S_{i-1} + r_i - r_{i-W}$), `RANGE` requires binary searching or monotonic two-pointer scans over the sort attribute values to resolve variable-width physical boundaries.
-
-ينص الثابت الرياضي الأساسي للإزاحات الموضعية على **إطلاق القيمة المحايدة $\bot_{\text{NULL}}$ عند ملامسة الحدود**: فكلما أدت الإزاحة إلى موقع يقع خارج نطاق القسم ($i - k < 1$ أو $i + k > N$)، يلتزم المحرك بإرجاع القيمة الفارغة بدلاً من قراءة عناوين ذاكرة عشوائية.
-
-وعلاوة على ذلك، تتميز حدود `ROWS` بأنها تنفذ عبر حسابات مؤشرات الذاكرة البسيطة بزمن $O(1)$ لكل صف باستخدام مجمعات الطرح الانزلاقية ($S_i = S_{i-1} + r_i - r_{i-W}$)، بينما تتطلب حدود `RANGE` بحثاً ثنائياً أو مؤشرين منزلقين لتحديد الصفوف التي تقع ضمن الفارق الزمني الحقيقي.
+#### Step-by-Step Arithmetic Cost & Invariant Breakdown:
+1. **Sliding Accumulator Time Complexity**:
+   For `ROWS BETWEEN k PRECEDING AND CURRENT ROW`:
+   $$S_i = S_{i-1} + r_i - r_{i-k-1}$$
+   - Each incoming row adds 1 addition and 1 subtraction.
+   - Amortized update cost $= \mathcal{O}(1)$ time per row across all $N$ records.
+2. **Logical RANGE Cost**:
+   Requires maintaining two pointer indices or conducting binary search:
+   - Amortized two-pointer sweep on sorted date axis $= \mathcal{O}(1)$ amortized.
+   - Arbitrary random intervals $= \mathcal{O}(\log N)$ per row.
+3. **Boundary Clamping Invariant**:
+   For $i - k < 1$: output is mathematically bounded to $\bot_{\text{NULL}}$ to avoid accessing uninitialized memory.
 
 ## Beat 3: Interactive Code Challenge
 
@@ -112,10 +155,8 @@ WITH metrics_lagged AS (
     SELECT
         metric_date,
         revenue,
-        -- Step 1: 3-day trailing rolling sum:
-        --         ROUND(SUM(revenue) OVER (ORDER BY metric_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS rolling_3day_revenue
-        -- Step 2: Previous day revenue:
-        --         LAG(revenue, 1) OVER (ORDER BY metric_date) AS prev_day_revenue
+        ROUND(SUM(revenue) OVER (ORDER BY metric_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS rolling_3day_revenue,
+        LAG(revenue, 1) OVER (ORDER BY metric_date) AS prev_day_revenue
     FROM daily_metrics
 )
 SELECT
@@ -123,9 +164,10 @@ SELECT
     revenue,
     rolling_3day_revenue,
     prev_day_revenue,
-    -- Step 3: Compute DoD growth percentage:
-    --         CASE WHEN prev_day_revenue IS NULL OR prev_day_revenue = 0 THEN NULL
-    --              ELSE ROUND(((revenue - prev_day_revenue) / prev_day_revenue) * 100.0, 2) END AS dod_growth_pct
+    CASE 
+        WHEN prev_day_revenue IS NULL OR prev_day_revenue = 0 THEN NULL
+        ELSE ROUND(((revenue - prev_day_revenue) / prev_day_revenue) * 100.0, 2) 
+    END AS dod_growth_pct
 FROM metrics_lagged
 ORDER BY metric_date ASC;
 ```

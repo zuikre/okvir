@@ -12,9 +12,11 @@ i18n:
 
 # Name-Binding, Environment Frames & Variable Lifetime
 
+## Beat 1: Intuition & Mental Model / الحدس والنموذج الذهني
+
 To truly master Python, you must first dismantle a pervasive beginner myth: that a variable is a "labeled cardboard box" holding a value inside it. In low-level languages like C, a variable declaration like `int x = 5;` sets aside 4 physical bytes of stack memory at a fixed address and writes the bit pattern directly into that slot. But Python does not work this way. In Python, **variables are sticky name tags**, and values are independent living entities residing in a vast memory landscape called the **Heap**.
 
-When you write `x = [1, 2, 3]`, Python's runtime takes two distinct actions. First, it constructs a new list object on the heap at a specific physical address—think of it as building a house with a unique street number, which you can inspect using `id(x)`. Second, it attaches the name tag `x` to that house's front door. The variable does not "contain" the list; it merely *points* to it.
+When you write `x = [1, 2, 3]`, Python's runtime takes two distinct actions. First, it constructs a new list object on the heap at a specific physical address—think of it as building a house with a unique street address, which you can inspect using `id(x)`. Second, it attaches the name tag `x` to that house's front door. The variable does not "contain" the list; it merely *points* to it.
 
 The real magic—and the source of frequent bugs—emerges when you introduce an alias: `y = x`. A beginner expects Python to duplicate the list, creating a second independent house. Instead, Python does nothing of the sort: it simply pastes a second sticky name tag `y` onto the *exact same front door*. Both `x` and `y` now point to the identical address (`id(x) == id(y)`). If someone walks into the house through tag `x` and changes the furniture (`x.append(4)`), anyone looking through the door marked `y` immediately sees `[1, 2, 3, 4]`. This is called **pointer aliasing** and **in-place mutation**.
 
@@ -22,28 +24,7 @@ This brings us to the critical distinction between **mutable** and **immutable**
 
 Finally, what governs the lifespan of these objects? Every Python object carries a built-in reference counter (`ob_refcnt`). Each time a new name tag or data structure references the object, its counter increments; whenever a tag falls out of scope or is explicitly removed with `del`, the counter decrements. The statement `del x` does **not** delete the underlying object—it merely peels off the tag `x`. The moment an object's reference counter hits absolute zero, it becomes orphaned. CPython's memory manager immediately reclaims its memory through automatic garbage collection.
 
-:::simulation-widget{engine="canvas2d" component="EnvironmentFrameCanvas"}
 ---
-interactive: true
-highlighted_metric: "loss"
----
-:::
-
-### Mathematical & Architectural Foundations / الأسس الرياضية والمعمارية
-
-$$
-\sigma: \text{Var} \to \text{Loc}, \quad \mu: \text{Loc} \to \text{PyObject}, \quad \text{PyObject} = \langle \text{ob\_refcnt}, \text{ob\_type}, \text{payload} \rangle
-$$
-
-```text
-Stack Frame (Local Scope)                 Heap Memory (CPython Objects)
-+-----------------------+                 +--------------------------------------+
-| Name Tag: x           | ------------->  | Loc: 0x7f9a12c8                      |
-+-----------------------+          /      | ob_refcnt: 2                         |
-| Name Tag: y           | --------+       | ob_type: <class 'list'>              |
-+-----------------------+                 | payload: [*ptr0, *ptr1, *ptr2]       |
-                                          +--------------------------------------+
-```
 
 لإتقان بايثون حقاً، يجب أولاً التخلص تماماً من وهم المبتدئين الشائع بأن المتغير عبارة عن "صندوق كرتوني يحمل اسماً ونضع في داخله القيمة". في اللغات منخفضة المستوى مثل C، يعني التصريح `int x = 5;` حجز 4 بايتات فيزيائية محددة في مكدس الذاكرة تُكتب فيها البتات مباشرة. أما في بايثون، فالأمر مختلف جذرياً: **المتغيرات هي بطاقات اسمية لاصقة** (Sticky Name Tags)، بينما القيم هي كائنات حية مستقلة تسكن في فضاء شاسع يُدعى **ذاكرة الكومة** (Heap).
 
@@ -55,19 +36,101 @@ Stack Frame (Local Scope)                 Heap Memory (CPython Objects)
 
 أخيراً، كيف تنتهي حياة هذه الكائنات؟ يحمل كل كائن في بايثون عداد مراجع داخلي (`ob_refcnt`). كلما وُضعت بطاقة اسم جديدة تشير إليه، يزداد العداد بمقدار 1؛ وكلما انتهى نطاق دالة أو استُخدم الأمر `del`، ينقص العداد. لاحظ أن الأمر `del x` لا يحذف الكائن إطلاقاً، بل ينزع البطاقة الاسمية `x` فقط. وحين يصل العداد إلى الصفر تماماً، يدرك مفسر CPython أن الكائن أصبح مهجوراً ولا يمكن لأحد الوصول إليه، فيتدخل جامع القمامة (Garbage Collector) تلقائياً لهدم المنزل وتحرير الذاكرة للنظام.
 
-#### Architectural Breakdown & Mathematical Mapping:
-- **Environment Mapping ($\sigma: \text{Var} \to \text{Loc}$)**: The symbol table mapping string variable names in the active stack frame to raw memory locations.
-- **Store Mapping ($\mu: \text{Loc} \to \text{PyObject}$)**: The physical heap mapping memory addresses to actual CPython object structures.
-- **Standard Object Header (`PyObject`)**: Every CPython object starts with a 16-byte header:
-  - `ob_refcnt` (8 bytes): 64-bit integer tracking active references.
-  - `ob_type` (8 bytes): Pointer to the type descriptor struct (`PyTypeObject*`).
-- **In-place Mutation vs Rebinding**: In-place mutation updates the memory payload $\mu(\text{loc})$ while preserving $\text{loc}$. Rebinding creates a new location $\text{loc}'$ and redirects $\sigma(x) = \text{loc}'$.
+### Jargon Decoder / جدول فك شفرة المصطلحات
 
-#### التحليل المعماري وتفصيل الرموز:
-- **دالة تعيين البيئة ($\sigma: \text{Var} \to \text{Loc}$)**: جدول الرموز الذي يربط الأسماء النصية في إطار المكدس بعناوين الذاكرة الحرة.
-- **دالة مخزن الذاكرة ($\mu: \text{Loc} \to \text{PyObject}$)**: تخطيط الذاكرة الفيزيائي الذي يربط العناوين بكائنات CPython الفعلية.
-- **ترويسة الكائن القياسية (`PyObject`)**: تتكون من 16 بايت في كل كائن: عداد المراجع `ob_refcnt` (8 بايت) ومؤشر النوع `ob_type` (8 بايت).
-- **التعديل في الموضع مقابل إعادة الربط**: التعديل يغير المحتوى الداخلي للعنوان الأصلي دون تغيير العنوان، بينما إعادة الربط تنشئ عنواناً جديداً وتربط الاسم به.
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Pointer / Reference** (المؤشر / المرجع) | A house street address written on a note, telling you where to find the data without moving the house itself. | عنوان منزل مكتوب على قصاصة ورقية، يخبرك بمكان البيانات دون الحاجة لنقل المنزل نفسه. |
+| **Heap Memory** (ذاكرة الكومة) | A vast open neighborhood where houses (objects) can be built anywhere free space exists. | حي سكني مفتوح وشاسع تُبنى فيه المنازل (الكائنات) في أي مساحة خالية. |
+| **Stack Frame** (إطار المكدس) | A temporary desk drawer holding sticky name tags for the function currently running. | درج مكتب مؤقت لحفظ بطاقات الأسماء اللاصقة الخاصة بالدالة النشطة حالياً. |
+| **In-place Mutation** (التعديل في الموضع) | Swapping furniture or painting walls inside the same house without changing its street address. | تغيير الأثاث أو طلاء الجدران داخل نفس المنزل دون تغيير عنوانه في الشارع. |
+| **Rebinding** (إعادة ربط الاسم) | Peeling a sticky name tag off one house and sticking it onto a completely different house. | نزع بطاقة الاسم اللاصقة من منزل ولصقها على منزل آخر جديد كلياً. |
+| **Garbage Collection** (جمع القمامة) | A city recycling crew that quietly demolishes and recycles any house that has zero name tags on its door. | فريق نظافة بلدي يهدم ويعيد تدوير أي منزل مهجور لا يحمل أي بطاقة اسم على بابه. |
+
+### Visual Step-by-Step Data Transformation / التحول البصري للبيانات
+
+```text
+Step 1: Allocation and Binding (x = [1, 2])
+Local Stack Frame                          Heap Memory (House at Loc: 0x100)
++------------------------+                 +--------------------------------------+
+| Name Tag: x            | ------------->  | Loc: 0x100                           |
++------------------------+                 | ob_refcnt: 1                         |
+                                           | payload: [1, 2]                      |
+                                           +--------------------------------------+
+
+Step 2: Aliasing (y = x)
+Local Stack Frame                          Heap Memory (Same House: 0x100)
++------------------------+                 +--------------------------------------+
+| Name Tag: x            | ------------->  | Loc: 0x100                           |
++------------------------+          /      | ob_refcnt: 2                         |
+| Name Tag: y            | --------+       | payload: [1, 2]                      |
++------------------------+                 +--------------------------------------+
+
+Step 3: In-Place Mutation (x.append(99))
+Local Stack Frame                          Heap Memory (Same House: 0x100, Same ID!)
++------------------------+                 +--------------------------------------+
+| Name Tag: x            | ------------->  | Loc: 0x100                           |
++------------------------+          /      | ob_refcnt: 2                         |
+| Name Tag: y            | --------+       | payload: [1, 2, 99]                  |
++------------------------+                 +--------------------------------------+
+                                           (Both x and y see 99 immediately!)
+
+Step 4: Rebinding via Concatenation (x = x + [100])
+Local Stack Frame                          Heap Memory (Two Independent Houses)
++------------------------+                 +--------------------------------------+
+| Name Tag: y            | ------------->  | Loc: 0x100  (ob_refcnt: 1)           |
++------------------------+                 | payload: [1, 2, 99]                  |
+                                           +--------------------------------------+
++------------------------+                 +--------------------------------------+
+| Name Tag: x            | ------------->  | Loc: 0x200 (NEW HOUSE! ob_refcnt: 1) |
++------------------------+                 | payload: [1, 2, 99, 100]             |
+                                           +--------------------------------------+
+```
+
+:::simulation-widget{engine="canvas2d" component="EnvironmentFrameCanvas"}
+---
+interactive: true
+highlighted_metric: "loss"
+---
+:::
+
+## Beat 2: Formal Invariants Demystified / الأسس الرياضية واللامتغيرات الصارمة
+
+$$
+\sigma: \text{Var} \to \text{Loc}, \quad \mu: \text{Loc} \to \text{PyObject}, \quad \text{PyObject} = \langle \text{ob\_refcnt}, \text{ob\_type}, \text{payload} \rangle
+$$
+
+### Mathematical Mapping & Structural Roles
+
+| Symbol / الرمز | Mathematical Domain / المجال الرياضي | Architectural Role / الدور المعماري | Meaning / الشرح بالعربية |
+| :--- | :--- | :--- | :--- |
+| $\sigma$ | $\text{Var} \to \text{Loc}$ | Environment symbol table in active stack frame | جدول الرموز الذي يربط اسم المتغير بعنوان الذاكرة |
+| $\mu$ | $\text{Loc} \to \text{PyObject}$ | Physical store mapping memory address to heap object | مخزن الذاكرة الفيزيائي الذي يربط العنوان بالكائن الفعلي |
+| $\text{ob\_refcnt}$ | $\text{uint64}$ (8 bytes) | Reference counter tracking active live aliases | عداد المراجع الذي يسجل عدد المتغيرات التي تشير للكائن |
+| $\text{ob\_type}$ | $\text{PyTypeObject}^*$ (8 bytes) | Pointer to object's CPython type descriptor struct | مؤشر نوع الكائن يحدد العمليات الصالحة وحجم الذاكرة |
+| $\text{payload}$ | Sized memory block | Pointers to contained values or primitive bit data | البيانات الفعلية أو مصفوفة المؤشرات للعناصر المحتواة |
+
+### Step-by-Step Execution Cost & Complexity Breakdown / تفكيك التكلفة الحسابية خطوة بخطوة
+
+#### 1. In-Place Mutation: `items.append(val)`
+- **Step 1 (Stack Lookup)**: Resolve variable name `items` in local symbol table $\sigma(\text{items}) \to \text{loc}$: **1 CPU cycle** ($O(1)$).
+- **Step 2 (Pointer Dereference)**: Follow pointer address $\text{loc}$ to list header $\mu(\text{loc})$: **1 memory access** (~2-5 ns if in L1 cache).
+- **Step 3 (Capacity Check)**: Compare allocated slots against current length (`ob_size < allocated`): **1 CPU comparison**.
+- **Step 4 (Slot Write)**: Store pointer to `val` into pre-allocated contiguous buffer index `ob_size`: **1 memory store** ($O(1)$).
+- **Step 5 (Metadata Update)**: Increment `ob_size` by $+1$ and increment `val->ob_refcnt` by $+1$: **2 additions** ($O(1)$).
+- **Total Arithmetic Cost**: Amortized $O(1)$ time, $0$ new heap allocations.
+
+#### 2. Rebinding with Concatenation: `items = items + [val]`
+- **Step 1 (Heap Allocation)**: Request new list header ($56$ bytes) plus contiguous pointer array for $N+1$ items from CPython pymalloc allocator: **~50-100 CPU cycles**.
+- **Step 2 (Memory Copy)**: Copy all $N$ existing element pointers from old list to new list: **$N$ memory writes** ($O(N)$ time).
+- **Step 3 (Append New Element)**: Store pointer to `val` at index $N$ in the newly allocated list: **1 memory write**.
+- **Step 4 (Rebind Symbol Table)**: Update local stack frame mapping $\sigma(\text{items}) \leftarrow \text{loc}_{\text{new}}$: **1 pointer write**.
+- **Step 5 (Decrement Old Reference)**: Decrement `old_list->ob_refcnt` by $-1$; if zero, schedule for deallocation: **1 subtraction**.
+- **Total Arithmetic Cost**: $O(N)$ time, $O(N)$ auxiliary heap memory allocated.
+
+---
+
+## Beat 3: Guided Code Challenge / التحدي البرمجي الموجه
 
 :::python-challenge{id="py-name-binding-lifetime"}
 ---
@@ -126,24 +189,24 @@ def track_rebinding_vs_mutation(items: list[int]) -> dict[str, Any]:
 ```
 :::
 
-### Transfer Quiz & Practical Debugging / أسئلة الفهم ونقل المعرفة
+## Beat 4: Real-World Transfer Scenario / سيناريو التطبيق ونقل المعرفة
 
-:::transfer-quiz
-**Question / السؤال:**
-Consider the following function with a default parameter:
+### Reality Check: The Shared Cart Cache Bug
+
+In an e-commerce microservice, user shopping sessions share an in-memory cache helper. A junior engineer writes:
 ```python
 def append_to_cache(item: int, cache: list = []) -> list:
     cache.append(item)
     return cache
 ```
 What is returned when `append_to_cache(1)` is executed, followed immediately by `append_to_cache(2)`?
-*تأمل الدالة التالية التي تستخدم وسيطاً افتراضياً:
-```python
-def append_to_cache(item: int, cache: list = []) -> list:
-    cache.append(item)
-    return cache
-```
-ما هي النتيجة المعادة عند تنفيذ `append_to_cache(1)` متبوعة مباشرة بـ `append_to_cache(2)`؟*
+
+*في خدمة مصغرة للتجارة الإلكترونية، تتشارك جلسات التسوق ذاكرة تخزين مؤقت. كتب مهندس مبتدئ الدالة أعلاه. ما هي النتيجة المعادة عند استدعاء `append_to_cache(1)` متبوعة مباشرة بـ `append_to_cache(2)`؟*
+
+:::transfer-quiz
+**Question / السؤال:**
+What is the resulting output and underlying memory behavior?
+*ما هي المخرجات الناتجة والسلوك الذاكري الكامن خلفها؟*
 
 - [x] [1, 2] — Default arguments are evaluated once when the function is defined, binding 'cache' to a single persistent heap object.
   *[1, 2] — يتم تقييم الوسائط الافتراضية مرة واحدة فقط عند تعريف الدالة، مما يربط 'cache' بكائن دائم في الكومة عبر الاستدعاءات.*

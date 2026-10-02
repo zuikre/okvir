@@ -14,27 +14,90 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Modern datasets routinely confront data scientists with dozens or thousands of interrelated, collinear features—financial balance sheet metrics, multi-channel sensor telemetry, facial image pixels, or single-cell gene expression markers. Attempting to visualize, explore, or fit machine learning models on high-dimensional data directly leads to computational paralysis, severe multicollinearity, and the curse of dimensionality. Yet in practice, most features are deeply redundant: measuring a runner's stride length, shoe size, and leg length captures three variations of the exact same underlying physical trait.
+### Intuition & Real-World Story
 
-**Principal Component Analysis (PCA)** is the foundational unsupervised technique for linear dimensionality reduction. To grasp its tactile geometry, imagine holding an intricate three-dimensional metal wire sculpture in your hands inside a pitch-black room. Your objective is to project the sculpture's silhouette onto a flat, two-dimensional white wall using a single handheld flashlight. If you shine the flashlight from an arbitrary, clumsy angle, the wire branches collapse into an unrecognizable, tangled clump that conceals the sculpture's true structure.
+Modern datasets routinely bombard data scientists with dozens or thousands of interrelated features—corporate balance sheets, multi-sensor telemetry, facial image pixels, or single-cell gene expression markers.
+Attempting to model these high-dimensional spaces directly leads to computational slowdowns, severe multicollinearity, and the curse of dimensionality.
 
-PCA is the mathematical art of **rotating the flashlight around the sculpture to discover the exact camera angle that casts the widest, sharpest, most informative shadow possible**. The physical width and spread of this shadow corresponds to **statistical variance**: the direction along which the data points are most spread out preserves the maximum amount of original information, while the flat, squashed dimensions represent redundant noise that can be safely discarded without losing the core signal.
+Yet in reality, most features are deeply redundant:
+If you measure an athlete's **height, arm span, shoe size, and leg length**, you aren't measuring four independent biological traits—you are measuring four reflections of the **exact same underlying body size factor!**
 
-This spatial rotation proceeds through an orderly, orthogonal hierarchy:
+**Principal Component Analysis (PCA)** is the foundational technique for linear dimensionality reduction.
+To grasp its tactile geometry, imagine holding an intricate **3D wire sculpture** in your hands inside a pitch-black room. Your mission is to project the sculpture's silhouette onto a flat 2D white wall using a single handheld flashlight.
+
+If you shine the flashlight from an arbitrary, clumsy angle, the wire branches collapse into an unrecognizable, messy tangle that conceals the sculpture's true shape.
+PCA is the mathematical art of **rotating the flashlight around the sculpture to find the exact angle that casts the widest, sharpest, most informative shadow possible!**
+
+The physical width and spread of this shadow corresponds to **statistical variance**:
+- The direction where data points are most spread out preserves the maximum amount of original information.
+- Flat, squished dimensions represent redundant noise that can be safely discarded without losing the core signal.
+
+This spatial rotation proceeds through a strict orthogonal hierarchy:
 - The **First Principal Component ($\mathbf{v}_1$)** is the primary axis of maximum variance—the single widest perspective of your data manifold.
 - The **Second Principal Component ($\mathbf{v}_2$)** is the axis of maximum *remaining* variance that is strictly orthogonal (at a perfect $90^\circ$ angle) to the first.
-- Every subsequent component captures diminishing residual variance while remaining mutually perpendicular to all predecessors. Because these axes are orthogonal by construction, PCA completely uncorrelates the features, effectively rotating your coordinate system so that the new axes align with the intrinsic geometric structure of the data.
+- Every subsequent component captures diminishing residual variance while remaining perpendicular to all predecessors.
 
-تغمر مجموعات البيانات الحديثة مهندسي البيانات بمئات أو آلاف المتغيرات المتشابكة والمترابطة—مثل النسب المالية للشركات، أو قراءات مجسات الطائرات، أو بكسلات الصور الرقمية، أو مصفوفات التعبير الجيني. وتؤدي محاولة نمذجة هذه الفضاءات الشاهقة مباشرة إلى شلل حسابي، وتداخل خطي مدمر (Multicollinearity)، وسقوط في لعنة الأبعاد. ومع ذلك، فإن أغلب هذه المتغيرات مكررة في جوهرها؛ فقياس طول ساق العداء ومقاس حذائه وطول خطوته هي ثلاثة أوجه لمتغير بيولوجي كامن واحد.
+Because these axes are orthogonal by construction, PCA completely uncorrelates the features, rotating your coordinate system so that the new axes align with the intrinsic geometric structure of the data.
 
-يمثل **تحليل المكونات الرئيسية (Principal Component Analysis - PCA)** الأساس الهندسي الأهم لتقليص الأبعاد الخطي دون إشراف. ولاستيعاب هذا المفهوم حسياً، تخيل أنك تمسك بيدك مجسماً سلكياً ثلاثي الأبعاد معقداً داخل غرفة مظلمة، ومهمتك هي التقاط صورة ظلية للمجسم على جدار مستوٍ أبيض ثنائي الأبعاد باستخدام مصباح يدوي. إذا سلطت الضوء من زاوية عشوائية خرقاء، سينهار الظل إلى كتلة متشابكة ومبهمة تخفي المعالم الهندسية الحقيقية للمجسم.
+#### Jargon Decoder
 
-PCA هو الفن الرياضي لـ **تدوير زاوية إضاءة المصباح بدقة للبحث عن الزاوية المثالية التي تصنع أوسع ظل وأكثره وضوحاً وتفصيلاً على الجدار**. يقابل اتساع هذا الظل الممتد مفهوم **التباين الإحصائي (Variance)**: فالاتجاه الذي تتشتت فيه نقاط البيانات بأكبر قدر ممكن هو الاتجاه الذي يحتفظ بأقصى طاقة بيانية ومعلوماتية أصلية، بينما تمثل الأبعاد المنكمشة ضجيجاً متكرراً يمكن التخلص منه دون أي خسارة جوهرية.
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Dimensionality Reduction** | The compression lens: simplifying 1,000 features down to 2 or 3 essential axes without losing the signal. |
+| **Variance Maximization** | Finding the widest shadow: rotating coordinates so the first axis captures the biggest spread. |
+| **Principal Component** | An essential axis: an eigenvector of the covariance matrix defining a new coordinate direction. |
+| **Orthogonality** | At perfect 90 degrees: ensuring new axes are completely uncorrelated and independent. |
+| **Explained Variance Ratio** | Information retained: the percentage of total dataset variance captured by a given component. |
+
+```text
+    THE PCA ROTATION & SILHOUETTE PROJECTION:
+
+         Feature 2
+             ^                  .  *  *  (Original Data Cloud)
+             |               *   *   *
+             |            *   *   *      <--- Axis of Maximum Spread:
+             |         *   *   *              First Principal Component (v_1)
+             |      *   *
+             |   *                 \
+             |                      \--- Axis of Minor Spread:
+             |                           Second Component (v_2, 90 deg)
+             +----------------------------------------> Feature 1
+```
+
+### الحدس والقصة الواقعية
+
+تغمر مجموعات البيانات الحديثة مهندسي البيانات بمئات أو آلاف المتغيرات المتشابكة والمترابطة—مثل النسب المالية للشركات، أو قراءات مجسات الطائرات، أو بكسلات الصور الرقمية، أو مصفوفات التعبير الجيني.
+وتؤدي محاولة نمذجة هذه الفضاءات الشاهقة مباشرة إلى شلل حسابي، وتداخل خطي مدمر (Multicollinearity)، وسقوط في لعنة الأبعاد.
+
+ومع ذلك، فإن أغلب هذه المتغيرات مكررة في جوهرها؛
+فإذا قست **طول الرياضي، وطول ذراعه، ومقاس حذائه، وطول ساقه**، فأنت لا تقيس أربعة متغيرات مستقلة، بل تقيس أربعة أوجه لمتغير بيولوجي كامن واحد هو: **الحجم الجسدي العام!**
+
+يمثل **تحليل المكونات الرئيسية (Principal Component Analysis - PCA)** الأساس الهندسي الأهم لتقليص الأبعاد الخطي.
+ولاستيعاب هذا المفهوم حسياً، تخيل أنك تمسك بيدك **مجسماً سلكياً ثلاثي الأبعاد** معقداً داخل غرفة مظلمة، ومهمتك هي التقاط صورة ظلية للمجسم على جدار مستوٍ أبيض ثنائي الأبعاد باستخدام مصباح يدوي.
+
+إذا سلطت الضوء من زاوية عشوائية خرقاء، سينهار الظل إلى كتلة متشابكة ومبهمة تخفي المعالم الهندسية الحقيقية للمجسم.
+PCA هو الفن الرياضي لـ **تدوير زاوية إضاءة المصباح بدقة للبحث عن الزاوية المثالية التي تصنع أوسع ظل وأكثره وضوحاً وتفصيلاً على الجدار!**
+
+يقابل اتساع هذا الظل الممتد مفهوم **التباين الإحصائي (Variance)**:
+- فالاتجاه الذي تتشتت فيه نقاط البيانات بأكبر قدر ممكن هو الاتجاه الذي يحتفظ بأقصى طاقة بيانية ومعلوماتية أصلية.
+- بينما تمثل الأبعاد المنكمشة ضجيجاً متكرراً يمكن التخلص منه دون أي خسارة جوهرية.
 
 يسير هذا التدوير الهندسي وفق تسلسل هرمي متعامد وصارم:
 - **المكون الرئيسي الأول ($\mathbf{v}_1$)** هو محور التباين الأقصى المطلق—وهو أوسع زاوية رؤية ممكنة لبياناتك.
 - **المكون الرئيسي الثاني ($\mathbf{v}_2$)** هو محور التباين الأقصى المتبقي، بشرط أن يكون متعامداً تماماً وبزاوية $90^\circ$ على المحور الأول.
-- وهكذا، يلتقط كل مكون لاحق تشتتاً متناقصاً مع الحفاظ على تعامده مع كافة المكونات السابقة. وبفضل هذا التعامد الجبري، يلغي PCA الارتباط الخطي بين المتغيرات تماماً، ويعيد تدوير محاور الإحداثيات لتتطابق تماماً مع البنية الهندسية الحقيقية للبيانات.
+- وهكذا، يلتقط كل مكون لاحق تشتتاً متناقصاً مع الحفاظ على تعامده التام مع كافة المكونات السابقة.
+
+وبفضل هذا التعامد الجبري، يلغي PCA الارتباط الخطي بين المتغيرات تماماً، ويعيد تدوير محاور الإحداثيات لتتطابق تماماً مع البنية الهندسية الحقيقية للبيانات.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **تقليص الأبعاد** | عدسة الضغط: تبسيط 1,000 متغير إلى محورين أو ثلاثة دون فقدان الإشارة الجوهرية. |
+| **تعظيم التباين** | البحث عن أوسع ظل: تدوير الإحداثيات بحيث يلتقط المحور الأول أقصى انتشار للبيانات. |
+| **المكون الرئيسي** | المحور الجوهري: متجه ذاتي لمصفوفة التغاير يحدد اتجاه الإحداثيات الجديد. |
+| **التعامد الجبري** | زاوية 90 درجة تامة: ضمان استقلال المحاور الجديدة وانعدام الارتباط الخطي بينها تماماً. |
+| **نسبة التباين المفسر** | الطاقة المحفوظة: النسبة المئوية من إجمالي تباين البيانات التي يلتقطها المكون. |
 
 :::simulation-widget{engine="canvas2d" component="KMeansVoronoi"}
 ---
@@ -59,61 +122,58 @@ Because $\mathbf{\Sigma}$ is real, symmetric ($\mathbf{\Sigma} = \mathbf{\Sigma}
 We seek a unit projection vector $\mathbf{u}_1 \in \mathbb{R}^P$ ($\|\mathbf{u}_1\|_2^2 = \mathbf{u}_1^T \mathbf{u}_1 = 1$) that maximizes the variance of the projected scalar coordinates $\mathbf{z}_1 = \mathbf{X}\mathbf{u}_1$:
 
 $$
-\max_{\mathbf{u}_1} \text{Var}(\mathbf{X}\mathbf{u}_1) = \max_{\mathbf{u}_1} \frac{1}{N - 1} (\mathbf{X}\mathbf{u}_1)^T (\mathbf{X}\mathbf{u}_1) = \max_{\mathbf{u}_1} \mathbf{u}_1^T \mathbf{\Sigma} \mathbf{u}_1 \quad \text{subject to } \mathbf{u}_1^T \mathbf{u}_1 = 1
+\text{Var}(\mathbf{z}_1) = \frac{1}{N - 1} \mathbf{z}_1^T \mathbf{z}_1 = \frac{1}{N - 1} (\mathbf{X}\mathbf{u}_1)^T (\mathbf{X}\mathbf{u}_1) = \mathbf{u}_1^T \left( \frac{1}{N - 1} \mathbf{X}^T \mathbf{X} \right) \mathbf{u}_1 = \mathbf{u}_1^T \mathbf{\Sigma} \mathbf{u}_1
 $$
 
-Formulating the Lagrangian objective with multiplier $\lambda_1$:
+Formulating the Lagrangian objective with Lagrange multiplier $\lambda_1$:
 
 $$
 \mathcal{L}(\mathbf{u}_1, \lambda_1) = \mathbf{u}_1^T \mathbf{\Sigma} \mathbf{u}_1 - \lambda_1 (\mathbf{u}_1^T \mathbf{u}_1 - 1)
 $$
 
-Taking the vector derivative and setting it to zero:
+Taking the vector derivative with respect to $\mathbf{u}_1$ and setting it to zero:
 
 $$
-\nabla_{\mathbf{u}_1} \mathcal{L} = 2\mathbf{\Sigma} \mathbf{u}_1 - 2\lambda_1 \mathbf{u}_1 = \mathbf{0} \iff \mathbf{\Sigma} \mathbf{u}_1 = \lambda_1 \mathbf{u}_1
+\nabla_{\mathbf{u}_1} \mathcal{L} = 2\mathbf{\Sigma}\mathbf{u}_1 - 2\lambda_1 \mathbf{u}_1 = \mathbf{0} \implies \mathbf{\Sigma}\mathbf{u}_1 = \lambda_1 \mathbf{u}_1
 $$
 
-This is the foundational **Matrix Eigenvalue Problem**! Multiplying both sides on the left by $\mathbf{u}_1^T$ reveals:
+This is the canonical **eigenvalue equation**:
+- The optimal projection direction $\mathbf{u}_1$ is an **eigenvector** of covariance matrix $\mathbf{\Sigma}$.
+- Pre-multiplying by $\mathbf{u}_1^T$ reveals that the projected variance equals the eigenvalue: $\text{Var}(\mathbf{z}_1) = \mathbf{u}_1^T \mathbf{\Sigma} \mathbf{u}_1 = \lambda_1 \mathbf{u}_1^T \mathbf{u}_1 = \lambda_1$.
+- To maximize variance, we choose the eigenvector $\mathbf{v}_1$ associated with the **largest eigenvalue** $\lambda_1 = \lambda_{\max}$.
 
-$$
-\mathbf{u}_1^T \mathbf{\Sigma} \mathbf{u}_1 = \lambda_1 \mathbf{u}_1^T \mathbf{u}_1 = \lambda_1
-$$
-
-The maximal projected variance equals the largest eigenvalue $\lambda_1$, achieved when the projection vector $\mathbf{u}_1$ is the principal eigenvector of covariance matrix $\mathbf{\Sigma}$.
-
-### Spectral Decomposition & Low-Rank Projection
-By the Spectral Theorem, the covariance matrix factors into an orthonormal basis of eigenvectors $\mathbf{V} = [\mathbf{v}_1, \dots, \mathbf{v}_P] \in \mathbb{R}^{P \times P}$ and diagonal eigenvalue matrix $\mathbf{\Lambda} = \text{diag}(\lambda_1, \dots, \lambda_P)$:
+### Spectral Decomposition & Truncation
+By the Spectral Theorem, the covariance matrix decomposes into orthonormal eigenvectors $\mathbf{V} = [\mathbf{v}_1, \dots, \mathbf{v}_P]$ and diagonal eigenvalue matrix $\mathbf{\Lambda} = \text{diag}(\lambda_1, \dots, \lambda_P)$:
 
 $$
 \mathbf{\Sigma} = \mathbf{V} \mathbf{\Lambda} \mathbf{V}^T, \quad \text{with } \lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_P \ge 0
 $$
 
-To compress the data from $P$ dimensions down to $K < P$, we form the truncated projection matrix $\mathbf{V}_K = [\mathbf{v}_1, \dots, \mathbf{v}_K] \in \mathbb{R}^{P \times K}$ and compute the low-dimensional representation:
+To reduce dimension from $P$ to $K < P$, we retain the top $K$ eigenvectors $\mathbf{V}_K \in \mathbb{R}^{P \times K}$. The low-dimensional coordinates $\mathbf{Z} \in \mathbb{R}^{N \times K}$ are:
 
 $$
-\mathbf{Z} = \mathbf{X} \mathbf{V}_K \in \mathbb{R}^{N \times K}
+\mathbf{Z} = \mathbf{X} \mathbf{V}_K
 $$
 
-The **Explained Variance Ratio (EVR)** for the $j$-th principal component is:
+The fraction of total variance preserved by component $j$ (Explained Variance Ratio) is:
 
 $$
-\text{EVR}_j = \frac{\lambda_j}{\sum_{m=1}^P \lambda_m} = \frac{\lambda_j}{\text{tr}(\mathbf{\Sigma})}
+\text{EVR}_j = \frac{\lambda_j}{\sum_{k=1}^P \lambda_k} = \frac{\lambda_j}{\text{tr}(\mathbf{\Sigma})}
 $$
-
-The cumulative explained variance $\sum_{j=1}^K \text{EVR}_j$ quantifies the exact percentage of total information retained in the low-dimensional projection.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $\mathbf{X} \in \mathbb{R}^{N \times P}$: Mean-centered feature matrix containing $N$ samples and $P$ original predictors.
-* $\mathbf{\Sigma} \in \mathbb{R}^{P \times P}$: Symmetric, positive semi-definite sample covariance matrix.
-* $\mathbf{u}_1 \in \mathbb{R}^P$: Unit projection vector defining the orientation of the principal axis.
-* $\lambda_j$: The $j$-th eigenvalue of $\mathbf{\Sigma}$, quantifying the variance along eigenvector $\mathbf{v}_j$.
-* $\mathbf{v}_j$: The $j$-th orthonormal eigenvector of $\mathbf{\Sigma}$ (the $j$-th Principal Component loading vector).
-* $\mathbf{V}_K \in \mathbb{R}^{P \times K}$: Truncated projection matrix composed of the top $K$ principal eigenvectors.
-* $\mathbf{Z} \in \mathbb{R}^{N \times K}$: Low-dimensional compressed coordinate matrix (principal component scores).
-* $\text{tr}(\mathbf{\Sigma}) = \sum_{j=1}^P \lambda_j$: Trace of the covariance matrix, measuring total multivariate variance.
-* $\text{EVR}_j$: Explained Variance Ratio quantifying the fraction of total variance captured by component $j$.
+| Symbol / Term | Formal Definition | Intuitive Meaning / Role | المعنى والمدلول بالعربية |
+| :--- | :--- | :--- | :--- |
+| $\mathbf{X} \in \mathbb{R}^{N \times P}$ | Zero-centered data matrix | $N$ observations across $P$ demeaned features | مصفوفة البيانات المتمركزة حول الصفر |
+| $\mathbf{\Sigma} \in \mathbb{R}^{P \times P}$ | $\frac{1}{N-1}\mathbf{X}^T\mathbf{X}$ | Sample covariance matrix of features | مصفوفة التغاير الإحصائي للمتغيرات |
+| $\mathbf{u}_1 \in \mathbb{R}^P$ | Unit projection vector | Direction of the first principal component | متجه الوحدة لإسقاط المكون الرئيسي الأول |
+| $\lambda_j$ | $j$-th eigenvalue of $\mathbf{\Sigma}$ | Variance captured along eigenvector $\mathbf{v}_j$ | القيمة الذاتية ومقدار التباين للمكون $j$ |
+| $\mathbf{v}_j$ | $j$-th eigenvector of $\mathbf{\Sigma}$ | Orthonormal Principal Component loading axis | المتجه الذاتي المتعامد ومحور المكون $j$ |
+| $\mathbf{V}_K \in \mathbb{R}^{P \times K}$ | Top $K$ eigenvectors | Low-dimensional projection transformation matrix | مصفوفة التحويل للإسقاط المنخفض الأبعاد |
+| $\mathbf{Z} \in \mathbb{R}^{N \times K}$ | $\mathbf{X}\mathbf{V}_K$ | Low-dimensional compressed coordinate scores | درجات وإحداثيات المكونات المضغوطة |
+| $\text{tr}(\mathbf{\Sigma})$ | $\sum_{j=1}^P \lambda_j$ | Total multivariate variance in the dataset | أثر المصفوفة ومجموع التباين الكلي للبيانات |
+| $\text{EVR}_j$ | $\lambda_j / \sum \lambda_k$ | Explained Variance Ratio for component $j$ | نسبة التباين المفسر والمحفوظ بالمكون $j$ |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 

@@ -34,6 +34,26 @@ By strategically canceling out variables below the diagonal, the messy system tr
 
 ---
 
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Gaussian Elimination | A systematic recipe for clearing out unknowns one variable at a time | حذف غاوس | خوارزمية منظمة لإلغاء المجاهيل تدريجياً حتى ينكشف الحل الأخير |
+| Pivot | The leading nonzero number in a row, used as an anchor to cancel numbers below it | عنصر الارتكاز (Pivot) | الرقم غير المعدوم الرائد في الصف، يُتخذ كدعامة لتصفير ما تحته |
+| Row Operations | Fair balance-scale moves: swapping rows, scaling a row, or adding rows together | العمليات الصفية البسيطة | حركات موازنة مشروعة: تبديل الصفوف، ضرب صف بعدد، أو جمع صف لآخر |
+| Echelon Form | A neat downward staircase where each row starts with more zeros than the last | الشكل المدرج (Echelon Form) | هيكل مدرج أنيق يتسع فيه عدد الأصفار كلما نزلت صفاً للأسفل |
+| Back-Substitution | Solving the bottom single-variable equation, then plugging it upward | التعويض الخلفي | إيجاد المجهول الأخير المعزول في الأسفل ثم الصعود به لتعويض باقي القيم |
+
+#### Geometric & Visual Flow
+
+```
+      Original Matrix               Upper Triangular Staircase
+        [ 2   1  -1 |  8 ]             [ 2   1  -1 |  8 ]
+        [ -3 -1   2 | -11]    ───►     [ 0   1   1 |  2 ]
+        [ -2  1   2 | -3 ]             [ 0   0   1 | -1 ] ◄── Solve z first!
+                                       Then back-substitute upwards!
+```
+
 ### الحدس الفيزيائي والهندسي
 
 تخيل أنك دخلت سوقاً للمزارعين حيث اشترى ثلاثة زبائن سلالاً تحتوي على التفاح والموز والبطيخ، لكن البائع نسي وضع بطاقات الأسعار المنفردة على الفواكه. الفاتورة الأولى تبين أن: تفاحتين و3 موزات وبطيخة واحدة تكلفتها 16 دولاراً. الفاتورة الثانية تبين أن: تفاحة واحدة وموزتين و4 بطيخات تكلفتها 25 دولاراً. والفاتورة الثالثة تبين أن: 3 تفاحات وموزة واحدة وبطيختين تكلفتها 17 دولاراً. كيف تستطيع معرفة السعر الدقيق لكل فاكهة على حدة دون الغرق في التخمين العشوائي المتعب؟
@@ -53,6 +73,26 @@ By strategically canceling out variables below the diagonal, the messy system tr
 1. **الهندسة الكهربائية ومحاكاة الدوائر الإلكترونية (SPICE):** عند محاكاة المعالجات الحديثة التي تضم مليارات الترانزستورات، تطبق البرامج قوانين كيرشوف للجهد والتيار، منتجة منظومات خطية عملاقة تُحل عبر الحذف الغاوسي وتفكيك LU في أجزاء من الثانية.
 2. **الهندسة الإنشائية وتحليل الإجهاد في الجسور (FEA):** يمثل مهندسو البناء هياكل ناطحات السحاب والجسور كمنظومات توازن قوى خطية ($\mathbf{K}\mathbf{u} = \mathbf{f}$). حل هذه المنظومة يكشف مقدار الانحناء والإجهاد الميكانيكي على كل عارضة فولاذية لحماية الجسر من الانهيار تحت تأثير الرياح.
 3. **الاقتصاد القياسي ونماذج المدخلات والمخرجات:** نال فاسيلي ليونتيف جائزة نوبل في الاقتصاد بفضل نمذجته لاقتصادات الدول كمنظومة خطية متشابكة: فصناعة الحديد تحتاج كهرباء، والكهرباء تحتاج فحماً، واستخراج الفحم يحتاج آلات حديدية؛ وحل المنظومة الخطية يضمن التوازن الإنتاجي للدولة بأكملها.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| حذف غاوس | A systematic recipe for clearing out unknowns one variable at a time | حذف غاوس | خوارزمية منظمة لإلغاء المجاهيل تدريجياً حتى ينكشف الحل الأخير |
+| عنصر الارتكاز (Pivot) | The leading nonzero number in a row, used as an anchor to cancel numbers below it | عنصر الارتكاز (Pivot) | الرقم غير المعدوم الرائد في الصف، يُتخذ كدعامة لتصفير ما تحته |
+| العمليات الصفية البسيطة | Fair balance-scale moves: swapping rows, scaling a row, or adding rows together | العمليات الصفية البسيطة | حركات موازنة مشروعة: تبديل الصفوف، ضرب صف بعدد، أو جمع صف لآخر |
+| الشكل المدرج (Echelon Form) | A neat downward staircase where each row starts with more zeros than the last | الشكل المدرج (Echelon Form) | هيكل مدرج أنيق يتسع فيه عدد الأصفار كلما نزلت صفاً للأسفل |
+| التعويض الخلفي | Solving the bottom single-variable equation, then plugging it upward | التعويض الخلفي | إيجاد المجهول الأخير المعزول في الأسفل ثم الصعود به لتعويض باقي القيم |
+
+#### المخطط البصري الهندسي
+
+```
+      المصفوفة الأصلية               المصفوفة المثلثية العلوية المدرجة
+        [ 2   1  -1 |  8 ]             [ 2   1  -1 |  8 ]
+        [ -3 -1   2 | -11]    ───►     [ 0   1   1 |  2 ]
+        [ -2  1   2 | -3 ]             [ 0   0   1 | -1 ] ◄── احسب z أولاً!
+                                       ثم عوض قيمته صعوداً للأعلى!
+```
 
 :::simulation-widget{engine="canvas2d" component="LinearSystemSolverCanvas"}
 ---

@@ -14,21 +14,65 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-Once the regression hyperplane is locked into place, researchers ask: *How much of the outcome's real-world variation have we actually explained?* The Analysis of Variance (ANOVA) decomposition provides the answer by splitting total variation into two strictly perpendicular components using the **Pythagorean theorem in $N$ dimensions**.
+### Intuition & Real-World Story
 
-Think of the total variation in the outcome as the acoustic energy of an audio recording. The recording consists of a clear musical melody (the signal explained by the regressors, ESS) and unavoidable static hiss (the residual noise, SSR). Because the fitted prediction vector $\hat{\mathbf{y}}$ and the residual vector $\mathbf{e}$ are mutually orthogonal ($90^\circ$), the squared length of the total signal equals the sum of the squared lengths of the melody plus the hiss! The coefficient of determination, $R^2$, is simply the percentage of total energy accounted for by the melody. Geometrically, $R^2 = \cos^2(\theta)$, where $\theta$ is the angle between the centered outcome vector and its projection.
+Imagine you manage a real estate agency. You notice that house prices swing wildly: some sell for $200,000, others for $800,000. If you have no information about a newly listed home, your best blind guess is simply the average price of all houses in the city (say, $450,000). The total spread of actual house prices around this baseline average is the **Total Variation** in your market.
 
-However, $R^2$ is one of the most dangerously misinterpreted metrics in all of empirical science. **A high $R^2$ does not imply causality, and a low $R^2$ does not mean your research is useless!** Adding random noise variables (such as astrological signs or coin flips) will mechanically drive $R^2$ upward because the projection space expands with every additional column. This is why **Adjusted $R^2$ ($\bar{R}^2$)** enforces a mathematical penalty: it only rises if a newly added variable explains more variation than what would occur purely by random chance.
+Now, you build a simple regression model using floor area (square footage). Your model predicts that a 3,000 sq ft home should sell for $720,000. When that home actually sells for $750,000, two things happened:
+1. Floor area explained a massive leap: jumping from the baseline $450,000 up to $720,000. This is the **Explained Variation**.
+2. But your model still missed the final sale price by $30,000. That leftover gap is the **Unexplained Residual Noise**.
 
-Crucially, we must untangle the sharp boundary between prediction and causal explanation. In pure predictive machine learning, maximizing $R^2$ is often the primary goal—finding any correlations that help forecast $\hat{y}$. But in econometrics and policy design, $R^2$ is secondary. Consider a randomized controlled trial testing a life-saving cancer immunotherapy: the regression of patient survival on treatment might yield an $R^2$ of only $0.03$ (3%) because human genetics, environmental exposures, and lifestyle choices create massive residual variance. Yet that $3\%$ variance reflects an unconfounded, life-saving causal effect! Conversely, regressing children's reading level on shoe size yields a sky-high $R^2 = 0.85$ purely driven by age. Buying larger shoes will not teach a toddler to read. Prediction seeks the shadow; causal inference seeks the hand casting it.
+The Analysis of Variance (ANOVA) decomposition proves that because your prediction line balances errors perfectly at right angles ($90^\circ$), total market spread splits cleanly into two parts: $\text{Total Spread} = \text{Explained Signal} + \text{Residual Noise}$. The coefficient of determination, $R^2$, is simply the percentage of total price variance captured by your features (e.g., $R^2 = 0.80$ means 80% explained, 20% noise).
 
-بمجرد استقرار المستوى الفائق للانحدار، يتبادر للباحث السؤال الأهم: *ما هي النسبة الحقيقية التي استطاع النموذج تفسيرها من تباين الظاهرة المدروسة؟* يقدم تفكيك تحليل التباين (ANOVA) الإجابة عبر تقسيم التباين الإجمالي إلى مركبتين متعامدتين تمامًا بالاعتماد على **مبرهنة فيثاغورس في فضاء الأبعاد الـ $N$**.
+Crucially, we must untangle predictive accuracy from causal truth. A high $R^2$ does not mean you found the cause! For example, regressing children's reading level on shoe size yields a sky-high $R^2 = 0.85$ purely because older children have larger feet and read better. Buying bigger shoes will not teach a toddler to read. Conversely, an effective medical treatment might explain only 3% of recovery variance ($R^2 = 0.03$) because human genetics vary wildly, yet that 3% represents a life-saving causal impact.
 
-تخيل التباين الإجمالي في المتغير التابع كطاقة صوتية في تسجيل إذاعي. يتكون هذا التسجيل من لحن موسيقي واضح ومفهوم (التباين الذي فسره النموذج ESS) وتشويش إلكتروني مصاحب (بواقي الخطأ SSR). ونظرًا لأن متجه القيم المقدرة $\hat{\mathbf{y}}$ ومتجه البواقي $\mathbf{e}$ متعامدان هندسيًا بزاوية قائمة ($90^\circ$)، فإن مربع طول الإشارة الكلية يساوي تمامًا مجموع مربعي طولي اللحن والتشويش! معامل التحديد $R^2$ هو ببساطة النسبة المئوية للطاقة التي فسرها اللحن، وهندسيًا يمثل $R^2 = \cos^2(\theta)$، حيث $\theta$ هي الزاوية بين المتجه الممركز للنتيجة ومسقطه.
+#### Jargon Decoder
 
-ومع ذلك، يُعد $R^2$ من أكثر المقاييس إساءةً للفهم في البحث التطبيقي؛ **فالقيمة المرتفعة لـ $R^2$ لا تعني أبدًا وجود علاقة سببية، والقيمة المنخفضة لا تعني فشل الدراسة!** إن إضافة متغيرات عشوائية تافهة (كأبراج الحظ أو تقلبات الطقس العشوائية) ترفع $R^2$ ميكانيكيًا لأن فضاء الإسقاط يتسع مع كل عمود جديد. لهذا السبب وُضع **معامل التحديد المعدل ($\bar{R}^2$)**؛ لفرض غرامة رياضية على درجات الحرية المفقودة، فلا يرتفع إلا إذا قدم المتغير الجديد إضافة حقيقية تتجاوز الصدفة المحضة.
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Total Sum of Squares (TSS)** | Total market variation: how wildly actual outcomes spread around the sample average. |
+| **Explained Sum of Squares (ESS)** | Explained signal: how much variance the regression model successfully accounts for. |
+| **Residual Sum of Squares (SSR)** | Leftover noise: the squared errors where the model's predictions missed reality. |
+| **R-squared ($R^2$)** | The scoreboard: the percentage of total variation explained by the model ($0.0$ to $1.0$). |
+| **Adjusted R-squared ($\bar{R}^2$)** | The honest referee: penalizes adding useless features that only memorize random noise. |
 
-وهنا تتجلى الهوة العميقة بين التنبؤ والسببية: في تعلم الآلة التنبؤي، يكون تعظيم $R^2$ هدفًا رئيسيًا للتخمين الدقيق. أما في الاقتصاد القياسي وصنع السياسات، فإن $R^2$ ثانوي تمامًا. تخيل تجربة عشوائية منضبطة لعقار مضاد للسرطان؛ قد يكون معامل التحديد $R^2$ مساويًا لـ $0.03$ فقط (3%) لأن الفروق البيولوجية ونمط الحياة بين المرضى شاسعة، ومع ذلك فإن هذا الأثر الصغير سببي خالص وينقذ آلاف الأرواح! في المقابل، لو قمنا بانحدار مهارة القراءة عند الأطفال على مقاس أحذيتهم، سنحصل على $R^2 = 0.85$ بسبب عامل العمر المشترك، ولكن شراء أحذية أكبر لن يجعل الرضيع يقرأ شكسبير! التنبؤ يرصد حركة الظلال، بينما السببية تفحص اليد التي تحركها.
+```text
+  House Price ($)
+    ^
+    |                                   * Actual Price ($750k)
+    |                                 / |
+    |                                /  | Residual Noise (SSR): $30k gap
+    |                Fitted Value ->/---+ ($720k)
+    |                             /     |
+    |                           /       | Explained Signal (ESS): $270k gain
+    |                         /         |
+    |  - - - - - - - - - - - / - - - - -+ - - Baseline Average (y_bar = $450k)
+    |                      /
+    |                    /
+    0-------------------+-------------------------> Square Footage
+```
+
+### الحدس والقصة الواقعية
+
+تخيل أنك تدير شركة عقارية. تلاحظ أن أسعار المنازل تتفاوت بشدة: بعضها يباع بـ 200,000 دولار وبعضها بـ 800,000 دولار. إذا لم تكن تملك أي معلومة عن منزل معروض للبيع، فإن تخمينك الأولي الوحيد هو متوسط سعر السوق (وليكن 450,000 دولار). هذا التشتت الكلي لأسعار المنازل حول المتوسط يسمى **التباين الإجمالي**.
+
+الآن، قمت بإنشاء نموذج انحدار يعتمد على مساحة المنزل بالقدم المربع. توقع نموذجك أن منزلاً مساحته 3000 قدم مربع سيباع بـ 720,000 دولار. وعندما بيع المنزل فعليًا بـ 750,000 دولار، انقسم الفارق إلى جزأين:
+1. قفزة فسرها النموذج: الانتقال من المتوسط العام (450 ألف) إلى توقع النموذج (720 ألف). هذا هو **التباين المفسَّر**.
+2. فجوة متبقية أخطأ فيها النموذج: الفارق البالغ 30,000 دولار بين الواقع والتوقع. هذا هو **باقي الخطأ العشوائي**.
+
+تثبت مبرهنة تفكيك التباين (ANOVA) أن التباين الكلي ينقسم تمامًا إلى: $\text{التباين الكلي} = \text{الإشارة المفسرة} + \text{التشويش العشوائي}$. ويمثل معامل التحديد $R^2$ النسبة المئوية من تباين السوق التي فسرها النموذج.
+
+والأهم هو إدراك الفرق بين التنبؤ والسببية: ارتفاع $R^2$ لا يعني أبدًا أنك اكتشفت السبب الحقيقي! فانحدار مهارة القراءة عند الأطفال على مقاس أحذيتهم يعطي $R^2 = 0.85$ بسبب عامل العمر المشترك، ولكن شراء أحذية كبيرة لن يعلم الطفل القراءة. وعلى النقيض، قد يعطي دواء منقذ للحياة $R^2 = 0.03$ فقط لتفاوت جينات البشر، ومع ذلك فهو أثر سببي حقيقي ينقذ الأرواح.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **مجموع المربعات الكلي (TSS)** | إجمالي تشتت الظاهرة: مدى ابتعاد القيم الحقيقية عن المتوسط العام للعينة. |
+| **مجموع المربعات المفسر (ESS)** | إشارة النموذج: مقدار التباين الذي نجحت المتغيرات المستقلة في تفسيره. |
+| **مجموع مربعات البواقي (SSR)** | التشويش المتبقي: مجموع أخطاء التنبؤ التي عجز النموذج عن تفسيرها. |
+| **معامل التحديد ($R^2$)** | لوحة النتائج: النسبة المئوية للتباين المفسر بالنموذج (بين 0 و 1). |
+| **معامل التحديد المعدل ($\bar{R}^2$)** | الحكم النزيه: يفرض غرامة على إضافة متغيرات تافهة تعتمد على الصدفة. |
 
 :::simulation-widget{engine="canvas2d" component="ColumnSpaceProjection3D"}
 ---
@@ -41,9 +85,25 @@ highlighted_metric: "loss"
 
 When a regression includes an intercept term $\boldsymbol{\iota}_N$, the residuals sum to zero ($\sum_{i=1}^N e_i = 0$), guaranteeing that the sample mean of fitted values equals the sample mean of outcomes: $\bar{y} = \bar{\hat{y}}$.
 
-### Algebraic Derivation of the ANOVA Pythagorean Identity
+### Why the Math Works Step-by-Step
 
-Express each centered observation $y_i - \bar{y}$ by adding and subtracting the fitted value $\hat{y}_i$:
+1. **Why does the cross-product vanish?**
+   When squaring $((\hat{y}_i - \bar{y}) + e_i)$, the cross-product term is $2 \sum (\hat{y}_i - \bar{y})e_i = 2 (\hat{\mathbf{y}} - \bar{y}\boldsymbol{\iota})^T \mathbf{e}$. Because OLS residuals are strictly orthogonal to the fitted values ($\hat{\mathbf{y}}^T \mathbf{e} = 0$) and sum to zero ($\boldsymbol{\iota}^T \mathbf{e} = 0$), this cross-product is identically zero! Pythagoras in $N$ dimensions guarantees:
+   $$
+   \text{TSS} = \text{ESS} + \text{SSR}
+   $$
+2. **Why does adding random noise always increase unadjusted $R^2$?**
+   Every added variable expands the column space of $\mathbf{X}$. Even if a variable is pure random noise (like coin flips), it has a tiny accidental alignment with $\mathbf{y}$, which decreases SSR and mechanically drives $R^2 = 1 - \frac{\text{SSR}}{\text{TSS}}$ upward.
+3. **How does Adjusted $R^2$ solve this?**
+   Adjusted $R^2$ divides SSR and TSS by their respective degrees of freedom:
+   $$
+   \bar{R}^2 = 1 - \frac{\text{SSR} / (N - p - 1)}{\text{TSS} / (N - 1)}
+   $$
+   Adding a useless variable costs 1 degree of freedom ($N - p - 1$ shrinks), which increases the penalty unless the new variable reduces SSR by more than random chance!
+
+### Algebraic Derivation of the ANOVA Identity
+
+Express each centered observation $y_i - \bar{y}$ by adding and subtracting fitted $\hat{y}_i$:
 
 $$
 y_i - \bar{y} = (\hat{y}_i - \bar{y}) + (y_i - \hat{y}_i) = (\hat{y}_i - \bar{y}) + e_i
@@ -55,44 +115,29 @@ $$
 \sum_{i=1}^N (y_i - \bar{y})^2 = \sum_{i=1}^N (\hat{y}_i - \bar{y})^2 + \sum_{i=1}^N e_i^2 + 2 \sum_{i=1}^N (\hat{y}_i - \bar{y})e_i
 $$
 
-We now prove that the cross-product term is identically zero:
+Because $\sum_{i=1}^N (\hat{y}_i - \bar{y})e_i = \hat{\boldsymbol{\beta}}^T \mathbf{X}^T \mathbf{e} - \bar{y} \sum e_i = 0 - 0 = 0$:
 
 $$
-\sum_{i=1}^N (\hat{y}_i - \bar{y})e_i = \sum_{i=1}^N \hat{y}_i e_i - \bar{y} \sum_{i=1}^N e_i = \hat{\mathbf{y}}^T \mathbf{e} - \bar{y} (\boldsymbol{\iota}_N^T \mathbf{e})
+\text{TSS} = \text{ESS} + \text{SSR} \implies R^2 = \frac{\text{ESS}}{\text{TSS}} = 1 - \frac{\text{SSR}}{\text{TSS}}
 $$
-
-1. By the OLS Normal Equations, $\mathbf{X}^T \mathbf{e} = \mathbf{0}$. Because $\hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol{\beta}}$, we have $\hat{\mathbf{y}}^T \mathbf{e} = (\mathbf{X}\hat{\boldsymbol{\beta}})^T \mathbf{e} = \hat{\boldsymbol{\beta}}^T (\mathbf{X}^T \mathbf{e}) = \hat{\boldsymbol{\beta}}^T \mathbf{0} = 0$.
-2. Because the regression includes an intercept column $\boldsymbol{\iota}_N \in \text{col}(\mathbf{X})$, the first normal equation is $\boldsymbol{\iota}_N^T \mathbf{e} = \sum_{i=1}^N e_i = 0$.
-
-Therefore, the cross-product vanishes completely:
-
-$$
-\sum_{i=1}^N (y_i - \bar{y})^2 = \sum_{i=1}^N (\hat{y}_i - \bar{y})^2 + \sum_{i=1}^N e_i^2 \iff \text{TSS} = \text{ESS} + \text{SSR}
-$$
-
-The coefficient of determination $R^2$ is defined as the explained ratio:
-
-$$
-R^2 \equiv \frac{\text{ESS}}{\text{TSS}} = 1 - \frac{\text{SSR}}{\text{TSS}} \in [0, 1]
-$$
-
-To penalize the artificial inflation caused by adding extra regressors, the degrees-of-freedom **Adjusted $R^2$** ($\bar{R}^2$) scales by degrees of freedom:
-
-$$
-\bar{R}^2 \equiv 1 - \frac{\text{SSR} / (N - p - 1)}{\text{TSS} / (N - 1)} = 1 - (1 - R^2)\left(\frac{N - 1}{N - p - 1}\right)
-$$
-
-A celebrated econometric result shows that adding a regressor increases $\bar{R}^2$ if and only if the absolute value of its $t$-statistic exceeds 1 ($|t| > 1$).
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $\text{TSS}$ (Total Sum of Squares): Total sample variation of the outcome $y_i$ around the grand mean $\bar{y}$, possessing $N - 1$ degrees of freedom.
-* $\text{ESS}$ (Explained Sum of Squares): Variation captured by the fitted model predictions $\hat{y}_i$ around the grand mean $\bar{y}$, possessing $p$ degrees of freedom.
-* $\text{SSR}$ (Sum of Squared Residuals): Unexplained variance of the residuals $e_i = y_i - \hat{y}_i$, possessing $N - p - 1$ degrees of freedom.
-* $N$: Total number of observations in the sample.
-* $p$: Number of explanatory regressor slopes (excluding the constant intercept).
-* $R^2$: Fraction of sample variance explained by the regression plane ($0 \le R^2 \le 1$ when an intercept is included).
-* $\bar{R}^2$: Adjusted coefficient of determination, which can be strictly less than $R^2$ and can even become negative if regressors add pure noise.
+* $\text{TSS} = \sum_{i=1}^N (y_i - \bar{y})^2$: Total Sum of Squares with $N - 1$ degrees of freedom.
+* $\text{ESS} = \sum_{i=1}^N (\hat{y}_i - \bar{y})^2$: Explained Sum of Squares with $p$ degrees of freedom.
+* $\text{SSR} = \sum_{i=1}^N e_i^2$: Residual Sum of Squares with $N - p - 1$ degrees of freedom.
+* $R^2 = 1 - \frac{\text{SSR}}{\text{TSS}}$: Unadjusted sample coefficient of determination.
+* $\bar{R}^2 = 1 - \frac{\text{SSR}/(N - p - 1)}{\text{TSS}/(N - 1)}$: Degrees-of-freedom adjusted $R^2$.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\text{TSS}$ | مجموع المربعات الكلي | قياس تشتت البيانات الأصلية حول متوسطها الحسابي بدرجات حرية $N-1$. |
+| $\text{ESS}$ | مجموع المربعات المفسر | التباين الإيجابي الذي فسره خط الانحدار بدرجات حرية $p$. |
+| $\text{SSR}$ | مجموع مربعات الأخطاء | تباين الفروق العشوائية غير المفسرة بدرجات حرية $N-p-1$. |
+| $R^2$ | معامل التحديد | نسبة التباين المفسر الأصلية غير المعاقبة على كثرة المتغيرات. |
+| $\bar{R}^2$ | معامل التحديد المعدل | المقياس النزيه الذي يعاقب النموذج عند إضافة متغيرات عديمة الفائدة. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -114,56 +159,50 @@ import numpy as np
 
 def compute_r2_anova(y: np.ndarray, y_hat: np.ndarray, p: int) -> dict[str, float]:
     """
-    Computes ANOVA variance components, R^2, and adjusted R^2.
-    
+    Computes the ANOVA variance decomposition, unadjusted R^2, and adjusted R^2.
+
     Parameters
     ----------
     y : np.ndarray of shape (N,)
         Observed target values.
     y_hat : np.ndarray of shape (N,)
-        Model fitted values.
+        Model fitted predictions.
     p : int
-        Number of explanatory slopes (regressors excluding the constant intercept).
-        
+        Number of explanatory slope features (excluding intercept).
+
     Returns
     -------
-    dict with keys:
-        'tss': float, Total Sum of Squares
-        'ess': float, Explained Sum of Squares
-        'ssr': float, Sum of Squared Residuals
-        'r2': float, Coefficient of determination
-        'adj_r2': float, Degrees-of-freedom adjusted R^2
+    dict with keys 'tss', 'ess', 'ssr', 'r2', 'adj_r2'
     """
-    N = len(y)
-    y_bar = float(np.mean(y))
-    
-    # Step 1: Compute Total Sum of Squares (variation about the mean)
-    tss = float(np.sum((y - y_bar) ** 2))
-    
-    # Step 2: Compute Explained Sum of Squares
-    ess = float(np.sum((y_hat - y_bar) ** 2))
-    
-    # Step 3: Compute Residual Sum of Squares (squared length of error vector)
+    n = len(y)
+    y_mean = float(np.mean(y))
+
+    # Step 1: Calculate Total Sum of Squares (spread around average baseline)
+    tss = float(np.sum((y - y_mean) ** 2))
+
+    # Step 2: Calculate Explained Sum of Squares (signal captured by predictions)
+    ess = float(np.sum((y_hat - y_mean) ** 2))
+
+    # Step 3: Calculate Residual Sum of Squares (unexplained error noise)
     ssr = float(np.sum((y - y_hat) ** 2))
-    
+
     # Step 4: Compute unadjusted R^2
     r2 = 1.0 - (ssr / tss) if tss > 0 else 0.0
-    
-    # Step 5: Compute Adjusted R^2 with degrees of freedom correction
-    df_tot = N - 1
-    df_res = N - p - 1
-    
-    if df_res > 0 and tss > 0:
-        adj_r2 = 1.0 - ((ssr / df_res) / (tss / df_tot))
+
+    # Step 5: Compute degrees-of-freedom adjusted R^2
+    df_total = n - 1
+    df_resid = n - p - 1
+    if df_resid > 0 and tss > 0:
+        adj_r2 = 1.0 - ((ssr / df_resid) / (tss / df_total))
     else:
         adj_r2 = 0.0
-        
+
     return {
         "tss": tss,
         "ess": ess,
         "ssr": ssr,
-        "r2": r2,
-        "adj_r2": adj_r2,
+        "r2": float(r2),
+        "adj_r2": float(adj_r2),
     }
 ```
 :::

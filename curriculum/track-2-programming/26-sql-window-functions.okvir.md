@@ -31,6 +31,17 @@ To visualize window execution, imagine a bustling financial trading floor viewed
 
 You achieve multi-level analytic aggregations **without destroying or collapsing a single row of underlying data**!
 
+### Jargon Decoder / قاموس المصطلحات المعمارية
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Window Function (`OVER`)** / الدالة النافذية | Computing an aggregate or ranking metric across a window of rows while keeping every individual row intact. Analogy: Viewing traders from a glass catwalk overhead. | حساب مقاييس إحصائية أو ترتيبية عبر نافذة من الصفوف مع الحفاظ على كل صف بمفرده. التشبيه: مراقبة المتداولين من ممشى زجاجي علوي دون مقاطعتهم. |
+| **`PARTITION BY`** / التقسيم التحليلي | Grouping rows into isolated subsets for window calculation without collapsing rows. Analogy: Drawing chalk circles around department desks on the office floor. | تقسيم الصفوف إلى مجموعات فرعية لحساب مقاييس النافذة دون دمج الصفوف. التشبيه: رسم دوائر طباشيرية تفصل مكاتب كل قسم في قاعة الشركة. |
+| **Row Cardinality Preservation** / الحفاظ التام على عدد الصفوف | The invariant that the query outputs exactly 1 row for every 1 input row ($|\text{Output}| = |R|$). Analogy: Taking a group photo where everyone stays in the picture. | الثابت المعماري: خروج صف ناتج مقابل كل صف مدخل دون أي نقصان في العدد. التشبيه: التقاط صورة جماعية يظهر فيها كل فرد بمفرده دون استثناء أحد. |
+| **`DENSE_RANK()` vs `RANK()`** / الترتيب الكثيف مقابل الترتيب الفجوي | Dense rank produces continuous numbers ($1, 2, 2, 3$); Rank leaves gaps for ties ($1, 2, 2, 4$). Analogy: Podium medals vs sports tournament tiebreaker slots. | الترتيب الكثيف يعطي أرقاماً متتابعة بلا فجوات، بينما يترك الترتيب العادي فجوات بعد التعادل. التشبيه: منح ميداليات المراكز المتتابعة مقابل بطولات التنس. |
+| **Sliding Window Frame (`ROWS BETWEEN`)** / إطار النافذة المنزلق | Specifying how many preceding and following rows are included in the rolling aggregation. Analogy: An inspection magnifying glass sliding down a line of receipts. | تحديد عدد الصفوف السابقة واللاحقة المشمولة في الحساب التراكمي المتحرك. التشبيه: عدسة مكبرة تنزلق فوق شريط الإيصالات خطوة بخطوة. |
+| **Running Accumulator** / المجمع الإحصائي المتدفق | In-memory register updating running totals in $\mathcal{O}(1)$ as rows stream by. Analogy: A handheld clicker counter used by a flight attendant. | مسجل ذاكرة سريع يحدّث المجاميع التراكمية في زمن ثابت أثناء تدفق الصفوف. التشبيه: عداد نقرات يدوي في يد مضيف الطائرة لعد الركاب. |
+
 :::simulation-widget{engine="canvas2d" component="WindowFunctionFrameLab"}
 ---
 interactive: true
@@ -61,6 +72,34 @@ $$
 \mathcal{W}_f(t) = f\Big( \big\{ s \in R \mid p(s) = p(t) \land s \in \text{Frame}(t) \big\} \Big), \quad \text{DENSE\_RANK}(t) = 1 + \big| \{ v \in \text{vals}(p(t)) \mid v > t.\text{val} \} \big|
 $$
 
+```text
+Visual ASCII Transformation: GROUP BY Hydraulic Compactor vs Window Function Catwalk:
+
+Input Table: employees(id, dept, salary)
+  id | dept  | salary
+  ---+-------+-------
+   1 | Eng   | 150000
+   2 | Eng   | 120000
+   3 | Sales | 100000
+   4 | Sales |  80000
+
+Approach 1: GROUP BY dept, AVG(salary)  (Hydraulic Compactor):
+  dept  | avg_salary
+  ------+-----------
+  Eng   | 135000     <- CRUSHED! Individual names, IDs, and salaries are PERMANENTLY DESTROYED!
+  Sales |  90000
+  Output Rows = 2  (Cardinality reduced from 4 to 2!)
+
+Approach 2: Window Function AVG(salary) OVER (PARTITION BY dept)  (Glass Catwalk):
+  id | dept  | salary | dept_avg | gap_to_avg
+  ---+-------+--------+----------+-----------
+   1 | Eng   | 150000 |   135000 |   +15000   <- Every individual row is preserved!
+   2 | Eng   | 120000 |   135000 |   -15000   <- Every employee gets the cohort metric!
+   3 | Sales | 100000 |    90000 |   +10000
+   4 | Sales |  80000 |    90000 |   -10000
+  Output Rows = 4  (Strict 1-to-1 Bijective Cardinality Preservation!)
+```
+
 ### Mathematical Invariants & Symbol Breakdown
 
 | الرمز / Symbol | المجال والتعريف الرياضي / Mathematical Domain | الدور الهندسي والمعماري / Data Engineering & Architectural Role | الشرح الدقيق بالعربية / Arabic Explanation |
@@ -73,9 +112,17 @@ $$
 | $\text{DENSE\_RANK}$ | Dense ranking sequence | Strict consecutive integers: $1, 2, 2, 3$ (no gaps after ties) | ترقيم ترتيبي متصل دون فجوات عند تكرار نفس القيمة |
 | $\text{RANK}$ | Sparse ranking sequence | Gap-introducing integers: $1, 2, 2, 4$ (leaves gap equal to tied count) | ترقيم ترتيبي يترك فجوات مساوية لعدد القيم المكررة |
 
-The definitive relational invariant of window functions is **Row Cardinality Preservation**: $|\text{Output}| = |R|$. Unlike `GROUP BY` which reduces cardinality to $|\mathcal{K}| \ll |R|$, a window function guarantees a strict bijective 1-to-1 mapping between input rows and output rows.
-
-الثابت الرياضي القاطع للدوال النافذية هو **الحفاظ الكامل على عدد الصفوف**: $|\text{Output}| = |R|$. فعلى عكس `GROUP BY` التي تقلص عدد الصفوف إلى عدد المجموعات $|\mathcal{K}| \ll |R|$، تضمن الدوال النافذية علاقة تقابلية تامة تخرج صفاً واحداً مقابلاً لكل صف دخل في المعالجة.
+#### Step-by-Step Arithmetic Cost & Invariant Breakdown:
+1. **Self-Join vs Window Streaming Complexity**:
+   - **Self-Join Pipeline**:
+     $$\text{Cost} = \text{Scan}_1(N) + \text{Aggregate}(N) + \text{Materialize Hash Table}(|\mathcal{K}|) + \text{Scan}_2(N) + \text{Join Probe}(N)$$
+     For $N = 20,000,000$ and $120\text{ GB}$ state, this spills to disk and requires **45 minutes**.
+   - **Window Pipeline**:
+     $$\text{Cost} = \text{Sort by Partition}(N \log N) + \text{Streaming Scan}(N)$$
+     Keeps running metrics in $\mathcal{O}(1)$ register accumulator memory $\implies$ **5.8 seconds (a 465x acceleration!)**.
+2. **Cardinality Bijective Mapping Invariant**:
+   $$|\text{Output}| \equiv |R|$$
+   A window function never adds, duplicates, or destroys rows.
 
 ## Beat 3: Interactive Code Challenge
 
@@ -94,14 +141,14 @@ test_cases:
 -- Schema: employees(emp_id, dept_name, emp_name, salary)
 
 SELECT
-    -- Step 1: Base columns emp_id, dept_name, emp_name, salary
-    -- Step 2: Departmental salary rank:
-    --         DENSE_RANK() OVER (PARTITION BY dept_name ORDER BY salary DESC) AS dept_salary_rank
-    -- Step 3: Difference between maximum departmental salary and current employee salary:
-    --         ROUND(MAX(salary) OVER (PARTITION BY dept_name) - salary, 2) AS salary_gap_to_max
+    emp_id,
+    dept_name,
+    emp_name,
+    salary,
+    DENSE_RANK() OVER (PARTITION BY dept_name ORDER BY salary DESC) AS dept_salary_rank,
+    ROUND(MAX(salary) OVER (PARTITION BY dept_name) - salary, 2) AS salary_gap_to_max
 FROM employees
--- Step 4: ORDER BY dept_name ASC, dept_salary_rank ASC, salary DESC, emp_id ASC
-;
+ORDER BY dept_name ASC, dept_salary_rank ASC, salary DESC, emp_id ASC;
 ```
 :::
 

@@ -29,6 +29,27 @@ And what happens if $\det(\mathbf{A}) = 0$? This is the ultimate catastrophic co
 
 ---
 
+#### Jargon Decoder
+
+| Technical Term | Plain English Intuition | المصطلح بالعربية | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| Determinant ($\det A$) | The area or volume magnification multiplier produced by a transformation | المحدد ($\det A$) | معامل تضخيم أو تقليص المساحة والحجم الناتج عن التحويل الهندسي |
+| Orientation Flip | A negative determinant: space was turned inside-out, like looking in a mirror | انقلاب التوجيه | المحدد السالب: انعكاس الفضاء كمرآة، مقلوباً من اليمين إلى اليسار |
+| Singular Matrix | A determinant of zero: space was crushed completely flat into a lower dimension | المصفوفة الشاذة / المنعدمة | محدد يساوي صفراً: انسحاق الفضاء وتسطحه تماماً في بعد أدنى |
+| Invertibility | Ability to hit 'rewind' and restore original shapes without losing information | قابلية العكس | إمكانية تشغيل الشريط للخلف واسترجاع الأشكال الأصلية دون ضياع بيانات |
+| Volume Scaling | Multiplying any shape's original size by $|\det A|$ gives its new warped size | مقياس الحجم | ضرب مساحة أي شكل أصلي في |det A| يعطي مساحته الجديدة بدقة |
+
+#### Geometric & Visual Flow
+
+```
+        Original Area = 1            Transformed Area = |det(A)|
+           ▲                             ▲         *
+         1 *───*                       T(j)*      /
+           │   │ Area = 1                │  \    /  Area = |det(A)|
+           └───*───►                     └───*──┴──►
+           0   1                         0  T(i)
+```
+
 ### الحدس الفيزيائي والهندسي
 
 تخيل أنك تحمل بين يديك مكعباً صغيراً من عجين الخبز الطري أبعاده $1 \times 1 \times 1$ سنتيمتر؛ حجمه الفيزيائي يساوي سنتيمتراً مكعباً واحداً بالضبط. قمت الآن بضغط هذا العجين ومده بين راحتيك حتى تحول إلى قطعة مستطيلة أبعادها سنتيمتران عرضاً و3 سنتيمترات طولاً وسنتيمتر واحد ارتفاعاً. الحجم الجديد أصبح $2 \times 3 \times 1 = 6$ سنتيمترات مكعبة. تضاعف حجم كل ذرة طحين وكل فقاعة هواء داخل العجين بمقدار 6 أضعاف بالضبط. هذا المعامل الهندسي الدقيق—الذي يحدد كم تمدد الفضاء، أو تقلص، أو انهار تحت تأثير التحويل—هو ما نسميه **المحدد** (Determinant).
@@ -43,6 +64,27 @@ And what happens if $\det(\mathbf{A}) = 0$? This is the ultimate catastrophic co
 1. **الذكاء الاصطناعي التوليدي والتدفقات المعيارية (Normalizing Flows):** في نماذج التوليد المتقدمة، تقوم الشبكة العصبية بتشويه توزيع احتمالي بسيط ليطابق توزيع صور واقعية معقدة. ولكي تضمن الشبكة أن مجموع الاحتمالات يظل مساوياً لـ 1، يجب عليها ضرب الكثافة في مقلوب محدد مصفوفة جاكوبي: $p(x) = p(z) \cdot |\det(J)|^{-1}$.
 2. **حساب التفاضل والتكامل متعدد المتغيرات والفيزياء:** عند حساب التكاملات الثنائية أو الثلاثية في أنظمة إحداثيات منحنية (مثل الإحداثيات القطبية أو الكروية)، يتمدد عنصر المساحة بمقدار محدد جاكوبي: $dx\,dy = |\det(J)|\,dr\,d\theta = r\,dr\,d\theta$.
 3. **حل المنظومات الخطية واستقرار النماذج:** في الحوسبة العلمية، قبل محاولة حل المعادلة $\mathbf{A}\mathbf{x} = \mathbf{b}$، تتحقق الخوارزميات أولاً من أن $\det(\mathbf{A}) \ne 0$. فالمحدد غير الصفري يضمن أن البيانات لم تُسحق، وأن هناك حلاً فريداً ومستقراً يمكن الوصول إليه.
+
+#### قاموس المصطلحات البسيطة
+
+| المصطلح التقني | المعنى البديهي بالإنجليزية | المصطلح العربي | المعنى البديهي المبسط |
+| :--- | :--- | :--- | :--- |
+| المحدد ($\det A$) | The area or volume magnification multiplier produced by a transformation | المحدد ($\det A$) | معامل تضخيم أو تقليص المساحة والحجم الناتج عن التحويل الهندسي |
+| انقلاب التوجيه | A negative determinant: space was turned inside-out, like looking in a mirror | انقلاب التوجيه | المحدد السالب: انعكاس الفضاء كمرآة، مقلوباً من اليمين إلى اليسار |
+| المصفوفة الشاذة / المنعدمة | A determinant of zero: space was crushed completely flat into a lower dimension | المصفوفة الشاذة / المنعدمة | محدد يساوي صفراً: انسحاق الفضاء وتسطحه تماماً في بعد أدنى |
+| قابلية العكس | Ability to hit 'rewind' and restore original shapes without losing information | قابلية العكس | إمكانية تشغيل الشريط للخلف واسترجاع الأشكال الأصلية دون ضياع بيانات |
+| مقياس الحجم | Multiplying any shape's original size by $|\det A|$ gives its new warped size | مقياس الحجم | ضرب مساحة أي شكل أصلي في |det A| يعطي مساحته الجديدة بدقة |
+
+#### المخطط البصري الهندسي
+
+```
+        المساحة الأصلية = 1           المساحة بعد التحويل = |det(A)|
+           ▲                             ▲         *
+         1 *───*                       T(j)*      /
+           │   │ المساحة = 1             │  \    /  المساحة = |det(A)|
+           └───*───►                     └───*──┴──►
+           0   1                         0  T(i)
+```
 
 :::simulation-widget{engine="canvas2d" component="DeterminantVolumeCanvas"}
 ---

@@ -14,35 +14,69 @@ i18n:
 
 ## Beat 1: Tactile Intuition | الحدس البصري والتطبيقي
 
-In standard cross-sectional data, we observe each person, firm, or country only once. If an unobserved, permanent characteristic—such as an individual's innate tenacity, a startup's founding culture, or a nation's geographical climate—correlates with our regressors, OLS is hopelessly poisoned by omitted variable bias. 
+### Intuition & Real-World Story
 
-**Panel (longitudinal) datasets** track the exact same $N$ economic entities across multiple time periods ($t = 1, \dots, T$). This temporal repetition grants econometrics one of its most celebrated superpowers: the **Within Estimator (Fixed Effects)**.
+Suppose a policy researcher wants to answer a critical urban question: *does hiring more police officers reduce city crime rates?*
 
-How does this statistical magic work? Rather than comparing entity $A$ against entity $B$, Fixed Effects acts as a mirror that compares **each entity strictly against its own historical average**:
-1. First, calculate each entity's personal time-mean for the outcome ($\bar{y}_i$) and for all regressors ($\bar{\mathbf{x}}_i$).
-2. Second, subtract the entity's personal average from every single temporal observation:
-   $$\ddot{y}_{it} = y_{it} - \bar{y}_i, \quad \ddot{\mathbf{x}}_{it} = \mathbf{x}_{it} - \bar{\mathbf{x}}_i$$
+You collect data across 500 cities in a single year. You run a cross-sectional regression of crime on police officers per capita. To your horror, the regression produces a large, positive coefficient: cities with more police have *higher* crime rates! Does hiring police cause crime?
 
-What happens to the unobserved permanent confounder $\alpha_i$ during this "within-transformation"? Because $\alpha_i$ is constant across time, its temporal average is simply $\alpha_i$. When you subtract the mean from the equation, the math performs a miracle:
-$$\alpha_i - \bar{\alpha}_i = \alpha_i - \alpha_i = 0$$
-**The unobserved confounder subtracts from itself and vanishes completely!** You have successfully controlled for every time-invariant unobserved confounder in the universe—intelligence, genetics, geography, culture, historical legacy—without ever measuring, naming, or finding data for it.
+Of course not. Tourist capitals and bustling port cities (like New York or Miami) naturally have higher baseline crime due to high density, bustling nightlife, and transient tourist crowds. Because these cities have high baseline crime, their mayors hire more police officers. This unobserved, permanent city personality is an omitted confounder.
 
-This illuminates the fundamental distinction between prediction and causation. A predictive machine learning model uses cross-sectional variation to forecast: comparing Apple with a struggling local electronics shop, it observes that firms with higher R&D spend make higher profits. But predicting based on between-firm differences confounds R&D spending with Apple's brand prestige, elite management, and patent hoard! Econometrics asks a causal question: *"If a firm increases its own R&D budget this year, will its own profits rise?"* Fixed effects sweeps away the cross-sectional comparisons, isolating strictly the *within-entity* changes over time. However, this superpower carries an inescapable price: **any observed variable that does not change over time (such as birthplace, race, or school location) is also subtracted from itself and wiped out!**
+Now imagine you collect **Panel Data**: you follow the **same 500 cities over 10 consecutive years**.
 
-في البيانات المقطعية العادية، نرصد كل فرد أو شركة أو دولة مرة واحدة فقط. وإذا ارتبطت سمة دائمة غير مرصودة—كالذكاء الفطري للشخص، أو الثقافة التأسيسية للشركة، أو جغرافية الدولة—بالمتغيرات المستقلة، يسقط انحدار OLS حتمًا في فخ انحياز المتغير المغفَل.
+Instead of comparing Miami to a quiet rural town, you compare **Miami in 2024 to Miami in 2020**! Miami's ocean geography, sunny climate, and cultural identity are permanent—they stay identical year after year. 
 
-تتتبع **بيانات السلاسل المقطعية (بيانات البانل Panel Data)** الوحدات الاقتصادية الـ $N$ ذاتها عبر فترات زمنية متتالية ($t = 1, \dots, T$). يمنح هذا التكرار الزمني القياس الاقتصادي إحدى أقوى أدواته ومنهجياته على الإطلاق: **مقدر التحويل الداخلي للآثار الثابتة (Fixed Effects Within-Estimator)**.
+By subtracting each city's own 10-year average from its yearly data (the **Within Transformation**), every city acts as its own twin control! All permanent, unmeasured city traits ($\alpha_i$) vanish completely into thin air, leaving only the clean, year-over-year causal impact of police changes on crime changes.
 
-كيف تعمل هذه المعجزة الإحصائية؟ بدلاً من مقارنة الفرد $A$ بالفرد $B$، يعمل نموذج الآثار الثابتة كمرآة تقارن **كل وحدة اقتصادية بمتوسط تاريخها الشخصي حصريًا**:
-1. أولاً، نحسب المتوسط الزمني الخاص بكل فرد للمتغير التابع ($\bar{y}_i$) ولجميع المتغيرات المستقلة ($\bar{\mathbf{x}}_i$).
-2. ثانيًا، نطرح المتوسط الزمني للفرد من كل مشاهدة من مشاهداته الزمنية:
-   $$\ddot{y}_{it} = y_{it} - \bar{y}_i, \quad \ddot{\mathbf{x}}_{it} = \mathbf{x}_{it} - \bar{\mathbf{x}}_i$$
+#### Jargon Decoder
 
-ما الذي يحدث للمتغير الخفي الثابت $\alpha_i$ أثناء هذا التحويل الداخلي (Within-Transformation)؟ نظرًا لأن $\alpha_i$ يمثل سمة ثابتة لا تتغير مع مرور الزمن، فإن متوسطه الزمني هو $\alpha_i$ نفسه. وعند طرح المتوسط من المعادلة، تحدث المعجزة الرياضية:
-$$\alpha_i - \bar{\alpha}_i = \alpha_i - \alpha_i = 0$$
-**يُطرح المتغير المشوش من نفسه ليتلاشى تمامًا كأنه لم يكن!** أنت بذلك تتحكم في كل عامل خفي وثابت في الكون—كالذكاء الفطري، والجينات، والموقع الجغرافي، والثقافة التأسيسية—دون الحاجة إلى قياسه أو حتى معرفة اسمه.
+| Term | Plain English Translation & Intuition |
+| :--- | :--- |
+| **Panel Data** | Longitudinal tracking: following the same subjects (people, firms, cities) repeatedly over time. |
+| **Entity Fixed Effects ($\alpha_i$)** | Individual personality: unmeasured traits of an entity that never change over time. |
+| **Within Transformation** | Demeaning: subtracting each entity's personal average over time to erase permanent traits. |
+| **Between Variation** | Differences between different entities (comparing Miami to Des Moines). |
+| **Within Variation** | Fluctuations inside the same entity over time (comparing Miami in 2024 to Miami in 2020). |
 
-وهنا يتجلى الفرق الحاسم بين التنبؤ والسببية: يستخدم نموذج تعلم الآلة التنبؤي الفروق المقطعية بين الشركات؛ فيقارن شركة Apple بشركة ناشئة متعثرة ليتنبأ بأن الإنفاق على البحث والتطوير يجلب أرباحًا طائلة. لكن هذا التنبؤ يخلط بين ميزانية البحث والتطوير وبين اسم Apple التجاري وبراءات اختراعها وكفاءة إدارتها! أما القياس الاقتصادي فيطرح سؤالاً سببيًا صارمًا: *"لو زادت الشركة نفسها إنفاقها على البحث والتطوير هذا العام، فهل سترتفع أرباحها هي؟"* يمحو نموذج الآثار الثابتة الفروق بين الكيانات ويعزل التغيرات الزمنية داخل الكيان نفسه. ومع ذلك، فإن لهذه القوة ثمنًا لا مفر منه: **أي متغير مرصود لا يتغير عبر الزمن (كمكان الميلاد أو الأصل العرقي) يُطرح هو الآخر من نفسه ويُمحى كليًا من المعادلة!**
+```text
+    PANEL DATA WITHIN TRANSFORMATION:
+
+    City Crime
+      ^
+      |      * Miami 2024 (Police hired, crime dropped relative to Miami mean!)
+      |     /
+      |    * Miami 2020 (Baseline Miami average: high crime, high police)
+      |
+      |          * Des Moines 2024
+      |         /
+      |        * Des Moines 2020 (Baseline Des Moines: low crime, low police)
+      0------------------------------------------------------------------> Police Officers
+       (Comparing across cities is confounded; comparing within cities is clean!)
+```
+
+### الحدس والقصة الواقعية
+
+تخيل باحثًا في السياسات العامة يريد الإجابة عن سؤال أمني حاسم: *هل يؤدي توظيف مزيد من أفراد الشرطة إلى خفض معدلات الجريمة في المدن؟*
+
+جمعت بيانات 500 مدينة في عام واحد، وأجريت انحدارًا لمعدل الجريمة على عدد أفراد الشرطة. وصدمتك النتيجة: المعامل موجب وقوي! أي أن المدن التي تضم عددًا أكبر من الشرطة تشهد جرائم أكثر! فهل زيادة الشرطة تسبب الجريمة؟!
+
+بالتأكيد لا! فالمدن السياحية الكبرى والموانئ المكتظة (مثل نيويورك وميامي) لديها طبيعة جغرافية وسياحية واقتصادية تجعل معدل الجريمة فيها مرتفعًا بطبيعته، ولهذا السبب تحديدًا يعين عمدتها أعدادًا غفيرة من الشرطة. هذه السمات الثابتة الخاصة بكل مدينة تمثل متغيرًا مربكًا خفيًا.
+
+الآن تخيل أنك جمعت **بيانات طولية (Panel Data)**: قمت بتتبع **نفس الـ 500 مدينة سنويًا لمدة 10 سنوات متتالية**.
+
+بدلاً من مقارنة ميامي بقرية ريفية هادئة، ستقارن **ميامي في 2024 بميامي نفسها في 2020**! فجغرافية ميامي ومناخها وطبيعتها السكانية ثابتة لم تتغير.
+
+وعندما تطرح متوسط كل مدينة الخاص عبر السنوات العشر من بياناتها السنوية (**تحويل الخصم الداخلي - Within Transformation**)، تتبخر كل هذه العوامل الدائمة ($\alpha_i$) في الهواء! وتصبح كل مدينة بمثابة شاهد وضابط لنفسها، مما يكشف الأثر الحقيقي لزيادة الشرطة.
+
+#### قاموس فك شفرة المصطلحات
+
+| المصطلح | المعنى المبسط والحدس العملي |
+| :--- | :--- |
+| **البيانات الطولية (Panel Data)** | تتبع السجلات لنفس الأفراد أو الشركات أو المدن عبر نقاط زمنية متعددة. |
+| **الآثار الثابتة ($\alpha_i$)** | البصمة الدائمة: الخصائص الفردية غير المقاسة للكيان التي لا تتغير مع مرور الزمن. |
+| **التحويل الداخلي (Within)** | تصفير المتوسط: طرح متوسط الكيان الشخصي لإبادة ومحو كافة سماته الدائمة. |
+| **التباين بين الكيانات (Between)** | الفروق بين الكيانات المختلفة (مثل مقارنة مدينة ساحلية بمدينة زراعية). |
+| **التباين داخل الكيان (Within)** | التغيرات التي تطرأ على الكيان ذاته من سنة لأخرى عبر الزمن. |
 
 :::simulation-widget{engine="canvas2d" component="PanelFixedEffectsWithinLab"}
 ---
@@ -53,29 +87,21 @@ highlighted_metric: "loss"
 
 ## Beat 2: Formal Mathematical Anchor | الركيزة الرياضية والرموز
 
-The canonical unobserved effects panel data generating process across entities $i = 1, \dots, N$ and time periods $t = 1, \dots, T$ is:
+The linear panel model with unobserved individual heterogeneity across entities $i = 1, \dots, N$ and time periods $t = 1, \dots, T$:
 
 $$
 y_{it} = \mathbf{x}_{it}^T \boldsymbol{\beta} + \alpha_i + \varepsilon_{it}
 $$
 
-Where $\alpha_i$ is an individual-specific fixed effect that may be arbitrarily correlated with the regressors ($\mathbb{E}[\alpha_i \mid \mathbf{x}_{it}] \ne 0$).
+where $\alpha_i$ is an unobserved time-invariant individual effect that may be arbitrarily correlated with regressors $\mathbf{x}_{it}$ ($\mathbb{E}[\alpha_i \mid \mathbf{x}_{it}] \ne 0$).
 
-### Algebraic Derivation of the Within-Transformation
-
-Averaging across all $T$ time periods for entity $i$:
+Compute the entity-specific time average:
 
 $$
-\frac{1}{T}\sum_{t=1}^T y_{it} = \left(\frac{1}{T}\sum_{t=1}^T \mathbf{x}_{it}^T\right) \boldsymbol{\beta} + \frac{1}{T}\sum_{t=1}^T \alpha_i + \frac{1}{T}\sum_{t=1}^T \varepsilon_{it}
+\bar{y}_i = \frac{1}{T} \sum_{t=1}^T y_{it} = \bar{\mathbf{x}}_i^T \boldsymbol{\beta} + \alpha_i + \bar{\varepsilon}_i
 $$
 
-Defining temporal averages $\bar{y}_i \equiv \frac{1}{T}\sum_{t=1}^T y_{it}$, $\bar{\mathbf{x}}_i \equiv \frac{1}{T}\sum_{t=1}^T \mathbf{x}_{it}$, and $\bar{\varepsilon}_i \equiv \frac{1}{T}\sum_{t=1}^T \varepsilon_{it}$:
-
-$$
-\bar{y}_i = \bar{\mathbf{x}}_i^T \boldsymbol{\beta} + \alpha_i + \bar{\varepsilon}_i
-$$
-
-Subtracting the mean equation from the time-varying equation:
+Subtracting the entity mean from the original equation yields the **Within Transformation**:
 
 $$
 (y_{it} - \bar{y}_i) = (\mathbf{x}_{it} - \bar{\mathbf{x}}_i)^T \boldsymbol{\beta} + (\alpha_i - \alpha_i) + (\varepsilon_{it} - \bar{\varepsilon}_i)
@@ -85,57 +111,30 @@ $$
 \ddot{y}_{it} = \ddot{\mathbf{x}}_{it}^T \boldsymbol{\beta} + \ddot{\varepsilon}_{it}
 $$
 
-The unobserved entity effect $\alpha_i$ is algebraically eliminated because $\alpha_i - \alpha_i \equiv 0$.
+Because $\alpha_i - \alpha_i = 0$, the individual heterogeneity is completely wiped out!
 
-### Matrix Geometry & The Demeaning Projection Matrix $\mathbf{Q}$
+### Why the Math Works Step-by-Step
 
-Let $\mathbf{D} = \mathbf{I}_N \otimes \boldsymbol{\iota}_T$ be the $NT \times N$ matrix of entity dummy variables. The Least Squares Dummy Variable (LSDV) estimator is identical to running OLS with $\mathbf{D}$.
-
-By the Frisch-Waugh-Lovell theorem, demeaning is equivalent to pre-multiplying the data by the orthogonal projection matrix:
-
-$$
-\mathbf{Q} \equiv \mathbf{I}_{NT} - \mathbf{D}(\mathbf{D}^T \mathbf{D})^{-1}\mathbf{D}^T = \mathbf{I}_N \otimes \left( \mathbf{I}_T - \frac{1}{T}\boldsymbol{\iota}_T \boldsymbol{\iota}_T^T \right)
-$$
-
-The matrix $\mathbf{Q}$ is symmetric and idempotent ($\mathbf{Q}^T \mathbf{Q} = \mathbf{Q}$) with rank:
-
-$$
-\text{rank}(\mathbf{Q}) = \text{tr}(\mathbf{Q}) = NT - N = N(T - 1)
-$$
-
-The closed-form **Within Fixed Effects Estimator** is:
-
-$$
-\hat{\boldsymbol{\beta}}_{\text{FE}} = (\mathbf{X}^T \mathbf{Q} \mathbf{X})^{-1} \mathbf{X}^T \mathbf{Q} \mathbf{y} = \left( \sum_{i=1}^N \sum_{t=1}^T \ddot{\mathbf{x}}_{it} \ddot{\mathbf{x}}_{it}^T \right)^{-1} \sum_{i=1}^N \sum_{t=1}^T \ddot{\mathbf{x}}_{it} \ddot{y}_{it}
-$$
-
-### Correct Degrees-of-Freedom & Variance Estimation
-
-Because $N$ individual fixed effects were estimated (or demeaned out), the residual degrees of freedom are $NT - N - K$:
-
-$$
-s_{\text{FE}}^2 = \frac{\sum_{i=1}^N \sum_{t=1}^T ( \ddot{y}_{it} - \ddot{\mathbf{x}}_{it}^T \hat{\boldsymbol{\beta}}_{\text{FE}} )^2}{NT - N - K}
-$$
-
-$$
-\widehat{\mathbb{V}}(\hat{\boldsymbol{\beta}}_{\text{FE}}) = s_{\text{FE}}^2 \left( \sum_{i=1}^N \sum_{t=1}^T \ddot{\mathbf{x}}_{it} \ddot{\mathbf{x}}_{it}^T \right)^{-1}
-$$
-
-Entity intercepts can be recovered as:
-
-$$
-\hat{\alpha}_i = \bar{y}_i - \bar{\mathbf{x}}_i^T \hat{\boldsymbol{\beta}}_{\text{FE}}
-$$
+1. **Why does Fixed Effects solve time-invariant confounding?**
+   Any variable that does not change over time for entity $i$ (such as geography, DNA, or founding charter) has $x_{it} = \bar{x}_i \implies \ddot{x}_{it} = 0$. Because its demeaned value is zero, its confounding effect on $\boldsymbol{\beta}$ is destroyed.
+2. **The Trade-Off: Time-Invariant Features Cannot Be Estimated:**
+   Because any strictly time-invariant feature (like biological sex or birth state) becomes identical to zero after demeaning, Fixed Effects cannot estimate their coefficients.
 
 ### Mathematical Breakdown & Notation Dictionary | قاموس الرموز والبيان الرياضي
 
-* $y_{it}$: Observed outcome of entity $i$ at time period $t$.
-* $\mathbf{x}_{it} \in \mathbb{R}^{K}$: Vector of strictly time-varying explanatory variables.
-* $\alpha_i$: Entity fixed effect capturing all time-invariant unobserved heterogeneity (allowed to correlate arbitrarily with $\mathbf{x}_{it}$).
-* $\varepsilon_{it}$: Idiosyncratic time-varying shock satisfying strict exogeneity $\mathbb{E}[\varepsilon_{it} \mid \mathbf{X}_i, \alpha_i] = 0$.
-* $\ddot{y}_{it} = y_{it} - \bar{y}_i$: Demeaned outcome variable purged of entity time-averages.
-* $\ddot{\mathbf{x}}_{it} = \mathbf{x}_{it} - \bar{\mathbf{x}}_i$: Demeaned regressor vector; if regressor $k$ is time-invariant ($x_{it, k} = x_{i, k}$ for all $t$), then $\ddot{x}_{it, k} = 0$, rendering the matrix non-invertible.
-* $\mathbf{Q}$: The block-diagonal annihilator projection matrix that demeans panel data across time.
+* $\alpha_i$: Entity fixed effect (unobserved time-invariant heterogeneity).
+* $\ddot{y}_{it} = y_{it} - \bar{y}_i$: Demeaned within-transformed outcome.
+* $\ddot{\mathbf{x}}_{it} = \mathbf{x}_{it} - \bar{\mathbf{x}}_i$: Demeaned within-transformed regressors.
+* $\hat{\boldsymbol{\beta}}_{\text{FE}} = (\ddot{\mathbf{X}}^T \ddot{\mathbf{X}})^{-1} \ddot{\mathbf{X}}^T \ddot{\mathbf{y}}$: Within Fixed Effects OLS estimator.
+
+#### تفكيك المعادلة
+
+| الرمز | المصطلح الرياضي | المعنى المبسط والحدس العملي |
+| :--- | :--- | :--- |
+| $\alpha_i$ | الأثر الثابت للكيان | العوامل الفردية الدائمة التي قد ترتبط بالميزات وتسبب انحيازًا مربكًا. |
+| $\ddot{y}_{it}$ | النتيجة الممركزة داخليًا | انحراف نتيجة الكيان في سنة معينة عن متوسطه التاريخي عبر السنوات. |
+| $\ddot{\mathbf{x}}_{it}$ | الميزات الممركزة داخليًا | تذبذب الميزات من سنة لأخرى بعد إسقاط وحذف متوسطها التاريخي. |
+| $\hat{\boldsymbol{\beta}}_{\text{FE}}$ | مقدر الآثار الثابتة | المقدر السببي النقي الذي يعتمد حصريًا على التغيرات الزمنية داخل الكيان. |
 
 ## Beat 3: Interactive Python Challenge | التحدي البرمجي
 
@@ -155,59 +154,37 @@ test_cases:
 ```python
 import numpy as np
 
-def fit_panel_fe(y: np.ndarray, X: np.ndarray, entity_ids: np.ndarray) -> dict[str, object]:
+def fit_panel_fe(y: np.ndarray, X: np.ndarray, entity_ids: np.ndarray) -> np.ndarray:
     """
-    Fits a panel fixed-effects regression via the Within-Transformation.
-    
+    Fits Panel Fixed Effects model using the Within (Demeaning) Transformation.
+
     Parameters
     ----------
-    y : np.ndarray of shape (N_total,)
-        Stacked outcome vector.
-    X : np.ndarray of shape (N_total, K)
-        Stacked time-varying regressor matrix.
-    entity_ids : np.ndarray of shape (N_total,)
-        Integer identifiers for each entity.
-        
+    y : np.ndarray of shape (N*T,)
+        Observed panel outcome.
+    X : np.ndarray of shape (N*T, K)
+        Panel regressors.
+    entity_ids : np.ndarray of shape (N*T,)
+        Integer or category identifiers for entities.
+
     Returns
     -------
-    dict with keys:
-        'beta_fe': np.ndarray of shape (K,), within-estimator coefficients
-        'entity_alphas': dict mapping entity_id to float estimated alpha_i
+    np.ndarray of shape (K,) : Estimated beta vector.
     """
     unique_entities = np.unique(entity_ids)
-    
-    # Initialize arrays for demeaned variables
-    y_ddot = np.zeros_like(y, dtype=float)
-    X_ddot = np.zeros_like(X, dtype=float)
-    entity_means_y = {}
-    entity_means_X = {}
-    
-    # Step 1: Compute entity-specific temporal averages and demean (within-transformation)
-    for eid in unique_entities:
-        mask = (entity_ids == eid)
-        y_bar = np.mean(y[mask])
-        X_bar = np.mean(X[mask], axis=0)
-        
-        entity_means_y[eid] = y_bar
-        entity_means_X[eid] = X_bar
-        
-        y_ddot[mask] = y[mask] - y_bar
-        X_ddot[mask] = X[mask] - X_bar
-        
-    # Step 2: Fit OLS on demeaned data: beta_fe = (X_ddot^T X_ddot)^(-1) X_ddot^T y_ddot
-    XtX = X_ddot.T @ X_ddot
-    Xty = X_ddot.T @ y_ddot
-    beta_fe = np.linalg.solve(XtX, Xty)
-    
-    # Step 3: Back out entity-specific intercepts: alpha_i = y_bar_i - X_bar_i @ beta_fe
-    entity_alphas = {}
-    for eid in unique_entities:
-        entity_alphas[eid] = float(entity_means_y[eid] - entity_means_X[eid] @ beta_fe)
-        
-    return {
-        "beta_fe": beta_fe,
-        "entity_alphas": entity_alphas,
-    }
+    y_demeaned = np.zeros_like(y, dtype=float)
+    X_demeaned = np.zeros_like(X, dtype=float)
+
+    # Step 1: Demean within each entity group
+    for ent in unique_entities:
+        mask = (entity_ids == ent)
+        y_demeaned[mask] = y[mask] - np.mean(y[mask])
+        X_demeaned[mask] = X[mask] - np.mean(X[mask], axis=0)
+
+    # Step 2: Fit OLS on demeaned variables: (X_ddot^T X_ddot)^(-1) X_ddot^T y_ddot
+    beta = np.linalg.solve(X_demeaned.T @ X_demeaned, X_demeaned.T @ y_demeaned)
+
+    return beta
 ```
 :::
 
