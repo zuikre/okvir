@@ -31,11 +31,6 @@ interface ActiveBall {
   color: string;
   radius: number;
   settled: boolean;
-  spin: number;        // Angular rotation (radians)
-  spinRate: number;     // Spin velocity (rad/frame)
-  squash: number;       // Squash/stretch factor (1.0 = normal, <1 = squashed, >1 = stretched)
-  trailAlpha: number;   // Trail opacity multiplier
-  history: Array<{ x: number; y: number }>;
 }
 
 interface SettledBall {
@@ -175,16 +170,16 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
   const nextBallIdRef = useRef(1);
   const lastSoundTimeRef = useRef(0);
 
-  // Gravity scalar mapping
+  // Gravity scalar mapping - snappy, responsive physical values
   const gravity = useMemo(() => {
     switch (gravityPreset) {
       case 'lunar':
-        return 0.12;
+        return 0.22;
       case 'heavy':
-        return 0.38;
+        return 0.72;
       case 'earth':
       default:
-        return 0.24;
+        return 0.46;
     }
   }, [gravityPreset]);
 
@@ -271,15 +266,14 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
       const newBalls: ActiveBall[] = [];
       for (let i = 0; i < toSpawn; i++) {
-        const spinInit = (Math.random() - 0.5) * 0.15;
         if (labMode === 'galton') {
-          // Drops from funnel targeting the top apex pin (row 0, col 0)
+          // Drops from funnel targeting top apex pin (row 0, col 0)
           newBalls.push({
             id: nextBallIdRef.current++,
-            x: layout.cx + (Math.random() - 0.5) * 4,
-            y: layout.topFunnelY - 8 - i * 16,
-            vx: (Math.random() - 0.5) * 0.2,
-            vy: 1.6 + Math.random() * 0.3,
+            x: layout.cx + (Math.random() - 0.5) * 3,
+            y: layout.topFunnelY - 6 - i * 14,
+            vx: (Math.random() - 0.5) * 0.25,
+            vy: 2.4 + Math.random() * 0.4,
             targetRow: 0,
             targetCol: 0,
             targetX: layout.cx,
@@ -288,11 +282,6 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
             color: BALL_PALETTE[Math.floor(Math.random() * BALL_PALETTE.length)],
             radius: 3.8,
             settled: false,
-            spin: 0,
-            spinRate: spinInit,
-            squash: 1.0,
-            trailAlpha: 1.0,
-            history: [],
           });
         } else if (labMode === 'dice') {
           // Sum of k uniform dice rolls
@@ -308,10 +297,10 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
           newBalls.push({
             id: nextBallIdRef.current++,
-            x: chuteX + (Math.random() - 0.5) * 4,
-            y: layout.binTopY - 12 - i * 14,
-            vx: (Math.random() - 0.5) * 0.4,
-            vy: 2.0 + Math.random() * 0.4,
+            x: chuteX + (Math.random() - 0.5) * 3,
+            y: layout.binTopY - 10 - i * 12,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: 2.8 + Math.random() * 0.4,
             targetRow: numRows,
             targetCol: binIdx,
             targetX: chuteX,
@@ -320,11 +309,6 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
             color: BALL_PALETTE[Math.floor(Math.random() * BALL_PALETTE.length)],
             radius: 3.8,
             settled: false,
-            spin: 0,
-            spinRate: spinInit,
-            squash: 1.0,
-            trailAlpha: 1.0,
-            history: [],
           });
         } else if (labMode === 'skew') {
           // Average of k skewed exponential random draws
@@ -340,10 +324,10 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
           newBalls.push({
             id: nextBallIdRef.current++,
-            x: chuteX + (Math.random() - 0.5) * 4,
-            y: layout.binTopY - 12 - i * 14,
-            vx: (Math.random() - 0.5) * 0.4,
-            vy: 2.0 + Math.random() * 0.4,
+            x: chuteX + (Math.random() - 0.5) * 3,
+            y: layout.binTopY - 10 - i * 12,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: 2.8 + Math.random() * 0.4,
             targetRow: numRows,
             targetCol: binIdx,
             targetX: chuteX,
@@ -352,11 +336,6 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
             color: BALL_PALETTE[Math.floor(Math.random() * BALL_PALETTE.length)],
             radius: 3.8,
             settled: false,
-            spin: 0,
-            spinRate: spinInit,
-            squash: 1.0,
-            trailAlpha: 1.0,
-            history: [],
           });
         }
       }
@@ -707,40 +686,31 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
       }
       ctx.globalAlpha = 1.0;
 
-      // ── 6. PHYSICS UPDATE & BALL RENDERING ──
+      // ── 6. PHYSICS UPDATE & BALL RENDERING (CRISP & SNAPPY, NO LINGERING TRACES) ──
       const balls = activeBallsRef.current;
       let binUpdated = false;
 
       for (let i = balls.length - 1; i >= 0; i--) {
         const ball = balls[i];
 
-        ball.spin += ball.spinRate;
-        ball.squash += (1.0 - ball.squash) * 0.18;
-        ball.vx *= 0.992;
+        ball.vx *= 0.994;
 
         if (!ball.inChute) {
+          // ── Phase 1: Pascal Pin Field ──
           ball.vy += gravity;
           ball.y += ball.vy;
           ball.x += ball.vx;
 
-          ball.vx += (Math.random() - 0.5) * 0.04;
-
+          // Micro-guidance toward target pin
           const dx = ball.targetX - ball.x;
-          ball.vx += dx * 0.045;
-
-          if (balls.length <= 6) {
-            ball.history.push({ x: ball.x, y: ball.y });
-            if (ball.history.length > 30) ball.history.shift();
-          }
+          ball.vx += dx * 0.055;
 
           const hitThreshold = ball.targetY - (pegRadius + ball.radius);
           if (ball.y >= hitThreshold) {
             ball.y = hitThreshold;
             ball.x = ball.targetX;
 
-            ball.squash = 0.6;
-            ball.spinRate = (Math.random() - 0.5) * 0.35;
-
+            // Ripple glow at peg contact
             pegGlowsRef.current.push({
               x: ball.targetX,
               y: ball.targetY,
@@ -750,7 +720,7 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
             if (config.soundEnabled) {
               const now = performance.now();
-              if (now - lastSoundTimeRef.current > 45) {
+              if (now - lastSoundTimeRef.current > 40) {
                 audio.playClick();
                 lastSoundTimeRef.current = now;
               }
@@ -764,19 +734,21 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
               const nextPegX = layout.getPegX(nextRow, nextCol);
               const nextPegY = layout.getPegY(nextRow);
 
-              ball.vy = -restitutionVal * (2.0 + Math.random() * 0.6) - 0.5;
+              // Snappy glancing bounce off peg flank (fast, light deflection, not floaty)
+              ball.vy = -restitutionVal * 0.5 - 0.2;
 
               const deltaY = nextPegY - ball.y;
               const disc = Math.sqrt(Math.max(0.1, ball.vy * ball.vy + 2 * gravity * deltaY));
               const timeFrames = Math.max(1, (-ball.vy + disc) / gravity);
               const deltaX = nextPegX - ball.x;
-              ball.vx = deltaX / timeFrames + (Math.random() - 0.5) * 0.12;
+              ball.vx = deltaX / timeFrames;
 
               ball.targetRow = nextRow;
               ball.targetCol = nextCol;
               ball.targetX = nextPegX;
               ball.targetY = nextPegY;
             } else {
+              // Reached bottom row of pins -> drop into collection chute
               const finalBin = bounceRight ? ball.targetCol + 1 : ball.targetCol;
               const chuteX = layout.getChuteCenterX(finalBin);
 
@@ -785,36 +757,33 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
               ball.targetY = layout.binTopY;
               ball.inChute = true;
 
-              ball.vy = -restitutionVal * 1.4 - 0.3;
-              ball.vx = (bounceRight ? 1 : -1) * (0.9 + Math.random() * 0.4);
+              ball.vy = 0.8;
+              ball.vx = (bounceRight ? 1 : -1) * (1.2 + Math.random() * 0.3);
             }
           }
         } else {
+          // ── Phase 2: Vertical Chute Descent ──
           const targetBin = Math.max(0, Math.min(numBins - 1, ball.targetCol));
           const leftBarX = layout.binStartX + targetBin * layout.pegPitchX;
           const rightBarX = leftBarX + layout.pegPitchX;
           const chuteCenter = leftBarX + layout.pegPitchX / 2;
 
-          ball.vy += gravity * 1.1;
+          ball.vy += gravity * 1.15;
           ball.y += ball.vy;
           ball.x += ball.vx;
 
           if (ball.x - ball.radius <= leftBarX) {
             ball.x = leftBarX + ball.radius;
-            ball.vx = Math.abs(ball.vx) * restitutionVal + 0.15;
-            ball.squash = 0.7;
-            ball.spinRate = -Math.abs(ball.spinRate) - 0.05;
+            ball.vx = Math.abs(ball.vx) * restitutionVal + 0.2;
             barFlashesRef.current.push({ x: leftBarX, y: ball.y, life: 1.0 });
           } else if (ball.x + ball.radius >= rightBarX) {
             ball.x = rightBarX - ball.radius;
-            ball.vx = -Math.abs(ball.vx) * restitutionVal - 0.15;
-            ball.squash = 0.7;
-            ball.spinRate = Math.abs(ball.spinRate) + 0.05;
+            ball.vx = -Math.abs(ball.vx) * restitutionVal - 0.2;
             barFlashesRef.current.push({ x: rightBarX, y: ball.y, life: 1.0 });
           }
 
-          ball.vx += (chuteCenter - ball.x) * 0.04;
-          ball.vx *= 0.93;
+          ball.vx += (chuteCenter - ball.x) * 0.08;
+          ball.vx *= 0.92;
 
           const currentCount = binsRef.current[targetBin];
           const ballDiam = ball.radius * 2;
@@ -841,67 +810,33 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
           }
         }
 
-        // ── Motion trail (tapered width + fading) ──
-        if (ball.history.length > 3) {
-          for (let hIdx = 1; hIdx < ball.history.length; hIdx++) {
-            const prev = ball.history[hIdx - 1];
-            const curr = ball.history[hIdx];
-            const t = hIdx / ball.history.length;
-            ctx.strokeStyle = ball.color;
-            ctx.globalAlpha = t * 0.4;
-            ctx.lineWidth = t * 2.2;
-            ctx.beginPath();
-            ctx.moveTo(prev.x, prev.y);
-            ctx.lineTo(curr.x, curr.y);
-            ctx.stroke();
-          }
-          ctx.globalAlpha = 1.0;
-        }
-
-        // ── Ball: drop shadow + spin + squash/stretch ──
-        const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-        const angle = Math.atan2(ball.vy, ball.vx);
-
-        const stretchFactor = Math.min(1.35, 1.0 + speed * 0.025);
-        const bsx = ball.squash < 1.0 ? (2 - ball.squash) : stretchFactor;
-        const bsy = ball.squash < 1.0 ? ball.squash : (2 - stretchFactor);
-
-        ctx.fillStyle = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.35)';
+        // ── Render Ball (Solid Rigid 3D Sphere, Zero Leftover Trace) ──
+        // Soft contact drop shadow
+        ctx.fillStyle = isLight ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.35)';
         ctx.beginPath();
-        ctx.ellipse(ball.x + 1, ball.y + 2, ball.radius * bsx * 0.9, ball.radius * bsy * 0.6, angle, 0, Math.PI * 2);
+        ctx.arc(ball.x + 0.8, ball.y + 1.4, ball.radius, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.save();
-        ctx.translate(ball.x, ball.y);
-        ctx.rotate(ball.spin);
-        if (ball.squash < 1.0) {
-          ctx.scale(bsx, bsy);
-        } else if (speed > 2.5) {
-          ctx.rotate(angle - ball.spin);
-          ctx.scale(bsx, bsy);
-          ctx.rotate(-(angle - ball.spin));
-        }
-
+        // 3D Spherical metallic/acrylic body
         const ballGrad = ctx.createRadialGradient(
-          -ball.radius * 0.3, -ball.radius * 0.3, ball.radius * 0.08,
-          0, 0, ball.radius
+          ball.x - ball.radius * 0.35, ball.y - ball.radius * 0.35, ball.radius * 0.08,
+          ball.x, ball.y, ball.radius
         );
         ballGrad.addColorStop(0, '#ffffff');
-        ballGrad.addColorStop(0.25, ball.color);
+        ballGrad.addColorStop(0.3, ball.color);
         ballGrad.addColorStop(0.85, ball.color);
-        ballGrad.addColorStop(1, isLight ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.8)');
+        ballGrad.addColorStop(1, isLight ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.7)');
 
         ctx.fillStyle = ballGrad;
         ctx.beginPath();
-        ctx.arc(0, 0, ball.radius, 0, Math.PI * 2);
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        // Specular reflection glint
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
         ctx.beginPath();
-        ctx.ellipse(-ball.radius * 0.25, -ball.radius * 0.3, ball.radius * 0.35, ball.radius * 0.2, -0.4, 0, Math.PI * 2);
+        ctx.arc(ball.x - ball.radius * 0.32, ball.y - ball.radius * 0.32, ball.radius * 0.28, 0, Math.PI * 2);
         ctx.fill();
-
-        ctx.restore();
       }
 
       if (binUpdated) {
