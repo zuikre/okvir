@@ -121,9 +121,25 @@ download_file() {
   local url="$1"
   local dest="$2"
   if [ "${DOWNLOADER}" = "curl" ]; then
-    curl -fsSL "${url}" -o "${dest}"
+    if curl -fsIL "${url}" >/dev/null 2>&1; then
+      if [ -t 2 ] || [ -t 1 ]; then
+        curl -fL --progress-bar "${url}" -o "${dest}"
+      else
+        curl -fsSL "${url}" -o "${dest}"
+      fi
+      return 0
+    fi
+    return 1
   else
-    wget -qO "${dest}" "${url}"
+    if wget --spider -q "${url}" 2>/dev/null; then
+      if [ -t 2 ] || [ -t 1 ]; then
+        wget --show-progress -qO "${dest}" "${url}"
+      else
+        wget -qO "${dest}" "${url}"
+      fi
+      return 0
+    fi
+    return 1
   fi
 }
 
@@ -170,15 +186,15 @@ if [ "${PLATFORM}" = "linux" ]; then
 
   TMP_DIR="$(mktemp -d)"
 
-  echo "    • Fetching Linux bundle for ${ARCH_SUFFIX}..."
+  echo "    • Fetching Linux bundle for ${ARCH_SUFFIX} (~85 MB desktop binary, please wait)..."
   DESKTOP_TARGET="${APP_DIR}/okvir.AppImage"
   mkdir -p "${APP_DIR}/bin"
 
-  if download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TARGET}" 2>/dev/null || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TARGET}" 2>/dev/null || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" 2>/dev/null || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" 2>/dev/null || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir" "${DESKTOP_TARGET}" 2>/dev/null; then
+  if download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TARGET}" || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TARGET}" || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir" "${DESKTOP_TARGET}"; then
 
     if [ -f "${TMP_DIR}/okvir.tar.gz" ]; then
       tar -xzf "${TMP_DIR}/okvir.tar.gz" -C "${TMP_DIR}"
@@ -285,11 +301,11 @@ DESKTOP_ENTRY_EOF
 elif [ "${PLATFORM}" = "macos" ]; then
   DMG_TMP="$(mktemp -d)/okvir.dmg"
 
-  echo "Downloading macOS desktop disk image..."
-  if download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/OKVIR_${RESOLVED_VERSION}_universal.dmg" "${DMG_TMP}" 2>/dev/null || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_universal.dmg" "${DMG_TMP}" 2>/dev/null || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/Okvir-macOS-${TARGET_ARCH}.dmg" "${DMG_TMP}" 2>/dev/null || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/Okvir-macOS-${TARGET_ARCH}.dmg" "${DMG_TMP}" 2>/dev/null; then
+  echo "    • Fetching macOS desktop disk image (~14 MB dmg, please wait)..."
+  if download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/OKVIR_${RESOLVED_VERSION}_universal.dmg" "${DMG_TMP}" || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_universal.dmg" "${DMG_TMP}" || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/Okvir-macOS-${TARGET_ARCH}.dmg" "${DMG_TMP}" || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/Okvir-macOS-${TARGET_ARCH}.dmg" "${DMG_TMP}"; then
     hdiutil attach -nobrowse "${DMG_TMP}" -mountpoint /Volumes/OkvirInstall >/dev/null 2>&1
     cp -R "/Volumes/OkvirInstall/Okvir.app" /Applications/
     hdiutil detach /Volumes/OkvirInstall >/dev/null 2>&1
