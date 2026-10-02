@@ -81,8 +81,69 @@ if ($Version -eq "latest") {
 }
 Write-Host "    • Resolved Target Version: v$ResolvedVersion" -ForegroundColor Gray
 
+function Download-OkvirFile {
+    param (
+        [string]$Url,
+        [string]$Dest
+    )
+
+    # 1. Native Windows curl.exe (built-in on Windows 10 build 17063+ & Windows 11)
+    $curlCmd = Get-Command "curl.exe" -ErrorAction SilentlyContinue
+    if ($curlCmd) {
+        & $curlCmd.Source -fsIL $Url 2>$null | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            & $curlCmd.Source -fL --progress-bar $Url -o $Dest
+            if ($LASTEXITCODE -eq 0 -and (Test-Path $Dest) -and ((Get-Item $Dest).Length -gt 0)) {
+                return $true
+            }
+        }
+        return $false
+    }
+
+    # 2. Pure .NET asynchronous download with interactive progress bar
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        $req = [System.Net.HttpWebRequest]::Create($Url)
+        $req.Method = "HEAD"
+        $req.Timeout = 8000
+        $res = $req.GetResponse()
+        $totalBytes = $res.ContentLength
+        $res.Close()
+
+        $wc = New-Object System.Net.WebClient
+        $task = $wc.DownloadFileTaskAsync($Url, $Dest)
+        $lastReport = -1
+
+        while (-not $task.IsCompleted -and -not $task.IsFaulted) {
+            if (Test-Path $Dest) {
+                $cur = (Get-Item $Dest).Length
+                if ($totalBytes -gt 0) {
+                    $pct = [Math]::Min(100, [Math]::Round(($cur / $totalBytes) * 100))
+                    if ($pct -ne $lastReport) {
+                        $lastReport = $pct
+                        Write-Progress -Activity "Downloading Okvir Desktop Engine" -Status "$pct% complete ($([Math]::Round($cur / 1MB, 1)) MB / $([Math]::Round($totalBytes / 1MB, 1)) MB)" -PercentComplete $pct
+                    }
+                }
+            }
+            Start-Sleep -Milliseconds 100
+        }
+        Write-Progress -Activity "Downloading Okvir Desktop Engine" -Completed
+        $wc.Dispose()
+        return (Test-Path $Dest) -and ((Get-Item $Dest).Length -gt 0)
+    } catch {
+        # 3. Fallback to Invoke-WebRequest
+        try {
+            Invoke-WebRequest -Uri $Url -OutFile $Dest -UseBasicParsing -TimeoutSec 60
+            return (Test-Path $Dest) -and ((Get-Item $Dest).Length -gt 0)
+        } catch {
+            return $false
+        }
+    }
+}
+
 Write-Host ""
 Write-Host "==> [4/5] Downloading Native Okvir Desktop Engine (v$ResolvedVersion)..." -ForegroundColor Cyan
+Write-Host "    • Fetching Windows desktop bundle (~6-7 MB installer, please wait)..." -ForegroundColor Gray
 
 # 4. Resolve Download URL
 $PossibleAssets = @(
@@ -97,16 +158,15 @@ foreach ($AssetName in $PossibleAssets) {
     $ReleaseUrl = "https://github.com/$Repo/releases/download/v$ResolvedVersion/$AssetName"
     $LatestUrl = "https://github.com/$Repo/releases/latest/download/$AssetName"
     $InstallerTmp = "$env:TEMP\$AssetName"
-    Write-Host "==> Trying Okvir installer ($AssetName)..." -ForegroundColor Gray
 
-    try {
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        try {
-            Invoke-WebRequest -Uri $ReleaseUrl -OutFile $InstallerTmp -UseBasicParsing -TimeoutSec 30
-        } catch {
-            Invoke-WebRequest -Uri $LatestUrl -OutFile $InstallerTmp -UseBasicParsing -TimeoutSec 30
-        }
-        Write-Host "==> Running silent currentUser installation..." -ForegroundColor Gray
+    if (Download-OkvirFile -Url $ReleaseUrl -Dest $InstallerTmp) {
+        $DownloadSuccess = $true
+    } elseif (Download-OkvirFile -Url $LatestUrl -Dest $InstallerTmp) {
+        $DownloadSuccess = $true
+    }
+
+    if ($DownloadSuccess) {
+        Write-Host "    • Running silent currentUser installation (extracting desktop components)..." -ForegroundColor Gray
         if ($AssetName.EndsWith(".msi")) {
             Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$InstallerTmp`" /qn ALLUSERS=2" -Wait
         } else {
@@ -114,11 +174,8 @@ foreach ($AssetName in $PossibleAssets) {
         }
         # Record installed release version
         Set-Content -Path "$env:USERPROFILE\.okvir\version" -Value $ResolvedVersion -Encoding UTF8 -Force
-        $DownloadSuccess = $true
         Write-Host "✔ Installed Okvir Desktop (v$ResolvedVersion) successfully!" -ForegroundColor Green
         break
-    } catch {
-        # Try next asset
     }
 }
 
@@ -128,14 +185,11 @@ if (-not $DownloadSuccess) {
     $ZipReleaseUrl = "https://github.com/$Repo/releases/latest/download/$ZipAssetName"
     $ZipTmp = "$env:TEMP\$ZipAssetName"
 
-    try {
-        Write-Host "==> Trying standalone desktop package ($ZipAssetName)..." -ForegroundColor Gray
-        Invoke-WebRequest -Uri $ZipReleaseUrl -OutFile $ZipTmp -UseBasicParsing -TimeoutSec 30
+    Write-Host "    • Trying standalone desktop package ($ZipAssetName)..." -ForegroundColor Gray
+    if (Download-OkvirFile -Url $ZipReleaseUrl -Dest $ZipTmp) {
         Expand-Archive -Path $ZipTmp -DestinationPath $InstallDir -Force
         $DownloadSuccess = $true
         Write-Host "✔ Okvir native desktop package installed to $InstallDir!" -ForegroundColor Green
-    } catch {
-        Write-Host "! Standalone desktop package not found." -ForegroundColor Gray
     }
 }
 

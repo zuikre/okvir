@@ -306,10 +306,20 @@ elif [ "${PLATFORM}" = "macos" ]; then
      download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_universal.dmg" "${DMG_TMP}" || \
      download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/Okvir-macOS-${TARGET_ARCH}.dmg" "${DMG_TMP}" || \
      download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/Okvir-macOS-${TARGET_ARCH}.dmg" "${DMG_TMP}"; then
+    echo ""
+    echo "${CYAN}${BOLD}==> [5/5] Integrating System Launcher & Application Shortcuts...${RESET}"
+    echo "    • Mounting Okvir disk image (hdiutil)..."
     hdiutil attach -nobrowse "${DMG_TMP}" -mountpoint /Volumes/OkvirInstall >/dev/null 2>&1
+    echo "    • Installing Okvir.app to /Applications/..."
     cp -R "/Volumes/OkvirInstall/Okvir.app" /Applications/
+    echo "    • Unmounting disk image..."
     hdiutil detach /Volumes/OkvirInstall >/dev/null 2>&1
+    echo "    • Configuring unified CLI launcher at ${INSTALL_DIR}/okvir..."
     ln -sf "/Applications/Okvir.app/Contents/MacOS/okvir" "${INSTALL_DIR}/okvir"
+    mkdir -p "${APP_DIR}/bin"
+    download_file "https://raw.githubusercontent.com/${OKVIR_REPO}/main/bin/okvir.js" "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
+    chmod +x "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
+    echo '{"type": "module"}' > "${APP_DIR}/package.json" 2>/dev/null || true
     mkdir -p "${APP_DIR}"
     echo "${RESOLVED_VERSION}" > "${APP_DIR}/version"
     rm -rf "$(dirname "${DMG_TMP}")"
