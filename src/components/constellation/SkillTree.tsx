@@ -431,9 +431,9 @@ export const SkillTree: React.FC = () => {
             const milestoneBadge = MILESTONE_BADGES.find((b) => b.id === unit.badgeId);
 
             // Container dimensions for analytical SVG mapping
-            const ROW_HEIGHT = 165;
+            const ROW_HEIGHT = 150;
             const CONTAINER_WIDTH = 500;
-            const TOTAL_HEIGHT = unit.modules.length * ROW_HEIGHT + 60;
+            const TOTAL_HEIGHT = unit.modules.length * ROW_HEIGHT + 50;
 
             // Multi-harmonic terrain curve producing an authentic, organic winding road
             // Combines macro-meanders (valley turns), hillside curves, and micro-contour
@@ -448,7 +448,7 @@ export const SkillTree: React.FC = () => {
               const xOffset = boundedOffset * (language === 'ar' ? -1 : 1);
               return {
                 x: CONTAINER_WIDTH / 2 + xOffset,
-                y: 80 + i * ROW_HEIGHT,
+                y: 75 + i * ROW_HEIGHT,
                 xOffset,
               };
             });
