@@ -435,9 +435,17 @@ export const SkillTree: React.FC = () => {
             const CONTAINER_WIDTH = 440;
             const TOTAL_HEIGHT = unit.modules.length * ROW_HEIGHT + 50;
 
-            // Pre-calculate exact (X, Y) center coordinates for each node
+            // Multi-harmonic terrain curve producing an authentic, organic winding road
+            // Combines macro-meanders (valley turns), hillside curves, and micro-contour
             const nodeCoords = unit.modules.map((_, i) => {
-              const xOffset = Math.sin((i + 0.3) * 1.35) * 95 * (language === 'ar' ? -1 : 1);
+              const u = unit.unitNumber - 1;
+              const h1 = Math.sin(i * 0.78 + 0.5 + u * 1.6) * 56;
+              const h2 = Math.sin(i * 1.55 + 1.1 + u * 0.95) * 30;
+              const h3 = Math.cos(i * 0.38 + u * 0.75) * 16;
+              const raw = h1 + h2 + h3;
+              // Smooth hyperbolic tangent collar strictly bounds within ±88px
+              const boundedOffset = 88 * Math.tanh(raw / 78);
+              const xOffset = boundedOffset * (language === 'ar' ? -1 : 1);
               return {
                 x: CONTAINER_WIDTH / 2 + xOffset,
                 y: 70 + i * ROW_HEIGHT,
@@ -545,10 +553,10 @@ export const SkillTree: React.FC = () => {
                       const isNextMastered = lessons[nextMod.id]?.status === 'mastered';
                       const isNextActive = lessons[nextMod.id]?.status === 'available' || lessons[nextMod.id]?.status === 'in_progress';
 
-                      // Connect center to center: node pedestal sits firmly on top of the pipe
+                      // Connect center to center: natural S-curve transition between consecutive points
                       const deltaY = next.y - curr.y;
-                      const ctrlY1 = curr.y + deltaY * 0.5;
-                      const ctrlY2 = curr.y + deltaY * 0.5;
+                      const ctrlY1 = curr.y + deltaY * 0.48;
+                      const ctrlY2 = next.y - deltaY * 0.48;
                       const pathD = `M ${curr.x} ${curr.y} C ${curr.x} ${ctrlY1}, ${next.x} ${ctrlY2}, ${next.x} ${next.y}`;
 
                       const isBothMastered = isCurrentMastered && isNextMastered;
@@ -642,7 +650,7 @@ export const SkillTree: React.FC = () => {
                         key={mod.id}
                         className="absolute z-10 flex flex-col items-center"
                         style={{
-                          left: `${coord.x}px`,
+                          left: `${(coord.x / CONTAINER_WIDTH) * 100}%`,
                           top: `${coord.y}px`,
                           transform: 'translate(-50%, -50%)',
                         }}
