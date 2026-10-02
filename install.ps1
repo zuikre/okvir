@@ -73,10 +73,10 @@ if ($Version -eq "latest") {
         if ($LatestRelease.tag_name) {
             $ResolvedVersion = $LatestRelease.tag_name.TrimStart("v")
         } else {
-            $ResolvedVersion = "1.0.3"
+            $ResolvedVersion = "1.0.4"
         }
     } catch {
-        $ResolvedVersion = "1.0.3"
+        $ResolvedVersion = "1.0.4"
     }
 }
 Write-Host "    • Resolved Target Version: v$ResolvedVersion" -ForegroundColor Gray

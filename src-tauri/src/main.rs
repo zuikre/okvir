@@ -8,16 +8,32 @@ use std::process::{self, Command};
 const HELP_TEXT: &str = "Usage:
   okvir <command> [options]
 
-Core Commands:
+Core Authoring & Engine:
   okvir [app], open            Launch native interactive desktop environment          [default]
   okvir dev                    Launch live-reload curriculum previewer
   okvir test [path]            Run AST validation and test cases on .okvir.md lessons
+  okvir lint [dir]             Deep curriculum linter for math, i18n & challenge schemas
   okvir init <course-name>     Scaffold a new interactive curriculum repository
   okvir pack [dir] [out]       Compile lesson assets into seekable .okvir container
   okvir verify <file.okvir>    Cryptographically verify .okvir binary package signature
+
+Course & Package Ecosystem:
+  okvir install <target>       Install curriculum pack (.okvir container, URL, or ID)
+  okvir list, ls               List locally installed curriculum packs and courses
+  okvir search <query>         Search decentralized registry for courses and packs
   okvir registry [query]       Explore decentralized community curriculum packs
 
-Maintenance & Diagnostics:
+Interoperability (Jupyter & Export):
+  okvir export <lesson>        Convert .okvir.md to Jupyter (.ipynb), Markdown, or HTML
+  okvir import <file.ipynb>    Convert Jupyter Notebook into interactive .okvir.md lesson
+
+Student Learning & Performance:
+  okvir run <lesson.okvir.md>  Run interactive code challenge in terminal
+  okvir progress, stats        View learning statistics, streak, XP & track mastery
+  okvir benchmark, bench       Run high-performance math & vector engine benchmarks
+
+Maintenance & Configuration:
+  okvir config [get|set|list]  Manage global user preferences (lang, theme, telemetry)
   okvir version, -v, --version Show version info, environment diagnostics & update status
   okvir doctor, info           Run comprehensive system diagnostic & environment audit
   okvir update, --update       Check for updates & upgrade Okvir desktop app and CLI
@@ -36,16 +52,6 @@ Options:
   -v, --version                Show version number                                    [boolean]
       --app, --gui             Explicitly launch the desktop GUI application          [boolean]
       --headless               Run computational kernel headlessly without GUI        [boolean]
-
-Examples:
-  okvir open                   Launch desktop GUI application
-  okvir version                Check current version and remote updates
-  okvir doctor                 Run complete system and environment health audit
-  okvir update                 Upgrade to the latest Okvir release
-  okvir rate                   Support and star Okvir on GitHub
-  okvir test ./curriculum      Verify curriculum lessons and AST test cases
-  okvir init econometrics-101  Scaffold a new course repository
-  okvir registry causal        Search community curriculum packages
 ";
 
 /// Resolve version dynamically:
@@ -183,7 +189,10 @@ fn main() {
                 okvir_desktop::run();
                 return;
             }
-            "init" | "dev" | "test" | "pack" | "verify" | "registry"
+            "init" | "dev" | "test" | "lint" | "pack" | "verify" | "registry"
+            | "install" | "add" | "list" | "ls" | "search"
+            | "export" | "import" | "run" | "progress" | "stats"
+            | "benchmark" | "bench" | "config"
             | "doctor" | "info" | "update" | "--update" | "rate" | "star"
             | "docs" | "issue" | "bug" | "sponsor" | "donate" | "clean"
             | "uninstall" | "--uninstall" | "remove"

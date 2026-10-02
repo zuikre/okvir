@@ -152,7 +152,7 @@ if [ "${OKVIR_VERSION}" = "latest" ]; then
   fi
   # Fallback to current repository package version if rate-limited or offline
   if [ -z "${RESOLVED_VERSION}" ]; then
-    RESOLVED_VERSION="1.0.3"
+    RESOLVED_VERSION="1.0.4"
   fi
 else
   RESOLVED_VERSION="${OKVIR_VERSION#v}"
