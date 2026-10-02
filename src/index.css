@@ -129,6 +129,16 @@ html[dir='rtl'][data-arabic-font="sans"],
   --math-data: #38bdf8;          /* Electric Sky: 9.29:1 */
   --math-cluster: #f472b6;       /* Pink: 7.51:1 */
 
+  /* Locked Skill Node Pedestal Variables (Dark Mode) */
+  --node-locked-bg: linear-gradient(180deg, #27272a 0%, #18181b 100%);
+  --node-locked-border: #3f3f46;
+  --node-locked-shadow: 0 5px 0 #121215, 0 10px 20px rgba(0, 0, 0, 0.45);
+  --node-locked-icon: #71717a;
+
+  /* Constellation Pipe Variables (Dark Mode) */
+  --pipe-shadow: rgba(0, 0, 0, 0.45);
+  --pipe-locked-stroke: #27272a;
+
   color-scheme: dark;
 }
 
@@ -158,6 +168,16 @@ html[dir='rtl'][data-arabic-font="sans"],
   --math-prediction: #6b21a8;    /* Deep Purple: 7.64:1 */
   --math-data: #0369a1;          /* Deep Sky: 7.08:1 */
   --math-cluster: #9d174d;       /* Magenta: 7.52:1 */
+
+  /* Locked Skill Node Pedestal Variables (Light Mode) */
+  --node-locked-bg: linear-gradient(180deg, #f8f8fa 0%, #e8e8ed 100%);
+  --node-locked-border: #d4d4d8;
+  --node-locked-shadow: 0 5px 0 #cbd5e1, 0 6px 14px rgba(0, 0, 0, 0.08);
+  --node-locked-icon: #94a3b8;
+
+  /* Constellation Pipe Variables (Light Mode) */
+  --pipe-shadow: rgba(0, 0, 0, 0.04);
+  --pipe-locked-stroke: #d4d4d8;
 
   color-scheme: light;
 }
@@ -517,6 +537,19 @@ input[type='range']::-moz-range-thumb {
 
 .pedestal-3d:active {
   transform: translateY(2px) scale(0.98);
+}
+
+/* Locked Node Pedestal with 100% Opacity and Adaptive Ceramic/Slate Finish */
+.pedestal-locked {
+  background: var(--node-locked-bg) !important;
+  border: 1px solid var(--node-locked-border) !important;
+  box-shadow: var(--node-locked-shadow) !important;
+  color: var(--node-locked-icon) !important;
+  opacity: 1 !important;
+}
+
+.pedestal-locked:hover {
+  filter: brightness(1.04);
 }
 
 /* RTL Arrow Flip Utility */

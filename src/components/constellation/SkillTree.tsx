@@ -549,66 +549,76 @@ export const SkillTree: React.FC = () => {
 
                       const isBothMastered = isCurrentMastered && isNextMastered;
                       const isFlowing = isCurrentMastered && isNextActive;
+                      const isActive = isBothMastered || isFlowing;
 
                       return (
                         <g key={`spline-${i}`}>
-                          {/* Outer dark drop shadow */}
-                          <path
-                            d={pathD}
-                            fill="none"
-                            stroke="rgba(0,0,0,0.6)"
-                            strokeWidth="16"
-                            strokeLinecap="round"
-                          />
-
-                          {/* Outer structural pipe casing */}
-                          <path
-                            d={pathD}
-                            fill="none"
-                            stroke="var(--border-strong)"
-                            strokeWidth="11"
-                            strokeLinecap="round"
-                          />
-
-                          {/* Colored state core */}
-                          <path
-                            d={pathD}
-                            fill="none"
-                            stroke={
-                              isBothMastered
-                                ? '#10b981'
-                                : isFlowing || isCurrentMastered
-                                ? unit.color
-                                : 'var(--border-subtle)'
-                            }
-                            strokeWidth="7"
-                            strokeLinecap="round"
-                            opacity={isBothMastered || isFlowing ? 1.0 : 0.45}
-                          />
-
-                          {/* Inner radiant energy glow and animated streaming dashes for active learning path */}
-                          {isFlowing && (
+                          {isActive ? (
                             <>
+                              {/* Outer subtle drop shadow (theme-calibrated: soft in light, deep in dark) */}
                               <path
                                 d={pathD}
                                 fill="none"
-                                stroke={unit.color}
-                                strokeWidth="14"
-                                opacity="0.35"
-                                filter={`url(#glow-${unit.id})`}
+                                stroke="var(--pipe-shadow)"
+                                strokeWidth="16"
                                 strokeLinecap="round"
                               />
+
+                              {/* Outer structural pipe casing */}
                               <path
                                 d={pathD}
                                 fill="none"
-                                stroke="#ffffff"
-                                strokeWidth="2.5"
-                                strokeDasharray="6 6"
-                                className="river-flow"
+                                stroke="var(--border-strong)"
+                                strokeWidth="11"
                                 strokeLinecap="round"
-                                opacity="0.85"
                               />
+
+                              {/* Colored active state core */}
+                              <path
+                                d={pathD}
+                                fill="none"
+                                stroke={isBothMastered ? '#10b981' : unit.color}
+                                strokeWidth="7"
+                                strokeLinecap="round"
+                                opacity="1.0"
+                              />
+
+                              {/* Inner radiant energy glow and animated streaming dashes for active learning path */}
+                              {isFlowing && (
+                                <>
+                                  <path
+                                    d={pathD}
+                                    fill="none"
+                                    stroke={unit.color}
+                                    strokeWidth="14"
+                                    opacity="0.35"
+                                    filter={`url(#glow-${unit.id})`}
+                                    strokeLinecap="round"
+                                  />
+                                  <path
+                                    d={pathD}
+                                    fill="none"
+                                    stroke="#ffffff"
+                                    strokeWidth="2.5"
+                                    strokeDasharray="6 6"
+                                    className="river-flow"
+                                    strokeLinecap="round"
+                                    opacity="0.85"
+                                  />
+                                </>
+                              )}
                             </>
+                          ) : (
+                            /* Elegant, clean guide trail for upcoming locked lessons */
+                            <path
+                              d={pathD}
+                              fill="none"
+                              stroke="var(--pipe-locked-stroke)"
+                              strokeWidth="3.5"
+                              strokeDasharray="6 8"
+                              strokeLinecap="round"
+                              opacity="0.65"
+                            />
                           )}
                         </g>
                       );

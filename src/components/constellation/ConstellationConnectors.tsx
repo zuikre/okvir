@@ -32,7 +32,7 @@ export const ConstellationConnectors: React.FC<ConstellationConnectorsProps> = (
           markerHeight="7"
           orient="auto"
         >
-          <path d="M 1 2 L 8 5 L 1 8 z" fill="#52525b" />
+          <path d="M 1 2 L 8 5 L 1 8 z" fill="var(--border-strong)" />
         </marker>
 
         <marker

@@ -65,6 +65,9 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
 
         {/* 3D Round Node Pedestal */}
         <div className="relative w-20 h-20">
+          {/* Solid background backing disc to prevent any underlying SVG pipe from leaking through */}
+          <div className="absolute inset-0 rounded-full bg-[var(--bg-app)] pointer-events-none" />
+
           {isAvailable && (
             <div className="absolute inset-0 rounded-full beacon-ping bg-sky-400/40 pointer-events-none" />
           )}
@@ -80,7 +83,7 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
                 ? 'bg-gradient-to-b from-sky-400 to-blue-600 shadow-[0_6px_0_#1e40af,0_12px_24px_rgba(56,189,248,0.4)] text-white pulse-ring hover:scale-105 active:scale-95'
                 : isDecaying
                 ? 'bg-gradient-to-b from-rose-500 to-rose-700 shadow-[0_6px_0_#881337,0_12px_24px_rgba(244,63,94,0.3)] text-white hover:scale-105'
-                : 'bg-gradient-to-b from-[#18181b] to-[#121215] shadow-[0_5px_0_#27272a] border border-[#27272a] text-zinc-500 opacity-60 hover:opacity-85'
+                : 'pedestal-locked hover:scale-102 active:scale-98'
             } ${isHovered || isSelected ? 'ring-2 ring-[var(--text-primary)] scale-105' : ''}`}
           >
             <div className="flex items-center justify-center">
@@ -110,8 +113,10 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
         </div>
 
         {/* Node Label Below inside floating glassmorphic pill */}
-        <div className="mt-2.5 px-3 py-1 rounded-xl bg-[var(--bg-app)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-center max-w-[150px] shadow-sm">
-          <div className="text-xs font-bold text-[var(--text-primary)] leading-tight truncate">
+        <div className="mt-2.5 px-3 py-1 rounded-xl bg-[var(--bg-surface)] backdrop-blur-md border border-[var(--border-subtle)] text-center max-w-[150px] shadow-sm">
+          <div className={`text-xs font-bold leading-tight truncate ${
+            isLocked ? 'text-[var(--text-secondary)]' : 'text-[var(--text-primary)]'
+          }`}>
             {language === 'ar' ? module.titleAr : module.title}
           </div>
           <div className="text-[10px] font-mono text-[var(--text-tertiary)] flex items-center justify-center gap-1 mt-0.5">
@@ -166,7 +171,7 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
             ? 'bg-[var(--bg-surface)] border-amber-500/80 shadow-[0_2px_8px_rgba(245,158,11,0.25)] hover:border-amber-400 hover:scale-105'
             : isAvailable
             ? 'bg-[var(--bg-surface)] border-sky-500 shadow-[0_2px_10px_rgba(56,189,248,0.3)] hover:border-sky-400 hover:scale-105 ring-2 ring-sky-500/30 animate-pulse'
-            : 'bg-[var(--bg-surface)]/70 border-[var(--border-subtle)] text-[var(--text-tertiary)] opacity-60 hover:opacity-90 hover:border-[var(--border-strong)]'
+            : 'bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-disabled)] shadow-sm hover:border-[var(--border-strong)] hover:text-[var(--text-secondary)]'
         } ${isHovered || isSelected ? 'ring-2 ring-[var(--text-primary)] scale-105 shadow-xl' : ''}`}
       >
         {/* Card Header: Track dot + Est. Time + Status Icon */}
@@ -185,12 +190,14 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
             {isMastered && <Check size={12} className="text-[var(--math-vector)] stroke-[3]" />}
             {isInProgress && <Play size={10} fill="currentColor" className="text-[var(--math-gradient)]" />}
             {isAvailable && <Play size={11} fill="currentColor" className="text-[var(--math-data)]" />}
-            {isLocked && <Lock size={10} className="text-[var(--text-tertiary)]" />}
+            {isLocked && <Lock size={10} className="text-[var(--text-disabled)]" />}
           </div>
         </div>
 
         {/* Card Body: Localized Title */}
-        <div className="text-[10px] font-bold text-[var(--text-primary)] leading-tight line-clamp-2 truncate">
+        <div className={`text-[10px] font-bold leading-tight line-clamp-2 truncate ${
+          isLocked ? 'text-[var(--text-secondary)]' : 'text-[var(--text-primary)]'
+        }`}>
           {language === 'ar' ? module.titleAr : module.title}
         </div>
       </button>
