@@ -371,11 +371,11 @@ export const CodeChallengeEditor: React.FC<{
           <button
             onClick={runTests}
             disabled={isRunning}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono font-semibold bg-[var(--math-vector)] text-[var(--bg-app)] shadow-sm hover:opacity-90 transition-all active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono font-semibold bg-[var(--math-vector)] text-[var(--bg-app)] shadow-sm hover:opacity-90 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap shrink-0 cursor-pointer"
           >
-            <Play className="w-3.5 h-3.5 fill-current" />
-            <span>{tr('runAndTest', language)}</span>
-            <kbd className="px-1 py-0.2 text-[10px] bg-black/15 rounded font-mono">⌘↵</kbd>
+            <Play className="w-3.5 h-3.5 fill-current shrink-0" />
+            <span className="whitespace-nowrap">{tr('runAndTest', language)}</span>
+            <kbd className="px-1 py-0.2 text-[10px] bg-black/15 rounded font-mono shrink-0">⌘↵</kbd>
           </button>
         </div>
       </div>

@@ -388,26 +388,26 @@ export const SettingsView: React.FC = () => {
                 type="button"
                 onClick={handleTestAudioPing}
                 title={isRtl ? 'اختبار النبض الصوتي' : 'Test procedural audio synthesizer'}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all active:scale-95 cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
               >
-                <Volume2 size={13} className="text-[var(--math-vector)]" />
-                <span>{isRtl ? 'اختبار الصوت' : 'Audio Ping'}</span>
+                <Volume2 size={13} className="text-[var(--math-vector)] shrink-0" />
+                <span className="whitespace-nowrap">{isRtl ? 'اختبار الصوت' : 'Audio Ping'}</span>
               </button>
 
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all active:scale-95 cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
               >
                 {theme === 'dark' ? (
                   <>
-                    <Moon size={13} className="text-[var(--math-data)]" />
-                    <span>OLED Dark</span>
+                    <Moon size={13} className="text-[var(--math-data)] shrink-0" />
+                    <span className="whitespace-nowrap">OLED Dark</span>
                   </>
                 ) : (
                   <>
-                    <Sun size={13} className="text-[var(--math-gradient)]" />
-                    <span>Warm Paper</span>
+                    <Sun size={13} className="text-[var(--math-gradient)] shrink-0" />
+                    <span className="whitespace-nowrap">Warm Paper</span>
                   </>
                 )}
               </button>
@@ -925,10 +925,10 @@ export const SettingsView: React.FC = () => {
                   type="button"
                   onClick={handleRunIntegrityCheck}
                   disabled={integrityState === 'checking'}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--math-vector)]/30 bg-[var(--math-vector)]/10 hover:bg-[var(--math-vector)]/20 text-[var(--math-vector)] text-xs font-mono font-semibold transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--math-vector)]/30 bg-[var(--math-vector)]/10 hover:bg-[var(--math-vector)]/20 text-[var(--math-vector)] text-xs font-mono font-semibold transition-all active:scale-95 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
                 >
-                  <Activity size={13} className={integrityState === 'checking' ? 'animate-spin' : ''} />
-                  <span>
+                  <Activity size={13} className={`shrink-0 ${integrityState === 'checking' ? 'animate-spin' : ''}`} />
+                  <span className="whitespace-nowrap">
                     {integrityState === 'checking'
                       ? isRtl
                         ? 'جارٍ الفحص...'
@@ -975,15 +975,15 @@ export const SettingsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleExportBackup}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--math-vector)]/50 hover:bg-[var(--bg-surface-hover)] text-xs font-mono text-[var(--text-primary)] transition-all cursor-pointer active:scale-95 shadow-sm"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--math-vector)]/50 hover:bg-[var(--bg-surface-hover)] text-xs font-mono text-[var(--text-primary)] transition-all cursor-pointer active:scale-95 shadow-sm whitespace-nowrap shrink-0"
                 >
-                  <Download size={14} className="text-[var(--math-vector)]" />
-                  <span>{isRtl ? 'تصدير نسخة احتياطية (.json)' : 'Export JSON Snapshot'}</span>
+                  <Download size={14} className="text-[var(--math-vector)] shrink-0" />
+                  <span className="whitespace-nowrap">{isRtl ? 'تصدير نسخة احتياطية (.json)' : 'Export JSON Snapshot'}</span>
                 </button>
 
-                <label className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--math-data)]/50 hover:bg-[var(--bg-surface-hover)] text-xs font-mono text-[var(--text-primary)] transition-all cursor-pointer active:scale-95 shadow-sm">
-                  <Upload size={14} className="text-[var(--math-data)]" />
-                  <span>{isRtl ? 'استيراد نسخة سابقة' : 'Restore from Snapshot'}</span>
+                <label className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--math-data)]/50 hover:bg-[var(--bg-surface-hover)] text-xs font-mono text-[var(--text-primary)] transition-all cursor-pointer active:scale-95 shadow-sm whitespace-nowrap shrink-0">
+                  <Upload size={14} className="text-[var(--math-data)] shrink-0" />
+                  <span className="whitespace-nowrap">{isRtl ? 'استيراد نسخة سابقة' : 'Restore from Snapshot'}</span>
                   <input type="file" accept=".json" onChange={handleImportFile} className="hidden" />
                 </label>
 
@@ -1289,9 +1289,9 @@ export const SettingsView: React.FC = () => {
                       audio.playErrorDissonance();
                       setDangerStep(2);
                     }}
-                    className="px-4 py-2.5 rounded-xl border border-rose-500/40 text-[var(--math-loss)] hover:bg-rose-500/10 text-xs font-mono font-bold transition-all cursor-pointer shadow-sm active:scale-95"
+                    className="px-4 py-2.5 rounded-xl border border-rose-500/40 text-[var(--math-loss)] hover:bg-rose-500/10 text-xs font-mono font-bold transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap shrink-0"
                   >
-                    {isRtl ? 'بدء إجراءات إعادة ضبط المصنع...' : 'Initiate Factory Reset Protocol...'}
+                    <span className="whitespace-nowrap">{isRtl ? 'بدء إجراءات إعادة ضبط المصنع...' : 'Initiate Factory Reset Protocol...'}</span>
                   </button>
                 </div>
               ) : (
@@ -1309,14 +1309,14 @@ export const SettingsView: React.FC = () => {
                     />
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <button
                       type="button"
                       disabled={confirmInput.trim().toUpperCase() !== 'RESET'}
                       onClick={handleConfirmReset}
-                      className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-mono font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+                      className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-mono font-bold transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
                     >
-                      {isRtl ? 'تأكيد الحذف النهائي الشامل' : 'Confirm Complete Wipe'}
+                      <span className="whitespace-nowrap">{isRtl ? 'تأكيد الحذف النهائي الشامل' : 'Confirm Complete Wipe'}</span>
                     </button>
                     <button
                       type="button"
@@ -1325,9 +1325,9 @@ export const SettingsView: React.FC = () => {
                         setDangerStep(1);
                         setConfirmInput('');
                       }}
-                      className="px-4 py-2 rounded-xl border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] cursor-pointer"
+                      className="px-4 py-2 rounded-xl border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] cursor-pointer whitespace-nowrap shrink-0"
                     >
-                      {isRtl ? 'إلغاء' : 'Cancel'}
+                      <span className="whitespace-nowrap">{isRtl ? 'إلغاء' : 'Cancel'}</span>
                     </button>
                   </div>
                 </div>

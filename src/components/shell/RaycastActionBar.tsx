@@ -111,10 +111,10 @@ export const RaycastActionBar: React.FC = () => {
         <React.Fragment key={action.label}>
           <button
             onClick={action.onClick}
-            className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors px-1 py-0.5 rounded"
+            className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors px-1 py-0.5 rounded whitespace-nowrap shrink-0 cursor-pointer"
           >
-            <span>{action.label}</span>
-            <kbd className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-[var(--border-subtle)] text-[var(--text-tertiary)] border border-[var(--border-strong)]">
+            <span className="whitespace-nowrap">{action.label}</span>
+            <kbd className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-[var(--border-subtle)] text-[var(--text-tertiary)] border border-[var(--border-strong)] shrink-0">
               {action.key}
             </kbd>
           </button>

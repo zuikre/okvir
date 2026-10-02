@@ -262,10 +262,10 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
           {!isPassing && (
             <button
               onClick={handleRetry}
-              className="w-full sm:w-auto px-6 py-3 rounded-2xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-[var(--math-loss)] text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 rounded-2xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-[var(--math-loss)] text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0"
             >
-              <RotateCcw className="w-4 h-4" />
-              <span>{isAr ? 'إعادة التحدي التشخيصي (خيارات عشوائية)' : 'Retry Assessment Battery (Shuffled)'}</span>
+              <RotateCcw className="w-4 h-4 shrink-0" />
+              <span className="whitespace-nowrap">{isAr ? 'إعادة التحدي التشخيصي (خيارات عشوائية)' : 'Retry Assessment Battery (Shuffled)'}</span>
             </button>
           )}
 
@@ -433,9 +433,9 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
           <div className="flex justify-end pt-2">
             <button
               onClick={handleAdvance}
-              className="px-6 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-purple-500/20 transition-all cursor-pointer transform hover:scale-105"
+              className="px-6 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-purple-500/20 transition-all cursor-pointer transform hover:scale-105 whitespace-nowrap shrink-0"
             >
-              <span>
+              <span className="whitespace-nowrap">
                 {currentIndex < questions.length - 1
                   ? isAr
                     ? 'السؤال التالي'
@@ -444,7 +444,7 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
                   ? 'عرض النتيجة واعتماد التمكن'
                   : 'View Results & Certify'}
               </span>
-              <ArrowRight className="w-4 h-4 rtl-flip" />
+              <ArrowRight className="w-4 h-4 rtl-flip shrink-0" />
             </button>
           </div>
         </div>

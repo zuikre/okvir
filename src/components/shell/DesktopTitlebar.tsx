@@ -103,22 +103,22 @@ export const DesktopTitlebar: React.FC = () => {
           {/* Performance & Hardware HUD Pill (PRD Section 2.2 & 16) */}
           <button
             onClick={() => setIsHudOpen(true)}
-            className="flex items-center gap-1.5 px-2 py-1 rounded-md border border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--bg-app)] text-xs font-mono text-[var(--text-secondary)] transition-colors group"
+            className="flex items-center gap-1.5 px-2 py-1 rounded-md border border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--bg-app)] text-xs font-mono text-[var(--text-secondary)] transition-colors group whitespace-nowrap shrink-0 cursor-pointer"
             title={language === 'ar' ? 'مؤشرات الأداء العتادي والذاكرة' : 'Hardware Telemetry & Benchmarks (<350MB RAM)'}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[11px] tabular-nums font-semibold text-[var(--math-vector)]">{fps} FPS</span>
-            <span className="text-[10px] text-[var(--text-tertiary)] tabular-nums hidden sm:inline">{frameTimeMs}ms</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span className="text-[11px] tabular-nums font-semibold text-[var(--math-vector)] whitespace-nowrap">{fps} FPS</span>
+            <span className="text-[10px] text-[var(--text-tertiary)] tabular-nums hidden sm:inline whitespace-nowrap">{frameTimeMs}ms</span>
           </button>
 
           {/* Streak Indicator */}
           <button
             onClick={() => setCurrentView('settings')}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--bg-app)] border border-[var(--border-subtle)] text-xs font-mono font-bold text-[var(--math-gradient)] hover:border-[var(--math-gradient)]/40 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--bg-app)] border border-[var(--border-subtle)] text-xs font-mono font-bold text-[var(--math-gradient)] hover:border-[var(--math-gradient)]/40 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             title="Daily Streak (View Local Data)"
           >
-            <Flame size={13} className="text-[var(--math-gradient)] fill-[var(--math-gradient)]/20" />
-            <span className="tabular-nums">
+            <Flame size={13} className="text-[var(--math-gradient)] fill-[var(--math-gradient)]/20 shrink-0" />
+            <span className="tabular-nums whitespace-nowrap">
               {streakDays} {language === 'ar' ? 'يوم' : 'Days'}
             </span>
           </button>
@@ -126,23 +126,23 @@ export const DesktopTitlebar: React.FC = () => {
           {/* XP Indicator */}
           <button
             onClick={() => setCurrentView('settings')}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--bg-app)] border border-[var(--border-subtle)] text-xs font-mono font-bold text-[var(--math-vector)] hover:border-[var(--math-vector)]/40 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--bg-app)] border border-[var(--border-subtle)] text-xs font-mono font-bold text-[var(--math-vector)] hover:border-[var(--math-vector)]/40 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             title="Experience Points (View Local Data)"
           >
-            <Zap size={13} className="text-[var(--math-vector)] fill-[var(--math-vector)]/20" />
-            <span className="tabular-nums">{xp.toLocaleString()} XP</span>
+            <Zap size={13} className="text-[var(--math-vector)] fill-[var(--math-vector)]/20 shrink-0" />
+            <span className="tabular-nums whitespace-nowrap">{xp.toLocaleString()} XP</span>
           </button>
 
-          <span className="w-px h-4 bg-[var(--border-subtle)]" />
+          <span className="w-px h-4 bg-[var(--border-subtle)] shrink-0" />
 
           {/* Language Switcher */}
           <button
             onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--bg-app)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--bg-app)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             title="Switch Language (EN / العربية)"
           >
-            <Languages size={13} />
-            <span className="font-semibold">{language === 'en' ? 'عربي' : 'EN'}</span>
+            <Languages size={13} className="shrink-0" />
+            <span className="font-semibold whitespace-nowrap">{language === 'en' ? 'عربي' : 'EN'}</span>
           </button>
 
           {/* Theme Switcher */}

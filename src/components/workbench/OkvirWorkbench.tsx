@@ -713,14 +713,14 @@ export const OkvirWorkbench: React.FC = () => {
               <button
                 key={sec.id}
                 onClick={() => scrollToSection(sec.id)}
-                className={`px-3 py-1 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3 py-1 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'bg-[var(--text-primary)] text-[var(--bg-app)] font-bold shadow-xs'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
                 }`}
               >
                 <span className="font-mono text-[11px] opacity-75">0{idx + 1}.</span>
-                <span className="font-semibold">{sec.label}</span>
+                <span className="font-semibold whitespace-nowrap">{sec.label}</span>
               </button>
             );
           })}
@@ -1163,10 +1163,10 @@ export const OkvirWorkbench: React.FC = () => {
                   if (config.soundEnabled) audio.playVictoryHarmonics();
                   setCurrentView('constellation');
                 }}
-                className="px-8 py-4 rounded-2xl text-base font-bold bg-emerald-500 hover:bg-emerald-400 text-black shadow-xl shadow-emerald-500/20 transition-all transform hover:scale-105 cursor-pointer inline-flex items-center gap-3"
+                className="px-8 py-4 rounded-2xl text-base font-bold bg-emerald-500 hover:bg-emerald-400 text-black shadow-xl shadow-emerald-500/20 transition-all transform hover:scale-105 cursor-pointer inline-flex items-center gap-3 whitespace-nowrap shrink-0"
               >
-                <span>{isAr ? 'العودة إلى خريطة المعرفة' : 'Return to Knowledge Constellation'}</span>
-                <ArrowRight className="w-5 h-5 rtl-flip" />
+                <span className="whitespace-nowrap">{isAr ? 'العودة إلى خريطة المعرفة' : 'Return to Knowledge Constellation'}</span>
+                <ArrowRight className="w-5 h-5 rtl-flip shrink-0" />
               </button>
             </div>
           ) : (
@@ -1186,10 +1186,10 @@ export const OkvirWorkbench: React.FC = () => {
               </div>
               <button
                 onClick={() => scrollToSection('section-quiz')}
-                className="px-6 py-3 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-app)] hover:border-amber-500/50 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--math-gradient)] transition-colors inline-flex items-center gap-2 cursor-pointer"
+                className="px-6 py-3 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-app)] hover:border-amber-500/50 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--math-gradient)] transition-colors inline-flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
               >
-                <Award className="w-4 h-4 text-[var(--math-gradient)]" />
-                <span>{isAr ? 'الانتقال إلى الاختبار التشخيصي' : 'Take Diagnostic Battery (Section 05)'}</span>
+                <Award className="w-4 h-4 text-[var(--math-gradient)] shrink-0" />
+                <span className="whitespace-nowrap">{isAr ? 'الانتقال إلى الاختبار التشخيصي' : 'Take Diagnostic Battery (Section 05)'}</span>
               </button>
             </div>
           )}

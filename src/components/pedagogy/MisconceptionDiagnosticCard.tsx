@@ -139,13 +139,13 @@ export const MisconceptionDiagnosticCard: React.FC<MisconceptionDiagnosticCardPr
         <button
           onClick={handleSubmit}
           disabled={selectedIdx === null}
-          className={`w-full py-2.5 rounded-lg text-xs font-semibold transition-all shadow ${
+          className={`w-full py-2.5 rounded-lg text-xs font-semibold transition-all shadow whitespace-nowrap shrink-0 ${
             selectedIdx !== null
               ? 'bg-[var(--math-prediction)] text-white hover:brightness-110 cursor-pointer'
               : 'bg-[var(--border-subtle)] text-[var(--text-disabled)] cursor-not-allowed'
           }`}
         >
-          {isAr ? 'تأكيد الإجابة وتشخيص الفهم' : 'Submit Answer for Diagnostic Evaluation'}
+          <span className="whitespace-nowrap">{isAr ? 'تأكيد الإجابة وتشخيص الفهم' : 'Submit Answer for Diagnostic Evaluation'}</span>
         </button>
       ) : (
         <div className="space-y-3 animate-fade-in">
@@ -195,10 +195,10 @@ export const MisconceptionDiagnosticCard: React.FC<MisconceptionDiagnosticCardPr
           <div className="flex justify-end">
             <button
               onClick={handleReset}
-              className="px-3 py-1.5 rounded-lg text-xs border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] flex items-center gap-1.5 transition-all"
+              className="px-3 py-1.5 rounded-lg text-xs border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] flex items-center gap-1.5 transition-all whitespace-nowrap shrink-0 cursor-pointer"
             >
-              <RotateCcw className="w-3 h-3" />
-              <span>{isAr ? 'إعادة المحاولة' : 'Retry Dilemma'}</span>
+              <RotateCcw className="w-3 h-3 shrink-0" />
+              <span className="whitespace-nowrap">{isAr ? 'إعادة المحاولة' : 'Retry Dilemma'}</span>
             </button>
           </div>
         </div>

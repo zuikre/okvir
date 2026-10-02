@@ -334,17 +334,17 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
           <button
             onClick={handlePlayToggle}
             title="Play / Pause (Space)"
-            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--math-gradient)] text-black font-mono transition-transform active:scale-95 hover:brightness-110 shadow-sm flex items-center gap-1.5"
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--math-gradient)] text-black font-mono transition-transform active:scale-95 hover:brightness-110 shadow-sm flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
           >
             {isPlaying ? (
               <>
-                <Pause size={12} fill="currentColor" />
-                <span>Pause</span>
+                <Pause size={12} fill="currentColor" className="shrink-0" />
+                <span className="whitespace-nowrap">Pause</span>
               </>
             ) : (
               <>
-                <Play size={12} fill="currentColor" />
-                <span>Play</span>
+                <Play size={12} fill="currentColor" className="shrink-0" />
+                <span className="whitespace-nowrap">Play</span>
               </>
             )}
           </button>

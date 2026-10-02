@@ -318,15 +318,15 @@ export const DailyCalibration: React.FC = () => {
                   setActiveLessonId('linear-algebra-vectors');
                   setCurrentView('lesson');
                 }}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--math-prediction)] text-black font-semibold text-xs transition-transform active:scale-95 shadow-md shadow-[var(--math-prediction)]/20"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--math-prediction)] text-black font-semibold text-xs transition-transform active:scale-95 shadow-md shadow-[var(--math-prediction)]/20 whitespace-nowrap shrink-0 cursor-pointer"
               >
-                <span>{language === 'ar' ? 'ابدأ الدرس 1: المتجهات كهندسة' : 'Start Lesson 1: Vectors as Geometry'}</span>
+                <span className="whitespace-nowrap">{language === 'ar' ? 'ابدأ الدرس 1: المتجهات كهندسة' : 'Start Lesson 1: Vectors as Geometry'}</span>
               </button>
               <button
                 onClick={() => setCurrentView('constellation')}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
-                <span>{language === 'ar' ? 'استكشف كوكبة المعرفة' : 'Explore Constellation'}</span>
+                <span className="whitespace-nowrap">{language === 'ar' ? 'استكشف كوكبة المعرفة' : 'Explore Constellation'}</span>
               </button>
             </div>
           </div>
@@ -353,10 +353,10 @@ export const DailyCalibration: React.FC = () => {
                   setSessionStats({ reviewed: 0, correct: 0, xpEarned: 0 });
                   resetInteraction();
                 }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
-                <RotateCcw size={13} />
-                <span>{language === 'ar' ? 'بدء جولة جديدة' : 'Restart Session'}</span>
+                <RotateCcw size={13} className="shrink-0" />
+                <span className="whitespace-nowrap">{language === 'ar' ? 'بدء جولة جديدة' : 'Restart Session'}</span>
               </button>
             </div>
           </div>

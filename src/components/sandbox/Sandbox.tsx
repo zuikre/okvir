@@ -155,10 +155,10 @@ export const Sandbox: React.FC = () => {
                     </div>
                     <button
                       onClick={() => startLesson(prereq!.id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--math-vector)] text-black text-xs font-mono font-semibold hover:brightness-110 transition-transform active:scale-95 cursor-pointer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--math-vector)] text-black text-xs font-mono font-semibold hover:brightness-110 transition-transform active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
                     >
-                      <BookOpen size={12} />
-                      <span>{language === 'ar' ? 'ابدأ المتطلب' : 'Start Lesson'}</span>
+                      <BookOpen size={12} className="shrink-0" />
+                      <span className="whitespace-nowrap">{language === 'ar' ? 'ابدأ المتطلب' : 'Start Lesson'}</span>
                     </button>
                   </div>
                 ))}
@@ -168,25 +168,25 @@ export const Sandbox: React.FC = () => {
             <div className="pt-2 flex flex-wrap justify-center gap-3">
               <button
                 onClick={() => setUnlockedPlaygroundSims((prev) => new Set([...prev, activeSimulation]))}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--math-gradient)]/40 bg-[var(--math-gradient)]/10 hover:bg-[var(--math-gradient)]/20 text-xs font-mono font-bold text-[var(--math-gradient)] transition-all active:scale-95 cursor-pointer"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--math-gradient)]/40 bg-[var(--math-gradient)]/10 hover:bg-[var(--math-gradient)]/20 text-xs font-mono font-bold text-[var(--math-gradient)] transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
               >
-                <FlaskConical size={14} />
-                <span>{language === 'ar' ? 'تشغيل في وضع التجربة الحرة' : 'Launch Playground (Sandbox Override)'}</span>
+                <FlaskConical size={14} className="shrink-0" />
+                <span className="whitespace-nowrap">{language === 'ar' ? 'تشغيل في وضع التجربة الحرة' : 'Launch Playground (Sandbox Override)'}</span>
               </button>
               <button
                 onClick={() => setCurrentView('constellation')}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--border-subtle)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--border-subtle)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer whitespace-nowrap shrink-0"
               >
-                <Compass size={14} />
-                <span>{language === 'ar' ? 'الذهاب إلى برج المعرفة' : 'Explore Constellation'}</span>
+                <Compass size={14} className="shrink-0" />
+                <span className="whitespace-nowrap">{language === 'ar' ? 'الذهاب إلى برج المعرفة' : 'Explore Constellation'}</span>
               </button>
               {activeModule && (
                 <button
                   onClick={() => startLesson(activeModule.id)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--text-primary)] text-[var(--bg-app)] text-xs font-mono font-semibold hover:brightness-90 transition-transform active:scale-95"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--text-primary)] text-[var(--bg-app)] text-xs font-mono font-semibold hover:brightness-90 transition-transform active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
                 >
-                  <span>{language === 'ar' ? 'فتح شاشة الوحدة' : 'View Module Screen'}</span>
-                  <ArrowRight size={13} className={language === 'ar' ? 'rotate-180' : ''} />
+                  <span className="whitespace-nowrap">{language === 'ar' ? 'فتح شاشة الوحدة' : 'View Module Screen'}</span>
+                  <ArrowRight size={13} className={`shrink-0 ${language === 'ar' ? 'rotate-180' : ''}`} />
                 </button>
               )}
             </div>

@@ -306,9 +306,9 @@ export const LessonPlayer: React.FC = () => {
                 </div>
                 <button
                   onClick={() => startLesson(p!.id)}
-                  className="px-3 py-1 rounded-lg bg-[var(--math-vector)] text-black text-[11px] font-mono font-semibold hover:brightness-110 transition-transform active:scale-95"
+                  className="px-3 py-1 rounded-lg bg-[var(--math-vector)] text-black text-[11px] font-mono font-semibold hover:brightness-110 transition-transform active:scale-95 whitespace-nowrap shrink-0 cursor-pointer"
                 >
-                  {language === 'ar' ? 'ابدأ المتطلب' : 'Start Prerequisite'}
+                  <span className="whitespace-nowrap">{language === 'ar' ? 'ابدأ المتطلب' : 'Start Prerequisite'}</span>
                 </button>
               </div>
             ))}
@@ -316,9 +316,9 @@ export const LessonPlayer: React.FC = () => {
 
           <button
             onClick={() => setCurrentView('constellation')}
-            className="w-full py-2.5 rounded-xl border border-[var(--border-subtle)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] transition-colors"
+            className="w-full py-2.5 rounded-xl border border-[var(--border-subtle)] hover:border-[var(--border-strong)] text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
           >
-            {language === 'ar' ? 'العودة إلى بُرج المعرفة' : 'Back to Constellation'}
+            <span className="whitespace-nowrap">{language === 'ar' ? 'العودة إلى بُرج المعرفة' : 'Back to Constellation'}</span>
           </button>
         </div>
       </div>
@@ -333,10 +333,10 @@ export const LessonPlayer: React.FC = () => {
           <div>
             <button
               onClick={() => setCurrentView('constellation')}
-              className="text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mb-1.5 flex items-center gap-1.5"
+              className="text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mb-1.5 flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
             >
-              <ArrowLeft size={13} className={language === 'ar' ? 'rotate-180' : ''} />
-              {tr('backToConstellation', language)}
+              <ArrowLeft size={13} className={`shrink-0 ${language === 'ar' ? 'rotate-180' : ''}`} />
+              <span className="whitespace-nowrap">{tr('backToConstellation', language)}</span>
             </button>
             <h1 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
               {language === 'ar' ? mod.titleAr : mod.title}
@@ -344,7 +344,7 @@ export const LessonPlayer: React.FC = () => {
           </div>
 
           {/* 4-Beat Cognitive Pacing Indicator */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-wrap">
             {[1, 2, 3, 4].map((b) => {
               const beatNum = b as BeatNumber;
               const isActive = currentBeat === beatNum;
@@ -356,13 +356,13 @@ export const LessonPlayer: React.FC = () => {
                   key={b}
                   disabled={!canAccess}
                   onClick={() => canAccess && setBeat(beatNum)}
-                  className={`flex items-center gap-1 px-3 py-1 text-xs font-mono rounded-md border transition-all ${
+                  className={`flex items-center gap-1 px-3 py-1 text-xs font-mono rounded-md border transition-all whitespace-nowrap shrink-0 ${
                     isActive
                       ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/10 text-[var(--math-vector)] font-semibold shadow-sm'
                       : isDone
-                      ? 'border-[var(--border-strong)] text-[var(--math-vector)] hover:bg-[var(--bg-surface-hover)]'
+                      ? 'border-[var(--border-strong)] text-[var(--math-vector)] hover:bg-[var(--bg-surface-hover)] cursor-pointer'
                       : canAccess
-                      ? 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
+                      ? 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] cursor-pointer'
                       : 'border-[var(--border-subtle)] text-[var(--text-tertiary)] opacity-35 cursor-not-allowed'
                   }`}
                   title={!canAccess ? (language === 'ar' ? 'أكمل النبضات السابقة أولاً' : 'Complete preceding beats first') : undefined}
@@ -476,10 +476,10 @@ export const LessonPlayer: React.FC = () => {
               </span>
               <button
                 onClick={() => setBeat(2)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--text-primary)] text-[var(--bg-app)] font-medium text-xs transition-transform active:scale-95 hover:brightness-90 shadow-sm"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--text-primary)] text-[var(--bg-app)] font-medium text-xs transition-transform active:scale-95 hover:brightness-90 shadow-sm whitespace-nowrap shrink-0 cursor-pointer"
               >
-                <span>{tr('nextBeat', language)}: {tr('beat2', language)}</span>
-                <ArrowRight size={13} className={language === 'ar' ? 'rotate-180' : ''} />
+                <span className="whitespace-nowrap">{tr('nextBeat', language)}: {tr('beat2', language)}</span>
+                <ArrowRight size={13} className={`shrink-0 ${language === 'ar' ? 'rotate-180' : ''}`} />
               </button>
             </div>
           </div>
@@ -665,20 +665,20 @@ export const LessonPlayer: React.FC = () => {
                 {renderNarrative(beat2?.narrative?.[language])}
               </div>
 
-              <div className="flex justify-between pt-3 border-t border-[var(--border-subtle)]">
+              <div className="flex justify-between items-center pt-3 border-t border-[var(--border-subtle)] gap-2">
                 <button
                   onClick={handlePrev}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] whitespace-nowrap shrink-0 cursor-pointer"
                 >
-                  <ArrowLeft size={13} className={language === 'ar' ? 'rotate-180' : ''} />
-                  ← Beat 1
+                  <ArrowLeft size={13} className={`shrink-0 ${language === 'ar' ? 'rotate-180' : ''}`} />
+                  <span className="whitespace-nowrap">← Beat 1</span>
                 </button>
                 <button
                   onClick={() => setBeat(3)}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--text-primary)] text-[var(--bg-app)] font-medium text-xs transition-transform active:scale-95 hover:brightness-90 shadow-sm"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--text-primary)] text-[var(--bg-app)] font-medium text-xs transition-transform active:scale-95 hover:brightness-90 shadow-sm whitespace-nowrap shrink-0 cursor-pointer"
                 >
-                  <span>{tr('nextBeat', language)}: {tr('beat3', language)}</span>
-                  <ArrowRight size={13} className={language === 'ar' ? 'rotate-180' : ''} />
+                  <span className="whitespace-nowrap">{tr('nextBeat', language)}: {tr('beat3', language)}</span>
+                  <ArrowRight size={13} className={`shrink-0 ${language === 'ar' ? 'rotate-180' : ''}`} />
                 </button>
               </div>
             </div>
@@ -707,18 +707,18 @@ export const LessonPlayer: React.FC = () => {
                 }}
               />
 
-              <div className="flex justify-between items-center pt-2">
+              <div className="flex justify-between items-center pt-2 gap-2">
                 <button
                   onClick={handlePrev}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] whitespace-nowrap shrink-0 cursor-pointer"
                 >
-                  <ArrowLeft size={13} className={language === 'ar' ? 'rotate-180' : ''} />
-                  ← Beat 2
+                  <ArrowLeft size={13} className={`shrink-0 ${language === 'ar' ? 'rotate-180' : ''}`} />
+                  <span className="whitespace-nowrap">← Beat 2</span>
                 </button>
                 <button
                   onClick={() => setBeat(4)}
                   disabled={!isCodeChallengePassed}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg font-medium text-xs transition-all shadow-sm ${
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg font-medium text-xs transition-all shadow-sm whitespace-nowrap shrink-0 ${
                     isCodeChallengePassed
                       ? 'bg-[var(--text-primary)] text-[var(--bg-app)] active:scale-95 hover:brightness-90 cursor-pointer'
                       : 'bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-tertiary)] opacity-40 cursor-not-allowed'
@@ -726,8 +726,8 @@ export const LessonPlayer: React.FC = () => {
                   title={!isCodeChallengePassed ? (language === 'ar' ? 'اجتز اختبارات الكود للمتابعة' : 'Pass code tests to advance') : undefined}
                 >
                   {!isCodeChallengePassed && <Lock size={12} className="shrink-0" />}
-                  <span>{tr('nextBeat', language)}: {tr('beat4', language)}</span>
-                  <ArrowRight size={13} className={language === 'ar' ? 'rotate-180' : ''} />
+                  <span className="whitespace-nowrap">{tr('nextBeat', language)}: {tr('beat4', language)}</span>
+                  <ArrowRight size={13} className={`shrink-0 ${language === 'ar' ? 'rotate-180' : ''}`} />
                 </button>
               </div>
             </div>
@@ -848,19 +848,19 @@ export const LessonPlayer: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex justify-between items-center pt-3 border-t border-[var(--border-subtle)]">
+              <div className="flex justify-between items-center pt-3 border-t border-[var(--border-subtle)] gap-2">
                 <button
                   onClick={handlePrev}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border-subtle)] text-xs font-mono text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] whitespace-nowrap shrink-0 cursor-pointer"
                 >
-                  <ArrowLeft size={13} className={language === 'ar' ? 'rotate-180' : ''} />
-                  ← Beat 3
+                  <ArrowLeft size={13} className={`shrink-0 ${language === 'ar' ? 'rotate-180' : ''}`} />
+                  <span className="whitespace-nowrap">← Beat 3</span>
                 </button>
 
                 <button
                   onClick={handleNext}
                   disabled={!isSelectedCorrect}
-                  className={`flex items-center gap-1.5 px-5 py-2.5 rounded-lg font-semibold text-xs transition-all shadow-md ${
+                  className={`flex items-center gap-1.5 px-5 py-2.5 rounded-lg font-semibold text-xs transition-all shadow-md whitespace-nowrap shrink-0 ${
                     isSelectedCorrect
                       ? 'bg-[var(--math-vector)] text-black hover:brightness-110 active:scale-95 cursor-pointer shadow-[0_0_15px_rgba(56,189,248,0.25)]'
                       : 'bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-tertiary)] opacity-40 cursor-not-allowed'
@@ -868,8 +868,8 @@ export const LessonPlayer: React.FC = () => {
                   title={!isSelectedCorrect ? (language === 'ar' ? 'اختر الإجابة الصحيحة أولاً لإتمام الدرس' : 'Select the correct hypothesis to complete') : undefined}
                 >
                   {!isSelectedCorrect && <Lock size={13} className="shrink-0" />}
-                  <Check size={14} />
-                  <span>{language === 'ar' ? 'إتمام الدرس وترسيخ المفهوم (+50 XP)' : 'Complete & Anchor Concept (+50 XP)'}</span>
+                  <Check size={14} className="shrink-0" />
+                  <span className="whitespace-nowrap">{language === 'ar' ? 'إتمام الدرس وترسيخ المفهوم (+50 XP)' : 'Complete & Anchor Concept (+50 XP)'}</span>
                 </button>
               </div>
             </div>

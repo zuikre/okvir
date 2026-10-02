@@ -92,13 +92,13 @@ export const PredictiveHookPrompt: React.FC<PredictiveHookPromptProps> = ({
         <button
           onClick={handleCommit}
           disabled={!selectedId}
-          className={`w-full py-2.5 rounded-lg text-xs font-semibold transition-all shadow-md ${
+          className={`w-full py-2.5 rounded-lg text-xs font-semibold transition-all shadow-md whitespace-nowrap shrink-0 ${
             selectedId
               ? 'bg-[var(--math-prediction)] text-white hover:brightness-110 cursor-pointer'
               : 'bg-[var(--border-subtle)] text-[var(--text-disabled)] cursor-not-allowed'
           }`}
         >
-          {isAr ? 'تأكيد التوقع وإلغاء قفل التجربة' : 'Lock in Prediction & Unlock Laboratory'}
+          <span className="whitespace-nowrap">{isAr ? 'تأكيد التوقع وإلغاء قفل التجربة' : 'Lock in Prediction & Unlock Laboratory'}</span>
         </button>
       ) : (
         <div className="p-3.5 rounded-lg border border-[var(--math-vector)]/30 bg-[var(--math-vector)]/10 text-[var(--math-vector)] text-xs animate-fade-in flex items-start gap-2.5">

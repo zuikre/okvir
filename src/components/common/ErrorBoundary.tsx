@@ -55,18 +55,18 @@ export class ErrorBoundary extends Component<Props, State> {
               {this.state.errorInfo?.componentStack}
             </div>
 
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex items-center gap-3 pt-2 flex-wrap">
               <button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 text-xs font-semibold rounded-lg bg-[var(--bg-surface-active)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-primary)] border border-[var(--border-subtle)] transition-colors cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold rounded-lg bg-[var(--bg-surface-active)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-primary)] border border-[var(--border-subtle)] transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
-                Reload Window
+                <span className="whitespace-nowrap">Reload Window</span>
               </button>
               <button
                 onClick={this.handleReset}
-                className="px-4 py-2 text-xs font-semibold rounded-lg bg-rose-600 hover:bg-rose-500 text-white transition-colors"
+                className="px-4 py-2 text-xs font-semibold rounded-lg bg-rose-600 hover:bg-rose-500 text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
-                Reset Local Cache & Reload
+                <span className="whitespace-nowrap">Reset Local Cache & Reload</span>
               </button>
             </div>
           </div>

@@ -400,9 +400,9 @@ export const SkillTree: React.FC = () => {
                 if (config.soundEnabled) audio.playSuccess();
                 startLesson(nextRecommendedModule.id);
               }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-mono text-xs font-bold hover:brightness-110 active:scale-95 shadow-md shrink-0 transition-transform cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-mono text-xs font-bold hover:brightness-110 active:scale-95 shadow-md shrink-0 whitespace-nowrap transition-transform cursor-pointer"
             >
-              <span>
+              <span className="whitespace-nowrap">
                 {lessons[nextRecommendedModule.id]?.status === 'in_progress'
                   ? (language === 'ar' ? 'متابعة الدرس' : 'Continue Lesson')
                   : (language === 'ar' ? 'ابدأ الدرس' : 'Start Lesson')}
@@ -702,15 +702,15 @@ export const SkillTree: React.FC = () => {
                       {isUnitMastered && (
                         <button
                           onClick={() => handleClaimBadge(milestoneBadge.id)}
-                          className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-black text-xs font-mono font-bold hover:brightness-110 active:scale-95 shadow-md transition-transform shrink-0"
+                          className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-black text-xs font-mono font-bold hover:brightness-110 active:scale-95 shadow-md transition-transform shrink-0 whitespace-nowrap"
                         >
                           {celebratingBadgeId === milestoneBadge.id ? (
-                            <span className="flex items-center gap-1">
+                            <span className="flex items-center gap-1 whitespace-nowrap">
                               <Check size={13} />
                               {language === 'ar' ? 'تم التصدير' : 'Exported'}
                             </span>
                           ) : (
-                            <span>{language === 'ar' ? 'استلام الشهادة' : 'Claim Badge'}</span>
+                            <span className="whitespace-nowrap">{language === 'ar' ? 'استلام الشهادة' : 'Claim Badge'}</span>
                           )}
                         </button>
                       )}
@@ -745,15 +745,17 @@ export const SkillTree: React.FC = () => {
                 <button
                   disabled={stats.masteredCount < stats.total}
                   onClick={() => handleClaimBadge('badge-okvir-fellow')}
-                  className={`px-6 py-3 rounded-xl font-mono text-xs font-bold transition-all shadow-lg ${
+                  className={`px-6 py-3 rounded-xl font-mono text-xs font-bold transition-all shadow-lg whitespace-nowrap shrink-0 ${
                     stats.masteredCount >= stats.total
-                      ? 'bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-white hover:brightness-110 active:scale-95 animate-pulse'
+                      ? 'bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-white hover:brightness-110 active:scale-95 animate-pulse cursor-pointer'
                       : 'opacity-40 cursor-not-allowed bg-[var(--bg-app)] border border-[var(--border-strong)] text-[var(--text-tertiary)]'
                   }`}
                 >
-                  {stats.masteredCount >= stats.total
-                    ? (language === 'ar' ? 'تحميل شهادة الزمالة المعتمدة' : 'Claim Fellow Credential')
-                    : `${stats.masteredCount} / ${stats.total} ${language === 'ar' ? 'وحدات مكتملة' : 'Modules Completed'}`}
+                  <span className="whitespace-nowrap">
+                    {stats.masteredCount >= stats.total
+                      ? (language === 'ar' ? 'تحميل شهادة الزمالة المعتمدة' : 'Claim Fellow Credential')
+                      : `${stats.masteredCount} / ${stats.total} ${language === 'ar' ? 'وحدات مكتملة' : 'Modules Completed'}`}
+                  </span>
                 </button>
               </div>
             </div>
@@ -1138,7 +1140,7 @@ const ModuleDrawer: React.FC<{
                     <button
                       key={p.id}
                       onClick={() => onSelectModule(p)}
-                      className={`px-2.5 py-1 text-xs font-mono rounded-md border text-start transition-colors flex items-center gap-1.5 ${
+                      className={`px-2.5 py-1 text-xs font-mono rounded-md border text-start transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer ${
                         isPMastered
                           ? 'border-[var(--math-vector)]/40 bg-[var(--math-vector)]/10 text-[var(--math-vector)] hover:border-[var(--math-vector)]'
                           : isPInProgress
@@ -1152,7 +1154,7 @@ const ModuleDrawer: React.FC<{
                       {isPInProgress && <Play size={10} className="text-[var(--math-gradient)] shrink-0" fill="currentColor" />}
                       {isPAvailable && <span className="w-1.5 h-1.5 rounded-full bg-[var(--math-data)] shrink-0" />}
                       {!isPMastered && !isPInProgress && !isPAvailable && <Lock size={10} className="shrink-0" />}
-                      <span>{language === 'ar' ? p.titleAr : p.title}</span>
+                      <span className="whitespace-nowrap">{language === 'ar' ? p.titleAr : p.title}</span>
                     </button>
                   );
                 })}
@@ -1190,10 +1192,10 @@ const ModuleDrawer: React.FC<{
         <div className="p-6 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]">
           <button
             onClick={onStart}
-            className="w-full py-3 rounded-xl font-semibold text-xs font-mono transition-transform flex items-center justify-center gap-2 shadow-lg bg-[var(--math-vector)] text-black active:scale-[0.98] hover:brightness-110 cursor-pointer"
+            className="w-full py-3 rounded-xl font-semibold text-xs font-mono transition-transform flex items-center justify-center gap-2 shadow-lg bg-[var(--math-vector)] text-black active:scale-[0.98] hover:brightness-110 cursor-pointer whitespace-nowrap shrink-0"
           >
-            <Play size={14} fill="currentColor" />
-            <span>
+            <Play size={14} fill="currentColor" className="shrink-0" />
+            <span className="whitespace-nowrap">
               {isMastered
                 ? (language === 'ar' ? 'مراجعة الدرس' : 'Review Lesson')
                 : progress?.status === 'in_progress'
