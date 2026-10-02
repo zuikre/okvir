@@ -1,13 +1,14 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { TimelinePlaybackBar } from '@/components/simulation/TimelinePlaybackBar';
 import { PreCanvasBriefing, PostCanvasConsolidation, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 import { audio } from '@/lib/audio';
 import { sonifier } from '@/lib/audio/WebAudioSonifier';
-import { GitCompare } from 'lucide-react';
+import { GitCompare, CheckCircle2, AlertTriangle, Target, Compass, Sparkles } from 'lucide-react';
 
 type OptimizerType = 'sgd' | 'momentum' | 'rmsprop' | 'adam';
 type SurfaceType = 'bowl' | 'rosenbrock' | 'saddle';
+type StopTolerance = 0.005 | 0.02 | 0.08;
 
 interface LossSurfaceDef {
   name: { en: string; ar: string };
@@ -15,6 +16,8 @@ interface LossSurfaceDef {
   grad: (x: number, y: number) => [number, number];
   bounds: { minX: number; maxX: number; minY: number; maxY: number };
   defaultStart: { x: number; y: number };
+  optimum: { x: number; y: number };
+  zRange: { min: number; max: number };
 }
 
 const SURFACES: Record<SurfaceType, LossSurfaceDef> = {
@@ -27,6 +30,8 @@ const SURFACES: Record<SurfaceType, LossSurfaceDef> = {
     ],
     bounds: { minX: -5, maxX: 5, minY: -5, maxY: 5 },
     defaultStart: { x: 3.5, y: 3.5 },
+    optimum: { x: 0, y: 0 },
+    zRange: { min: 0, max: 15 },
   },
   rosenbrock: {
     name: { en: 'Rosenbrock Banana Valley', ar: 'وادي روزنبروك المنحني' },
@@ -37,6 +42,8 @@ const SURFACES: Record<SurfaceType, LossSurfaceDef> = {
     ],
     bounds: { minX: -2.5, maxX: 2.5, minY: -1.5, maxY: 3.5 },
     defaultStart: { x: -1.8, y: 2.2 },
+    optimum: { x: 1, y: 1 },
+    zRange: { min: 0, max: 120 },
   },
   saddle: {
     name: { en: 'Saddle Point (Minimax)', ar: 'نقطة السرج' },
@@ -44,6 +51,8 @@ const SURFACES: Record<SurfaceType, LossSurfaceDef> = {
     grad: (x, y) => [x, -y],
     bounds: { minX: -4, maxX: 4, minY: -4, maxY: 4 },
     defaultStart: { x: 0.1, y: 2.5 },
+    optimum: { x: 0, y: 0 },
+    zRange: { min: -8, max: 8 },
   },
 };
 
@@ -115,6 +124,8 @@ interface TrajectorySnapshot {
   y: number;
   loss: number;
   gradNorm: number;
+  vx?: number;
+  vy?: number;
 }
 
 export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact = true }) => {
@@ -127,33 +138,97 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
   const [trajectory, setTrajectory] = useState<TrajectorySnapshot[]>([]);
   const [ghostSgdTrajectory, setGhostSgdTrajectory] = useState<TrajectorySnapshot[]>([]);
   const [showComparison, setShowComparison] = useState<boolean>(true);
+  const [showVectorField, setShowVectorField] = useState<boolean>(true);
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
   const dragging = useRef(false);
 
+  // Stopping Criteria States
+  const [stopTol, setStopTol] = useState<StopTolerance>(0.02);
+  const [maxStepBudget, setMaxStepBudget] = useState<number>(80);
+  const [autoStopOnConvergence, setAutoStopOnConvergence] = useState<boolean>(true);
+  const [convergenceInfo, setConvergenceInfo] = useState<{
+    status: 'converged' | 'diverged' | 'iterating';
+    step: number;
+    gradNorm: number;
+    loss: number;
+    reason: string;
+  }>({
+    status: 'iterating',
+    step: 0,
+    gradNorm: 0,
+    loss: 0,
+    reason: '',
+  });
+
   const surface = SURFACES[surfaceType];
 
-  // Compute trajectories for active optimizer & reference SGD
+  // Compute trajectories with active Stopping Criteria
   const computeTrajectories = useCallback(() => {
     const curSurface = SURFACES[surfaceType];
-    const maxSteps = 80;
 
-    const runOpt = (opt: OptimizerType): TrajectorySnapshot[] => {
+    const runOpt = (opt: OptimizerType) => {
       const snaps: TrajectorySnapshot[] = [];
       const p = { ...startPos };
       const v = { x: 0, y: 0 };
       const s = { x: 0, y: 0 };
       const eps = 1e-6;
 
-      for (let t = 0; t <= maxSteps; t++) {
+      let status: 'converged' | 'diverged' | 'iterating' = 'iterating';
+      let convergedStep = maxStepBudget;
+      let reason = '';
+
+      for (let t = 0; t <= maxStepBudget; t++) {
         const loss = curSurface.f(p.x, p.y);
         const [gx, gy] = curSurface.grad(p.x, p.y);
         const gradNorm = Math.hypot(gx, gy);
 
-        snaps.push({ step: t, x: p.x, y: p.y, loss, gradNorm });
+        snaps.push({ step: t, x: p.x, y: p.y, loss, gradNorm, vx: v.x, vy: v.y });
 
+        // Criteria 1: Check Divergence / Numerical Explosion
+        if (isNaN(loss) || !isFinite(loss) || Math.abs(loss) > 1e5 || gradNorm > 1e4) {
+          status = 'diverged';
+          convergedStep = t;
+          reason = language === 'ar' ? 'انفجار رقمي: معدل التعلم مرتفع جداً' : 'Numerical explosion: learning rate too high';
+          break;
+        }
+
+        // Criteria 2: Check Gradient Convergence Threshold (||∇f|| <= epsilon)
+        if (autoStopOnConvergence && t > 0 && gradNorm <= stopTol) {
+          status = 'converged';
+          convergedStep = t;
+          reason = language === 'ar'
+            ? `تحقق شرط التوقف: ||∇f|| = ${gradNorm.toFixed(4)} ≤ ${stopTol}`
+            : `Convergence threshold met: ||∇f|| = ${gradNorm.toFixed(4)} ≤ ${stopTol}`;
+          break;
+        }
+
+        // Criteria 3: Parameter Displacement Stagnation (Zero Progress)
+        if (autoStopOnConvergence && t > 1) {
+          const prev1 = snaps[t - 1];
+          const prev2 = snaps[t - 2];
+          const disp1 = Math.hypot(p.x - prev1.x, p.y - prev1.y);
+          const disp2 = Math.hypot(prev1.x - prev2.x, prev1.y - prev2.y);
+          if (disp1 < 1e-5 && disp2 < 1e-5 && gradNorm < 0.1) {
+            status = 'converged';
+            convergedStep = t;
+            reason = language === 'ar' ? 'سكون الإحداثيات: ثبات كامل في المعاملات' : 'Parameter stagnation: zero displacement';
+            break;
+          }
+        }
+
+        if (t === maxStepBudget) {
+          status = 'iterating';
+          convergedStep = maxStepBudget;
+          reason = language === 'ar' ? 'انتهاء ميزانية الخطوات المحددة' : 'Maximum step budget reached';
+          break;
+        }
+
+        // Advance optimizer state
         if (opt === 'sgd') {
-          p.x -= learningRate * gx;
-          p.y -= learningRate * gy;
+          v.x = -learningRate * gx;
+          v.y = -learningRate * gy;
+          p.x += v.x;
+          p.y += v.y;
         } else if (opt === 'momentum') {
           v.x = momentum * v.x - learningRate * gx;
           v.y = momentum * v.y - learningRate * gy;
@@ -162,8 +237,10 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
         } else if (opt === 'rmsprop') {
           s.x = 0.9 * s.x + 0.1 * gx * gx;
           s.y = 0.9 * s.y + 0.1 * gy * gy;
-          p.x -= (learningRate / Math.sqrt(s.x + eps)) * gx;
-          p.y -= (learningRate / Math.sqrt(s.y + eps)) * gy;
+          v.x = -(learningRate / Math.sqrt(s.x + eps)) * gx;
+          v.y = -(learningRate / Math.sqrt(s.y + eps)) * gy;
+          p.x += v.x;
+          p.y += v.y;
         } else if (opt === 'adam') {
           const stepNum = t + 1;
           v.x = 0.9 * v.x + 0.1 * gx;
@@ -176,22 +253,38 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
           const sHatX = s.x / (1 - Math.pow(0.999, stepNum));
           const sHatY = s.y / (1 - Math.pow(0.999, stepNum));
 
-          p.x -= (learningRate / (Math.sqrt(sHatX) + eps)) * mHatX;
-          p.y -= (learningRate / (Math.sqrt(sHatY) + eps)) * mHatY;
+          const stepX = -(learningRate / (Math.sqrt(sHatX) + eps)) * mHatX;
+          const stepY = -(learningRate / (Math.sqrt(sHatY) + eps)) * mHatY;
+          p.x += stepX;
+          p.y += stepY;
         }
 
-        // Clamp to prevent infinite explosion
-        p.x = Math.max(-10, Math.min(10, p.x));
-        p.y = Math.max(-10, Math.min(10, p.y));
+        // Clamp to bounding box plus small margin to avoid runaway rendering
+        p.x = Math.max(curSurface.bounds.minX - 3, Math.min(curSurface.bounds.maxX + 3, p.x));
+        p.y = Math.max(curSurface.bounds.minY - 3, Math.min(curSurface.bounds.maxY + 3, p.y));
       }
-      return snaps;
+
+      return { snaps, status, convergedStep, reason };
     };
 
-    const mainTraj = runOpt(optimizer);
-    const sgdTraj = runOpt('sgd');
-    setTrajectory(mainTraj);
-    setGhostSgdTrajectory(sgdTraj);
-  }, [surfaceType, optimizer, startPos, learningRate, momentum]);
+    const mainResult = runOpt(optimizer);
+    const sgdResult = runOpt('sgd');
+
+    setTrajectory(mainResult.snaps);
+    setGhostSgdTrajectory(sgdResult.snaps);
+
+    const lastSnap = mainResult.snaps[mainResult.snaps.length - 1];
+    setConvergenceInfo({
+      status: mainResult.status,
+      step: mainResult.convergedStep,
+      gradNorm: lastSnap?.gradNorm || 0,
+      loss: lastSnap?.loss || 0,
+      reason: mainResult.reason,
+    });
+
+    // Clamp currentStepIdx to newly generated trajectory length
+    setCurrentStepIdx((prev) => Math.min(prev, Math.max(0, mainResult.snaps.length - 1)));
+  }, [surfaceType, optimizer, startPos, learningRate, momentum, stopTol, maxStepBudget, autoStopOnConvergence, language]);
 
   useEffect(() => {
     computeTrajectories();
@@ -203,14 +296,16 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
     const snap = trajectory[Math.min(currentStepIdx, trajectory.length - 1)];
     if (!snap) return;
 
-    if (currentStepIdx === trajectory.length - 1 && snap.loss < 0.1) {
+    if (currentStepIdx === trajectory.length - 1 && convergenceInfo.status === 'converged') {
       sonifier.playConvergenceChime();
+    } else if (convergenceInfo.status === 'diverged') {
+      sonifier.playDivergenceAlarm();
     } else {
       sonifier.updateLoss(snap.loss);
     }
-  }, [currentStepIdx, trajectory, config.soundEnabled]);
+  }, [currentStepIdx, trajectory, convergenceInfo.status, config.soundEnabled]);
 
-  // Render Frame
+  // Main Render Loop (Realistic Mathematical Landscape & Contours)
   const render = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -231,43 +326,180 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
       py: (1 - (y - b.minY) / (b.maxY - b.minY)) * height,
     });
 
-    // 1. Loss Contours
-    const numLevels = 10;
-    for (let l = 1; l <= numLevels; l++) {
-      ctx.beginPath();
-      ctx.strokeStyle =
-        theme === 'dark'
-          ? `rgba(168, 85, 247, ${0.05 + (l / numLevels) * 0.18})`
-          : `rgba(147, 51, 234, ${0.05 + (l / numLevels) * 0.16})`;
-      ctx.lineWidth = 1;
+    const isDark = theme === 'dark';
 
-      // Draw approximate contour circles/ellipses
-      const r = (l / numLevels) * (surfaceType === 'rosenbrock' ? 1.8 : 4.0);
-      const center = toPx(surfaceType === 'rosenbrock' ? 1.0 : 0, surfaceType === 'rosenbrock' ? 1.0 : 0);
-      const rx = (r / (b.maxX - b.minX)) * width;
-      const ry = (r / (b.maxY - b.minY)) * height;
-      ctx.ellipse(center.px, center.py, rx, ry, 0, 0, Math.PI * 2);
+    // ── 1. MATHEMATICAL LOSS SURFACE HEATMAP (DENSE 80x60 GRID) ──
+    const gridCols = 80;
+    const gridRows = 60;
+    const cellW = width / gridCols;
+    const cellH = height / gridRows;
+
+    const zMatrix: number[][] = [];
+    for (let r = 0; r < gridRows; r++) {
+      zMatrix[r] = [];
+      const dataY = b.maxY - ((r + 0.5) / gridRows) * (b.maxY - b.minY);
+      for (let c = 0; c < gridCols; c++) {
+        const dataX = b.minX + ((c + 0.5) / gridCols) * (b.maxX - b.minX);
+        const z = surface.f(dataX, dataY);
+        zMatrix[r][c] = z;
+
+        // Topographic color normalization
+        let norm = 0;
+        if (surfaceType === 'rosenbrock') {
+          norm = Math.log(1 + Math.max(0, z)) / Math.log(1 + surface.zRange.max);
+        } else if (surfaceType === 'bowl') {
+          norm = Math.sqrt(Math.max(0, z) / surface.zRange.max);
+        } else {
+          norm = (z - surface.zRange.min) / (surface.zRange.max - surface.zRange.min);
+        }
+        norm = Math.max(0, Math.min(1, norm));
+
+        // Scientific terrain palette: Deep Valley (Navy/Cyan) -> Mid Slopes (Emerald/Amber) -> Peak (Rose)
+        if (norm < 0.3) {
+          const t = norm / 0.3;
+          ctx.fillStyle = isDark
+            ? `rgba(${Math.round(15 + t * 20)}, ${Math.round(30 + t * 90)}, ${Math.round(80 + t * 110)}, 0.45)`
+            : `rgba(${Math.round(224 - t * 40)}, ${Math.round(242 - t * 30)}, ${Math.round(254 - t * 20)}, 0.55)`;
+        } else if (norm < 0.65) {
+          const t = (norm - 0.3) / 0.35;
+          ctx.fillStyle = isDark
+            ? `rgba(${Math.round(16 + t * 120)}, ${Math.round(120 + t * 30)}, ${Math.round(120 - t * 70)}, 0.35)`
+            : `rgba(${Math.round(209 + t * 45)}, ${Math.round(250 - t * 30)}, ${Math.round(229 - t * 70)}, 0.45)`;
+        } else {
+          const t = (norm - 0.65) / 0.35;
+          ctx.fillStyle = isDark
+            ? `rgba(${Math.round(160 + t * 80)}, ${Math.round(80 - t * 30)}, ${Math.round(40 + t * 20)}, 0.45)`
+            : `rgba(${Math.round(254 - t * 15)}, ${Math.round(215 - t * 60)}, ${Math.round(170 - t * 70)}, 0.55)`;
+        }
+        ctx.fillRect(c * cellW, r * cellH, cellW + 0.5, cellH + 0.5);
+      }
+    }
+
+    // ── 2. TRUE TOPOGRAPHIC LEVEL CONTOUR CURVES ──
+    const numLevels = 14;
+    ctx.lineWidth = 1.0;
+
+    for (let l = 1; l <= numLevels; l++) {
+      const frac = l / (numLevels + 1);
+      let levelZ = 0;
+      if (surfaceType === 'rosenbrock') {
+        levelZ = Math.exp(frac * Math.log(1 + surface.zRange.max)) - 1;
+      } else if (surfaceType === 'bowl') {
+        levelZ = Math.pow(frac, 2) * surface.zRange.max;
+      } else {
+        levelZ = surface.zRange.min + frac * (surface.zRange.max - surface.zRange.min);
+      }
+
+      ctx.beginPath();
+      ctx.strokeStyle = isDark
+        ? `rgba(168, 85, 247, ${0.12 + (l / numLevels) * 0.28})`
+        : `rgba(147, 51, 234, ${0.15 + (l / numLevels) * 0.25})`;
+
+      for (let r = 0; r < gridRows; r++) {
+        for (let c = 0; c < gridCols; c++) {
+          const z0 = zMatrix[r][c];
+          // Check horizontal level crossing
+          if (c < gridCols - 1) {
+            const z1 = zMatrix[r][c + 1];
+            if ((z0 - levelZ) * (z1 - levelZ) <= 0 && z0 !== z1) {
+              const edgeX = (c + 1) * cellW;
+              ctx.moveTo(edgeX, r * cellH);
+              ctx.lineTo(edgeX, (r + 1) * cellH);
+            }
+          }
+          // Check vertical level crossing
+          if (r < gridRows - 1) {
+            const z2 = zMatrix[r + 1][c];
+            if ((z0 - levelZ) * (z2 - levelZ) <= 0 && z0 !== z2) {
+              const edgeY = (r + 1) * cellH;
+              ctx.moveTo(c * cellW, edgeY);
+              ctx.lineTo((c + 1) * cellW, edgeY);
+            }
+          }
+        }
+      }
       ctx.stroke();
     }
 
-    // 2. Ghost SGD Trajectory (Comparison Mode)
+    // ── 3. STEEPEST DESCENT VECTOR FIELD ARROWS (-∇f) ──
+    if (showVectorField) {
+      const fieldCols = 14;
+      const fieldRows = 10;
+      ctx.fillStyle = isDark ? 'rgba(148, 163, 184, 0.35)' : 'rgba(100, 116, 139, 0.4)';
+      ctx.strokeStyle = isDark ? 'rgba(148, 163, 184, 0.35)' : 'rgba(100, 116, 139, 0.4)';
+      ctx.lineWidth = 1;
+
+      for (let fr = 0; fr < fieldRows; fr++) {
+        for (let fc = 0; fc < fieldCols; fc++) {
+          const dx = b.minX + ((fc + 0.5) / fieldCols) * (b.maxX - b.minX);
+          const dy = b.minY + ((fr + 0.5) / fieldRows) * (b.maxY - b.minY);
+          const [gx, gy] = surface.grad(dx, dy);
+          const gNorm = Math.hypot(gx, gy);
+
+          if (gNorm > 0.05) {
+            const centerPx = toPx(dx, dy);
+            // Vector points downhill (-gx, -gy)
+            const arrowLen = Math.min(13, 4 + Math.log(1 + gNorm) * 2.2);
+            const uX = -gx / gNorm;
+            const uY = gy / gNorm; // Flip y for screen coords
+
+            const tipX = centerPx.px + uX * arrowLen;
+            const tipY = centerPx.py + uY * arrowLen;
+
+            ctx.beginPath();
+            ctx.moveTo(centerPx.px, centerPx.py);
+            ctx.lineTo(tipX, tipY);
+            ctx.stroke();
+
+            // Arrowhead
+            const angle = Math.atan2(uY, uX);
+            ctx.beginPath();
+            ctx.moveTo(tipX, tipY);
+            ctx.lineTo(tipX - 4 * Math.cos(angle - Math.PI / 6), tipY - 4 * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(tipX - 4 * Math.cos(angle + Math.PI / 6), tipY - 4 * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+          }
+        }
+      }
+    }
+
+    // ── 4. GLOBAL OPTIMUM TARGET MARKER (θ*) ──
+    const optPx = toPx(surface.optimum.x, surface.optimum.y);
+    ctx.beginPath();
+    ctx.arc(optPx.px, optPx.py, 8, 0, Math.PI * 2);
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(optPx.px, optPx.py, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fill();
+
+    ctx.font = 'bold 10px monospace';
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillText('θ* Optimum', optPx.px + 10, optPx.py + 3);
+
+    // ── 5. GHOST SGD TRAJECTORY (COMPARISON PATH) ──
     if (showComparison && optimizer !== 'sgd' && ghostSgdTrajectory.length > 0) {
       ctx.beginPath();
-      ctx.setLineDash([4, 4]);
+      ctx.setLineDash([3, 4]);
       ghostSgdTrajectory.forEach((snap, idx) => {
         const pt = toPx(snap.x, snap.y);
         if (idx === 0) ctx.moveTo(pt.px, pt.py);
         else ctx.lineTo(pt.px, pt.py);
       });
-      ctx.strokeStyle = 'rgba(244, 63, 94, 0.45)';
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(244, 63, 94, 0.6)';
+      ctx.lineWidth = 1.8;
       ctx.stroke();
       ctx.setLineDash([]);
     }
 
-    // 3. Active Optimizer Trajectory Path
+    // ── 6. ACTIVE OPTIMIZER TRAJECTORY PATH & STEP MARKERS ──
     if (trajectory.length > 0) {
       const activeSnaps = trajectory.slice(0, currentStepIdx + 1);
+
       ctx.beginPath();
       activeSnaps.forEach((snap, idx) => {
         const pt = toPx(snap.x, snap.y);
@@ -275,57 +507,109 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
         else ctx.lineTo(pt.px, pt.py);
       });
       ctx.strokeStyle = '#10b981';
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 2.8;
       ctx.stroke();
 
-      // Path dots
-      activeSnaps.forEach((snap, idx) => {
-        if (idx % 2 === 0) {
-          const pt = toPx(snap.x, snap.y);
-          ctx.beginPath();
-          ctx.arc(pt.px, pt.py, 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = '#10b981';
-          ctx.fill();
-        }
+      // Step dots along trajectory
+      activeSnaps.forEach((snap) => {
+        const pt = toPx(snap.x, snap.y);
+        ctx.beginPath();
+        ctx.arc(pt.px, pt.py, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#10b981';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
       });
 
-      // 4. Current Marble Bead
+      // ── 7. CURRENT PHYSICAL MARBLE BEAD & VELOCITY HEADING ──
       const cur = activeSnaps[activeSnaps.length - 1];
       if (cur) {
         const curPx = toPx(cur.x, cur.y);
-        // Halo
+
+        // Velocity vector arrow (Momentum step heading)
+        if (currentStepIdx < trajectory.length - 1) {
+          const nextSnap = trajectory[currentStepIdx + 1];
+          const nextPx = toPx(nextSnap.x, nextSnap.y);
+          const vdx = nextPx.px - curPx.px;
+          const vdy = nextPx.py - curPx.py;
+          const vlen = Math.hypot(vdx, vdy);
+
+          if (vlen > 2) {
+            ctx.beginPath();
+            ctx.moveTo(curPx.px, curPx.py);
+            ctx.lineTo(curPx.px + vdx, curPx.py + vdy);
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            const angle = Math.atan2(vdy, vdx);
+            ctx.beginPath();
+            ctx.moveTo(curPx.px + vdx, curPx.py + vdy);
+            ctx.lineTo(curPx.px + vdx - 5 * Math.cos(angle - Math.PI / 6), curPx.py + vdy - 5 * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(curPx.px + vdx - 5 * Math.cos(angle + Math.PI / 6), curPx.py + vdy - 5 * Math.sin(angle + Math.PI / 6));
+            ctx.fillStyle = '#38bdf8';
+            ctx.fill();
+          }
+        }
+
+        // Marble Contact Drop Shadow
+        ctx.fillStyle = isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.2)';
+        ctx.beginPath();
+        ctx.arc(curPx.px + 1.2, curPx.py + 2, 7.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Outer Glow
         ctx.beginPath();
         ctx.arc(curPx.px, curPx.py, 12, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
         ctx.fill();
-        // Core
-        ctx.beginPath();
-        ctx.arc(curPx.px, curPx.py, 7, 0, Math.PI * 2);
-        ctx.fillStyle = '#10b981';
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
 
+        // 3D Spherical Marble Body
+        const marbleGrad = ctx.createRadialGradient(
+          curPx.px - 2.5, curPx.py - 2.5, 0.5,
+          curPx.px, curPx.py, 7.5
+        );
+        marbleGrad.addColorStop(0, '#ffffff');
+        marbleGrad.addColorStop(0.3, '#34d399');
+        marbleGrad.addColorStop(0.85, '#059669');
+        marbleGrad.addColorStop(1, '#064e3b');
+
+        ctx.fillStyle = marbleGrad;
+        ctx.beginPath();
+        ctx.arc(curPx.px, curPx.py, 7.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Specular glint
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.beginPath();
+        ctx.arc(curPx.px - 2.2, curPx.py - 2.2, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Floating Coordinates Tag
         ctx.font = 'bold 11px monospace';
         ctx.fillStyle = '#10b981';
-        ctx.fillText(`L = ${cur.loss.toFixed(3)}`, curPx.px + 12, curPx.py - 6);
+        ctx.fillText(
+          `θ(${cur.x.toFixed(2)}, ${cur.y.toFixed(2)})`,
+          curPx.px + 12,
+          curPx.py - 6
+        );
       }
     }
 
-    // 5. Start Position Marker (Draggable)
+    // ── 8. START POSITION MARKER θ₀ (DRAGGABLE) ──
     const startPx = toPx(startPos.x, startPos.y);
     ctx.beginPath();
-    ctx.arc(startPx.px, startPx.py, 6, 0, Math.PI * 2);
+    ctx.arc(startPx.px, startPx.py, 7, 0, Math.PI * 2);
     ctx.fillStyle = '#f59e0b';
     ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
     ctx.stroke();
 
-    ctx.font = '10px monospace';
+    ctx.font = 'bold 10px monospace';
     ctx.fillStyle = '#f59e0b';
-    ctx.fillText('Start θ₀', startPx.px + 8, startPx.py + 12);
+    ctx.fillText('Start θ₀', startPx.px + 9, startPx.py + 13);
 
     ctx.restore();
   }, [
@@ -336,6 +620,7 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
     trajectory,
     ghostSgdTrajectory,
     showComparison,
+    showVectorField,
     currentStepIdx,
     theme,
   ]);
@@ -366,6 +651,7 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
       x: Number(dataX.toFixed(2)),
       y: Number(dataY.toFixed(2)),
     });
+    setCurrentStepIdx(0);
     dragging.current = true;
     e.currentTarget.setPointerCapture(e.pointerId);
     if (config.soundEnabled) audio.playClick();
@@ -387,6 +673,7 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
       x: Number(dataX.toFixed(2)),
       y: Number(dataY.toFixed(2)),
     });
+    setCurrentStepIdx(0);
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -406,6 +693,8 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
     if (config.soundEnabled) audio.playClick();
   };
 
+  const activeSnap = trajectory[Math.min(currentStepIdx, trajectory.length - 1)];
+
   return (
     <div className="flex flex-col gap-4 select-none">
       {/* Pre-Canvas Intuitive Briefing & Mental Model */}
@@ -422,7 +711,7 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
             <button
               key={st}
               onClick={() => handleSelectSurface(st)}
-              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer ${
                 surfaceType === st
                   ? 'border-[var(--math-gradient)] bg-[var(--math-gradient)]/15 text-[var(--math-gradient)] font-bold shadow-sm'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
@@ -443,9 +732,10 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
               key={opt}
               onClick={() => {
                 setOptimizer(opt);
+                setCurrentStepIdx(0);
                 if (config.soundEnabled) audio.playClick();
               }}
-              className={`px-2.5 py-1 text-xs font-mono rounded-lg border uppercase transition-all ${
+              className={`px-2.5 py-1 text-xs font-mono rounded-lg border uppercase transition-all cursor-pointer ${
                 optimizer === opt
                   ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/15 text-[var(--math-vector)] font-bold shadow-sm'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
@@ -455,11 +745,25 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
             </button>
           ))}
 
+          {/* Toggle Vector Field Arrows */}
+          <button
+            onClick={() => setShowVectorField(!showVectorField)}
+            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer ${
+              showVectorField
+                ? 'border-sky-500/40 bg-sky-500/15 text-sky-400 font-bold'
+                : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+            }`}
+            title="Toggle Steepest Descent Gradient Vector Field (-∇f)"
+          >
+            <Compass size={12} />
+            <span>-∇f</span>
+          </button>
+
           {/* Toggle SGD Ghost Comparison */}
           {optimizer !== 'sgd' && (
             <button
               onClick={() => setShowComparison(!showComparison)}
-              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-mono rounded-lg border transition-all cursor-pointer ${
                 showComparison
                   ? 'border-[var(--math-loss)] bg-[var(--math-loss)]/15 text-[var(--math-loss)] font-bold'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
@@ -481,31 +785,147 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className="w-full h-80 rounded-xl cursor-crosshair touch-none"
+          className="w-full h-80 rounded-xl cursor-crosshair touch-none block"
         />
 
-        <div className="absolute top-4 start-4 px-2.5 py-1 rounded-md bg-[var(--bg-surface)]/80 backdrop-blur-md border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-tertiary)]">
-          {language === 'ar' ? 'انقر في أي مكان لوضع كرة البداية θ₀' : 'Click anywhere on contour surface to drop marble θ₀'}
+        <div className="absolute bottom-3 start-3 px-2.5 py-1 rounded-md bg-[var(--bg-surface)]/85 backdrop-blur-md border border-[var(--border-subtle)] text-[10px] sm:text-[11px] font-mono text-[var(--text-tertiary)] shadow-xs pointer-events-none">
+          {language === 'ar' ? 'انقر أو اسحب لنقل نقطة البداية θ₀' : 'Click or drag anywhere to reposition θ₀'}
         </div>
 
-        {/* Live Step Badge */}
-        {trajectory.length > 0 && (
-          <div className="absolute top-4 end-4 flex items-center gap-3 px-3 py-1.5 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-xs font-mono shadow-sm">
+        {/* Live Diagnostics Card */}
+        {activeSnap && (
+          <div className="absolute top-3 end-3 flex items-center gap-3 px-3 py-1.5 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-xs font-mono shadow-sm">
             <div>
               <span className="text-[var(--text-tertiary)]">Loss: </span>
               <span className="text-emerald-400 font-bold tabular-nums">
-                {trajectory[Math.min(currentStepIdx, trajectory.length - 1)]?.loss.toFixed(3)}
+                {activeSnap.loss.toFixed(4)}
+              </span>
+            </div>
+            <div className="w-px h-3 bg-[var(--border-subtle)]" />
+            <div>
+              <span className="text-[var(--text-tertiary)]">||∇L||: </span>
+              <span className="text-amber-400 font-bold tabular-nums">
+                {activeSnap.gradNorm.toFixed(4)}
               </span>
             </div>
             <div className="w-px h-3 bg-[var(--border-subtle)]" />
             <div>
               <span className="text-[var(--text-tertiary)]">Step: </span>
               <span className="text-purple-400 font-bold tabular-nums">
-                {currentStepIdx} / {trajectory.length - 1}
+                {currentStepIdx} / {Math.max(1, trajectory.length - 1)}
               </span>
             </div>
           </div>
         )}
+      </div>
+
+      {/* Convergence Milestone / Status Banner */}
+      {convergenceInfo.status === 'converged' && (
+        <div className="p-3 px-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 flex items-center justify-between gap-3 text-xs font-mono slide-up">
+          <div className="flex items-center gap-2 text-emerald-400">
+            <CheckCircle2 size={16} className="shrink-0" />
+            <span>
+              <strong>{language === 'ar' ? 'تم الوصول لنقطة الاستقرار (تقارب ناجح):' : 'Convergence Milestone Achieved:'}</strong>{' '}
+              {language === 'ar'
+                ? `توقف عند الخطوة ${convergenceInfo.step} لأن ||∇L|| = ${convergenceInfo.gradNorm.toFixed(4)} ≤ ${stopTol}`
+                : `Halted at Step ${convergenceInfo.step} with ||∇L|| = ${convergenceInfo.gradNorm.toFixed(4)} ≤ ε (${stopTol})`}
+            </span>
+          </div>
+          <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px] shrink-0">
+            {language === 'ar' ? 'مستقر ✓' : 'Stationary ✓'}
+          </span>
+        </div>
+      )}
+
+      {convergenceInfo.status === 'diverged' && (
+        <div className="p-3 px-4 rounded-xl border border-rose-500/40 bg-rose-500/10 flex items-center justify-between gap-3 text-xs font-mono slide-up">
+          <div className="flex items-center gap-2 text-rose-400">
+            <AlertTriangle size={16} className="shrink-0" />
+            <span>
+              <strong>{language === 'ar' ? 'تشتت وانفجار حسابي (Divergence):' : 'Optimization Diverged:'}</strong>{' '}
+              {language === 'ar'
+                ? `تجاوزت الخوارزمية الحدود عند الخطوة ${convergenceInfo.step}. خفّض معدل التعلم η.`
+                : `Loss exploded at Step ${convergenceInfo.step}. Reduce Learning Rate η.`}
+            </span>
+          </div>
+          <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold text-[10px] shrink-0">
+            {language === 'ar' ? 'تشتت ⚠' : 'Diverged ⚠'}
+          </span>
+        </div>
+      )}
+
+      {/* Stopping Criteria & Iteration Budget Toolbar */}
+      <div className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-3 shadow-xs">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+          {/* Tolerance Criteria Epsilon */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] text-[var(--text-secondary)] font-semibold flex items-center gap-1 shrink-0">
+              <Target size={13} className="text-emerald-400" />
+              <span>{language === 'ar' ? 'معيار التوقف (عتبة التدرج ε):' : 'Stopping Criteria (||∇L|| ≤ ε):'}</span>
+            </span>
+            <div className="flex items-center gap-1 bg-[var(--bg-app)] p-0.5 rounded-lg border border-[var(--border-subtle)]">
+              {([0.005, 0.02, 0.08] as StopTolerance[]).map((tol) => (
+                <button
+                  key={tol}
+                  onClick={() => {
+                    setStopTol(tol);
+                    if (config.soundEnabled) audio.playClick();
+                  }}
+                  className={`px-2.5 py-1 rounded text-[11px] font-mono transition-all cursor-pointer ${
+                    stopTol === tol
+                      ? 'bg-[var(--bg-surface)] text-emerald-400 font-bold shadow-xs border border-[var(--border-subtle)]'
+                      : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+                  }`}
+                >
+                  {tol === 0.005
+                    ? (language === 'ar' ? '0.005 (دقيق)' : '0.005 (Strict)')
+                    : tol === 0.02
+                    ? (language === 'ar' ? '0.02 (قياسي)' : '0.02 (Standard)')
+                    : (language === 'ar' ? '0.08 (سريع)' : '0.08 (Relaxed)')}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Max Step Budget */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-[var(--text-tertiary)] shrink-0">
+              {language === 'ar' ? 'أقصى خطوات:' : 'Step Budget:'}
+            </span>
+            <div className="flex items-center gap-1 bg-[var(--bg-app)] p-0.5 rounded-lg border border-[var(--border-subtle)]">
+              {[25, 50, 80, 150].map((steps) => (
+                <button
+                  key={steps}
+                  onClick={() => {
+                    setMaxStepBudget(steps);
+                    if (config.soundEnabled) audio.playClick();
+                  }}
+                  className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all cursor-pointer ${
+                    maxStepBudget === steps
+                      ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
+                      : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+                  }`}
+                >
+                  {steps}
+                </button>
+              ))}
+            </div>
+
+            {/* Auto-Stop Toggle */}
+            <button
+              onClick={() => setAutoStopOnConvergence(!autoStopOnConvergence)}
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-mono border transition-all cursor-pointer ${
+                autoStopOnConvergence
+                  ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-400 font-bold'
+                  : 'border-[var(--border-subtle)] text-[var(--text-tertiary)]'
+              }`}
+            >
+              {autoStopOnConvergence
+                ? (language === 'ar' ? '✓ إيقاف تلقائي' : '✓ Auto-Stop')
+                : (language === 'ar' ? 'متابعة كاملة' : 'Full Run')}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Bidirectional Playback Timeline Bar */}
@@ -514,12 +934,12 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
         totalSteps={Math.max(1, trajectory.length - 1)}
         stepPhase={optimizer.toUpperCase()}
         metricLabel="Loss"
-        metricValue={trajectory[Math.min(currentStepIdx, trajectory.length - 1)]?.loss || 0}
+        metricValue={activeSnap?.loss || 0}
         onStepChange={(step) => setCurrentStepIdx(step)}
       />
 
-      {/* Hardware-Style Precision Parameter Sliders */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular">
+      {/* Hardware-Style Precision Parameter Sliders (Spacious 2-Tier Responsive Layout) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular shadow-xs">
         <div className="flex flex-col gap-1.5">
           <div className="flex justify-between text-xs font-mono text-[var(--text-secondary)]">
             <span className="flex items-center gap-1.5">
