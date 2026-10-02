@@ -1323,77 +1323,97 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
         </div>
 
         {/* =========================================================================
-            ADVANCED PHYSICAL & PARAMETRIC CONTROLS
+            ADVANCED PHYSICAL & PARAMETRIC CONTROLS (RESPONSIVE LAB FOOTER)
            ========================================================================= */}
         <div className="space-y-3 pt-1">
           {/* Mode 1: Galton Board Specific Controls (Right Bias + Gravity + Restitution) */}
           {labMode === 'galton' && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
-              {/* Right Bias p */}
-              <div className="flex items-center gap-3 flex-1">
-                <Sliders size={14} className="text-[var(--text-tertiary)] shrink-0" />
-                <span className="text-xs font-mono text-[var(--text-secondary)] shrink-0">
-                  {language === 'ar' ? 'احتمال الانحراف (p):' : 'Right Bias (p):'}{' '}
-                  <strong className="text-[var(--text-primary)] tabular-nums">{pBias.toFixed(2)}</strong>
-                </span>
-                <input
-                  type="range"
-                  min="0.2"
-                  max="0.8"
-                  step="0.05"
-                  value={pBias}
-                  onChange={(e) => {
-                    setPBias(parseFloat(e.target.value));
-                    resetBoard();
-                  }}
-                  className="flex-1 accent-[var(--math-gradient)] cursor-pointer"
-                />
-                <span className="text-[10px] font-mono text-[var(--math-gradient)] font-bold shrink-0 min-w-20 text-end">
-                  {pBias < 0.48 ? '← Left Skew' : pBias > 0.52 ? 'Right Skew →' : 'Symmetric'}
-                </span>
-              </div>
+            <div className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-3">
+              {/* Row 1: Right Bias Slider with full width breathability */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3">
+                <div className="flex items-center gap-2 shrink-0">
+                  <Sliders size={14} className="text-sky-400 shrink-0" />
+                  <span className="text-xs font-mono text-[var(--text-secondary)]">
+                    {language === 'ar' ? 'احتمال الانحراف (p):' : 'Right Bias (p):'}{' '}
+                    <strong className="text-[var(--text-primary)] tabular-nums">{pBias.toFixed(2)}</strong>
+                  </span>
+                </div>
 
-              {/* Gravity Environment */}
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[11px] font-mono text-[var(--text-tertiary)]">
-                  {language === 'ar' ? 'الجاذبية:' : 'Gravity:'}
-                </span>
-                <div className="flex items-center gap-1 bg-[var(--bg-surface)] p-0.5 rounded-lg border border-[var(--border-subtle)]">
-                  {(['lunar', 'earth', 'heavy'] as const).map((g) => (
-                    <button
-                      key={g}
-                      onClick={() => setGravityPreset(g)}
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono capitalize transition-all ${
-                        gravityPreset === g
-                          ? 'bg-[var(--bg-app)] text-[var(--text-primary)] font-bold shadow-xs'
-                          : 'text-[var(--text-tertiary)]'
-                      }`}
-                    >
-                      {g}
-                    </button>
-                  ))}
+                <div className="flex items-center gap-3 flex-1">
+                  <input
+                    type="range"
+                    min="0.2"
+                    max="0.8"
+                    step="0.05"
+                    value={pBias}
+                    onChange={(e) => {
+                      setPBias(parseFloat(e.target.value));
+                      resetBoard();
+                    }}
+                    className="flex-1 accent-sky-400 cursor-pointer min-w-28"
+                  />
+                  <span className="text-[11px] font-mono font-bold shrink-0 px-2.5 py-0.5 rounded-md bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-amber-400 shadow-xs">
+                    {pBias < 0.48
+                      ? (language === 'ar' ? '← انحراف لليسار' : '← Left Skew')
+                      : pBias > 0.52
+                      ? (language === 'ar' ? 'انحراف لليمين →' : 'Right Skew →')
+                      : (language === 'ar' ? 'متماثل' : 'Symmetric')}
+                  </span>
                 </div>
               </div>
 
-              {/* Bounciness / Restitution */}
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[11px] font-mono text-[var(--text-tertiary)]">
-                  {language === 'ar' ? 'المرونة:' : 'Bounce:'}
-                </span>
-                <div className="flex items-center gap-1 bg-[var(--bg-surface)] p-0.5 rounded-lg border border-[var(--border-subtle)]">
-                  {[0.35, 0.52, 0.75].map((r) => (
-                    <button
-                      key={r}
-                      onClick={() => setRestitutionVal(r)}
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
-                        restitutionVal === r
-                          ? 'bg-[var(--bg-app)] text-[var(--text-primary)] font-bold shadow-xs'
-                          : 'text-[var(--text-tertiary)]'
-                      }`}
-                    >
-                      {r === 0.35 ? 'Lead' : r === 0.52 ? 'Steel' : 'Spring'}
-                    </button>
-                  ))}
+              {/* Row 2: Physics Environment (Gravity & Bounce) with clean hairline divider */}
+              <div className="pt-2.5 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 text-xs">
+                {/* Gravity Environment */}
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono text-[var(--text-tertiary)] shrink-0">
+                    {language === 'ar' ? 'الجاذبية:' : 'Gravity:'}
+                  </span>
+                  <div className="flex items-center gap-1 bg-[var(--bg-surface)] p-0.5 rounded-lg border border-[var(--border-subtle)]">
+                    {(['lunar', 'earth', 'heavy'] as const).map((g) => (
+                      <button
+                        key={g}
+                        onClick={() => setGravityPreset(g)}
+                        className={`px-2.5 py-1 rounded-md text-[10px] font-mono capitalize transition-all cursor-pointer ${
+                          gravityPreset === g
+                            ? 'bg-[var(--bg-app)] text-[var(--text-primary)] font-bold shadow-xs'
+                            : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+                        }`}
+                      >
+                        {g === 'lunar'
+                          ? (language === 'ar' ? 'قمرية' : 'Lunar')
+                          : g === 'earth'
+                          ? (language === 'ar' ? 'أرضية' : 'Earth')
+                          : (language === 'ar' ? 'ثقيلة' : 'Heavy')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Bounciness / Restitution */}
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono text-[var(--text-tertiary)] shrink-0">
+                    {language === 'ar' ? 'المرونة:' : 'Bounce:'}
+                  </span>
+                  <div className="flex items-center gap-1 bg-[var(--bg-surface)] p-0.5 rounded-lg border border-[var(--border-subtle)]">
+                    {[
+                      { val: 0.35, label: language === 'ar' ? 'رصاص' : 'Lead' },
+                      { val: 0.52, label: language === 'ar' ? 'صلب' : 'Steel' },
+                      { val: 0.75, label: language === 'ar' ? 'نابض' : 'Spring' },
+                    ].map(({ val, label }) => (
+                      <button
+                        key={val}
+                        onClick={() => setRestitutionVal(val)}
+                        className={`px-2.5 py-1 rounded-md text-[10px] font-mono transition-all cursor-pointer ${
+                          restitutionVal === val
+                            ? 'bg-[var(--bg-app)] text-[var(--text-primary)] font-bold shadow-xs'
+                            : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1401,16 +1421,16 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
           {/* Mode 2: Dice Sum Controls (Number of Dice k) */}
           {labMode === 'dice' && (
-            <div className="flex items-center justify-between gap-4 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
               <div className="flex items-center gap-3">
-                <Dices size={16} className="text-emerald-400" />
+                <Dices size={16} className="text-emerald-400 shrink-0" />
                 <span className="text-xs font-mono text-[var(--text-secondary)]">
                   {language === 'ar' ? 'عدد النرد المستقل في كل رمية (k):' : 'Number of Independent Dice (k):'}{' '}
                   <strong className="text-emerald-400 font-bold">{numDice} Dice</strong>
                 </span>
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 {[1, 2, 5, 10, 30].map((k) => (
                   <button
                     key={k}
@@ -1433,16 +1453,16 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
           {/* Mode 3: Skewed Exponential Controls (k Samples) */}
           {labMode === 'skew' && (
-            <div className="flex items-center justify-between gap-4 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
               <div className="flex items-center gap-3">
-                <TrendingDown size={16} className="text-amber-400" />
+                <TrendingDown size={16} className="text-amber-400 shrink-0" />
                 <span className="text-xs font-mono text-[var(--text-secondary)]">
                   {language === 'ar' ? 'حجم العينة لحساب المتوسط (k):' : 'Sample Size for Averaging (k):'}{' '}
                   <strong className="text-amber-400 font-bold">{numSkewSamples} Draws</strong>
                 </span>
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 {[1, 2, 5, 15, 50].map((k) => (
                   <button
                     key={k}
