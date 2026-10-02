@@ -171,24 +171,79 @@ if [ "${PLATFORM}" = "linux" ]; then
   TMP_DIR="$(mktemp -d)"
 
   echo "    • Fetching Linux bundle for ${ARCH_SUFFIX}..."
-  if download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${INSTALL_DIR}/okvir" 2>/dev/null || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${INSTALL_DIR}/okvir" 2>/dev/null || \
+  DESKTOP_TARGET="${APP_DIR}/okvir.AppImage"
+  mkdir -p "${APP_DIR}/bin"
+
+  if download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TARGET}" 2>/dev/null || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TARGET}" 2>/dev/null || \
      download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" 2>/dev/null || \
      download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" 2>/dev/null || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir" "${INSTALL_DIR}/okvir" 2>/dev/null; then
+     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir" "${DESKTOP_TARGET}" 2>/dev/null; then
 
     if [ -f "${TMP_DIR}/okvir.tar.gz" ]; then
       tar -xzf "${TMP_DIR}/okvir.tar.gz" -C "${TMP_DIR}"
       chmod +x "${TMP_DIR}/okvir"
-      mv "${TMP_DIR}/okvir" "${INSTALL_DIR}/okvir"
+      mv "${TMP_DIR}/okvir" "${DESKTOP_TARGET}"
     fi
+    chmod +x "${DESKTOP_TARGET}"
+    ln -sf "${DESKTOP_TARGET}" "${INSTALL_DIR}/okvir-desktop"
+
+    # Install Framework CLI script and Node module descriptor to ~/.okvir
+    if [ -f "${TMP_DIR}/okvir.js" ]; then
+      cp -f "${TMP_DIR}/okvir.js" "${APP_DIR}/bin/okvir.js"
+    else
+      download_file "https://raw.githubusercontent.com/${OKVIR_REPO}/main/bin/okvir.js" "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
+    fi
+    chmod +x "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
+    echo '{"type": "module"}' > "${APP_DIR}/package.json" 2>/dev/null || true
+
+    # Create the unified CLI & desktop launcher at ${INSTALL_DIR}/okvir
+    cat << 'LAUNCHER_EOF' > "${INSTALL_DIR}/okvir"
+#!/usr/bin/env bash
+# ==============================================================================
+# OKVIR Unified CLI & Desktop Launcher
+# Author: Zakarya Roubhi <roubhizakarya@gmail.com>
+# ==============================================================================
+
+APP_DIR="${OKVIR_APP_DIR:-${HOME}/.okvir}"
+DESKTOP_APP="${APP_DIR}/okvir.AppImage"
+[ ! -f "${DESKTOP_APP}" ] && DESKTOP_APP="${HOME}/.local/bin/okvir-desktop"
+CLI_SCRIPT="${APP_DIR}/bin/okvir.js"
+[ -f "bin/okvir.js" ] && CLI_SCRIPT="bin/okvir.js"
+
+# 1. Desktop GUI Launch (default when no arguments, or explicit 'open' / 'app')
+if [ $# -eq 0 ] || [ "$1" = "open" ] || [ "$1" = "app" ] || [ "$1" = "--app" ] || [ "$1" = "--gui" ] || [ "$1" = "--desktop" ]; then
+  if [ -x "${DESKTOP_APP}" ]; then
+    if [ "$1" = "open" ]; then
+      nohup "${DESKTOP_APP}" >/dev/null 2>&1 &
+      echo "✔ Launched Okvir Desktop Application in background."
+      exit 0
+    else
+      exec "${DESKTOP_APP}" "$@"
+    fi
+  fi
+fi
+
+# 2. CLI Dispatch (version, update, doctor, rate, test, dev, init, etc.)
+if command -v node >/dev/null 2>&1 && [ -f "${CLI_SCRIPT}" ]; then
+  exec node "${CLI_SCRIPT}" "$@"
+fi
+
+# 3. Fallback to desktop binary
+if [ -x "${DESKTOP_APP}" ]; then
+  exec "${DESKTOP_APP}" "$@"
+fi
+
+echo "Error: Could not find Okvir desktop application or CLI runtime."
+exit 1
+LAUNCHER_EOF
     chmod +x "${INSTALL_DIR}/okvir"
 
     echo ""
     echo "${CYAN}${BOLD}==> [5/5] Integrating System Launcher & Application Shortcuts...${RESET}"
     echo "    • Installing FreeDesktop desktop entry (.desktop)"
     echo "    • Installing high-resolution SVG and PNG icons"
-    echo "    • Configuring CLI terminal launcher at ${INSTALL_DIR}/okvir"
+    echo "    • Configuring unified CLI & desktop launcher at ${INSTALL_DIR}/okvir"
 
     # Install FreeDesktop Application Shortcut & Icons
     mkdir -p "${HOME}/.local/share/applications"
@@ -197,16 +252,23 @@ if [ "${PLATFORM}" = "linux" ]; then
 
     [ -f "${TMP_DIR}/okvir.svg" ] && cp -f "${TMP_DIR}/okvir.svg" "${HOME}/.local/share/icons/hicolor/scalable/apps/okvir.svg"
     [ -f "${TMP_DIR}/okvir.png" ] && cp -f "${TMP_DIR}/okvir.png" "${HOME}/.local/share/pixmaps/okvir.png"
-    [ -f "${TMP_DIR}/okvir.desktop" ] && cp -f "${TMP_DIR}/okvir.desktop" "${HOME}/.local/share/applications/okvir.desktop"
-
-    # Install Framework CLI script to ~/.okvir/bin
-    mkdir -p "${APP_DIR}/bin"
-    if [ -f "${TMP_DIR}/okvir.js" ]; then
-      cp -f "${TMP_DIR}/okvir.js" "${APP_DIR}/bin/okvir.js"
+    if [ -f "${TMP_DIR}/okvir.desktop" ]; then
+      cp -f "${TMP_DIR}/okvir.desktop" "${HOME}/.local/share/applications/okvir.desktop"
     else
-      download_file "https://raw.githubusercontent.com/${OKVIR_REPO}/main/bin/okvir.js" "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
+      cat << DESKTOP_ENTRY_EOF > "${HOME}/.local/share/applications/okvir.desktop"
+[Desktop Entry]
+Name=OKVIR
+Comment=The Open-Source Desktop Framework for Learning Data Science, Econometrics & AI
+Exec=${INSTALL_DIR}/okvir open %U
+Icon=okvir
+Terminal=false
+Type=Application
+Categories=Education;Science;Math;Development;
+Keywords=data-science;econometrics;ai;machine-learning;statistics;interactive;
+StartupWMClass=okvir-desktop
+MimeType=application/x-okvir;
+DESKTOP_ENTRY_EOF
     fi
-    chmod +x "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
 
     # Record installed release version
     mkdir -p "${APP_DIR}"
@@ -216,7 +278,8 @@ if [ "${PLATFORM}" = "linux" ]; then
     echo "    • Refreshing system application database (Super key search ready)"
     rm -rf "${TMP_DIR}"
     INSTALLED=true
-    echo "${GREEN}✔ Installed Native Desktop Executable (v${RESOLVED_VERSION}) to ${INSTALL_DIR}/okvir${RESET}"
+    echo "${GREEN}✔ Installed Native Desktop Engine (v${RESOLVED_VERSION}) to ${DESKTOP_TARGET}${RESET}"
+    echo "${GREEN}✔ Configured Unified Terminal CLI Launcher at ${INSTALL_DIR}/okvir${RESET}"
   fi
 
 elif [ "${PLATFORM}" = "macos" ]; then

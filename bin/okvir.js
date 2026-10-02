@@ -656,11 +656,13 @@ function findDesktopApp() {
       if (fs.existsSync(c)) return c;
     }
   } else {
-    // Linux
     const candidates = [
+      path.join(home, '.local', 'bin', 'okvir-desktop'),
+      path.join(home, '.okvir', 'okvir.AppImage'),
       path.join(home, '.local', 'bin', 'okvir'),
       '/usr/local/bin/okvir',
       '/usr/bin/okvir',
+      '/usr/bin/OKVIR',
     ];
     for (const c of candidates) {
       if (fs.existsSync(c)) {

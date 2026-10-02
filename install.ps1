@@ -172,12 +172,57 @@ foreach ($p in $PotentialExes) {
 }
 
 if ($InstalledExe) {
+    $OkvirDir = "$env:USERPROFILE\.okvir"
+    $OkvirBin = "$OkvirDir\bin"
+    if (!(Test-Path $OkvirBin)) { New-Item -ItemType Directory -Path $OkvirBin -Force | Out-Null }
+
+    # Download Framework CLI script & configure ES module package descriptor
+    $CliScript = "$OkvirBin\okvir.js"
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/$Repo/main/bin/okvir.js" -OutFile $CliScript -UseBasicParsing -TimeoutSec 15
+        Set-Content -Path "$OkvirDir\package.json" -Value '{"type": "module"}' -Encoding UTF8 -Force
+    } catch {}
+
     # Generate batch wrapper so 'okvir' works in CMD, PowerShell, and Run dialog without admin rights
-    $CmdWrapper = "@echo off`r`nstart `"`" `"$InstalledExe`" %*`r`n"
+    $CmdWrapper = @"
+@echo off
+set "CLI_SCRIPT=%USERPROFILE%\.okvir\bin\okvir.js"
+if "%~1"=="" goto launch_gui
+if "%~1"=="open" goto launch_gui
+if "%~1"=="app" goto launch_gui
+if "%~1"=="--app" goto launch_gui
+if "%~1"=="--gui" goto launch_gui
+
+where node >nul 2>nul
+if %errorlevel% equ 0 (
+    if exist "%CLI_SCRIPT%" (
+        node "%CLI_SCRIPT%" %*
+        exit /b %errorlevel%
+    )
+)
+
+:launch_gui
+start "" "$InstalledExe" %*
+exit /b 0
+"@
     [System.IO.File]::WriteAllText("$BinDir\okvir.cmd", $CmdWrapper, [System.Text.Encoding]::ASCII)
 
     # Generate PowerShell wrapper
-    $Ps1Wrapper = "& `"$InstalledExe`" `$args`r`n"
+    $Ps1Wrapper = @"
+`$CliScript = "`$env:USERPROFILE\.okvir\bin\okvir.js"
+if (`$args.Count -eq 0 -or `$args[0] -in @("open", "app", "--app", "--gui", "--desktop")) {
+    Start-Process -FilePath "$InstalledExe" -ArgumentList `$args
+    exit 0
+}
+
+if ((Get-Command node -ErrorAction SilentlyContinue) -and (Test-Path `$CliScript)) {
+    & node `$CliScript `$args
+    exit `$LASTEXITCODE
+}
+
+& "$InstalledExe" `$args
+"@
     [System.IO.File]::WriteAllText("$BinDir\okvir.ps1", $Ps1Wrapper, [System.Text.Encoding]::UTF8)
 
     Write-Host "    • Desktop Executable: $InstalledExe" -ForegroundColor Gray

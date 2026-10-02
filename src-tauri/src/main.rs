@@ -6,18 +6,29 @@ use std::path::{Path, PathBuf};
 use std::process::{self, Command};
 
 const HELP_TEXT: &str = "Usage:
-  okvir [command] [options]
+  okvir <command> [options]
 
-Commands:
-  okvir [app]                  Launch native interactive desktop environment          [default]
+Core Commands:
+  okvir [app], open            Launch native interactive desktop environment          [default]
   okvir dev                    Launch live-reload curriculum previewer
   okvir test [path]            Run AST validation and test cases on .okvir.md lessons
   okvir init <course-name>     Scaffold a new interactive curriculum repository
   okvir pack [dir] [out]       Compile lesson assets into seekable .okvir container
   okvir verify <file.okvir>    Cryptographically verify .okvir binary package signature
   okvir registry [query]       Explore decentralized community curriculum packs
-  okvir version                Print Framework version information
-  okvir help [command]         Show help for a specific command
+
+Maintenance & Diagnostics:
+  okvir version, -v, --version Show version info, environment diagnostics & update status
+  okvir doctor, info           Run comprehensive system diagnostic & environment audit
+  okvir update, --update       Check for updates & upgrade Okvir desktop app and CLI
+  okvir clean                  Clean local package caches and temporary build artifacts
+
+Community & Links:
+  okvir rate, star             Open GitHub repository to star and rate Okvir
+  okvir docs                   Open official documentation and curriculum specifications
+  okvir issue, bug             Report a bug or submit a feature request on GitHub
+  okvir sponsor, donate        Support independent open-source development
+  okvir help, -h, --help       Show this help message
 
 Options:
   -h, --help                   Show help information                                  [boolean]
@@ -26,10 +37,12 @@ Options:
       --headless               Run computational kernel headlessly without GUI        [boolean]
 
 Examples:
-  okvir                        Launch desktop GUI application
-  okvir --help                 Show help information
-  okvir --version              Show version number
-  okvir test ./curriculum      Verify all 125 curriculum lessons and AST test cases
+  okvir open                   Launch desktop GUI application
+  okvir version                Check current version and remote updates
+  okvir doctor                 Run complete system and environment health audit
+  okvir update                 Upgrade to the latest Okvir release
+  okvir rate                   Support and star Okvir on GitHub
+  okvir test ./curriculum      Verify curriculum lessons and AST test cases
   okvir init econometrics-101  Scaffold a new course repository
   okvir registry causal        Search community curriculum packages
 ";
@@ -90,7 +103,11 @@ fn print_help(version: &str) {
 }
 
 fn print_version(version: &str) {
-    println!("okvir {}", version);
+    print_banner(version);
+    println!("  \x1b[1mOKVIR CLI:\x1b[0m        v{}", version);
+    println!("  \x1b[1mRepository:\x1b[0m       https://github.com/zuikre/okvir");
+    println!("  \x1b[1mAuthor:\x1b[0m           Zakarya Roubhi <roubhizakarya@gmail.com>");
+    println!("  \x1b[1mStatus:\x1b[0m           Installed & Ready (v{})\n", version);
 }
 
 fn find_okvir_js() -> Option<PathBuf> {
@@ -126,10 +143,18 @@ fn find_okvir_js() -> Option<PathBuf> {
         }
     }
 
+    // 4. %USERPROFILE%\.okvir\bin\okvir.js (Windows)
+    if let Ok(profile) = env::var("USERPROFILE") {
+        let profile_path = PathBuf::from(profile).join(".okvir").join("bin").join("okvir.js");
+        if profile_path.exists() {
+            return Some(profile_path);
+        }
+    }
+
     None
 }
 
-fn dispatch_cli(args: &[String]) {
+fn dispatch_cli(args: &[String]) -> bool {
     if let Some(script_path) = find_okvir_js() {
         let mut cmd = Command::new("node");
         cmd.arg(&script_path).args(args);
@@ -137,16 +162,10 @@ fn dispatch_cli(args: &[String]) {
             Ok(status) => {
                 process::exit(status.code().unwrap_or(0));
             }
-            Err(err) => {
-                eprintln!("\x1b[31mError launching Node.js runtime:\x1b[0m {}", err);
-                eprintln!("Ensure Node.js (v18+) is installed on your PATH to run CLI commands.");
-                process::exit(1);
-            }
+            Err(_) => false,
         }
     } else {
-        eprintln!("\x1b[31mError:\x1b[0m Could not locate Framework CLI script 'bin/okvir.js'.");
-        eprintln!("Ensure you run this command inside an Okvir project directory or have Okvir CLI installed.");
-        process::exit(1);
+        false
     }
 }
 
@@ -158,22 +177,37 @@ fn main() {
         let first_arg = args[1].as_str();
 
         match first_arg {
-            "-h" | "--help" | "help" => {
-                print_help(&version);
-                process::exit(0);
-            }
-            "-v" | "--version" | "version" => {
-                print_version(&version);
-                process::exit(0);
-            }
-            "init" | "dev" | "test" | "pack" | "verify" | "registry" => {
-                dispatch_cli(&args[1..]);
-                return;
-            }
-            "app" | "--app" | "--gui" | "--desktop" => {
+            "app" | "--app" | "--gui" | "--desktop" | "open" | "launch" => {
                 // Explicit GUI launch
                 okvir_desktop::run();
                 return;
+            }
+            "init" | "dev" | "test" | "pack" | "verify" | "registry"
+            | "doctor" | "info" | "update" | "--update" | "rate" | "star"
+            | "docs" | "issue" | "bug" | "sponsor" | "donate" | "clean"
+            | "version" | "-v" | "--version" | "help" | "-h" | "--help" => {
+                // Try forwarding to Framework CLI script first (for rich interactive checks & live updates)
+                if dispatch_cli(&args[1..]) {
+                    return;
+                }
+
+                // Graceful native Rust fallbacks if Node.js or okvir.js is unavailable
+                match first_arg {
+                    "-h" | "--help" | "help" => {
+                        print_help(&version);
+                        process::exit(0);
+                    }
+                    "-v" | "--version" | "version" => {
+                        print_version(&version);
+                        process::exit(0);
+                    }
+                    _ => {
+                        eprintln!("\x1b[31mError:\x1b[0m Could not locate Framework CLI script or Node.js runtime.");
+                        eprintln!("Install Node.js (v18+) to run advanced CLI authoring tools, or run 'okvir open' for desktop GUI.\n");
+                        print_help(&version);
+                        process::exit(1);
+                    }
+                }
             }
             arg if arg.starts_with('-') => {
                 eprintln!("\x1b[31mUnknown option:\x1b[0m {}\n", arg);
