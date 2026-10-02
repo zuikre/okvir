@@ -11,26 +11,28 @@ interface Point {
 }
 
 type DistanceMetric = 'L2' | 'L1' | 'Linf';
-type KNNPreset = 'two_blobs' | 'concentric' | 'xor';
+type KNNPreset = 'two_moons' | 'concentric' | 'xor' | 'two_blobs';
 
 const PRESETS: Record<KNNPreset, { name: { en: string; ar: string }; points: Point[] }> = {
-  two_blobs: {
-    name: { en: 'Two Gaussian Blobs', ar: 'عنقودان غاوسيان' },
+  two_moons: {
+    name: { en: 'Two Moons (Non-linear)', ar: 'الهلالان المتداخلان (غير خطي)' },
     points: [
-      // Class 0 (Sky Blue)
-      { x: 1.5, y: 2.2, cls: 0 }, { x: 2.0, y: 3.1, cls: 0 }, { x: 2.5, y: 2.0, cls: 0 },
-      { x: 2.8, y: 4.0, cls: 0 }, { x: 1.2, y: 3.5, cls: 0 }, { x: 3.2, y: 2.8, cls: 0 },
-      { x: 2.2, y: 4.8, cls: 0 }, { x: 3.8, y: 2.1, cls: 0 }, { x: 1.8, y: 4.2, cls: 0 },
-      { x: 3.0, y: 5.2, cls: 0 }, { x: 2.7, y: 3.7, cls: 0 }, { x: 1.9, y: 5.5, cls: 0 },
-      // Class 1 (Amber)
-      { x: 6.0, y: 6.8, cls: 1 }, { x: 7.0, y: 8.0, cls: 1 }, { x: 6.5, y: 6.2, cls: 1 },
-      { x: 7.5, y: 7.4, cls: 1 }, { x: 5.8, y: 8.1, cls: 1 }, { x: 8.0, y: 6.5, cls: 1 },
-      { x: 7.2, y: 8.9, cls: 1 }, { x: 6.2, y: 8.4, cls: 1 }, { x: 8.4, y: 8.0, cls: 1 },
-      { x: 7.1, y: 6.0, cls: 1 }, { x: 5.5, y: 7.0, cls: 1 }, { x: 8.1, y: 9.0, cls: 1 },
+      // Upper Crescent (Class 0 - Sky Blue)
+      { x: 1.4, y: 5.6, cls: 0 }, { x: 1.9, y: 6.7, cls: 0 }, { x: 2.7, y: 7.5, cls: 0 },
+      { x: 3.7, y: 8.0, cls: 0 }, { x: 4.8, y: 8.0, cls: 0 }, { x: 5.8, y: 7.4, cls: 0 },
+      { x: 6.6, y: 6.4, cls: 0 }, { x: 7.1, y: 5.2, cls: 0 },
+      { x: 2.4, y: 5.9, cls: 0 }, { x: 3.4, y: 6.9, cls: 0 }, { x: 4.5, y: 7.1, cls: 0 },
+      { x: 5.5, y: 6.5, cls: 0 }, { x: 6.2, y: 5.5, cls: 0 },
+      // Lower Interlocking Crescent (Class 1 - Amber)
+      { x: 3.5, y: 4.6, cls: 1 }, { x: 4.2, y: 3.5, cls: 1 }, { x: 5.1, y: 2.7, cls: 1 },
+      { x: 6.2, y: 2.3, cls: 1 }, { x: 7.3, y: 2.4, cls: 1 }, { x: 8.3, y: 3.0, cls: 1 },
+      { x: 9.0, y: 4.0, cls: 1 }, { x: 9.3, y: 5.2, cls: 1 },
+      { x: 4.6, y: 4.2, cls: 1 }, { x: 5.6, y: 3.4, cls: 1 }, { x: 6.7, y: 3.2, cls: 1 },
+      { x: 7.8, y: 3.7, cls: 1 }, { x: 8.5, y: 4.6, cls: 1 },
     ],
   },
   concentric: {
-    name: { en: 'Concentric Rings (Non-linear)', ar: 'حلقات متحدة المركز (غير خطي)' },
+    name: { en: 'Concentric Rings', ar: 'حلقات متحدة المركز' },
     points: [
       // Inner Circle (Class 0)
       { x: 5.0, y: 5.0, cls: 0 }, { x: 4.2, y: 5.0, cls: 0 }, { x: 5.8, y: 5.0, cls: 0 },
@@ -47,13 +49,28 @@ const PRESETS: Record<KNNPreset, { name: { en: string; ar: string }; points: Poi
     name: { en: 'XOR Topology', ar: 'بنية XOR المنطقية' },
     points: [
       // Top-Left Class 0
-      { x: 2.5, y: 7.5, cls: 0 }, { x: 3.0, y: 8.0, cls: 0 }, { x: 2.0, y: 7.0, cls: 0 },
+      { x: 2.5, y: 7.5, cls: 0 }, { x: 3.0, y: 8.0, cls: 0 }, { x: 2.0, y: 7.0, cls: 0 }, { x: 3.2, y: 6.8, cls: 0 },
       // Bottom-Right Class 0
-      { x: 7.5, y: 2.5, cls: 0 }, { x: 8.0, y: 3.0, cls: 0 }, { x: 7.0, y: 2.0, cls: 0 },
+      { x: 7.5, y: 2.5, cls: 0 }, { x: 8.0, y: 3.0, cls: 0 }, { x: 7.0, y: 2.0, cls: 0 }, { x: 6.8, y: 3.2, cls: 0 },
       // Bottom-Left Class 1
-      { x: 2.5, y: 2.5, cls: 1 }, { x: 3.0, y: 2.0, cls: 1 }, { x: 2.0, y: 3.0, cls: 1 },
+      { x: 2.5, y: 2.5, cls: 1 }, { x: 3.0, y: 2.0, cls: 1 }, { x: 2.0, y: 3.0, cls: 1 }, { x: 3.2, y: 3.2, cls: 1 },
       // Top-Right Class 1
-      { x: 7.5, y: 7.5, cls: 1 }, { x: 8.0, y: 8.0, cls: 1 }, { x: 7.0, y: 7.0, cls: 1 },
+      { x: 7.5, y: 7.5, cls: 1 }, { x: 8.0, y: 8.0, cls: 1 }, { x: 7.0, y: 7.0, cls: 1 }, { x: 6.8, y: 7.8, cls: 1 },
+    ],
+  },
+  two_blobs: {
+    name: { en: 'Curved Clusters', ar: 'عناقيد منحنية' },
+    points: [
+      // Class 0: Crescent-curving cluster
+      { x: 1.8, y: 2.5, cls: 0 }, { x: 2.2, y: 3.6, cls: 0 }, { x: 2.8, y: 4.8, cls: 0 },
+      { x: 3.8, y: 5.6, cls: 0 }, { x: 4.9, y: 6.2, cls: 0 }, { x: 1.5, y: 3.8, cls: 0 },
+      { x: 2.5, y: 2.0, cls: 0 }, { x: 3.2, y: 3.8, cls: 0 }, { x: 4.2, y: 4.8, cls: 0 },
+      { x: 2.9, y: 5.8, cls: 0 },
+      // Class 1: Interlocking opposite cluster
+      { x: 5.2, y: 3.8, cls: 1 }, { x: 6.1, y: 4.5, cls: 1 }, { x: 7.0, y: 5.5, cls: 1 },
+      { x: 7.8, y: 6.8, cls: 1 }, { x: 8.4, y: 8.0, cls: 1 }, { x: 6.5, y: 3.2, cls: 1 },
+      { x: 7.4, y: 4.2, cls: 1 }, { x: 8.2, y: 5.6, cls: 1 }, { x: 6.8, y: 7.2, cls: 1 },
+      { x: 8.6, y: 7.0, cls: 1 },
     ],
   },
 };
@@ -119,9 +136,9 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = true }) =>
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { knnK, setKnnK, theme, language, config } = useOkvirStore();
 
-  const [points, setPoints] = useState<Point[]>(PRESETS.two_blobs.points);
-  const [selectedPreset, setSelectedPreset] = useState<KNNPreset>('two_blobs');
-  const [query, setQuery] = useState({ x: 4.8, y: 5.5 });
+  const [points, setPoints] = useState<Point[]>(PRESETS.two_moons.points);
+  const [selectedPreset, setSelectedPreset] = useState<KNNPreset>('two_moons');
+  const [query, setQuery] = useState({ x: 5.2, y: 5.2 });
   const [metric, setMetric] = useState<DistanceMetric>('L2');
   const [addModeClass, setAddModeClass] = useState<0 | 1>(0);
   const [isWeighted, setIsWeighted] = useState(false);
@@ -205,26 +222,81 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = true }) =>
       py: (1 - y / 10) * height,
     });
 
-    // 1. Decision Boundary Background Grid Shading
+    // 1. High-Density Organic Decision Boundary & Confidence Probability Field
     if (showBoundaryField && points.length >= 3) {
-      const gridCols = 40;
-      const gridRows = 30;
+      const gridCols = 80;
+      const gridRows = 60;
       const cellW = width / gridCols;
       const cellH = height / gridRows;
 
-      for (let r = 0; r < gridRows; r++) {
-        for (let c = 0; c < gridCols; c++) {
-          const gx = (c + 0.5) / gridCols * 10;
-          const gy = (1 - (r + 0.5) / gridRows) * 10;
-          const pred = classifyPoint(gx, gy, knnK, metric, isWeighted).cls;
+      const classGrid: number[][] = [];
 
-          ctx.fillStyle =
-            pred === 0
-              ? 'rgba(56, 189, 248, 0.07)'
-              : 'rgba(245, 158, 11, 0.07)';
+      for (let r = 0; r < gridRows; r++) {
+        classGrid[r] = [];
+        for (let c = 0; c < gridCols; c++) {
+          const gx = ((c + 0.5) / gridCols) * 10;
+          const gy = (1 - (r + 0.5) / gridRows) * 10;
+          const res = classifyPoint(gx, gy, knnK, metric, isWeighted);
+          classGrid[r][c] = res.cls;
+
+          const totalScore = res.score0 + res.score1;
+          const p0 = totalScore > 0 ? res.score0 / totalScore : 0.5;
+
+          // Non-linear organic probability shading:
+          // Deep in class cluster: richly saturated. Near boundary: soft fade.
+          if (res.cls === 0) {
+            const conf = Math.max(0, Math.min(1, (p0 - 0.5) * 2));
+            ctx.fillStyle = `rgba(56, 189, 248, ${0.035 + conf * 0.12})`;
+          } else {
+            const conf = Math.max(0, Math.min(1, (0.5 - p0) * 2));
+            ctx.fillStyle = `rgba(245, 158, 11, ${0.035 + conf * 0.12})`;
+          }
           ctx.fillRect(c * cellW, r * cellH, cellW + 0.5, cellH + 0.5);
         }
       }
+
+      // Crisp Continuous Decision Boundary Contour Lines (P=0.5 Threshold)
+      // 1a. Outer Soft Glow
+      ctx.beginPath();
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = theme === 'dark' ? 'rgba(168, 85, 247, 0.4)' : 'rgba(147, 51, 234, 0.3)';
+      for (let r = 0; r < gridRows; r++) {
+        for (let c = 0; c < gridCols; c++) {
+          const currentCls = classGrid[r][c];
+          if (c < gridCols - 1 && currentCls !== classGrid[r][c + 1]) {
+            const edgeX = (c + 1) * cellW;
+            ctx.moveTo(edgeX, r * cellH);
+            ctx.lineTo(edgeX, (r + 1) * cellH);
+          }
+          if (r < gridRows - 1 && currentCls !== classGrid[r + 1][c]) {
+            const edgeY = (r + 1) * cellH;
+            ctx.moveTo(c * cellW, edgeY);
+            ctx.lineTo((c + 1) * cellW, edgeY);
+          }
+        }
+      }
+      ctx.stroke();
+
+      // 1b. Sharp Core Luminous Contour
+      ctx.beginPath();
+      ctx.lineWidth = 1.8;
+      ctx.strokeStyle = theme === 'dark' ? 'rgba(232, 200, 255, 0.9)' : 'rgba(126, 34, 206, 0.85)';
+      for (let r = 0; r < gridRows; r++) {
+        for (let c = 0; c < gridCols; c++) {
+          const currentCls = classGrid[r][c];
+          if (c < gridCols - 1 && currentCls !== classGrid[r][c + 1]) {
+            const edgeX = (c + 1) * cellW;
+            ctx.moveTo(edgeX, r * cellH);
+            ctx.lineTo(edgeX, (r + 1) * cellH);
+          }
+          if (r < gridRows - 1 && currentCls !== classGrid[r + 1][c]) {
+            const edgeY = (r + 1) * cellH;
+            ctx.moveTo(c * cellW, edgeY);
+            ctx.lineTo((c + 1) * cellW, edgeY);
+          }
+        }
+      }
+      ctx.stroke();
     }
 
     // 2. Coordinate Grid
