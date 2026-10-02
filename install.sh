@@ -188,18 +188,21 @@ if [ "${PLATFORM}" = "linux" ]; then
 
   echo "    • Fetching Linux bundle for ${ARCH_SUFFIX} (~85 MB desktop binary, please wait)..."
   DESKTOP_TARGET="${APP_DIR}/okvir.AppImage"
+  DESKTOP_TMP="${TMP_DIR}/okvir.download"
   mkdir -p "${APP_DIR}/bin"
 
-  if download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TARGET}" || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TARGET}" || \
+  if download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TMP}" || \
+     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TMP}" || \
      download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" || \
      download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir" "${DESKTOP_TARGET}"; then
+     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir" "${DESKTOP_TMP}"; then
 
     if [ -f "${TMP_DIR}/okvir.tar.gz" ]; then
       tar -xzf "${TMP_DIR}/okvir.tar.gz" -C "${TMP_DIR}"
       chmod +x "${TMP_DIR}/okvir"
-      mv "${TMP_DIR}/okvir" "${DESKTOP_TARGET}"
+      mv -f "${TMP_DIR}/okvir" "${DESKTOP_TARGET}"
+    elif [ -f "${DESKTOP_TMP}" ]; then
+      mv -f "${DESKTOP_TMP}" "${DESKTOP_TARGET}"
     fi
     chmod +x "${DESKTOP_TARGET}"
     ln -sf "${DESKTOP_TARGET}" "${INSTALL_DIR}/okvir-desktop"
@@ -226,6 +229,12 @@ DESKTOP_APP="${APP_DIR}/okvir.AppImage"
 [ ! -f "${DESKTOP_APP}" ] && DESKTOP_APP="${HOME}/.local/bin/okvir-desktop"
 CLI_SCRIPT="${APP_DIR}/bin/okvir.js"
 [ -f "bin/okvir.js" ] && CLI_SCRIPT="bin/okvir.js"
+
+# Configure GStreamer host plugin paths so WebKitGTK inside AppImage discovers audio/video elements
+_HOST_GST="/usr/lib/x86_64-linux-gnu/gstreamer-1.0:/usr/lib/aarch64-linux-gnu/gstreamer-1.0:/usr/lib/gstreamer-1.0:/usr/lib64/gstreamer-1.0:/lib/x86_64-linux-gnu/gstreamer-1.0:/usr/local/lib/gstreamer-1.0"
+export GST_PLUGIN_SYSTEM_PATH_1_0="${GST_PLUGIN_SYSTEM_PATH_1_0:+${GST_PLUGIN_SYSTEM_PATH_1_0}:}${_HOST_GST}"
+export GST_PLUGIN_PATH_1_0="${GST_PLUGIN_PATH_1_0:+${GST_PLUGIN_PATH_1_0}:}${_HOST_GST}"
+export GST_PLUGIN_PATH="${GST_PLUGIN_PATH:+${GST_PLUGIN_PATH}:}${_HOST_GST}"
 
 # 1. Desktop GUI Launch (default when no arguments, or explicit 'open' / 'app')
 if [ $# -eq 0 ] || [ "$1" = "open" ] || [ "$1" = "app" ] || [ "$1" = "--app" ] || [ "$1" = "--gui" ] || [ "$1" = "--desktop" ]; then

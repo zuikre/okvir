@@ -1562,7 +1562,20 @@ async function runDoctor() {
     console.log(`  \x1b[90m[-] Curriculum Context: Current directory is not an Okvir course repo\x1b[0m`);
   }
 
-  // 5. PATH check
+  // 5. Linux Multimedia & WebKitGTK GStreamer Check
+  if (process.platform === 'linux') {
+    try {
+      const { execSync } = await import('child_process');
+      const gstOut = execSync('gst-inspect-1.0 autoaudiosink 2>/dev/null || true', { encoding: 'utf-8' });
+      if (gstOut.includes('Auto audio sink') || gstOut.includes('autoaudiosink')) {
+        console.log(`  [✔] Multimedia Engine:  GStreamer host plugins detected (audio/video ready)`);
+      } else {
+        console.log(`  \x1b[33m[!] Multimedia Engine:  GStreamer audio sink not found (run: sudo apt install gstreamer1.0-plugins-good)\x1b[0m`);
+      }
+    } catch (_) {}
+  }
+
+  // 6. PATH check
   const pathEnv = process.env.PATH || '';
   const targetBin = process.platform === 'win32'
     ? path.join(home, 'AppData', 'Local', 'Programs', 'Okvir', 'bin')
