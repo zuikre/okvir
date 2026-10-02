@@ -85,6 +85,30 @@ class TauriBridge {
     return (window as unknown as TauriGlobal).__TAURI__;
   }
 
+  async getAppVersion(): Promise<string> {
+    if (typeof window !== 'undefined') {
+      const internals = (window as any).__TAURI_INTERNALS__;
+      if (internals?.invoke) {
+        try {
+          const v = await internals.invoke('get_app_version');
+          if (typeof v === 'string' && v.trim()) return v.trim().replace(/^v/, '');
+        } catch {
+          // fallback
+        }
+      }
+      const tauri = this.getTauri();
+      if (tauri?.core?.invoke) {
+        try {
+          const v = await tauri.core.invoke<string>('get_app_version');
+          if (typeof v === 'string' && v.trim()) return v.trim().replace(/^v/, '');
+        } catch {
+          // fallback
+        }
+      }
+    }
+    return '1.0.2';
+  }
+
   async getUserProfile(): Promise<UserProfileDTO> {
     const tauri = this.getTauri();
     if (this.isTauriAvailable() && tauri?.core) {

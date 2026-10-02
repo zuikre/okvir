@@ -30,7 +30,9 @@ export interface GitHubReleaseInfo {
   osAssetName?: string;
 }
 
-export const CURRENT_APP_VERSION = '1.0.1';
+declare const __APP_VERSION__: string | undefined;
+export const CURRENT_APP_VERSION: string =
+  typeof __APP_VERSION__ !== 'undefined' && __APP_VERSION__ ? __APP_VERSION__ : '1.0.2';
 const GITHUB_REPO = 'zuikre/okvir';
 
 /**
@@ -91,7 +93,7 @@ export class OkvirUpdateChecker {
   /**
    * Fetch and evaluate latest release from GitHub
    */
-  static async checkLatestRelease(force = false): Promise<GitHubReleaseInfo | null> {
+  static async checkLatestRelease(force = false, currentVer?: string): Promise<GitHubReleaseInfo | null> {
     const now = Date.now();
     // Cache result for 15 minutes unless forced
     if (!force && this.cachedResult && now - this.lastCheckTime < 15 * 60 * 1000) {
@@ -110,9 +112,10 @@ export class OkvirUpdateChecker {
       }
 
       const data = await response.json();
-      const tagName: string = data.tag_name || 'v1.0.1';
+      const baseVersion = currentVer || CURRENT_APP_VERSION;
+      const tagName: string = data.tag_name || `v${baseVersion}`;
       const cleanVersion = tagName.replace(/^v/, '');
-      const hasUpdate = isNewerVersion(cleanVersion, CURRENT_APP_VERSION);
+      const hasUpdate = isNewerVersion(cleanVersion, baseVersion);
 
       const rawAssets: any[] = Array.isArray(data.assets) ? data.assets : [];
       let totalDownloads = 0;

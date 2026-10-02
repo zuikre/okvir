@@ -663,3 +663,31 @@ pub fn dispatch_native_notification(
         Ok(true)
     }
 }
+
+#[tauri::command]
+pub fn get_app_version() -> String {
+    // 1. Check ~/.okvir/version (written by install.sh / updater from GitHub releases)
+    if let Ok(home) = std::env::var("HOME") {
+        let version_path = std::path::PathBuf::from(home).join(".okvir").join("version");
+        if let Ok(content) = std::fs::read_to_string(&version_path) {
+            let trimmed = content.trim().trim_start_matches('v');
+            if !trimmed.is_empty() {
+                return trimmed.to_string();
+            }
+        }
+    }
+
+    if let Ok(userprofile) = std::env::var("USERPROFILE") {
+        let version_path = std::path::PathBuf::from(userprofile).join(".okvir").join("version");
+        if let Ok(content) = std::fs::read_to_string(&version_path) {
+            let trimmed = content.trim().trim_start_matches('v');
+            if !trimmed.is_empty() {
+                return trimmed.to_string();
+            }
+        }
+    }
+
+    // 2. Fallback to Cargo package version
+    env!("CARGO_PKG_VERSION").to_string()
+}
+

@@ -19,7 +19,7 @@ function getPlatformOS(): 'macos' | 'windows' | 'linux' {
 }
 
 export const DesktopTitlebar: React.FC = () => {
-  const { theme, language, toggleTheme, setLanguage, xp, streakDays, setCommandPaletteOpen, setCurrentView, config } = useOkvirStore();
+  const { theme, language, appVersion, toggleTheme, setLanguage, xp, streakDays, setCommandPaletteOpen, setCurrentView, config } = useOkvirStore();
 
   const [os, setOs] = useState<'macos' | 'windows' | 'linux'>('linux');
   const [isMaximized, setIsMaximized] = useState(false);
@@ -147,7 +147,7 @@ export const DesktopTitlebar: React.FC = () => {
               OKVIR
             </span>
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-[var(--text-secondary)] border border-[var(--border-strong)]">
-              v1.0.1
+              v{appVersion || '1.0.2'}
             </span>
             {availableUpdate && (
               <button

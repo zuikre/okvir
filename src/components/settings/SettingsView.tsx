@@ -128,7 +128,10 @@ export const SettingsView: React.FC = () => {
     exportLocalData,
     importLocalData,
     resetAllData,
+    appVersion,
   } = useOkvirStore();
+
+  const displayVersion = appVersion || CURRENT_APP_VERSION;
 
   const [activeCategory, setActiveCategory] = useState<SettingsCategory>('identity');
   const [hoveredCategory, setHoveredCategory] = useState<SettingsCategory | null>(null);
@@ -312,7 +315,7 @@ export const SettingsView: React.FC = () => {
     setCheckingUpdate(true);
     setUpdateError(null);
     try {
-      const info = await OkvirUpdateChecker.checkLatestRelease(true);
+      const info = await OkvirUpdateChecker.checkLatestRelease(true, displayVersion);
       setReleaseInfo(info);
       if (info) {
         audio.playSuccessChime();
@@ -1359,7 +1362,7 @@ export const SettingsView: React.FC = () => {
                   </span>
                 </div>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--math-vector)]/10 text-[var(--math-vector)] border border-[var(--math-vector)]/20 font-bold">
-                  CURRENT: {CURRENT_APP_VERSION}
+                  CURRENT: {displayVersion}
                 </span>
               </div>
 
@@ -1372,8 +1375,8 @@ export const SettingsView: React.FC = () => {
                   </div>
                   <p className="text-xs text-[var(--text-tertiary)] font-mono">
                     {isRtl
-                      ? `الإصدار الحالي المثبت: ${CURRENT_APP_VERSION} • فحص تلقائي ومباشر من GitHub Releases`
-                      : `Installed Build: ${CURRENT_APP_VERSION} • Direct unauthenticated feed from GitHub Releases`}
+                      ? `الإصدار الحالي المثبت: ${displayVersion} • فحص تلقائي ومباشر من GitHub Releases`
+                      : `Installed Build: ${displayVersion} • Direct unauthenticated feed from GitHub Releases`}
                   </p>
                 </div>
 

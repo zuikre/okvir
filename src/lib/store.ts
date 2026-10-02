@@ -5,6 +5,7 @@ import { initialLessons, curriculum } from './curriculum';
 import { tauriBridge } from './tauri-bridge';
 import { updateCard, createNewCard, type Rating } from './fsrs';
 import { audio } from './audio';
+import { CURRENT_APP_VERSION } from './updater';
 
 export function recalculateLessonStatuses(lessons: Record<string, LessonProgress>): Record<string, LessonProgress> {
   const updated: Record<string, LessonProgress> = { ...initialLessons, ...lessons };
@@ -54,6 +55,8 @@ export function recalculateLessonStatuses(lessons: Record<string, LessonProgress
 export interface OkvirState {
   theme: Theme;
   language: Language;
+  appVersion: string;
+  setAppVersion: (v: string) => void;
   toggleTheme: () => void;
   setLanguage: (lang: Language) => void;
 
@@ -162,6 +165,8 @@ export const useOkvirStore = create<OkvirState>()(
     (set, get) => ({
       theme: 'dark',
       language: 'en',
+      appVersion: CURRENT_APP_VERSION,
+      setAppVersion: (appVersion) => set({ appVersion }),
       toggleTheme: () =>
         set((state) => {
           const next: Theme = state.theme === 'dark' ? 'light' : 'dark';
@@ -521,6 +526,13 @@ export const useOkvirStore = create<OkvirState>()(
           };
         }),
       syncWithTauriProfile: async () => {
+        try {
+          const liveVer = await tauriBridge.getAppVersion();
+          if (liveVer) {
+            set({ appVersion: liveVer });
+          }
+        } catch (_) {}
+
         try {
           const profile = await tauriBridge.getUserProfile();
           if (profile && profile.id && (profile.xp > 0 || profile.streak_days > 0)) {

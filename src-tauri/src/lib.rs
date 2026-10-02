@@ -23,6 +23,7 @@ pub fn run() {
             commands::check_notification_permission,
             commands::request_notification_permission,
             commands::dispatch_native_notification,
+            commands::get_app_version,
         ])
         .run(tauri::generate_context!())
         .expect("error while running okvir tauri application");

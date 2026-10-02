@@ -21,7 +21,7 @@
 [**Download Desktop App**](https://github.com/zuikre/okvir/releases) • [**Sponsor**](#support--sponsorship) • [**Architecture Specs**](ARCHITECTURE.md) • [**Curriculum Guide**](CURRICULUM_SPEC.md) • [**Contributing**](CONTRIBUTING.md)
 
 <br><br>
-<img src=".github/assets/okvir-hero.svg" alt="OKVIR Interactive Desktop Learning Engine" width="100%" />
+<img src=".github/assets/demo.gif" alt="OKVIR Interactive Desktop Learning Engine Demo" width="100%" />
 
 </div>
 
