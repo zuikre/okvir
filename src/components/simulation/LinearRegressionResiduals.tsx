@@ -526,7 +526,7 @@ export const LinearRegressionResiduals: React.FC<{
     ghostOLS,
     theme,
     highlightedElement,
-    activeMathToken,
+    effectiveMathToken,
     showResidualSquares,
     showConfidenceBands,
   ]);
