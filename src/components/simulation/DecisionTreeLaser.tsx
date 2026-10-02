@@ -14,6 +14,7 @@ import {
   Sliders,
   TrendingDown,
   Info,
+  Maximize2,
 } from 'lucide-react';
 
 // --- Data Types ---
@@ -73,20 +74,16 @@ function generateXORDataset(seedVal = 42): Point[] {
   };
   let id = 1;
 
-  // Q1: [1.2, 4.5] x [5.5, 8.8] -> Class 0
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < 20; i++) {
     points.push({ id: id++, x: Number((1.5 + rnd() * 2.8).toFixed(2)), y: Number((5.5 + rnd() * 2.8).toFixed(2)), cls: 0 });
   }
-  // Q2: [5.5, 8.8] x [5.5, 8.8] -> Class 1
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < 20; i++) {
     points.push({ id: id++, x: Number((5.5 + rnd() * 2.8).toFixed(2)), y: Number((5.5 + rnd() * 2.8).toFixed(2)), cls: 1 });
   }
-  // Q3: [1.2, 4.5] x [1.2, 4.5] -> Class 1
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < 20; i++) {
     points.push({ id: id++, x: Number((1.5 + rnd() * 2.8).toFixed(2)), y: Number((1.5 + rnd() * 2.8).toFixed(2)), cls: 1 });
   }
-  // Q4: [5.5, 8.8] x [1.2, 4.5] -> Class 0
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < 20; i++) {
     points.push({ id: id++, x: Number((5.5 + rnd() * 2.8).toFixed(2)), y: Number((1.5 + rnd() * 2.8).toFixed(2)), cls: 0 });
   }
   return points;
@@ -101,10 +98,9 @@ function generateMoonsDataset(seedVal = 42): Point[] {
   };
   let id = 1;
 
-  // Top moon (Class 0)
   for (let i = 0; i < 35; i++) {
     const theta = rnd() * Math.PI;
-    const r = 2.4 + (rnd() - 0.5) * 0.5;
+    const r = 2.4 + (rnd() - 0.5) * 0.45;
     points.push({
       id: id++,
       x: Number(Math.max(0.6, Math.min(9.4, 3.8 + r * Math.cos(theta))).toFixed(2)),
@@ -112,10 +108,9 @@ function generateMoonsDataset(seedVal = 42): Point[] {
       cls: 0,
     });
   }
-  // Bottom moon (Class 1)
   for (let i = 0; i < 35; i++) {
     const theta = Math.PI + rnd() * Math.PI;
-    const r = 2.4 + (rnd() - 0.5) * 0.5;
+    const r = 2.4 + (rnd() - 0.5) * 0.45;
     points.push({
       id: id++,
       x: Number(Math.max(0.6, Math.min(9.4, 6.2 + r * Math.cos(theta))).toFixed(2)),
@@ -134,9 +129,9 @@ function generateCirclesDataset(seedVal = 42): Point[] {
     return (s - 1) / 2147483646;
   };
   let id = 1;
-  const cx = 5.0, cy = 5.0;
+  const cx = 5.0,
+    cy = 5.0;
 
-  // Inner disk (Class 0)
   for (let i = 0; i < 28; i++) {
     const theta = rnd() * 2 * Math.PI;
     const r = Math.sqrt(rnd()) * 1.8;
@@ -147,7 +142,6 @@ function generateCirclesDataset(seedVal = 42): Point[] {
       cls: 0,
     });
   }
-  // Outer ring (Class 1)
   for (let i = 0; i < 42; i++) {
     const theta = rnd() * 2 * Math.PI;
     const r = 2.8 + rnd() * 1.3;
@@ -173,7 +167,6 @@ function generateDiagonalDataset(seedVal = 42): Point[] {
   for (let i = 0; i < 70; i++) {
     const x = 1.0 + rnd() * 8.0;
     const y = 1.0 + rnd() * 8.0;
-    // Boundary around y = x
     const dist = y - x;
     if (Math.abs(dist) < 0.25) continue;
     points.push({
@@ -195,7 +188,6 @@ function generateBlobsDataset(seedVal = 42): Point[] {
   };
   let id = 1;
 
-  // Blob 0
   for (let i = 0; i < 30; i++) {
     const u1 = Math.max(1e-6, rnd());
     const u2 = rnd();
@@ -208,7 +200,6 @@ function generateBlobsDataset(seedVal = 42): Point[] {
       cls: 0,
     });
   }
-  // Blob 1
   for (let i = 0; i < 30; i++) {
     const u1 = Math.max(1e-6, rnd());
     const u2 = rnd();
@@ -227,7 +218,6 @@ function generateBlobsDataset(seedVal = 42): Point[] {
 function generateOverfittingTrapDataset(seedVal = 42): Point[] {
   const points = generateBlobsDataset(seedVal);
   let id = 1000;
-  // Inject noise anomalies directly into opposing territory
   points.push({ id: id++, x: 3.0, y: 3.2, cls: 1 });
   points.push({ id: id++, x: 2.7, y: 3.5, cls: 1 });
   points.push({ id: id++, x: 7.1, y: 6.9, cls: 0 });
@@ -335,7 +325,7 @@ function findBestSplitForNode(
   const n0 = points.filter((p) => p.cls === 0).length;
   const n1 = points.length - n0;
   const parentImp = calculateImpurity(n0, n1, criterion);
-  if (parentImp <= 1e-6) return null; // Node is pure
+  if (parentImp <= 1e-6) return null;
 
   let bestCandidate: SplitCandidate | null = null;
   let bestGain = -Infinity;
@@ -414,7 +404,6 @@ function findBestSplitForNode(
   return bestCandidate;
 }
 
-// Clone tree helper
 function cloneTree(node: TreeNode): TreeNode {
   return {
     ...node,
@@ -433,7 +422,6 @@ function getTreeLeaves(node: TreeNode): TreeNode[] {
   return leaves;
 }
 
-// Evaluate tree accuracy & total impurity
 function evaluateTreeOnPoints(root: TreeNode, allPoints: Point[], criterion: ImpurityCriterion) {
   const leaves = getTreeLeaves(root);
   let totalImp = 0;
@@ -460,7 +448,6 @@ function evaluateTreeOnPoints(root: TreeNode, allPoints: Point[], criterion: Imp
   return { totalImpurity: Number(totalImp.toFixed(4)), accuracy: Number(accuracy.toFixed(1)) };
 }
 
-// Build Step-by-Step Tree Snapshots via Best-First CART Expansion
 function buildTreeSnapshots(
   allPoints: Point[],
   maxDepth: number,
@@ -505,7 +492,6 @@ function buildTreeSnapshots(
     );
     if (leaves.length === 0) break;
 
-    // Best-first: find candidate split with largest global weighted gain
     let bestLeaf: TreeNode | null = null;
     let bestSplit: SplitCandidate | null = null;
     let maxGlobalGain = -Infinity;
@@ -525,7 +511,6 @@ function buildTreeSnapshots(
 
     if (!bestLeaf || !bestSplit) break;
 
-    // Apply split to chosen leaf
     bestLeaf.isLeaf = false;
     bestLeaf.splitAxis = bestSplit.axis;
     bestLeaf.threshold = bestSplit.threshold;
@@ -582,31 +567,37 @@ function buildTreeSnapshots(
   return snapshots;
 }
 
-// Tree Layout Generator for SVG Diagram
+// --- Flawless Tidy Tree Drawing Algorithm (Reingold-Tilford zero overlap) ---
+
 interface LayoutNode {
   node: TreeNode;
   x: number;
   y: number;
-  xMin: number;
-  xMax: number;
 }
 
-function computeTreeLayout(root: TreeNode, width: number, nodeHeight = 55): LayoutNode[] {
-  const layout: LayoutNode[] = [];
+function layoutTidyTree(root: TreeNode, nodeWidth = 92, hGap = 26, vGap = 75) {
+  let leafCounter = 0;
+  const layoutNodes: LayoutNode[] = [];
 
-  function traverse(n: TreeNode, xMin: number, xMax: number) {
-    const x = (xMin + xMax) / 2;
-    const y = 30 + n.depth * (nodeHeight + 35);
-    layout.push({ node: n, x, y, xMin, xMax });
-
-    if (!n.isLeaf && n.left && n.right) {
-      traverse(n.left, xMin, x);
-      traverse(n.right, x, xMax);
+  function assignLeafX(node: TreeNode): number {
+    if (node.isLeaf || !node.left || !node.right) {
+      const x = leafCounter * (nodeWidth + hGap) + nodeWidth / 2 + 25;
+      const y = node.depth * vGap + 35;
+      layoutNodes.push({ node, x, y });
+      leafCounter++;
+      return x;
     }
+    const leftX = assignLeafX(node.left);
+    const rightX = assignLeafX(node.right);
+    const x = (leftX + rightX) / 2;
+    const y = node.depth * vGap + 35;
+    layoutNodes.push({ node, x, y });
+    return x;
   }
 
-  traverse(root, 20, width - 20);
-  return layout;
+  assignLeafX(root);
+  const totalWidth = Math.max(700, leafCounter * (nodeWidth + hGap) + 50);
+  return { layoutNodes, totalWidth };
 }
 
 export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = true }) => {
@@ -620,18 +611,18 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
   const [criterion, setCriterion] = useState<ImpurityCriterion>('gini');
   const [addModeClass, setAddModeClass] = useState<0 | 1>(0);
 
-  // Visual Toggles & Interactive Inspection
+  // Visual Toggles & Bidirectional Interactive Inspection
   const [showRegions, setShowRegions] = useState<boolean>(true);
   const [showLaserGlow, setShowLaserGlow] = useState<boolean>(true);
-  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [hoveredNode, setHoveredNode] = useState<TreeNode | null>(null);
+  const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
   const [activeTab, setActiveTab] = useState<'scan' | 'confusion' | 'rules'>('scan');
 
   // History Snapshots for Timeline Stepper
   const [snapshots, setSnapshots] = useState<TreeSnapshot[]>([]);
   const [currentStepIdx, setCurrentStepIdx] = useState<number>(0);
 
-  // Regenerate dataset
+  // Handle Preset change
   const handleSelectPreset = (p: DatasetPreset) => {
     setPreset(p);
     let pts: Point[];
@@ -656,6 +647,8 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         break;
     }
     setPoints(pts);
+    setHoveredNode(null);
+    setSelectedNode(null);
     if (config.soundEnabled) audio.playSuccess();
   };
 
@@ -684,14 +677,16 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         break;
     }
     setPoints(pts);
+    setHoveredNode(null);
+    setSelectedNode(null);
     if (config.soundEnabled) audio.playClick();
   };
 
-  // Rebuild Snapshots when points, maxDepth, or criterion changes
+  // Rebuild Snapshots on points, maxDepth, or criterion changes
   useEffect(() => {
     const snaps = buildTreeSnapshots(points, maxDepth, criterion, language);
     setSnapshots(snaps);
-    setCurrentStepIdx(snaps.length - 1); // default to converged fully-grown tree
+    setCurrentStepIdx(snaps.length - 1);
   }, [points, maxDepth, criterion, language]);
 
   const activeSnapshot = useMemo(() => {
@@ -720,19 +715,17 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
 
   // Candidate Split Scan Curve for active/selected node
   const scanData = useMemo(() => {
-    const nodeToScan =
-      (selectedNodeId && getTreeLeaves(activeSnapshot.tree).find((l) => l.id === selectedNodeId)) ||
-      activeSnapshot.tree;
+    const targetNode = selectedNode || activeSnapshot.tree;
 
-    const nodePoints = nodeToScan.pointIds
+    const nodePoints = targetNode.pointIds
       .map((id) => points.find((p) => p.id === id)!)
       .filter(Boolean);
 
-    const axis = nodeToScan.splitAxis || 'x';
+    const axis = targetNode.splitAxis || 'x';
     const sorted = [...nodePoints].sort((a, b) => (axis === 'x' ? a.x - b.x : a.y - b.y));
 
     const curve: { thresh: number; gain: number }[] = [];
-    const parentImp = nodeToScan.impurity;
+    const parentImp = targetNode.impurity;
 
     for (let i = 0; i < sorted.length - 1; i++) {
       const vA = axis === 'x' ? sorted[i].x : sorted[i].y;
@@ -756,8 +749,8 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
       curve.push({ thresh: Number(thresh.toFixed(2)), gain: Number(gain.toFixed(4)) });
     }
 
-    return { axis, curve, bestThresh: nodeToScan.threshold ?? (curve[0]?.thresh || 5) };
-  }, [activeSnapshot, selectedNodeId, points, criterion]);
+    return { axis, curve, bestThresh: targetNode.threshold ?? (curve[0]?.thresh || 5) };
+  }, [activeSnapshot, selectedNode, points, criterion]);
 
   // Confusion Matrix
   const confusionMatrix = useMemo(() => {
@@ -837,7 +830,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
     const height = rect.height;
     ctx.clearRect(0, 0, width, height);
 
-    const pad = 26;
+    const pad = 28;
     const plotW = width - pad * 2;
     const plotH = height - pad * 2;
     const toCanvasX = (x: number) => pad + (x / 10) * plotW;
@@ -861,8 +854,8 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
 
       ctx.font = '9px monospace';
       ctx.fillStyle = theme === 'dark' ? '#71717a' : '#a1a1aa';
-      ctx.fillText(i.toString(), cx - 3, pad + plotH + 14);
-      if (i > 0) ctx.fillText(i.toString(), pad - 16, cy + 3);
+      ctx.fillText(i.toString(), cx - 3, pad + plotH + 15);
+      if (i > 0) ctx.fillText(i.toString(), pad - 18, cy + 3);
     }
 
     // 2. Leaf Hyper-Rectangle Partitions & Decision Shading
@@ -874,11 +867,9 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         const rw = ((leaf.box.maxX - leaf.box.minX) / 10) * plotW;
         const rh = ((leaf.box.maxY - leaf.box.minY) / 10) * plotH;
 
-        const isHovered = hoveredNodeId === leaf.id;
         const total = leaf.numClass0 + leaf.numClass1;
         const purity = total > 0 ? (leaf.predictedClass === 0 ? leaf.numClass0 : leaf.numClass1) / total : 0.5;
 
-        // Tint background with decision class
         ctx.fillStyle =
           leaf.predictedClass === 0
             ? theme === 'dark'
@@ -888,16 +879,26 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             ? `rgba(245, 158, 11, ${0.08 + purity * 0.12})`
             : `rgba(217, 119, 6, ${0.05 + purity * 0.1})`;
         ctx.fillRect(rx, ry, rw, rh);
-
-        if (isHovered) {
-          ctx.strokeStyle = '#f59e0b';
-          ctx.lineWidth = 2.5;
-          ctx.strokeRect(rx, ry, rw, rh);
-        }
       });
     }
 
-    // 3. Localized Laser Partition Cut Lines (Recursive Laser Blades)
+    // 3. Highlight currently hovered node bounding box (Two-way synchronization)
+    if (hoveredNode) {
+      const hx = toCanvasX(hoveredNode.box.minX);
+      const hy = toCanvasY(hoveredNode.box.maxY);
+      const hw = ((hoveredNode.box.maxX - hoveredNode.box.minX) / 10) * plotW;
+      const hh = ((hoveredNode.box.maxY - hoveredNode.box.minY) / 10) * plotH;
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.14)';
+      ctx.fillRect(hx, hy, hw, hh);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(hx, hy, hw, hh);
+      ctx.restore();
+    }
+
+    // 4. Localized Laser Partition Cut Lines (Recursive Laser Blades)
     function drawLaserSplits(node: TreeNode, c: CanvasRenderingContext2D) {
       if (node.isLeaf || !node.splitAxis || node.threshold === undefined) return;
 
@@ -910,7 +911,6 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         const topY = toCanvasY(node.box.maxY);
         const bottomY = toCanvasY(node.box.minY);
 
-        // Neon Laser Glow
         if (showLaserGlow) {
           c.beginPath();
           c.moveTo(lx, topY);
@@ -920,7 +920,6 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
           c.stroke();
         }
 
-        // Core Sharp Laser Line
         c.beginPath();
         c.moveTo(lx, topY);
         c.lineTo(lx, bottomY);
@@ -928,7 +927,6 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         c.lineWidth = isCurrentActive ? 2.8 : 2.0;
         c.stroke();
 
-        // Label on laser blade
         c.font = 'bold 10px monospace';
         c.fillStyle = color;
         c.fillText(`X₁=${node.threshold}`, lx + 4, topY + 12);
@@ -964,14 +962,15 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
 
     drawLaserSplits(activeSnapshot.tree, ctx);
 
-    // 4. Observation Points & Misclassification Indicators
+    // 5. Data Observation Points
+    const hoveredPointIds = new Set(hoveredNode ? hoveredNode.pointIds : []);
+
     points.forEach((p) => {
       const cx = toCanvasX(p.x);
       const cy = toCanvasY(p.y);
       const isClass0 = p.cls === 0;
       const color = isClass0 ? '#38bdf8' : '#f59e0b';
 
-      // Check prediction for this point
       let cur = activeSnapshot.tree;
       while (!cur.isLeaf) {
         if (cur.splitAxis === 'x') {
@@ -981,8 +980,20 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         }
       }
       const isMisclassified = cur.predictedClass !== p.cls;
+      const isInsideHoveredNode = hoveredPointIds.has(p.id);
 
-      // Glow halo
+      // Extra highlight if point belongs to hovered node
+      if (isInsideHoveredNode) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+        ctx.fill();
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // Outer glow halo
       ctx.beginPath();
       ctx.arc(cx, cy, 6.5, 0, Math.PI * 2);
       ctx.fillStyle = isClass0 ? 'rgba(56, 189, 248, 0.2)' : 'rgba(245, 158, 11, 0.2)';
@@ -997,7 +1008,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
       ctx.lineWidth = 1.0;
       ctx.stroke();
 
-      // Red cross on misclassified point
+      // Red border on misclassified point
       if (isMisclassified) {
         ctx.beginPath();
         ctx.arc(cx, cy, 7.5, 0, Math.PI * 2);
@@ -1006,13 +1017,38 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         ctx.stroke();
       }
     });
-  }, [activeSnapshot, points, theme, showRegions, showLaserGlow, hoveredNodeId]);
+  }, [activeSnapshot, points, theme, showRegions, showLaserGlow, hoveredNode]);
 
   useEffect(() => {
     renderCanvas();
   }, [renderCanvas]);
 
-  // Pointer interactions on canvas (Click to add, right-click to delete)
+  // Pointer interactions on canvas (Hover detection, click to add, right-click to delete)
+  const handleCanvasPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+
+    const pad = 28;
+    const plotW = rect.width - pad * 2;
+    const plotH = rect.height - pad * 2;
+    const x = ((px - pad) / plotW) * 10;
+    const y = (1 - (py - pad) / plotH) * 10;
+
+    if (x >= 0 && x <= 10 && y >= 0 && y <= 10) {
+      const leaf = activeSnapshot.leaves.find(
+        (l) => x >= l.box.minX && x <= l.box.maxX && y >= l.box.minY && y <= l.box.maxY
+      );
+      if (leaf !== hoveredNode) {
+        setHoveredNode(leaf || null);
+      }
+    } else {
+      if (hoveredNode !== null) setHoveredNode(null);
+    }
+  };
+
   const handleCanvasPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -1020,7 +1056,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
     const px = e.clientX - rect.left;
     const py = e.clientY - rect.top;
 
-    const pad = 26;
+    const pad = 28;
     const plotW = rect.width - pad * 2;
     const plotH = rect.height - pad * 2;
 
@@ -1040,7 +1076,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
     const px = e.clientX - rect.left;
     const py = e.clientY - rect.top;
 
-    const pad = 26;
+    const pad = 28;
     const plotW = rect.width - pad * 2;
     const plotH = rect.height - pad * 2;
     const toCanvasX = (x: number) => pad + (x / 10) * plotW;
@@ -1062,26 +1098,26 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
   };
 
   // SVG Decision Tree Layout
-  const treeLayout = useMemo(() => {
-    return computeTreeLayout(activeSnapshot.tree, 520, 52);
+  const { layoutNodes: treeLayout, totalWidth: svgWidth } = useMemo(() => {
+    return layoutTidyTree(activeSnapshot.tree, 96, 28, 75);
   }, [activeSnapshot.tree]);
 
   return (
-    <div className="flex flex-col gap-4 select-none">
+    <div className="flex flex-col gap-5 select-none w-full">
       {/* Pre-Canvas Intuitive Briefing & Mental Model */}
       {!compact && <PreCanvasBriefing content={TREE_TIER_CONTENT} />}
 
-      {/* Top Parameter Toolbar: Benchmark Datasets + Depth + Impurity Criterion */}
-      <div className="flex flex-col gap-3 p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular shadow-xs">
+      {/* Top Parameter Toolbar: Presets + Depth + Impurity Criterion */}
+      <div className="flex flex-col gap-3.5 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular shadow-xs w-full">
         {/* Row 1: Datasets */}
-        <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-xs font-mono text-[var(--text-tertiary)] uppercase tracking-wider me-1">
               {language === 'ar' ? 'البيئة:' : 'Dataset:'}
             </span>
             <button
               onClick={() => handleSelectPreset('xor')}
-              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
                 preset === 'xor'
                   ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/15 text-[var(--math-vector)] font-bold shadow-xs'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
@@ -1091,7 +1127,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             </button>
             <button
               onClick={() => handleSelectPreset('moons')}
-              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
                 preset === 'moons'
                   ? 'border-indigo-500 bg-indigo-500/15 text-indigo-400 font-bold shadow-xs'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
@@ -1101,7 +1137,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             </button>
             <button
               onClick={() => handleSelectPreset('circles')}
-              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
                 preset === 'circles'
                   ? 'border-emerald-500 bg-emerald-500/15 text-emerald-400 font-bold shadow-xs'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
@@ -1111,7 +1147,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             </button>
             <button
               onClick={() => handleSelectPreset('diagonal')}
-              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
                 preset === 'diagonal'
                   ? 'border-rose-500 bg-rose-500/15 text-rose-400 font-bold shadow-xs'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
@@ -1121,7 +1157,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             </button>
             <button
               onClick={() => handleSelectPreset('blobs')}
-              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
                 preset === 'blobs'
                   ? 'border-amber-500 bg-amber-500/15 text-amber-400 font-bold shadow-xs'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
@@ -1131,7 +1167,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             </button>
             <button
               onClick={() => handleSelectPreset('overfit')}
-              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              className={`px-3 py-1.5 text-xs font-mono rounded-lg border transition-all ${
                 preset === 'overfit'
                   ? 'border-red-500 bg-red-500/20 text-red-400 font-bold shadow-xs'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
@@ -1144,7 +1180,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
           <button
             onClick={handleReseed}
             title="Re-roll dataset points"
-            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] transition-all active:scale-95"
           >
             <RefreshCw size={12} className="text-[var(--math-vector)]" />
             <span>{language === 'ar' ? 'توليد جديد' : 'Re-Seed'}</span>
@@ -1152,9 +1188,9 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         </div>
 
         {/* Row 2: Hyperparameters & Add Point Class */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[var(--border-subtle)]">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-[var(--border-subtle)]">
           {/* Max Depth */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <span className="text-xs font-mono text-[var(--text-tertiary)] uppercase tracking-wider me-1">
               Max Depth:
             </span>
@@ -1174,13 +1210,13 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
           </div>
 
           {/* Splitting Criterion */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <span className="text-xs font-mono text-[var(--text-tertiary)] uppercase tracking-wider me-1">
               Criterion:
             </span>
             <button
               onClick={() => setCriterion('gini')}
-              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              className={`px-3 py-1 text-xs font-mono rounded-lg border transition-all ${
                 criterion === 'gini'
                   ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/20 text-[var(--math-vector)] font-bold'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
@@ -1190,7 +1226,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             </button>
             <button
               onClick={() => setCriterion('entropy')}
-              className={`px-2.5 py-1 text-xs font-mono rounded-lg border transition-all ${
+              className={`px-3 py-1 text-xs font-mono rounded-lg border transition-all ${
                 criterion === 'entropy'
                   ? 'border-[var(--math-prediction)] bg-[var(--math-prediction)]/20 text-[var(--math-prediction)] font-bold'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
@@ -1201,13 +1237,13 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
           </div>
 
           {/* Add Point Class */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <span className="text-xs font-mono text-[var(--text-tertiary)] uppercase tracking-wider me-1">
               {language === 'ar' ? 'إضافة نقطة:' : 'Add Class:'}
             </span>
             <button
               onClick={() => setAddModeClass(0)}
-              className={`px-2 py-0.5 text-xs font-mono rounded-md border transition-all ${
+              className={`px-2.5 py-1 text-xs font-mono rounded-md border transition-all ${
                 addModeClass === 0
                   ? 'border-sky-500 bg-sky-500/20 text-sky-400 font-bold'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
@@ -1217,7 +1253,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             </button>
             <button
               onClick={() => setAddModeClass(1)}
-              className={`px-2 py-0.5 text-xs font-mono rounded-md border transition-all ${
+              className={`px-2.5 py-1 text-xs font-mono rounded-md border transition-all ${
                 addModeClass === 1
                   ? 'border-amber-500 bg-amber-500/20 text-amber-400 font-bold'
                   : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
@@ -1229,217 +1265,64 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         </div>
       </div>
 
-      {/* Dual Interactive Workspace: 2D Laser Feature Space + Tree Hierarchy Diagram */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* 1. 2D Laser Feature Space Canvas */}
-        <div className="relative rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-app)] overflow-hidden shadow-inner p-2 flex flex-col">
-          <div className="flex items-center justify-between pb-1.5 px-2">
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[var(--text-primary)]">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-xs" />
-              <span>{language === 'ar' ? 'فضاء الخصائص والليزر (2D)' : '2D Feature Space & Laser Slices'}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowRegions(!showRegions)}
-                className={`px-2 py-0.5 text-[10px] font-mono rounded border transition-colors ${
-                  showRegions
-                    ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/15 text-[var(--math-vector)]'
-                    : 'border-transparent text-[var(--text-tertiary)]'
-                }`}
-              >
-                Regions
-              </button>
-              <button
-                onClick={() => setShowLaserGlow(!showLaserGlow)}
-                className={`px-2 py-0.5 text-[10px] font-mono rounded border transition-colors ${
-                  showLaserGlow
-                    ? 'border-rose-500 bg-rose-500/15 text-rose-400'
-                    : 'border-transparent text-[var(--text-tertiary)]'
-                }`}
-              >
-                Laser Glow
-              </button>
-            </div>
+      {/* 1. Expansive 2D Laser Feature Space Canvas */}
+      <div className="relative rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-app)] overflow-hidden shadow-inner p-3 flex flex-col w-full">
+        <div className="flex items-center justify-between pb-2 px-2 border-b border-[var(--border-subtle)]">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[var(--text-primary)]">
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-xs" />
+            <span>{language === 'ar' ? 'فضاء الخصائص والليزر (2D Feature Space)' : '2D Feature Space & Laser Partitions'}</span>
           </div>
-
-          <canvas
-            ref={canvasRef}
-            onPointerDown={handleCanvasPointerDown}
-            onContextMenu={handleCanvasContextMenu}
-            className="w-full h-80 rounded-xl cursor-crosshair touch-none"
-          />
-
-          {/* Floating Instructions Overlay */}
-          <div className="absolute bottom-4 start-4 px-2.5 py-1 rounded-md bg-[var(--bg-surface)]/85 backdrop-blur-md border border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-tertiary)] shadow-xs">
-            {language === 'ar'
-              ? 'انقر لإضافة نقاط • انقر يمين لحذف نقطة • مرر فوق الأوراق لتمييزها'
-              : 'Click to add points • Right-click to delete • Hover nodes to highlight'}
-          </div>
-
-          {/* Telemetry Badge */}
-          <div className="absolute top-10 end-4 flex items-center gap-2.5 px-2.5 py-1 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-xs font-mono shadow-xs">
-            <span className="text-[var(--text-tertiary)]">Accuracy:</span>
-            <span className="text-emerald-400 font-bold tabular-nums">
-              {activeSnapshot.accuracy.toFixed(1)}%
-            </span>
-            <div className="w-px h-3 bg-[var(--border-subtle)]" />
-            <span className="text-[var(--text-tertiary)]">Impurity:</span>
-            <span className="text-rose-400 font-bold tabular-nums">
-              {activeSnapshot.totalImpurity.toFixed(3)}
-            </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowRegions(!showRegions)}
+              className={`px-2.5 py-1 text-[11px] font-mono rounded-md border transition-colors ${
+                showRegions
+                  ? 'border-[var(--math-vector)] bg-[var(--math-vector)]/15 text-[var(--math-vector)]'
+                  : 'border-transparent text-[var(--text-tertiary)]'
+              }`}
+            >
+              Shaded Regions
+            </button>
+            <button
+              onClick={() => setShowLaserGlow(!showLaserGlow)}
+              className={`px-2.5 py-1 text-[11px] font-mono rounded-md border transition-colors ${
+                showLaserGlow
+                  ? 'border-rose-500 bg-rose-500/15 text-rose-400'
+                  : 'border-transparent text-[var(--text-tertiary)]'
+              }`}
+            >
+              Laser Glow
+            </button>
           </div>
         </div>
 
-        {/* 2. Interactive Decision Tree Graph (SVG) */}
-        <div className="relative rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-app)] overflow-hidden shadow-inner p-2 flex flex-col">
-          <div className="flex items-center justify-between pb-1.5 px-2">
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[var(--text-primary)]">
-              <GitBranch size={14} className="text-[var(--math-gradient)]" />
-              <span>{language === 'ar' ? 'مخطط شجرة القرار الهرمية' : 'Hierarchical Decision Tree Flowchart'}</span>
-            </div>
-            <div className="text-[10px] font-mono text-[var(--text-tertiary)]">
-              {activeSnapshot.leaves.length} Leaves • Depth {maxDepth}
-            </div>
-          </div>
+        <canvas
+          ref={canvasRef}
+          onPointerMove={handleCanvasPointerMove}
+          onPointerLeave={() => setHoveredNode(null)}
+          onPointerDown={handleCanvasPointerDown}
+          onContextMenu={handleCanvasContextMenu}
+          className="w-full h-88 md:h-[400px] rounded-xl cursor-crosshair touch-none"
+        />
 
-          <div className="w-full h-80 overflow-auto relative p-1">
-            <svg className="w-full h-full min-w-[480px] overflow-visible" viewBox="0 0 520 280">
-              <defs>
-                <linearGradient id="treeLineGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#f43f5e" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.8" />
-                </linearGradient>
-              </defs>
+        {/* Floating Instructions Overlay */}
+        <div className="absolute bottom-6 start-6 px-3 py-1.5 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-tertiary)] shadow-xs">
+          {language === 'ar'
+            ? 'انقر لإضافة نقاط • انقر يمين لحذف نقطة • مرر فوق الأوراق لتمييزها'
+            : 'Click to add points • Right-click to delete • Hover regions to sync with tree'}
+        </div>
 
-              {/* Connecting Branch Lines */}
-              {treeLayout.map(({ node, x, y }) => {
-                if (node.isLeaf || !node.left || !node.right) return null;
-                const leftChild = treeLayout.find((ln) => ln.node.id === node.left!.id);
-                const rightChild = treeLayout.find((ln) => ln.node.id === node.right!.id);
-                if (!leftChild || !rightChild) return null;
-
-                return (
-                  <g key={`branch-${node.id}`}>
-                    {/* Left Branch */}
-                    <path
-                      d={`M ${x},${y + 24} C ${x},${(y + leftChild.y) / 2} ${leftChild.x},${(y + leftChild.y) / 2} ${leftChild.x},${leftChild.y - 20}`}
-                      fill="none"
-                      stroke={theme === 'dark' ? '#3f3f46' : '#d4d4d8'}
-                      strokeWidth="1.8"
-                    />
-                    <text
-                      x={(x + leftChild.x) / 2 - 12}
-                      y={(y + leftChild.y) / 2}
-                      fontSize="9"
-                      fontFamily="monospace"
-                      fill="#38bdf8"
-                      fontWeight="bold"
-                    >
-                      Yes
-                    </text>
-
-                    {/* Right Branch */}
-                    <path
-                      d={`M ${x},${y + 24} C ${x},${(y + rightChild.y) / 2} ${rightChild.x},${(y + rightChild.y) / 2} ${rightChild.x},${rightChild.y - 20}`}
-                      fill="none"
-                      stroke={theme === 'dark' ? '#3f3f46' : '#d4d4d8'}
-                      strokeWidth="1.8"
-                    />
-                    <text
-                      x={(x + rightChild.x) / 2 + 6}
-                      y={(y + rightChild.y) / 2}
-                      fontSize="9"
-                      fontFamily="monospace"
-                      fill="#f59e0b"
-                      fontWeight="bold"
-                    >
-                      No
-                    </text>
-                  </g>
-                );
-              })}
-
-              {/* Node Cards */}
-              {treeLayout.map(({ node, x, y }) => {
-                const isHovered = hoveredNodeId === node.id;
-                const isSelected = selectedNodeId === node.id;
-                const isLeaf = node.isLeaf;
-
-                const cardW = 100;
-                const cardH = 44;
-
-                const nodeColor = isLeaf
-                  ? node.predictedClass === 0
-                    ? '#38bdf8'
-                    : '#f59e0b'
-                  : node.splitAxis === 'x'
-                  ? '#f43f5e'
-                  : '#a855f7';
-
-                return (
-                  <g
-                    key={node.id}
-                    transform={`translate(${x - cardW / 2}, ${y - cardH / 2})`}
-                    className="cursor-pointer transition-transform duration-150 hover:scale-105"
-                    onMouseEnter={() => setHoveredNodeId(node.id)}
-                    onMouseLeave={() => setHoveredNodeId(null)}
-                    onClick={() => setSelectedNodeId(node.id)}
-                  >
-                    {/* Node Background */}
-                    <rect
-                      width={cardW}
-                      height={cardH}
-                      rx="8"
-                      fill={theme === 'dark' ? '#18181b' : '#ffffff'}
-                      stroke={isHovered || isSelected ? '#f59e0b' : nodeColor}
-                      strokeWidth={isHovered || isSelected ? 2.5 : 1.5}
-                      className="shadow-sm"
-                    />
-
-                    {/* Top Condition or Class Badge */}
-                    <text
-                      x={cardW / 2}
-                      y="14"
-                      textAnchor="middle"
-                      fontSize="9.5"
-                      fontFamily="monospace"
-                      fontWeight="bold"
-                      fill={nodeColor}
-                    >
-                      {isLeaf
-                        ? `Class ${node.predictedClass}`
-                        : `${node.splitAxis?.toUpperCase()} ≤ ${node.threshold}`}
-                    </text>
-
-                    {/* Middle Sample Distribution [N0, N1] */}
-                    <text
-                      x={cardW / 2}
-                      y="27"
-                      textAnchor="middle"
-                      fontSize="8.5"
-                      fontFamily="monospace"
-                      fill={theme === 'dark' ? '#a1a1aa' : '#71717a'}
-                    >
-                      [{node.numClass0}, {node.numClass1}] (N={node.numClass0 + node.numClass1})
-                    </text>
-
-                    {/* Bottom Impurity Metric */}
-                    <text
-                      x={cardW / 2}
-                      y="38"
-                      textAnchor="middle"
-                      fontSize="8"
-                      fontFamily="monospace"
-                      fill={node.impurity === 0 ? '#10b981' : theme === 'dark' ? '#71717a' : '#a1a1aa'}
-                      fontWeight={node.impurity === 0 ? 'bold' : 'normal'}
-                    >
-                      {criterion === 'gini' ? 'Gini' : 'H'}: {node.impurity.toFixed(2)}
-                    </text>
-                  </g>
-                );
-              })}
-            </svg>
-          </div>
+        {/* Top-Right Telemetry Badge */}
+        <div className="absolute top-12 end-6 flex items-center gap-3 px-3 py-1.5 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-xs font-mono shadow-sm">
+          <span className="text-[var(--text-tertiary)]">Accuracy:</span>
+          <span className="text-emerald-400 font-bold tabular-nums">
+            {activeSnapshot.accuracy.toFixed(1)}%
+          </span>
+          <div className="w-px h-3 bg-[var(--border-subtle)]" />
+          <span className="text-[var(--text-tertiary)]">Total Impurity:</span>
+          <span className="text-rose-400 font-bold tabular-nums">
+            {activeSnapshot.totalImpurity.toFixed(3)}
+          </span>
         </div>
       </div>
 
@@ -1453,14 +1336,163 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
         onStepChange={setCurrentStepIdx}
       />
 
-      {/* Expanded Analytics & Inspection Panels */}
-      <div className="flex flex-col gap-3 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular shadow-xs">
+      {/* 2. Expansive Hierarchical Decision Tree Flowchart (Zero Node Collisions) */}
+      <div className="relative rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden shadow-xs p-4 flex flex-col w-full">
+        <div className="flex items-center justify-between pb-3 px-1 border-b border-[var(--border-subtle)]">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[var(--text-primary)]">
+            <GitBranch size={15} className="text-[var(--math-gradient)]" />
+            <span>{language === 'ar' ? 'مخطط شجرة القرار الهرمية' : 'Hierarchical Decision Tree Flowchart'}</span>
+          </div>
+          <div className="text-xs font-mono text-[var(--text-tertiary)]">
+            {activeSnapshot.leaves.length} Leaf Regions • Depth {maxDepth} • Hover to cross-highlight 2D space
+          </div>
+        </div>
+
+        {/* Horizontally Scrollable Container for Non-Cramped Tree Display */}
+        <div className="w-full h-84 md:h-96 overflow-x-auto overflow-y-hidden relative py-3 scrollbar-thin">
+          <svg
+            style={{ width: `${svgWidth}px`, height: '100%' }}
+            viewBox={`0 0 ${svgWidth} ${Math.max(260, (maxDepth + 1) * 75 + 30)}`}
+            className="overflow-visible"
+          >
+            {/* Connecting Branch Bezier Lines */}
+            {treeLayout.map(({ node, x, y }) => {
+              if (node.isLeaf || !node.left || !node.right) return null;
+              const leftChild = treeLayout.find((ln) => ln.node.id === node.left!.id);
+              const rightChild = treeLayout.find((ln) => ln.node.id === node.right!.id);
+              if (!leftChild || !rightChild) return null;
+
+              return (
+                <g key={`branch-${node.id}`}>
+                  {/* Left Branch */}
+                  <path
+                    d={`M ${x},${y + 22} C ${x},${(y + leftChild.y) / 2} ${leftChild.x},${(y + leftChild.y) / 2} ${leftChild.x},${leftChild.y - 22}`}
+                    fill="none"
+                    stroke={theme === 'dark' ? '#3f3f46' : '#d4d4d8'}
+                    strokeWidth="1.8"
+                  />
+                  <text
+                    x={(x + leftChild.x) / 2 - 14}
+                    y={(y + leftChild.y) / 2}
+                    fontSize="9.5"
+                    fontFamily="monospace"
+                    fill="#38bdf8"
+                    fontWeight="bold"
+                  >
+                    Yes
+                  </text>
+
+                  {/* Right Branch */}
+                  <path
+                    d={`M ${x},${y + 22} C ${x},${(y + rightChild.y) / 2} ${rightChild.x},${(y + rightChild.y) / 2} ${rightChild.x},${rightChild.y - 22}`}
+                    fill="none"
+                    stroke={theme === 'dark' ? '#3f3f46' : '#d4d4d8'}
+                    strokeWidth="1.8"
+                  />
+                  <text
+                    x={(x + rightChild.x) / 2 + 6}
+                    y={(y + rightChild.y) / 2}
+                    fontSize="9.5"
+                    fontFamily="monospace"
+                    fill="#f59e0b"
+                    fontWeight="bold"
+                  >
+                    No
+                  </text>
+                </g>
+              );
+            })}
+
+            {/* Tree Node Cards */}
+            {treeLayout.map(({ node, x, y }) => {
+              const isHovered = hoveredNode?.id === node.id;
+              const isSelected = selectedNode?.id === node.id;
+              const isLeaf = node.isLeaf;
+
+              const cardW = 96;
+              const cardH = 44;
+
+              const nodeColor = isLeaf
+                ? node.predictedClass === 0
+                  ? '#38bdf8'
+                  : '#f59e0b'
+                : node.splitAxis === 'x'
+                ? '#f43f5e'
+                : '#a855f7';
+
+              return (
+                <g
+                  key={node.id}
+                  transform={`translate(${x - cardW / 2}, ${y - cardH / 2})`}
+                  className="cursor-pointer transition-transform duration-150 hover:scale-105"
+                  onMouseEnter={() => setHoveredNode(node)}
+                  onMouseLeave={() => setHoveredNode(null)}
+                  onClick={() => setSelectedNode(node)}
+                >
+                  <rect
+                    width={cardW}
+                    height={cardH}
+                    rx="8"
+                    fill={theme === 'dark' ? '#18181b' : '#ffffff'}
+                    stroke={isHovered || isSelected ? '#f59e0b' : nodeColor}
+                    strokeWidth={isHovered || isSelected ? 2.5 : 1.5}
+                    className="shadow-xs"
+                  />
+
+                  {/* Top Split Condition or Class Badge */}
+                  <text
+                    x={cardW / 2}
+                    y="14"
+                    textAnchor="middle"
+                    fontSize="9"
+                    fontFamily="monospace"
+                    fontWeight="bold"
+                    fill={nodeColor}
+                  >
+                    {isLeaf
+                      ? `Class ${node.predictedClass}`
+                      : `${node.splitAxis?.toUpperCase()} ≤ ${node.threshold}`}
+                  </text>
+
+                  {/* Middle Sample Distribution [N0, N1] */}
+                  <text
+                    x={cardW / 2}
+                    y="27"
+                    textAnchor="middle"
+                    fontSize="8.5"
+                    fontFamily="monospace"
+                    fill={theme === 'dark' ? '#a1a1aa' : '#71717a'}
+                  >
+                    [{node.numClass0}, {node.numClass1}] (N={node.numClass0 + node.numClass1})
+                  </text>
+
+                  {/* Bottom Impurity Metric */}
+                  <text
+                    x={cardW / 2}
+                    y="38"
+                    textAnchor="middle"
+                    fontSize="8"
+                    fontFamily="monospace"
+                    fill={node.impurity === 0 ? '#10b981' : theme === 'dark' ? '#71717a' : '#a1a1aa'}
+                    fontWeight={node.impurity === 0 ? 'bold' : 'normal'}
+                  >
+                    {criterion === 'gini' ? 'Gini' : 'H'}: {node.impurity.toFixed(2)}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+      </div>
+
+      {/* 3. Expanded Analytics & Inspection Panels */}
+      <div className="flex flex-col gap-3.5 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular shadow-xs w-full">
         {/* Tab Headers */}
         <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2.5">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setActiveTab('scan')}
-              className={`flex items-center gap-1.5 px-3 py-1 text-xs font-mono rounded-lg transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg transition-all ${
                 activeTab === 'scan'
                   ? 'bg-[var(--math-gradient)] text-black font-bold shadow-xs'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
@@ -1471,7 +1503,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             </button>
             <button
               onClick={() => setActiveTab('confusion')}
-              className={`flex items-center gap-1.5 px-3 py-1 text-xs font-mono rounded-lg transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg transition-all ${
                 activeTab === 'confusion'
                   ? 'bg-[var(--math-gradient)] text-black font-bold shadow-xs'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
@@ -1482,7 +1514,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             </button>
             <button
               onClick={() => setActiveTab('rules')}
-              className={`flex items-center gap-1.5 px-3 py-1 text-xs font-mono rounded-lg transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg transition-all ${
                 activeTab === 'rules'
                   ? 'bg-[var(--math-gradient)] text-black font-bold shadow-xs'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
@@ -1493,7 +1525,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             </button>
           </div>
 
-          <div className="text-[11px] font-mono text-[var(--text-tertiary)] hidden sm:block">
+          <div className="text-xs font-mono text-[var(--text-tertiary)] hidden sm:block">
             {language === 'ar' ? 'خوارزمية CART للاستقراء التكراري' : 'Recursive Binary Splitting (CART)'}
           </div>
         </div>
@@ -1507,7 +1539,6 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
                 : `Scanning Information Gain ΔI along axis ${scanData.axis.toUpperCase()}: The greedy CART algorithm scans sorted feature thresholds to locate the optimal peak θ*.`}
             </div>
 
-            {/* SVG Scan Curve */}
             <div className="h-36 w-full relative pt-2">
               <svg className="w-full h-full overflow-visible" viewBox="0 0 500 100" preserveAspectRatio="none">
                 <defs>
@@ -1541,7 +1572,6 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
                     const pathD = pts.reduce((acc, pt, i) => (i === 0 ? `M ${pt.x},${pt.y}` : `${acc} L ${pt.x},${pt.y}`), '');
                     const areaD = `${pathD} L ${pts[pts.length - 1].x},95 L ${pts[0].x},95 Z`;
 
-                    // Peak threshold
                     const peak = pts.reduce((p, c) => (c.gain > p.gain ? c : p), pts[0]);
 
                     return (
@@ -1549,7 +1579,6 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
                         <path d={areaD} fill="url(#gainGradient)" />
                         <path d={pathD} fill="none" stroke="#10b981" strokeWidth="2.5" />
 
-                        {/* Optimal Peak Guideline */}
                         <line
                           x1={peak.x}
                           y1="10"
@@ -1630,7 +1659,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
             {decisionRules.map((rule, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between p-2 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] text-xs font-mono"
+                className="flex items-center justify-between p-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] text-xs font-mono"
               >
                 <div className="flex items-center gap-2">
                   <span
