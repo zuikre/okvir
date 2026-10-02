@@ -2,7 +2,20 @@ import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react'
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
 import { PreCanvasBriefing, PostCanvasConsolidation, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
-import { Play, Pause, RotateCcw, Plus, Activity, Sparkles, Zap, CheckCircle2, Sliders } from 'lucide-react';
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  Activity,
+  Sparkles,
+  Zap,
+  CheckCircle2,
+  Sliders,
+  Dices,
+  BarChart3,
+  TrendingDown,
+  Info,
+} from 'lucide-react';
 
 interface ActiveBall {
   id: number;
@@ -10,11 +23,15 @@ interface ActiveBall {
   y: number;
   vx: number;
   vy: number;
-  row: number;
-  col: number;
+  targetRow: number;
+  targetCol: number;
+  targetX: number;
+  targetY: number;
+  inChute: boolean;
   color: string;
   radius: number;
   settled: boolean;
+  history: Array<{ x: number; y: number }>;
 }
 
 interface SettledBall {
@@ -29,6 +46,12 @@ interface PegGlow {
   y: number;
   life: number;
   color: string;
+}
+
+interface BarBounceFlash {
+  x: number;
+  y: number;
+  life: number;
 }
 
 const CLT_PEDAGOGY: TierContent = {
@@ -103,36 +126,128 @@ print(f"Theory:    Mean={n_pegs*p:.2f}, Var={n_pegs*p*(1-p):.2f}")`,
   },
 };
 
-// Vibrant tactile color palette for cascading ball bearings
-const BALL_COLORS = ['#38bdf8', '#34d399', '#fbbf24', '#c084fc', '#f43f5e'];
+// Vibrant tactile color palette
+const BALL_PALETTE = ['#38bdf8', '#34d399', '#fbbf24', '#c084fc', '#f43f5e', '#a78bfa'];
 
 export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) => {
   const { language, config } = useOkvirStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Experiment Mode:
+  // - 'galton': Physical Plinko Board (Bernoulli Trials)
+  // - 'dice': Sum of Uniform Dice (Uniform -> Gaussian)
+  // - 'skew': Exponential Waiting Times (Asymmetric -> Gaussian)
+  const [labMode, setLabMode] = useState<'galton' | 'dice' | 'skew'>('galton');
+
+  // Physical Galton Board Constants
   const numRows = 10;
   const numBins = numRows + 1;
 
-  // State controls
-  const [pBias, setPBias] = useState(0.5); // Probability of bouncing right (p)
-  const [targetN, setTargetN] = useState<number>(250); // Stop criteria: 100, 250, 500, 1000, 0 (infinite)
-  const [speedMode, setSpeedMode] = useState<'normal' | 'fast'>('normal');
+  // Dice parameters
+  const [numDice, setNumDice] = useState<number>(5); // k dice rolled per trial
+  // Skewed parameters
+  const [numSkewSamples, setNumSkewSamples] = useState<number>(10); // k exponential draws
+
+  // Controls & Stop Criteria
+  const [pBias, setPBias] = useState(0.5); // Right-bounce bias
+  const [targetN, setTargetN] = useState<number>(250); // Stop criteria: 100, 250, 500, 1000, 0 (Infinite)
+  const [gravityPreset, setGravityPreset] = useState<'earth' | 'lunar' | 'heavy'>('earth');
+  const [restitutionVal, setRestitutionVal] = useState<number>(0.52); // Bounciness
   const [isRunning, setIsRunning] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [speedMode, setSpeedMode] = useState<'normal' | 'fast'>('normal');
+
+  // Empirical Data
   const [bins, setBins] = useState<number[]>(new Array(numBins).fill(0));
   const [totalDropped, setTotalDropped] = useState(0);
 
-  // Animation & simulation refs
+  // Animation & Physics Refs
   const activeBallsRef = useRef<ActiveBall[]>([]);
   const settledBallsRef = useRef<SettledBall[]>([]);
   const pegGlowsRef = useRef<PegGlow[]>([]);
+  const barFlashesRef = useRef<BarBounceFlash[]>([]);
   const binsRef = useRef<number[]>(new Array(numBins).fill(0));
   binsRef.current = bins;
   const nextBallIdRef = useRef(1);
   const lastSoundTimeRef = useRef(0);
 
-  // Spawn batch of physical balls from the top funnel
-  const spawnBatch = useCallback(
+  // Gravity scalar mapping
+  const gravity = useMemo(() => {
+    switch (gravityPreset) {
+      case 'lunar':
+        return 0.12;
+      case 'heavy':
+        return 0.38;
+      case 'earth':
+      default:
+        return 0.24;
+    }
+  }, [gravityPreset]);
+
+  // Reset function
+  const resetBoard = useCallback(() => {
+    activeBallsRef.current = [];
+    settledBallsRef.current = [];
+    pegGlowsRef.current = [];
+    barFlashesRef.current = [];
+    setBins(new Array(numBins).fill(0));
+    setTotalDropped(0);
+    setIsRunning(false);
+    setIsCompleted(false);
+    if (config.soundEnabled) audio.playClick();
+  }, [numBins, config.soundEnabled]);
+
+  // Handle Lab Mode Switch
+  const switchMode = (mode: 'galton' | 'dice' | 'skew') => {
+    setLabMode(mode);
+    resetBoard();
+  };
+
+  // Dynamic Responsive Plinko Geometry & Coordinate Architecture
+  const getLayout = useCallback(
+    (w: number, h: number) => {
+      const cx = w / 2;
+      const topFunnelY = 32;
+      const pegFieldTopY = 60;
+      const pegFieldH = Math.min(230, h * 0.42);
+      const pegPitchY = pegFieldH / numRows;
+      const pegPitchX = Math.min(42, Math.max(26, (w * 0.88) / numBins));
+      const binStartX = cx - (numBins * pegPitchX) / 2;
+      const binTopY = pegFieldTopY + pegFieldH + 22;
+      const binBottomY = h - 28;
+      const binH = binBottomY - binTopY;
+
+      const getPegX = (row: number, col: number) => {
+        const rowCount = row + 1;
+        const rowStartX = cx - ((rowCount - 1) * pegPitchX) / 2;
+        return rowStartX + col * pegPitchX;
+      };
+
+      const getPegY = (row: number) => pegFieldTopY + row * pegPitchY;
+
+      const getChuteCenterX = (binIdx: number) => binStartX + binIdx * pegPitchX + pegPitchX / 2;
+
+      return {
+        cx,
+        topFunnelY,
+        pegFieldTopY,
+        pegFieldH,
+        pegPitchY,
+        pegPitchX,
+        binStartX,
+        binTopY,
+        binBottomY,
+        binH,
+        getPegX,
+        getPegY,
+        getChuteCenterX,
+      };
+    },
+    [numRows, numBins]
+  );
+
+  // Physical Galton Ball Spawner
+  const spawnPhysicalBalls = useCallback(
     (count = 1) => {
       if (targetN > 0 && totalDropped >= targetN) {
         setIsRunning(false);
@@ -141,7 +256,8 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
       const canvas = canvasRef.current;
       const w = canvas ? canvas.getBoundingClientRect().width : 600;
-      const cx = w / 2;
+      const h = canvas ? canvas.getBoundingClientRect().height : 540;
+      const layout = getLayout(w, h);
 
       const toSpawn = targetN > 0 ? Math.min(count, targetN - totalDropped) : count;
       if (toSpawn <= 0) {
@@ -151,18 +267,81 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
       const newBalls: ActiveBall[] = [];
       for (let i = 0; i < toSpawn; i++) {
-        newBalls.push({
-          id: nextBallIdRef.current++,
-          x: cx + (Math.random() - 0.5) * 6,
-          y: 20 - i * 14,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: 1.8 + Math.random() * 0.4,
-          row: 0,
-          col: 0,
-          color: BALL_COLORS[Math.floor(Math.random() * BALL_COLORS.length)],
-          radius: 3.5,
-          settled: false,
-        });
+        if (labMode === 'galton') {
+          // Drops from funnel targeting the top apex pin (row 0, col 0)
+          newBalls.push({
+            id: nextBallIdRef.current++,
+            x: layout.cx + (Math.random() - 0.5) * 4,
+            y: layout.topFunnelY - 8 - i * 16,
+            vx: (Math.random() - 0.5) * 0.2,
+            vy: 1.6 + Math.random() * 0.3,
+            targetRow: 0,
+            targetCol: 0,
+            targetX: layout.cx,
+            targetY: layout.getPegY(0),
+            inChute: false,
+            color: BALL_PALETTE[Math.floor(Math.random() * BALL_PALETTE.length)],
+            radius: 3.8,
+            settled: false,
+            history: [],
+          });
+        } else if (labMode === 'dice') {
+          // Sum of k uniform dice rolls
+          let sum = 0;
+          for (let d = 0; d < numDice; d++) {
+            sum += Math.floor(Math.random() * 6) + 1;
+          }
+          const minPossible = numDice * 1;
+          const maxPossible = numDice * 6;
+          const normalized = (sum - minPossible) / Math.max(1, maxPossible - minPossible);
+          const binIdx = Math.max(0, Math.min(numBins - 1, Math.round(normalized * (numBins - 1))));
+          const chuteX = layout.getChuteCenterX(binIdx);
+
+          newBalls.push({
+            id: nextBallIdRef.current++,
+            x: chuteX + (Math.random() - 0.5) * 4,
+            y: layout.binTopY - 12 - i * 14,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: 2.0 + Math.random() * 0.4,
+            targetRow: numRows,
+            targetCol: binIdx,
+            targetX: chuteX,
+            targetY: layout.binTopY,
+            inChute: true,
+            color: BALL_PALETTE[Math.floor(Math.random() * BALL_PALETTE.length)],
+            radius: 3.8,
+            settled: false,
+            history: [],
+          });
+        } else if (labMode === 'skew') {
+          // Average of k skewed exponential random draws
+          let sum = 0;
+          for (let s = 0; s < numSkewSamples; s++) {
+            sum += -Math.log(Math.max(1e-7, Math.random()));
+          }
+          const meanVal = sum / numSkewSamples;
+          const stdDev = 1.0 / Math.sqrt(numSkewSamples);
+          const zScore = (meanVal - 1.0) / stdDev;
+          const binIdx = Math.max(0, Math.min(numBins - 1, Math.round(((zScore + 3) / 6) * (numBins - 1))));
+          const chuteX = layout.getChuteCenterX(binIdx);
+
+          newBalls.push({
+            id: nextBallIdRef.current++,
+            x: chuteX + (Math.random() - 0.5) * 4,
+            y: layout.binTopY - 12 - i * 14,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: 2.0 + Math.random() * 0.4,
+            targetRow: numRows,
+            targetCol: binIdx,
+            targetX: chuteX,
+            targetY: layout.binTopY,
+            inChute: true,
+            color: BALL_PALETTE[Math.floor(Math.random() * BALL_PALETTE.length)],
+            radius: 3.8,
+            settled: false,
+            history: [],
+          });
+        }
       }
 
       activeBallsRef.current.push(...newBalls);
@@ -171,70 +350,101 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
       if (config.soundEnabled && toSpawn <= 5) {
         const now = performance.now();
-        if (now - lastSoundTimeRef.current > 70) {
+        if (now - lastSoundTimeRef.current > 75) {
           audio.playClick();
           lastSoundTimeRef.current = now;
         }
       }
     },
-    [targetN, totalDropped, config.soundEnabled]
+    [targetN, totalDropped, getLayout, labMode, numDice, numSkewSamples, numBins, numRows, config.soundEnabled]
   );
 
-  // Instant simulation: fast-forwards remaining trials to reach target without waiting
-  const instantSimulate = useCallback(() => {
+  // Fast Mathematical Batch Simulator (for Dice or Exponential modes or Instant button)
+  const batchSimulateMathematical = useCallback(
+    (trials: number) => {
+      const newBins = [...binsRef.current];
+
+      if (labMode === 'galton') {
+        // Bernoulli binomial cascade
+        for (let i = 0; i < trials; i++) {
+          let col = 0;
+          for (let r = 0; r < numRows; r++) {
+            if (Math.random() < pBias) col++;
+          }
+          newBins[col]++;
+        }
+      } else if (labMode === 'dice') {
+        // Sum of k uniform dice, mapped into 11 bins
+        for (let i = 0; i < trials; i++) {
+          let sum = 0;
+          for (let d = 0; d < numDice; d++) {
+            sum += Math.floor(Math.random() * 6) + 1; // 1 to 6
+          }
+          // Normalize sum between min (numDice * 1) and max (numDice * 6)
+          const minPossible = numDice * 1;
+          const maxPossible = numDice * 6;
+          const normalized = (sum - minPossible) / Math.max(1, maxPossible - minPossible);
+          const binIdx = Math.max(0, Math.min(numBins - 1, Math.round(normalized * (numBins - 1))));
+          newBins[binIdx]++;
+        }
+      } else if (labMode === 'skew') {
+        // Mean of k heavily skewed exponential variables Exp(1)
+        for (let i = 0; i < trials; i++) {
+          let sum = 0;
+          for (let s = 0; s < numSkewSamples; s++) {
+            // Inverse transform sampling for Exp(lambda=1): -ln(U)
+            sum += -Math.log(Math.max(1e-7, Math.random()));
+          }
+          const meanVal = sum / numSkewSamples;
+          // Theoretical mean is 1.0, map around center (bin 5)
+          const stdDev = 1.0 / Math.sqrt(numSkewSamples);
+          const zScore = (meanVal - 1.0) / stdDev;
+          // Map z-score [-3, +3] to [0, 10]
+          const binIdx = Math.max(0, Math.min(numBins - 1, Math.round(((zScore + 3) / 6) * (numBins - 1))));
+          newBins[binIdx]++;
+        }
+      }
+
+      binsRef.current = newBins;
+      setBins([...newBins]);
+      setTotalDropped((prev) => prev + trials);
+      activeBallsRef.current = [];
+
+      if (targetN > 0 && totalDropped + trials >= targetN) {
+        setIsRunning(false);
+        setIsCompleted(true);
+        if (config.soundEnabled) audio.playSuccessChime();
+      }
+    },
+    [labMode, numRows, pBias, numDice, numSkewSamples, numBins, targetN, totalDropped, config.soundEnabled]
+  );
+
+  // Instant Simulate to Target
+  const instantComplete = useCallback(() => {
     const remaining = targetN > 0 ? Math.max(0, targetN - totalDropped) : 250;
     if (remaining <= 0) return;
+    batchSimulateMathematical(remaining);
+  }, [targetN, totalDropped, batchSimulateMathematical]);
 
-    // Fast binomial generation
-    const newBins = [...binsRef.current];
-    for (let i = 0; i < remaining; i++) {
-      let col = 0;
-      for (let r = 0; r < numRows; r++) {
-        if (Math.random() < pBias) col++;
-      }
-      newBins[col]++;
-    }
-
-    binsRef.current = newBins;
-    setBins([...newBins]);
-    setTotalDropped((prev) => prev + remaining);
-    activeBallsRef.current = [];
-    setIsRunning(false);
-    setIsCompleted(true);
-
-    if (config.soundEnabled) audio.playSuccessChime();
-  }, [targetN, totalDropped, numRows, pBias, config.soundEnabled]);
-
-  const resetBoard = useCallback(() => {
-    activeBallsRef.current = [];
-    settledBallsRef.current = [];
-    pegGlowsRef.current = [];
-    setBins(new Array(numBins).fill(0));
-    setTotalDropped(0);
-    setIsRunning(false);
-    setIsCompleted(false);
-    if (config.soundEnabled) audio.playClick();
-  }, [numBins, config.soundEnabled]);
-
-  // Continuous Spawner Loop with Stop Criteria
+  // Continuous Spawning Tick Loop
   useEffect(() => {
     if (!isRunning) return;
 
-    const intervalMs = speedMode === 'fast' ? 25 : 60;
-    const batchSize = speedMode === 'fast' ? 4 : 2;
+    const intervalMs = speedMode === 'fast' ? 35 : 75;
+    const batchSize = speedMode === 'fast' ? 3 : 1;
 
     const interval = setInterval(() => {
       if (targetN > 0 && totalDropped >= targetN) {
         setIsRunning(false);
         return;
       }
-      spawnBatch(batchSize);
+      spawnPhysicalBalls(batchSize);
     }, intervalMs);
 
     return () => clearInterval(interval);
-  }, [isRunning, targetN, totalDropped, speedMode, spawnBatch]);
+  }, [isRunning, targetN, totalDropped, speedMode, spawnPhysicalBalls]);
 
-  // Real-time Empirical & Theoretical Statistics + Goodness-of-Fit
+  // Theoretical Distribution Moments & Empirical Diagnostics
   const stats = useMemo(() => {
     let sum = 0;
     let sumSq = 0;
@@ -245,8 +455,17 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
       count += cnt;
     });
 
-    const theoreticalMean = numRows * pBias;
-    const theoreticalVar = numRows * pBias * (1 - pBias);
+    let theoreticalMean = numRows * pBias;
+    let theoreticalVar = numRows * pBias * (1 - pBias);
+
+    if (labMode === 'dice') {
+      theoreticalMean = (numBins - 1) / 2; // Symmetric center
+      theoreticalVar = ((numBins - 1) ** 2) / (12 * numDice);
+    } else if (labMode === 'skew') {
+      theoreticalMean = (numBins - 1) / 2; // Normalized center
+      theoreticalVar = 1.0;
+    }
+
     const theoreticalSigma = Math.sqrt(Math.max(0.001, theoreticalVar));
 
     if (count === 0) {
@@ -265,7 +484,7 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
     const mean = sum / count;
     const variance = Math.max(0, sumSq / count - mean * mean);
 
-    // Compute R² Goodness of Fit to Gaussian Normal distribution
+    // Compute R² goodness of fit against continuous Gaussian Normal envelope
     let ssTot = 0;
     let ssRes = 0;
     const meanCount = count / numBins;
@@ -293,17 +512,26 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
       rSquared,
       targetProgress,
     };
-  }, [bins, numRows, pBias, numBins, targetN]);
+  }, [bins, numRows, pBias, labMode, numDice, numBins, targetN]);
 
-  // Check completion when all active balls have settled
+  // Check completion when all active physical balls settle
   useEffect(() => {
-    if (!isRunning && targetN > 0 && totalDropped >= targetN && activeBallsRef.current.length === 0 && !isCompleted && totalDropped > 0) {
+    if (
+      !isRunning &&
+      targetN > 0 &&
+      totalDropped >= targetN &&
+      activeBallsRef.current.length === 0 &&
+      !isCompleted &&
+      totalDropped > 0
+    ) {
       setIsCompleted(true);
       if (config.soundEnabled) audio.playSuccess();
     }
   }, [isRunning, targetN, totalDropped, isCompleted, config.soundEnabled]);
 
-  // Main 60 FPS Canvas Physics & Render Loop
+  // =========================================================================
+  // MAIN 60 FPS CANVAS RENDERING & RIGID 2D PLINKO PHYSICS ENGINE
+  // =========================================================================
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -325,169 +553,220 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
       const w = rect.width;
       const h = rect.height;
 
-      // Theme detection
       const isLight = document.documentElement.getAttribute('data-theme') === 'light';
 
       ctx.clearRect(0, 0, w, h);
 
-      // Coordinate anchors
-      const cx = w / 2;
-      const topFunnelY = 32;
-      const pegFieldTopY = 56;
-      const pegFieldH = Math.min(190, h * 0.44);
-      const binTopY = pegFieldTopY + pegFieldH + 18;
-      const binBottomY = h - 22;
-      const binH = binBottomY - binTopY;
+      const layout = getLayout(w, h);
 
-      const pegPitchX = Math.min(30, (w * 0.82) / (numRows + 1));
-      const pegPitchY = pegFieldH / numRows;
-      const binStartX = cx - (numBins * pegPitchX) / 2;
-
-      // 1. Draw Top Dropper Funnel Guide
-      ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.15)';
+      // 1. Draw Top Dropper Funnel (Polished Beveled Metal Guide)
+      ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.25)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(cx - 24, 10);
-      ctx.lineTo(cx - 8, topFunnelY);
-      ctx.lineTo(cx - 8, topFunnelY + 12);
-      ctx.moveTo(cx + 24, 10);
-      ctx.lineTo(cx + 8, topFunnelY);
-      ctx.lineTo(cx + 8, topFunnelY + 12);
+      ctx.moveTo(layout.cx - 32, 10);
+      ctx.lineTo(layout.cx - 10, layout.topFunnelY);
+      ctx.lineTo(layout.cx - 10, layout.topFunnelY + 16);
+      ctx.moveTo(layout.cx + 32, 10);
+      ctx.lineTo(layout.cx + 10, layout.topFunnelY);
+      ctx.lineTo(layout.cx + 10, layout.topFunnelY + 16);
       ctx.stroke();
 
-      // 2. Draw Brass / Steel Peg Matrix
-      const pegRadius = 2.8;
+      // 2. Draw Brass / Steel Pin Lattice (Pascal Triangle)
+      const pegRadius = 3.0;
       for (let r = 0; r < numRows; r++) {
-        const rowPegCount = r + 1;
-        const rowStartX = cx - ((rowPegCount - 1) * pegPitchX) / 2;
-        const py = pegFieldTopY + r * pegPitchY;
+        const rowCount = r + 1;
+        const py = layout.getPegY(r);
 
-        for (let c = 0; c < rowPegCount; c++) {
-          const px = rowStartX + c * pegPitchX;
+        for (let c = 0; c < rowCount; c++) {
+          const px = layout.getPegX(r, c);
 
-          // Peg body
+          // Subtle drop shadow under pin
           ctx.beginPath();
-          ctx.arc(px, py, pegRadius, 0, Math.PI * 2);
-          ctx.fillStyle = isLight ? '#71717a' : '#d4d4d8';
+          ctx.arc(px, py + 1.2, pegRadius, 0, Math.PI * 2);
+          ctx.fillStyle = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.6)';
           ctx.fill();
 
-          // Specular highlight on pin head
+          // Pin Body
           ctx.beginPath();
-          ctx.arc(px - 0.7, py - 0.7, 0.9, 0, Math.PI * 2);
+          ctx.arc(px, py, pegRadius, 0, Math.PI * 2);
+          ctx.fillStyle = isLight ? '#71717a' : '#e4e4e7';
+          ctx.fill();
+
+          // Specular Glint Highlight
+          ctx.beginPath();
+          ctx.arc(px - 0.8, py - 0.8, 0.9, 0, Math.PI * 2);
           ctx.fillStyle = '#ffffff';
           ctx.fill();
         }
       }
 
-      // 3. Draw Peg Glow Ripples
+      // 3. Draw Peg Glow Impact Ripples
       const glows = pegGlowsRef.current;
       for (let i = glows.length - 1; i >= 0; i--) {
         const g = glows[i];
         ctx.strokeStyle = g.color;
-        ctx.globalAlpha = g.life * 0.7;
-        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = g.life * 0.8;
+        ctx.lineWidth = 1.6;
         ctx.beginPath();
-        ctx.arc(g.x, g.y, (1 - g.life) * 12 + pegRadius, 0, Math.PI * 2);
+        ctx.arc(g.x, g.y, (1 - g.life) * 14 + pegRadius, 0, Math.PI * 2);
         ctx.stroke();
 
-        g.life -= 0.08;
-        if (g.life <= 0) {
-          glows.splice(i, 1);
-        }
+        g.life -= 0.07;
+        if (g.life <= 0) glows.splice(i, 1);
       }
       ctx.globalAlpha = 1.0;
 
-      // 4. Draw Collection Bins Vertical Slots
-      ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.1)';
-      ctx.lineWidth = 1;
+      // 4. Draw Collection Bins Vertical Divider Bars
+      ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.15)';
+      ctx.lineWidth = 1.2;
       for (let b = 0; b <= numBins; b++) {
-        const bx = binStartX + b * pegPitchX;
+        const bx = layout.binStartX + b * layout.pegPitchX;
         ctx.beginPath();
-        ctx.moveTo(bx, binTopY);
-        ctx.lineTo(bx, binBottomY);
+        ctx.moveTo(bx, layout.binTopY);
+        ctx.lineTo(bx, layout.binBottomY);
         ctx.stroke();
       }
 
-      // Base shelf line
-      ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.25)';
-      ctx.lineWidth = 2;
+      // Base Floor Line
+      ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.25)' : 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.moveTo(binStartX, binBottomY);
-      ctx.lineTo(binStartX + numBins * pegPitchX, binBottomY);
+      ctx.moveTo(layout.binStartX, layout.binBottomY);
+      ctx.lineTo(layout.binStartX + numBins * layout.pegPitchX, layout.binBottomY);
       ctx.stroke();
 
-      // 5. Update & Render Active Cascading Balls (Realistic 2D Plinko Physics)
+      // 5. Draw Bar Bounce Spark Flashes
+      const flashes = barFlashesRef.current;
+      for (let i = flashes.length - 1; i >= 0; i--) {
+        const f = flashes[i];
+        ctx.strokeStyle = '#ffffff';
+        ctx.globalAlpha = f.life * 0.9;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, (1 - f.life) * 7 + 1, 0, Math.PI * 2);
+        ctx.stroke();
+        f.life -= 0.14;
+        if (f.life <= 0) flashes.splice(i, 1);
+      }
+      ctx.globalAlpha = 1.0;
+
+      // 6. UPDATE & RENDER PHYSICAL CASCADING BALLS
       const balls = activeBallsRef.current;
-      const gravity = 0.24;
       let binUpdated = false;
 
       for (let i = balls.length - 1; i >= 0; i--) {
         const ball = balls[i];
 
-        ball.vy += gravity;
-        ball.y += ball.vy;
-        ball.x += ball.vx;
+        ball.vx *= 0.99; // Air damping
 
-        // Damping air friction
-        ball.vx *= 0.985;
+        if (!ball.inChute) {
+          // --- Phase 1: In the Pascal Pin Field ---
+          ball.vy += gravity;
+          ball.y += ball.vy;
+          ball.x += ball.vx;
 
-        // Peg Row Collision & Binary Deflection
-        if (ball.row < numRows) {
-          const currentPegY = pegFieldTopY + ball.row * pegPitchY;
-          if (ball.y >= currentPegY - ball.radius && ball.y <= currentPegY + pegPitchY * 0.5) {
-            // Calculate which peg in this row the ball is striking
-            const rowCount = ball.row + 1;
-            const rowStartX = cx - ((rowCount - 1) * pegPitchX) / 2;
-            const targetCol = Math.max(0, Math.min(rowCount - 1, ball.col));
-            const pegX = rowStartX + targetCol * pegPitchX;
+          // Gentle magnetic guidance towards current target peg
+          const dx = ball.targetX - ball.x;
+          ball.vx += dx * 0.05;
 
-            const dx = ball.x - pegX;
-            const dy = ball.y - currentPegY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
+          // Record trajectory trail for single ball drops
+          if (balls.length <= 4) {
+            ball.history.push({ x: ball.x, y: ball.y });
+            if (ball.history.length > 25) ball.history.shift();
+          }
 
-            if (dist < pegRadius + ball.radius + 3) {
-              // Binary choice: bounce right (with probability pBias) or left
-              const bounceRight = Math.random() < pBias;
-              if (bounceRight) ball.col += 1;
-              ball.row += 1;
+          // Check if ball has reached the dome of target peg
+          const hitThreshold = ball.targetY - (pegRadius + ball.radius);
+          if (ball.y >= hitThreshold) {
+            ball.y = hitThreshold;
+            ball.x = ball.targetX;
 
-              // Physical impulse: lateral push and elastic upward recoil
-              const impulseX = (bounceRight ? 1 : -1) * (1.5 + Math.random() * 0.4);
-              ball.vx = impulseX;
-              ball.vy = -0.32 * Math.abs(ball.vy) + 0.4;
-              ball.x = pegX + (bounceRight ? 2.5 : -2.5);
+            // Trigger ripple glow
+            pegGlowsRef.current.push({
+              x: ball.targetX,
+              y: ball.targetY,
+              life: 1.0,
+              color: ball.color,
+            });
 
-              // Peg light ripple
-              pegGlowsRef.current.push({
-                x: pegX,
-                y: currentPegY,
-                life: 1.0,
-                color: ball.color,
-              });
-
-              // Micro-haptic sound tick (throttled)
-              if (config.soundEnabled) {
-                const now = performance.now();
-                if (now - lastSoundTimeRef.current > 75) {
-                  audio.playClick();
-                  lastSoundTimeRef.current = now;
-                }
+            // Audio click
+            if (config.soundEnabled) {
+              const now = performance.now();
+              if (now - lastSoundTimeRef.current > 55) {
+                audio.playClick();
+                lastSoundTimeRef.current = now;
               }
             }
+
+            // Stochastic Bernoulli step
+            const bounceRight = Math.random() < pBias;
+
+            if (ball.targetRow < numRows - 1) {
+              const nextRow = ball.targetRow + 1;
+              const nextCol = bounceRight ? ball.targetCol + 1 : ball.targetCol;
+              const nextPegX = layout.getPegX(nextRow, nextCol);
+              const nextPegY = layout.getPegY(nextRow);
+
+              // Upward rebound
+              ball.vy = -restitutionVal * 2.2 - 0.7;
+
+              // Parabolic trajectory computation
+              const deltaY = nextPegY - ball.y;
+              const disc = Math.sqrt(Math.max(0.1, ball.vy * ball.vy + 2 * gravity * deltaY));
+              const timeFrames = Math.max(1, (-ball.vy + disc) / gravity);
+              const deltaX = nextPegX - ball.x;
+              ball.vx = deltaX / timeFrames;
+
+              ball.targetRow = nextRow;
+              ball.targetCol = nextCol;
+              ball.targetX = nextPegX;
+              ball.targetY = nextPegY;
+            } else {
+              // Reached bottom row of pegs! Transition to collection chute
+              const finalBin = bounceRight ? ball.targetCol + 1 : ball.targetCol;
+              const chuteX = layout.getChuteCenterX(finalBin);
+
+              ball.targetCol = finalBin;
+              ball.targetX = chuteX;
+              ball.targetY = layout.binTopY;
+              ball.inChute = true;
+
+              ball.vy = -restitutionVal * 1.5 - 0.4;
+              ball.vx = (bounceRight ? 1 : -1) * (1.1 + Math.random() * 0.3);
+            }
           }
-        }
+        } else {
+          // --- Phase 2: In the Vertical Collection Chute ---
+          const targetBin = Math.max(0, Math.min(numBins - 1, ball.targetCol));
+          const leftBarX = layout.binStartX + targetBin * layout.pegPitchX;
+          const rightBarX = leftBarX + layout.pegPitchX;
+          const chuteCenter = leftBarX + layout.pegPitchX / 2;
 
-        // Entering Bins: horizontal funneling into the correct vertical channel
-        if (ball.y >= binTopY) {
-          const targetBin = Math.max(0, Math.min(numBins - 1, ball.col));
-          const slotCenterX = binStartX + targetBin * pegPitchX + pegPitchX / 2;
-          ball.vx += (slotCenterX - ball.x) * 0.25;
-          ball.vx *= 0.6; // channel damping
+          ball.vy += gravity * 1.15;
+          ball.y += ball.vy;
+          ball.x += ball.vx;
 
-          // Landing on stack or bottom shelf
+          // Bounce off left vertical bar
+          if (ball.x - ball.radius <= leftBarX) {
+            ball.x = leftBarX + ball.radius;
+            ball.vx = Math.abs(ball.vx) * restitutionVal + 0.2;
+            barFlashesRef.current.push({ x: leftBarX, y: ball.y, life: 1.0 });
+          }
+          // Bounce off right vertical bar
+          else if (ball.x + ball.radius >= rightBarX) {
+            ball.x = rightBarX - ball.radius;
+            ball.vx = -Math.abs(ball.vx) * restitutionVal - 0.2;
+            barFlashesRef.current.push({ x: rightBarX, y: ball.y, life: 1.0 });
+          }
+
+          // Gentle channel damping
+          ball.vx += (chuteCenter - ball.x) * 0.05;
+          ball.vx *= 0.94;
+
+          // Landing on stack or floor
           const currentCount = binsRef.current[targetBin];
           const ballDiam = ball.radius * 2;
-          const stackY = binBottomY - Math.min(binH - 12, currentCount * (ballDiam * 0.85) + ball.radius);
+          const stackY = layout.binBottomY - Math.min(layout.binH - 22, currentCount * (ballDiam * 0.65) + ball.radius);
 
           if (ball.y >= stackY) {
             ball.settled = true;
@@ -496,10 +775,10 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
             binsRef.current = newBins;
             binUpdated = true;
 
-            // Retain visual settled bead (capped for performance)
-            if (settledBallsRef.current.length < 350) {
+            // Retain visual settled bead in bin
+            if (settledBallsRef.current.length < 450) {
               settledBallsRef.current.push({
-                x: slotCenterX + (Math.random() - 0.5) * (pegPitchX * 0.25),
+                x: chuteCenter + (Math.random() - 0.5) * (layout.pegPitchX * 0.35),
                 y: stackY,
                 color: ball.color,
                 radius: ball.radius,
@@ -511,7 +790,22 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
           }
         }
 
-        // Render Active Ball with 3D Radial Sphere Sheen
+        // Render trajectory motion trail
+        if (ball.history.length > 2) {
+          ctx.strokeStyle = ball.color;
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          for (let hIdx = 0; hIdx < ball.history.length; hIdx++) {
+            const pt = ball.history[hIdx];
+            ctx.globalAlpha = (hIdx / ball.history.length) * 0.35;
+            if (hIdx === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+          }
+          ctx.stroke();
+          ctx.globalAlpha = 1.0;
+        }
+
+        // Render Spherical Ball Bearing with Radial 3D Specular Sheen
         const grad = ctx.createRadialGradient(
           ball.x - ball.radius * 0.35,
           ball.y - ball.radius * 0.35,
@@ -534,7 +828,7 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
         setBins([...binsRef.current]);
       }
 
-      // 6. Draw Settled Physical Beads in Bins
+      // 7. Draw Settled Physical Beads in Bins
       const settled = settledBallsRef.current;
       for (let s = 0; s < settled.length; s++) {
         const sb = settled[s];
@@ -544,17 +838,24 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
         ctx.fill();
       }
 
-      // 7. Draw Smooth Fluid Histogram Bars
+      // 8. Draw Smooth Fluid Histogram Bars (Translucent Underneath Beads)
       const maxBinVal = Math.max(1, ...binsRef.current);
       for (let b = 0; b < numBins; b++) {
         const count = binsRef.current[b];
+        const bx = layout.binStartX + b * layout.pegPitchX;
+
+        // Draw bin index number below the floor line
+        ctx.fillStyle = isLight ? '#71717a' : '#a1a1aa';
+        ctx.font = 'bold 10px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${b}`, bx + layout.pegPitchX / 2, layout.binBottomY + 16);
+
         if (count === 0) continue;
 
-        const bx = binStartX + b * pegPitchX;
-        const barH = (count / maxBinVal) * (binH - 10);
-        const by = binBottomY - barH;
+        const barH = (count / maxBinVal) * (layout.binH - 26);
+        const by = layout.binBottomY - barH;
 
-        const grad = ctx.createLinearGradient(0, by, 0, binBottomY);
+        const grad = ctx.createLinearGradient(0, by, 0, layout.binBottomY);
         if (isLight) {
           grad.addColorStop(0, 'rgba(14, 165, 233, 0.65)');
           grad.addColorStop(1, 'rgba(16, 185, 129, 0.45)');
@@ -564,47 +865,60 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
         }
 
         ctx.fillStyle = grad;
-        ctx.fillRect(bx + 1.5, by, pegPitchX - 3, barH);
+        ctx.fillRect(bx + 1.5, by, layout.pegPitchX - 3, barH);
 
         // Individual count label atop each bin
-        if (pegPitchX > 16) {
+        if (layout.pegPitchX > 16) {
           ctx.fillStyle = isLight ? '#09090b' : '#fafafa';
           ctx.font = 'bold 9px monospace';
           ctx.textAlign = 'center';
-          ctx.fillText(`${count}`, bx + pegPitchX / 2, by - 4);
+          ctx.fillText(`${count}`, bx + layout.pegPitchX / 2, by - 6);
         }
       }
 
-      // 8. Draw Theoretical Gaussian Normal Overlay Envelope with Amber Glow Fill
+      // 9. DRAW THEORETICAL GAUSSIAN NORMAL CURVE WITH 68-95-99.7% EMPIRICAL CONFIDENCE REGIONS
       const totalCount = binsRef.current.reduce((a, b) => a + b, 0);
       if (totalCount >= 5) {
-        const mu = numRows * pBias;
-        const sigma = Math.sqrt(Math.max(0.001, numRows * pBias * (1 - pBias)));
+        let mu = numRows * pBias;
+        let sigma = Math.sqrt(Math.max(0.001, numRows * pBias * (1 - pBias)));
+
+        if (labMode === 'dice') {
+          mu = (numBins - 1) / 2;
+          sigma = Math.sqrt(((numBins - 1) ** 2) / (12 * numDice));
+        } else if (labMode === 'skew') {
+          mu = (numBins - 1) / 2;
+          sigma = 1.0;
+        }
+
+        // Draw 1-Sigma Confidence Band (68.2% of Mass)
+        const sigma1Left = layout.binStartX + Math.max(0, mu - sigma) * layout.pegPitchX + layout.pegPitchX / 2;
+        const sigma1Right = layout.binStartX + Math.min(numBins - 1, mu + sigma) * layout.pegPitchX + layout.pegPitchX / 2;
+        ctx.fillStyle = isLight ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.1)';
+        ctx.fillRect(sigma1Left, layout.binTopY, sigma1Right - sigma1Left, layout.binH);
 
         // Path for smooth Gaussian bell curve
         ctx.beginPath();
         const curvePoints: Array<{ x: number; y: number }> = [];
 
-        // Sample along continuous x coordinates
-        const stepCount = 50;
+        const stepCount = 60;
         for (let s = 0; s <= stepCount; s++) {
           const binCoord = (s / stepCount) * (numBins - 1);
-          const px = binStartX + binCoord * pegPitchX + pegPitchX / 2;
+          const px = layout.binStartX + binCoord * layout.pegPitchX + layout.pegPitchX / 2;
           const z = (binCoord - mu) / sigma;
           const pdf = (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * z * z);
           const theoCount = pdf * totalCount;
-          const barH = (theoCount / maxBinVal) * (binH - 10);
-          const py = Math.max(binTopY, binBottomY - barH);
+          const barH = (theoCount / maxBinVal) * (layout.binH - 26);
+          const py = Math.max(layout.binTopY, layout.binBottomY - barH);
 
           curvePoints.push({ x: px, y: py });
           if (s === 0) ctx.moveTo(px, py);
           else ctx.lineTo(px, py);
         }
 
-        // Draw soft amber Gaussian glow envelope area
+        // Soft Amber Glow Area under curve
         ctx.save();
-        ctx.lineTo(curvePoints[curvePoints.length - 1].x, binBottomY);
-        ctx.lineTo(curvePoints[0].x, binBottomY);
+        ctx.lineTo(curvePoints[curvePoints.length - 1].x, layout.binBottomY);
+        ctx.lineTo(curvePoints[0].x, layout.binBottomY);
         ctx.closePath();
         ctx.fillStyle = isLight ? 'rgba(245, 158, 11, 0.12)' : 'rgba(251, 191, 36, 0.15)';
         ctx.fill();
@@ -615,14 +929,14 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
         ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        // Draw Theoretical Mean (μ) Vertical Marker
-        const meanX = binStartX + mu * pegPitchX + pegPitchX / 2;
+        // Theoretical Mean (μ) Vertical Marker
+        const meanX = layout.binStartX + mu * layout.pegPitchX + layout.pegPitchX / 2;
         ctx.strokeStyle = '#f59e0b';
         ctx.lineWidth = 1.5;
         ctx.setLineDash([3, 3]);
         ctx.beginPath();
-        ctx.moveTo(meanX, binTopY - 4);
-        ctx.lineTo(meanX, binBottomY);
+        ctx.moveTo(meanX, layout.binTopY - 6);
+        ctx.lineTo(meanX, layout.binBottomY);
         ctx.stroke();
         ctx.setLineDash([]);
 
@@ -630,7 +944,7 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
         ctx.fillStyle = '#f59e0b';
         ctx.font = 'bold 9px monospace';
         ctx.textAlign = 'center';
-        ctx.fillText(`μ=${mu.toFixed(1)}`, meanX, binTopY - 7);
+        ctx.fillText(`μ=${mu.toFixed(1)}`, meanX, layout.binTopY - 9);
       }
 
       ctx.restore();
@@ -639,7 +953,7 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
     animId = requestAnimationFrame(render);
     return () => cancelAnimationFrame(animId);
-  }, [numRows, numBins, pBias]);
+  }, [numRows, numBins, pBias, gravity, restitutionVal, labMode, numDice, getLayout, config.soundEnabled]);
 
   return (
     <div className="flex flex-col gap-5 w-full select-none">
@@ -647,73 +961,120 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
       <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 lg:p-6 specular shadow-xl space-y-4">
         {/* =========================================================================
-            HEADER & DUAL TARGET CONTROLS (STOP CRITERIA)
+            HEADER & LAB MODE SWITCHER (GALTON / UNIFORM DICE / SKEWED EXPONENTIAL)
            ========================================================================= */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[var(--math-gradient)]/15 border border-[var(--math-gradient)]/30 flex items-center justify-center text-[var(--math-gradient)]">
-              <Activity size={18} />
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[var(--math-gradient)]/15 border border-[var(--math-gradient)]/30 flex items-center justify-center text-[var(--math-gradient)] shadow-inner">
+              <Activity size={20} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-[var(--text-primary)]">
-                {language === 'ar' ? 'لوحة غالتون ومبرهنة النهاية المركزية' : 'Galton Plinko & Central Limit Theorem'}
-              </h3>
-              <p className="text-[11px] text-[var(--text-tertiary)]">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)]">
+                  {language === 'ar' ? 'لوحة غالتون ومبرهنة النهاية المركزية' : 'Galton Plinko & The CLT Engine'}
+                </h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                  {language === 'ar' ? 'فيزياء حية 2D' : 'Rigid 2D Physics'}
+                </span>
+              </div>
+              <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">
                 {language === 'ar'
-                  ? 'مراقبة التقارب الغاووسي الحتمي مع تراكم الانحرافات الثنائية المستقلة'
-                  : 'Witness Gaussian bell convergence emerge from accumulated discrete coin flips'}
+                  ? 'اصطدامات فيزيائية حقيقية، ارتدادات بين القضبان، وتقارب حتمي نحو التوزيع الطبيعي'
+                  : 'Continuous rigid collision dynamics, channel bar bounces, and inevitable Gaussian convergence'}
               </p>
             </div>
           </div>
 
-          {/* Action Buttons: Run / Pause / Instant / Reset */}
+          {/* 3-Way Mode Switcher: Galton Plinko | Uniform Dice | Skewed Noise */}
+          <div className="flex items-center p-1 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+            <button
+              onClick={() => switchMode('galton')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg transition-all cursor-pointer ${
+                labMode === 'galton'
+                  ? 'bg-[var(--bg-surface-hover)] text-[var(--text-primary)] shadow-sm font-semibold'
+                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+              }`}
+              title="Physical Galton Plinko Pin Cascade (Binomial)"
+            >
+              <BarChart3 size={13} className="text-sky-400" />
+              <span>{language === 'ar' ? 'لوحة غالتون' : 'Galton Plinko'}</span>
+            </button>
+
+            <button
+              onClick={() => switchMode('dice')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg transition-all cursor-pointer ${
+                labMode === 'dice'
+                  ? 'bg-[var(--bg-surface-hover)] text-[var(--text-primary)] shadow-sm font-semibold'
+                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+              }`}
+              title="Sum of Uniform Dice Rolls (Flat Uniform -> Bell Curve)"
+            >
+              <Dices size={13} className="text-emerald-400" />
+              <span>{language === 'ar' ? 'رميات النرد' : 'Dice Sums'}</span>
+            </button>
+
+            <button
+              onClick={() => switchMode('skew')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded-lg transition-all cursor-pointer ${
+                labMode === 'skew'
+                  ? 'bg-[var(--bg-surface-hover)] text-[var(--text-primary)] shadow-sm font-semibold'
+                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+              }`}
+              title="Average of Skewed Exponential Noise (Long Tail -> Bell Curve)"
+            >
+              <TrendingDown size={13} className="text-amber-400" />
+              <span>{language === 'ar' ? 'ضوضاء ملتوية' : 'Skewed Noise'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* =========================================================================
+            PRIMARY ACTION CONTROLS & STOP CRITERIA
+           ========================================================================= */}
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)]">
+          {/* Action Buttons: Drop Balls / Pause / Instant / Reset */}
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setIsRunning(!isRunning)}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all shadow-sm cursor-pointer ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all shadow-md cursor-pointer ${
                 isRunning
                   ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-amber-500/30'
                   : 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:brightness-110 active:scale-95'
               }`}
             >
-              {isRunning ? <Pause size={13} /> : <Play size={13} fill="currentColor" />}
+              {isRunning ? <Pause size={14} /> : <Play size={14} fill="currentColor" />}
               <span>
                 {isRunning
                   ? (language === 'ar' ? 'إيقاف مؤقت' : 'Pause')
-                  : (language === 'ar' ? 'إطلاق الكرات' : 'Drop Balls')}
+                  : (language === 'ar' ? 'إطلاق الكرات' : 'Release Cascade')}
               </span>
             </button>
 
             <button
-              onClick={instantSimulate}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-sky-500/30 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 text-xs font-mono font-bold transition-colors cursor-pointer"
-              title="Instantly simulate to target N without delay"
+              onClick={instantComplete}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-sky-500/30 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 text-xs font-mono font-bold transition-colors cursor-pointer"
+              title="Instantly simulate to target N without waiting"
             >
-              <Zap size={12} />
+              <Zap size={13} />
               <span>{language === 'ar' ? 'محاكاة فورية' : 'Instant ⚡'}</span>
             </button>
 
             <button
               onClick={resetBoard}
               className="p-2 rounded-xl border border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors cursor-pointer"
-              title={language === 'ar' ? 'تصفير اللوحة' : 'Reset Board'}
+              title={language === 'ar' ? 'تصفير اللوحة' : 'Reset Experiment'}
             >
-              <RotateCcw size={13} />
+              <RotateCcw size={14} />
             </button>
           </div>
-        </div>
 
-        {/* =========================================================================
-            STOP CRITERIA & SPEED PRESETS BAR
-           ========================================================================= */}
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)]">
-          {/* Target Sample Size (Stop Criteria) */}
+          {/* Stop Criteria (Target N Presets) */}
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-mono text-[var(--text-secondary)] font-semibold flex items-center gap-1">
-              <CheckCircle2 size={12} className="text-[var(--math-vector)]" />
+              <CheckCircle2 size={13} className="text-[var(--math-vector)]" />
               {language === 'ar' ? 'معيار التوقف (N):' : 'Stop Criteria (Target N):'}
             </span>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 bg-[var(--bg-surface)] p-1 rounded-xl border border-[var(--border-subtle)]">
               {[100, 250, 500, 1000, 0].map((n) => (
                 <button
                   key={n}
@@ -724,10 +1085,10 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
                   className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                     targetN === n
                       ? 'bg-[var(--text-primary)] text-[var(--bg-app)] shadow-sm'
-                      : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] bg-[var(--bg-surface)]'
+                      : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
                   }`}
                 >
-                  {n === 0 ? '∞' : n}
+                  {n === 0 ? '∞ Stream' : n}
                 </button>
               ))}
             </div>
@@ -736,12 +1097,12 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
           {/* Speed Preset */}
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-mono text-[var(--text-tertiary)]">
-              {language === 'ar' ? 'السرعة:' : 'Speed:'}
+              {language === 'ar' ? 'التدفق:' : 'Rate:'}
             </span>
             <div className="flex items-center gap-1 bg-[var(--bg-surface)] p-0.5 rounded-lg border border-[var(--border-subtle)]">
               <button
                 onClick={() => setSpeedMode('normal')}
-                className={`px-2 py-0.5 rounded text-[11px] font-mono transition-all ${
+                className={`px-2.5 py-0.5 rounded text-[11px] font-mono transition-all ${
                   speedMode === 'normal'
                     ? 'bg-[var(--bg-app)] text-[var(--text-primary)] font-bold shadow-xs'
                     : 'text-[var(--text-tertiary)]'
@@ -751,7 +1112,7 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
               </button>
               <button
                 onClick={() => setSpeedMode('fast')}
-                className={`px-2 py-0.5 rounded text-[11px] font-mono transition-all ${
+                className={`px-2.5 py-0.5 rounded text-[11px] font-mono transition-all ${
                   speedMode === 'fast'
                     ? 'bg-[var(--bg-app)] text-[var(--text-primary)] font-bold shadow-xs'
                     : 'text-[var(--text-tertiary)]'
@@ -764,7 +1125,7 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
         </div>
 
         {/* =========================================================================
-            LIVE DIAGNOSTICS HUD & CONVERGENCE METRIC
+            LIVE DIAGNOSTICS HUD & CLT GOODNESS-OF-FIT
            ========================================================================= */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {/* Sample Size + Progress */}
@@ -823,34 +1184,34 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
               <span>{(stats.rSquared * 100).toFixed(1)}%</span>
             </div>
             <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
-              {stats.count < 30 ? (language === 'ar' ? 'تجميع العينات...' : 'Gathering noise...') : (language === 'ar' ? 'تقارب غاووسي' : 'Normal Convergence')}
+              {stats.count < 30 ? (language === 'ar' ? 'تجميع الضوضاء...' : 'Gathering noise...') : (language === 'ar' ? 'تقارب غاووسي حتمي' : 'Normal Convergence')}
             </span>
           </div>
         </div>
 
-        {/* Completion Milestone Banner */}
+        {/* Milestone Completion Banner */}
         {isCompleted && (
-          <div className="p-3.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 flex items-center justify-between gap-3 slide-up">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                <CheckCircle2 size={16} />
+          <div className="p-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 flex items-center justify-between gap-3 slide-up">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                <CheckCircle2 size={18} />
               </div>
               <div className="text-xs">
-                <span className="font-bold text-[var(--text-primary)]">
+                <span className="font-bold text-[var(--text-primary)] text-sm">
                   {language === 'ar'
                     ? `اكتملت التجربة بنجاح عند N = ${stats.count}!`
                     : `CLT Convergence Milestone Achieved at N = ${stats.count}!`}
                 </span>
-                <span className="block text-[11px] text-[var(--text-secondary)]">
+                <span className="block text-[11px] text-[var(--text-secondary)] mt-0.5">
                   {language === 'ar'
-                    ? `تطابق التوزيع التجريبي مع المنحنى الغاووسي بنسبة ${(stats.rSquared * 100).toFixed(1)}% دون أي معرفة مسبقة بمسار كل كرة.`
-                    : `The empirical distribution matches the theoretical Gaussian curve with ${(stats.rSquared * 100).toFixed(1)}% fidelity.`}
+                    ? `تطابق التوزيع التجريبي مع المنحنى الغاووسي بنسبة ${(stats.rSquared * 100).toFixed(1)}%. تثبت هذه النتيجة أن مجموع الضوضاء المستقلة يمحو العشوائية الفردية حتماً.`
+                    : `The empirical distribution matches the theoretical Gaussian curve with ${(stats.rSquared * 100).toFixed(1)}% fidelity. Microscopic noise has washed away into macroscopic order.`}
                 </span>
               </div>
             </div>
             <button
               onClick={resetBoard}
-              className="px-3 py-1.5 rounded-lg bg-emerald-500 text-black text-xs font-mono font-bold hover:brightness-110 active:scale-95 transition-transform shrink-0 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-emerald-500 text-black text-xs font-mono font-bold hover:brightness-110 active:scale-95 transition-transform shrink-0 cursor-pointer shadow-sm"
             >
               {language === 'ar' ? 'تجربة جديدة' : 'New Trial'}
             </button>
@@ -858,56 +1219,177 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
         )}
 
         {/* =========================================================================
-            CANVAS SIMULATION STAGE (TACTILE GALTON PLINKO)
+            CANVAS SIMULATION STAGE (TACTILE PLINKO WITH ACCURATE CHANNEL BOUNCES)
            ========================================================================= */}
-        <div className="relative w-full h-88 sm:h-96 rounded-2xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-app)] shadow-inner">
+        <div className="relative w-full h-[520px] sm:h-[560px] rounded-2xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-app)] shadow-inner">
           <canvas ref={canvasRef} className="w-full h-full block" />
 
           {/* Top Funnel Entrance Badge */}
-          <div className="absolute top-2.5 start-3 px-2 py-0.5 rounded-md bg-[var(--bg-surface)]/80 border border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-tertiary)] backdrop-blur-sm">
-            {language === 'ar' ? 'مدخل الكرات العشوائية' : 'Stochastic Funnel'}
+          <div className="absolute top-2.5 start-3 px-2.5 py-1 rounded-lg bg-[var(--bg-surface)]/85 border border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-tertiary)] backdrop-blur-md shadow-xs flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
+            <span>
+              {labMode === 'galton'
+                ? (language === 'ar' ? 'مدخل الكرات العشوائية' : 'Stochastic Funnel')
+                : labMode === 'dice'
+                ? (language === 'ar' ? `مجموع ${numDice} أحجار نرد منتظمة` : `Sum of ${numDice} Uniform Dice`)
+                : (language === 'ar' ? `متوسط ${numSkewSamples} عينات ملتوية` : `Mean of ${numSkewSamples} Skewed Draws`)}
+            </span>
           </div>
 
           {/* Theoretical Curve Legend */}
-          <div className="absolute top-2.5 end-3 px-2.5 py-1 rounded-md bg-[var(--bg-surface)]/85 border border-[var(--border-subtle)] text-[10px] font-mono flex items-center gap-2 backdrop-blur-md shadow-xs">
+          <div className="absolute top-2.5 end-3 px-2.5 py-1 rounded-lg bg-[var(--bg-surface)]/85 border border-[var(--border-subtle)] text-[10px] font-mono flex items-center gap-2 backdrop-blur-md shadow-xs">
             <span className="w-3.5 h-1 rounded-full bg-amber-400" />
             <span className="text-[var(--text-secondary)] font-semibold">
               {language === 'ar' ? 'المنحنى النظري N(μ, σ²)' : 'Theoretical Normal N(μ, σ²)'}
             </span>
           </div>
+
+          {/* 68% Empirical Confidence Band Badge */}
+          <div className="absolute bottom-2.5 end-3 px-2 py-0.5 rounded-md bg-[var(--bg-surface)]/80 border border-emerald-500/30 text-[9px] font-mono text-emerald-400 backdrop-blur-sm">
+            <span>±1σ (68.2% Band)</span>
+          </div>
         </div>
 
         {/* =========================================================================
-            BIAS SLIDER (P = 0.50 SKEW CONTROL)
+            ADVANCED PHYSICAL & PARAMETRIC CONTROLS
            ========================================================================= */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-          <div className="flex items-center gap-3">
-            <Sliders size={14} className="text-[var(--text-tertiary)]" />
-            <span className="text-xs font-mono text-[var(--text-secondary)]">
-              {language === 'ar' ? 'احتمال الانحراف يميناً (p):' : 'Right-Bounce Bias (p):'}{' '}
-              <strong className="text-[var(--text-primary)] font-bold tabular-nums">{pBias.toFixed(2)}</strong>
-            </span>
-          </div>
+        <div className="space-y-3 pt-1">
+          {/* Mode 1: Galton Board Specific Controls (Right Bias + Gravity + Restitution) */}
+          {labMode === 'galton' && (
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+              {/* Right Bias p */}
+              <div className="flex items-center gap-3 flex-1">
+                <Sliders size={14} className="text-[var(--text-tertiary)] shrink-0" />
+                <span className="text-xs font-mono text-[var(--text-secondary)] shrink-0">
+                  {language === 'ar' ? 'احتمال الانحراف (p):' : 'Right Bias (p):'}{' '}
+                  <strong className="text-[var(--text-primary)] tabular-nums">{pBias.toFixed(2)}</strong>
+                </span>
+                <input
+                  type="range"
+                  min="0.2"
+                  max="0.8"
+                  step="0.05"
+                  value={pBias}
+                  onChange={(e) => {
+                    setPBias(parseFloat(e.target.value));
+                    resetBoard();
+                  }}
+                  className="flex-1 accent-[var(--math-gradient)] cursor-pointer"
+                />
+                <span className="text-[10px] font-mono text-[var(--math-gradient)] font-bold shrink-0 min-w-20 text-end">
+                  {pBias < 0.48 ? '← Left Skew' : pBias > 0.52 ? 'Right Skew →' : 'Symmetric'}
+                </span>
+              </div>
 
-          <div className="flex items-center gap-3 flex-1 max-w-sm">
-            <span className="text-[10px] font-mono text-[var(--text-tertiary)]">0.2</span>
-            <input
-              type="range"
-              min="0.2"
-              max="0.8"
-              step="0.05"
-              value={pBias}
-              onChange={(e) => {
-                setPBias(parseFloat(e.target.value));
-                resetBoard();
-              }}
-              className="flex-1 accent-[var(--math-gradient)] cursor-pointer"
-            />
-            <span className="text-[10px] font-mono text-[var(--text-tertiary)]">0.8</span>
-            <span className="text-[10px] font-mono text-[var(--math-gradient)] font-bold shrink-0 min-w-20 text-end">
-              {pBias < 0.48 ? '← Left Skew' : pBias > 0.52 ? 'Right Skew →' : 'Symmetric'}
-            </span>
-          </div>
+              {/* Gravity Environment */}
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[11px] font-mono text-[var(--text-tertiary)]">
+                  {language === 'ar' ? 'الجاذبية:' : 'Gravity:'}
+                </span>
+                <div className="flex items-center gap-1 bg-[var(--bg-surface)] p-0.5 rounded-lg border border-[var(--border-subtle)]">
+                  {(['lunar', 'earth', 'heavy'] as const).map((g) => (
+                    <button
+                      key={g}
+                      onClick={() => setGravityPreset(g)}
+                      className={`px-2 py-0.5 rounded text-[10px] font-mono capitalize transition-all ${
+                        gravityPreset === g
+                          ? 'bg-[var(--bg-app)] text-[var(--text-primary)] font-bold shadow-xs'
+                          : 'text-[var(--text-tertiary)]'
+                      }`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bounciness / Restitution */}
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[11px] font-mono text-[var(--text-tertiary)]">
+                  {language === 'ar' ? 'المرونة:' : 'Bounce:'}
+                </span>
+                <div className="flex items-center gap-1 bg-[var(--bg-surface)] p-0.5 rounded-lg border border-[var(--border-subtle)]">
+                  {[0.35, 0.52, 0.75].map((r) => (
+                    <button
+                      key={r}
+                      onClick={() => setRestitutionVal(r)}
+                      className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
+                        restitutionVal === r
+                          ? 'bg-[var(--bg-app)] text-[var(--text-primary)] font-bold shadow-xs'
+                          : 'text-[var(--text-tertiary)]'
+                      }`}
+                    >
+                      {r === 0.35 ? 'Lead' : r === 0.52 ? 'Steel' : 'Spring'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mode 2: Dice Sum Controls (Number of Dice k) */}
+          {labMode === 'dice' && (
+            <div className="flex items-center justify-between gap-4 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+              <div className="flex items-center gap-3">
+                <Dices size={16} className="text-emerald-400" />
+                <span className="text-xs font-mono text-[var(--text-secondary)]">
+                  {language === 'ar' ? 'عدد النرد المستقل في كل رمية (k):' : 'Number of Independent Dice (k):'}{' '}
+                  <strong className="text-emerald-400 font-bold">{numDice} Dice</strong>
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1">
+                {[1, 2, 5, 10, 30].map((k) => (
+                  <button
+                    key={k}
+                    onClick={() => {
+                      setNumDice(k);
+                      resetBoard();
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                      numDice === k
+                        ? 'bg-emerald-500 text-black shadow-sm'
+                        : 'text-[var(--text-tertiary)] bg-[var(--bg-surface)] hover:text-[var(--text-secondary)]'
+                    }`}
+                  >
+                    {k === 1 ? 'k=1 (Flat)' : k === 2 ? 'k=2 (Triangle)' : `k=${k}`}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Mode 3: Skewed Exponential Controls (k Samples) */}
+          {labMode === 'skew' && (
+            <div className="flex items-center justify-between gap-4 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+              <div className="flex items-center gap-3">
+                <TrendingDown size={16} className="text-amber-400" />
+                <span className="text-xs font-mono text-[var(--text-secondary)]">
+                  {language === 'ar' ? 'حجم العينة لحساب المتوسط (k):' : 'Sample Size for Averaging (k):'}{' '}
+                  <strong className="text-amber-400 font-bold">{numSkewSamples} Draws</strong>
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1">
+                {[1, 2, 5, 15, 50].map((k) => (
+                  <button
+                    key={k}
+                    onClick={() => {
+                      setNumSkewSamples(k);
+                      resetBoard();
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                      numSkewSamples === k
+                        ? 'bg-amber-400 text-black shadow-sm'
+                        : 'text-[var(--text-tertiary)] bg-[var(--bg-surface)] hover:text-[var(--text-secondary)]'
+                    }`}
+                  >
+                    {k === 1 ? 'k=1 (Heavily Skewed)' : `k=${k}`}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
