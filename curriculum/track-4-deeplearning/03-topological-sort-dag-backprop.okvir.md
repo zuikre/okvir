@@ -5,7 +5,7 @@ title: "Topological Sort DAG Execution & Full Backpropagation"
 track: "deeplearning"
 module: "mod-35"
 estimated_minutes: 15
-prerequisites: ["reverse-mode-derivative-closures", "cs-04"]
+prerequisites: ["reverse-mode-derivative-closures", "pure-functions-recursion"]
 i18n:
   ar: "تنفيذ الرسم البياني الموجه غير الدائري بالترتيب الطوبولوجي وتراكم التدرجات"
 ---

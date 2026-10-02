@@ -5,7 +5,7 @@ title: "Multi-Dimensional Array Broadcasting Rules"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-16"]
+prerequisites: ["numpy-vectorization"]
 i18n:
   ar: "قواعد البث متعدد الأبعاد (Broadcasting Rules) في NumPy"
 ---

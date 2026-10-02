@@ -5,7 +5,7 @@ title: "Relational Joins & Set Semantics"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-24"]
+prerequisites: []
 i18n:
   ar: "الربط العلائقي (Joins) ودلالات المجموعات وقيم NULL"
 ---

@@ -5,7 +5,7 @@ title: "Singular Value Decomposition (SVD) & Spectral Geometry"
 track: "math"
 module: "mod-05"
 estimated_minutes: 15
-prerequisites: ["t1-12", "t1-09"]
+prerequisites: ["orthogonal-projections", "determinant-scaling-factor"]
 i18n:
   ar: "تفكيك القيم المفردة (SVD) والهندسة الطيفية"
 ---

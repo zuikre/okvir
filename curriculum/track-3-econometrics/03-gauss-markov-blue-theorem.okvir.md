@@ -5,7 +5,7 @@ title: "The Gauss-Markov Theorem & BLUE Estimator"
 track: "econometrics"
 module: "mod-19"
 estimated_minutes: 15
-prerequisites: ["ols-residual-geometry", "t1-29"]
+prerequisites: ["ols-residual-geometry", "central-limit-theorem"]
 i18n:
   ar: "مبرهنة غاوس-ماركوف وأفضل مقدر خطي غير متحيّز"
 ---

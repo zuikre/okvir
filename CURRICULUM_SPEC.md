@@ -129,7 +129,7 @@ Binds an interactive 60 FPS HTML5 Canvas or WebGL engine into the lesson:
 | `engine` | string | Rendering engine: `"canvas2d"` or `"webgl"` |
 | `component` | string | Component identifier from `src/components/simulation/` |
 
-**Supported Core Components:**
+**Supported Core Components (24 Interactive Simulation Lab Engines):**
 * `LinearRegressionResiduals`: Rotating regression line & shrinking error squares
 * `KNNRadar`: Pulsing radar scanner with elastic neighbor tethers
 * `GradientDescentCanvas`: 3D/contour surface with heavy-ball momentum
@@ -148,15 +148,21 @@ Binds an interactive 60 FPS HTML5 Canvas or WebGL engine into the lesson:
 * `InstrumentalVariablesLab`: Causal DAG with endogeneity, 2-Stage Least Squares (2SLS), and Wald estimator
 * `AutogradGraphLab`: OkvirGrad computational graph DAG with forward pass and reverse-mode backpropagation
 * `BpeTokenizerLab`: Byte-Pair Encoding subword tokenizer visualizer with greedy merge rule extraction
+* `FlashAttentionTilingLab`: FlashAttention-2 SRAM memory block tiling & online softmax accumulator
+* `RotaryEmbeddingLab`: Rotary Position Embeddings (RoPE) multi-frequency orthogonal rotation planes
+* `LoRADecompositionLab`: Low-Rank Adaptation (LoRA / QLoRA) weight matrix factorization ($W_0 + BA$)
+* `EnvironmentFrameCanvas`: CPython memory model, stack frames, heap pointers, and reference counting
+* `DynamicArrayGrowthLab`: Geometric array buffer allocation doubling ($0 \to 4 \to 8$) & memory striding
+* `HashTableInternalsCanvas`: Compact hash table arrays, open addressing probing & collision resolution
 
-### 4.2 Python Challenge (`:::python-challenge`)
-Executes self-grading unit tests in the Pyodide WebAssembly worker:
+### 4.2 Code Challenges (`:::python-challenge` & `:::sql-challenge`)
+Executes self-grading unit tests in client-side WebAssembly workers (Pyodide for CPython 3.12, DuckDB v1.28.0 for SQL:2016 analytics):
 
 | Property | Type | Description |
 | :--- | :--- | :--- |
 | `id` | string | Unique challenge identifier |
-| `timeout_ms` | number | Execution timeout before SIGINT cancellation (default: 3000ms) |
-| `test_cases` | array | List of input expressions and expected stringified outputs |
+| `timeout_ms` | number | Execution timeout before SIGINT cancellation (default: 3000ms, hard watchdog: 5000ms) |
+| `test_cases` | array | List of input expressions / test queries and expected stringified outputs |
 
 ---
 

@@ -5,7 +5,7 @@ title: "The Jacobian Matrix & Vector-Valued Deformation"
 track: "math"
 module: "mod-07"
 estimated_minutes: 15
-prerequisites: ["t1-21"]
+prerequisites: ["multivariable-scalar-fields"]
 i18n:
   ar: "مصفوفة جاكوبي والتشويه المكاني للدوال المتجهية"
 ---

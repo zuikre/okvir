@@ -5,7 +5,7 @@ title: "K-Means++ Clustering & Voronoi Tessellations"
 track: "econometrics"
 module: "mod-33"
 estimated_minutes: 15
-prerequisites: ["t1-01", "multiple-regression-matrix-calculus"]
+prerequisites: ["cartesian-coordinate-metric", "multiple-regression-matrix-calculus"]
 i18n:
   ar: "تجميع K-Means++ وتفسيف فورونوي"
 ---

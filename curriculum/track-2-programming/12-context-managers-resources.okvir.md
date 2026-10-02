@@ -5,7 +5,7 @@ title: "Context Managers & Deterministic Resource Cleanup"
 track: "programming"
 module: "mod-11"
 estimated_minutes: 15
-prerequisites: ["cs-11"]
+prerequisites: ["iterators-generators-streams"]
 i18n:
   ar: "مديرو السياق (Context Managers) والإدارة الحتمية للموارد"
 ---

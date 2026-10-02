@@ -5,7 +5,7 @@ title: "The Four Fundamental Subspaces"
 track: "math"
 module: "mod-04"
 estimated_minutes: 15
-prerequisites: ["t1-10"]
+prerequisites: ["gaussian-elimination-systems"]
 i18n:
   ar: "الفضاءات الجزئية الأربعة الأساسية"
 ---

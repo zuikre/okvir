@@ -5,7 +5,7 @@ title: "The Cross Product, Orthogonality & Oriented Area"
 track: "math"
 module: "mod-02"
 estimated_minutes: 15
-prerequisites: ["t1-05"]
+prerequisites: ["dot-product-geometry"]
 i18n:
   ar: "الجداء الاتجاهي والتعامد والمساحة الموجهة"
 ---

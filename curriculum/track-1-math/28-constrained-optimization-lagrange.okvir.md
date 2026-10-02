@@ -5,7 +5,7 @@ title: "Constrained Optimization & Lagrange Multipliers"
 track: "math"
 module: "mod-07"
 estimated_minutes: 15
-prerequisites: ["t1-01"]
+prerequisites: ["cartesian-coordinate-metric"]
 i18n:
   ar: "التحسين المقيد ومضروبات لاغرانج"
 ---

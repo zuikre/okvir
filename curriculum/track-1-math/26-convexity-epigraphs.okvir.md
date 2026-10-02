@@ -5,7 +5,7 @@ title: "Convexity, Epigraphs & Global Minimizers"
 track: "math"
 module: "mod-07"
 estimated_minutes: 15
-prerequisites: ["t1-22", "t1-03"]
+prerequisites: ["partial-derivatives-tangents", "linear-algebra-vectors"]
 i18n:
   ar: "التحدب، المخططات الفوقية، ونقاط النهاية الصغرى الشاملة"
 ---

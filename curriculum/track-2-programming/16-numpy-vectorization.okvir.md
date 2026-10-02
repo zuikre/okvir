@@ -5,7 +5,7 @@ title: "SIMD Architecture & Contiguous Buffer Vectorization"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-15","t1-03"]
+prerequisites: ["memory-profiling-cpython", "linear-algebra-vectors"]
 i18n:
   ar: "معمارية SIMD وتوجيه المخازن الذاكرية المتصلة في NumPy"
 ---

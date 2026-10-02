@@ -5,7 +5,7 @@ title: "Window Functions & Analytic Partitioning"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-26"]
+prerequisites: []
 i18n:
   ar: "دوال النوافذ (Window Functions) والتقسيم التحليلي"
 ---

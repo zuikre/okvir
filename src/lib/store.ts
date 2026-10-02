@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Theme, Language, ViewName, SimulationType, BeatNumber, LessonProgress, LocalConfig, ArabicFontFamily, SupportedCodeLanguage, FSRSState } from './types';
+import type { Theme, Language, ViewName, SimulationType, BeatNumber, LessonProgress, LocalConfig, ArabicFontFamily, SupportedCodeLanguage, FSRSState, AppNotificationRecord } from './types';
 import { initialLessons, curriculum } from './curriculum';
 import { tauriBridge } from './tauri-bridge';
 import { updateCard, createNewCard, type Rating } from './fsrs';
@@ -121,6 +121,13 @@ export interface OkvirState {
   fsrsCards: Record<string, FSRSState>;
   recordFsrsReview: (conceptId: string, rating: Rating) => FSRSState;
   syncFsrsFromDesktop: () => Promise<void>;
+
+  // Notification History (Center & Activity Log)
+  notificationsHistory: AppNotificationRecord[];
+  addNotificationRecord: (record: Omit<AppNotificationRecord, 'id' | 'timestamp' | 'read'>) => void;
+  markNotificationAsRead: (id: string) => void;
+  markAllNotificationsAsRead: () => void;
+  clearNotificationHistory: () => void;
 }
 
 // Self-healing: Purge any legacy mock values (1420 XP or 14 streak) from client localStorage
@@ -588,6 +595,33 @@ export const useOkvirStore = create<OkvirState>()(
           console.error('Failed to sync FSRS cards from desktop SQLite:', e);
         }
       },
+
+      // Notification History (Center & Activity Log)
+      notificationsHistory: [],
+      addNotificationRecord: (record) => {
+        const newRecord: AppNotificationRecord = {
+          ...record,
+          id: `notif-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+          timestamp: Date.now(),
+          read: false,
+        };
+        set((state) => ({
+          // Keep up to 50 most recent notifications
+          notificationsHistory: [newRecord, ...state.notificationsHistory].slice(0, 50),
+        }));
+      },
+      markNotificationAsRead: (id) =>
+        set((state) => ({
+          notificationsHistory: state.notificationsHistory.map((n) =>
+            n.id === id ? { ...n, read: true } : n
+          ),
+        })),
+      markAllNotificationsAsRead: () =>
+        set((state) => ({
+          notificationsHistory: state.notificationsHistory.map((n) => ({ ...n, read: true })),
+        })),
+      clearNotificationHistory: () =>
+        set({ notificationsHistory: [] }),
     }),
     {
       name: 'okvir-local-storage-v1',
@@ -624,6 +658,7 @@ export const useOkvirStore = create<OkvirState>()(
         config: state.config,
         lessons: state.lessons,
         fsrsCards: state.fsrsCards,
+        notificationsHistory: state.notificationsHistory,
       }),
     }
   )

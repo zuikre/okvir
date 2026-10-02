@@ -10,6 +10,7 @@ import {
 } from '@/lib/canvas/CanvasMath';
 import { PreCanvasBriefing, PostCanvasConsolidation, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 import { audio } from '@/lib/audio';
+import { powerGovernor } from '@/lib/powerGovernor';
 import { Sparkles, RotateCcw, Plus, Square, Shield } from 'lucide-react';
 
 const OLS_TIER_CONTENT: TierContent = {
@@ -166,8 +167,16 @@ export const LinearRegressionResiduals: React.FC<{
     const totalSteps = 35;
     const startSlope = slope;
     const startIntercept = intercept;
+    let lastAnimTime = performance.now();
 
-    const animate = () => {
+    const animate = (now: number) => {
+      const targetInterval = powerGovernor.getTargetFrameInterval();
+      if (now - lastAnimTime < targetInterval - 1.5) {
+        animFrameIdRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      lastAnimTime = now;
+
       step++;
       const progress = step / totalSteps;
       const ease = 1 - Math.pow(1 - progress, 3); // Cubic ease out

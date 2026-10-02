@@ -99,6 +99,10 @@ class HardwarePowerGovernorImpl {
     return () => this.listeners.delete(callback);
   }
 
+  public getTargetFrameInterval(): number {
+    return 1000 / this.state.targetFps;
+  }
+
   public shouldSkipFrame(frameCounter: number): boolean {
     // When throttled to 30 FPS on a 60Hz display, skip every alternate frame
     if (!this.state.isThrottling) return false;

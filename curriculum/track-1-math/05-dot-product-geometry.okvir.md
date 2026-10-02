@@ -5,7 +5,7 @@ title: "The Dot Product & Geometric Projection Duality"
 track: "math"
 module: "mod-02"
 estimated_minutes: 15
-prerequisites: ["t1-03"]
+prerequisites: ["linear-algebra-vectors"]
 i18n:
   ar: "الجداء النقطي وثنائية الإسقاط الهندسي"
 ---

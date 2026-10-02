@@ -44,7 +44,15 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     normType.includes('cross') ||
     normType.includes('linear') ||
     normType.includes('matrix') ||
-    normType.includes('schmidt')
+    normType.includes('schmidt') ||
+    normType.includes('subspace') ||
+    normType.includes('fundamental') ||
+    normType.includes('volume') ||
+    normType.includes('determinant') ||
+    normType.includes('mapping') ||
+    normType.includes('jacobian') ||
+    normType.includes('basis') ||
+    normType.includes('span')
   ) {
     return <VectorGeometryCanvas compact={compact} />;
   }
@@ -69,7 +77,21 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     normType.includes('hessian') ||
     normType.includes('tangent') ||
     normType.includes('adam') ||
-    normType.includes('optimi')
+    normType.includes('optimi') ||
+    normType.includes('gear') ||
+    normType.includes('chain') ||
+    normType.includes('contour') ||
+    normType.includes('elevation') ||
+    normType.includes('osculating') ||
+    normType.includes('curvature') ||
+    normType.includes('secant') ||
+    normType.includes('slope') ||
+    normType.includes('rate') ||
+    normType.includes('riemann') ||
+    normType.includes('integral') ||
+    normType.includes('lagrange') ||
+    normType.includes('multiplier') ||
+    normType.includes('convex')
   ) {
     return <GradientDescentCanvas compact={compact} />;
   }
@@ -96,7 +118,10 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     normType.includes('perceptron') ||
     normType.includes('activation') ||
     normType.includes('mlp') ||
-    normType.includes('norm')
+    normType.includes('norm') ||
+    normType.includes('sigmoid') ||
+    normType.includes('logistic') ||
+    normType.includes('surface')
   ) {
     return <NeuralActivationCanvas compact={compact} />;
   }
@@ -139,7 +164,7 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     return <AttentionHeatmapCanvas compact={compact} />;
   }
 
-  // 8. Autograd & Computational DAGs / Tree of Thought
+  // 11. Autograd & Computational DAGs / Tree of Thought
   if (
     normType === 'autograd' ||
     normType.includes('autograd') ||
@@ -153,7 +178,7 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     return <AutogradGraphLab compact={compact} />;
   }
 
-  // 9. Tokenization & NLP
+  // 12. Tokenization & NLP
   if (
     normType === 'bpe' ||
     normType.includes('bpe') ||
@@ -163,7 +188,7 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     return <BpeTokenizerLab compact={compact} />;
   }
 
-  // 10. Tree-Based Models & Boosting
+  // 13. Tree-Based Models & Boosting
   if (
     normType === 'tree' ||
     normType.includes('tree') ||
@@ -174,7 +199,7 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     return <DecisionTreeLaser compact={compact} />;
   }
 
-  // 11. Clustering & Manifold Learning (K-Means, PCA, UMAP, t-SNE)
+  // 14. Clustering & Manifold Learning (K-Means, PCA, UMAP, t-SNE)
   if (
     normType === 'kmeans' ||
     normType.includes('kmeans') ||
@@ -187,12 +212,20 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     return <KMeansVoronoi compact={compact} />;
   }
 
-  // 12. Nearest Neighbors & Metric Classification
-  if (normType === 'knn' || normType.includes('knn') || normType.includes('neighbor')) {
+  // 15. Nearest Neighbors & Metric Classification
+  if (
+    normType === 'knn' ||
+    normType.includes('knn') ||
+    normType.includes('neighbor') ||
+    normType.includes('roc') ||
+    normType.includes('auc') ||
+    normType.includes('dimension') ||
+    normType.includes('sphere')
+  ) {
     return <KNNRadar compact={compact} />;
   }
 
-  // 13. Regularization (Ridge / Lasso)
+  // 16. Regularization (Ridge / Lasso)
   if (
     normType === 'regularization' ||
     normType.includes('regular') ||
@@ -203,22 +236,49 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     return <RegularizationGeometryCanvas compact={compact} />;
   }
 
-  // 14. Simpson's Paradox & Causal Inference
-  if (normType === 'simpson' || normType.includes('simpson')) {
+  // 17. Simpson's Paradox & Causal Inference
+  if (
+    normType === 'simpson' ||
+    normType.includes('simpson') ||
+    normType.includes('did') ||
+    normType.includes('parallel') ||
+    normType.includes('event') ||
+    normType.includes('staggered') ||
+    normType.includes('causal') ||
+    normType.includes('dag') ||
+    normType.includes('backdoor') ||
+    normType.includes('collider') ||
+    normType.includes('stratification') ||
+    normType.includes('potential') ||
+    normType.includes('outcome') ||
+    normType.includes('cutoff') ||
+    normType.includes('rdd') ||
+    normType.includes('bandwidth')
+  ) {
     return <SimpsonsParadoxLab />;
   }
+
+  // 18. Instrumental Variables & Synthetic Controls
   if (
     normType === 'iv' ||
     normType.includes('iv') ||
     normType.includes('instrumental') ||
-    normType.includes('2sls')
+    normType.includes('2sls') ||
+    normType.includes('late') ||
+    normType.includes('synthetic') ||
+    normType.includes('donor') ||
+    normType.includes('scm') ||
+    normType.includes('placebo')
   ) {
     return <InstrumentalVariablesLab compact={compact} />;
   }
+
+  // 19. Anscombe's Quartet
   if (normType === 'anscombe' || normType.includes('anscombe')) {
     return <AnscombesQuartetLab compact={compact} />;
   }
 
+  // 20. Environment Frames, Lifetimes, Memory, Protocols
   if (
     normType.includes('memory') ||
     normType.includes('pointer') ||
@@ -227,11 +287,25 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     normType.includes('binding') ||
     normType.includes('alias') ||
     normType.includes('frame') ||
-    normType.includes('lifetime')
+    normType.includes('lifetime') ||
+    normType.includes('generator') ||
+    normType.includes('suspension') ||
+    normType.includes('stream') ||
+    normType.includes('iterator') ||
+    normType.includes('statemachine') ||
+    normType.includes('dunder') ||
+    normType.includes('protocol') ||
+    normType.includes('dispatch') ||
+    normType.includes('pipeline') ||
+    normType.includes('higherorder') ||
+    normType.includes('transparency') ||
+    normType.includes('pure') ||
+    normType.includes('referential')
   ) {
     return <EnvironmentFrameCanvas compact={compact} />;
   }
 
+  // 21. Dynamic Arrays, Vectors, Data Manipulation & Query Engines
   if (
     normType.includes('array') ||
     normType.includes('list') ||
@@ -239,11 +313,37 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     normType.includes('capacity') ||
     normType.includes('dynamic') ||
     normType.includes('allocation') ||
-    normType.includes('buffer')
+    normType.includes('buffer') ||
+    normType.includes('broadcast') ||
+    normType.includes('alignment') ||
+    normType.includes('complexity') ||
+    normType.includes('racer') ||
+    normType.includes('bigo') ||
+    normType.includes('stride') ||
+    normType.includes('simd') ||
+    normType.includes('benchmark') ||
+    normType.includes('loc') ||
+    normType.includes('iloc') ||
+    normType.includes('caliper') ||
+    normType.includes('tidy') ||
+    normType.includes('groupby') ||
+    normType.includes('split') ||
+    normType.includes('apply') ||
+    normType.includes('combine') ||
+    normType.includes('melt') ||
+    normType.includes('pivot') ||
+    normType.includes('algebra') ||
+    normType.includes('grid') ||
+    normType.includes('relational') ||
+    normType.includes('join') ||
+    normType.includes('sql') ||
+    normType.includes('query') ||
+    normType.includes('execution')
   ) {
     return <DynamicArrayGrowthLab compact={compact} />;
   }
 
+  // 22. Hash Tables & Dicts
   if (
     normType.includes('hash') ||
     normType.includes('dict') ||
@@ -255,6 +355,6 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
     return <HashTableInternalsCanvas compact={compact} />;
   }
 
-  // Default fallback: OLS Residual Geometry
+  // 23. Linear Regression Residuals (FWL, Heteroskedasticity, Panel, OLS)
   return <LinearRegressionResiduals compact={compact} highlightedElement={highlightedElement} />;
 };

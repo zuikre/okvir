@@ -5,7 +5,7 @@ title: "The Derivative as Local Linearization & Tangent Slope"
 track: "math"
 module: "mod-05"
 estimated_minutes: 15
-prerequisites: ["t1-13"]
+prerequisites: ["eigenvalues-eigenvectors"]
 i18n:
   ar: "المشتقة كتقريب خطي محلي وميل المماس"
 ---

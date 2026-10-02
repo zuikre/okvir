@@ -5,7 +5,7 @@ title: "Eigenvalues & Eigenvectors: Invariant Directions of Space"
 track: "math"
 module: "mod-05"
 estimated_minutes: 15
-prerequisites: ["t1-12"]
+prerequisites: ["orthogonal-projections"]
 i18n:
   ar: "القيم الذاتية والمتجهات الذاتية: الاتجاهات الصامدة في الفضاء"
 ---

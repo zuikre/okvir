@@ -5,7 +5,7 @@ title: "Gradient Descent, Learning Rates & Landscape Navigation"
 track: "math"
 module: "mod-07"
 estimated_minutes: 15
-prerequisites: ["t1-23", "t1-19"]
+prerequisites: ["gradient-vector", "higher-order-derivatives-concavity"]
 i18n:
   ar: "الانحدار التدريجي، معدلات التعلم، والملاحة في التضاريس"
 ---

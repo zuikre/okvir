@@ -5,7 +5,7 @@ title: "Classification Metrics, ROC Curves & The Mann-Whitney Equivalence"
 track: "econometrics"
 module: "mod-30"
 estimated_minutes: 15
-prerequisites: ["logistic-regression-sigmoid", "t1-29"]
+prerequisites: ["logistic-regression-sigmoid", "central-limit-theorem"]
 i18n:
   ar: "مقاييس التصنيف ومنحنى ROC ومكافئ مان-ويتني"
 ---

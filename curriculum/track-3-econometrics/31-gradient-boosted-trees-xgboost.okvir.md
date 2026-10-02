@@ -5,7 +5,7 @@ title: "Gradient Boosted Decision Trees & XGBoost 2nd-Order Expansion"
 track: "econometrics"
 module: "mod-33"
 estimated_minutes: 15
-prerequisites: ["random-forests-bagging", "t1-20"]
+prerequisites: ["random-forests-bagging", "taylor-series-polynomial"]
 i18n:
   ar: "أشجار التدرج المعززة والتقريب من الرتبة الثانية في XGBoost"
 ---

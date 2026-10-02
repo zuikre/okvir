@@ -5,7 +5,7 @@ title: "The Rubin Causal Model & The Fundamental Problem of Causal Inference"
 track: "econometrics"
 module: "mod-22"
 estimated_minutes: 15
-prerequisites: ["bayes-theorem"]
+prerequisites: ["constrained-optimization-lagrange"]
 i18n:
   ar: "نموذج روبين السببي والمشكلة الجوهرية للاستدلال السببي"
 ---

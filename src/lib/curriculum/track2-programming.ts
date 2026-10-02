@@ -147,7 +147,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-01"
+      "name-binding-lifetime"
     ],
     "x": 445,
     "y": 175,
@@ -284,7 +284,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-02"
+      "control-flow-branching"
     ],
     "x": 460,
     "y": 270,
@@ -421,7 +421,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-03"
+      "iteration-state-accumulation"
     ],
     "x": 445,
     "y": 365,
@@ -558,7 +558,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-04"
+      "pure-functions-recursion"
     ],
     "x": 460,
     "y": 460,
@@ -695,7 +695,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-05"
+      "first-class-closures"
     ],
     "x": 445,
     "y": 555,
@@ -832,7 +832,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-06"
+      "scope-resolution-legb"
     ],
     "x": 460,
     "y": 650,
@@ -969,7 +969,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-07"
+      "python-lists-memory-growth"
     ],
     "x": 445,
     "y": 745,
@@ -1106,7 +1106,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-08"
+      "hash-tables-dict-internals"
     ],
     "x": 460,
     "y": 840,
@@ -1243,7 +1243,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-09"
+      "tuples-immutability-sets"
     ],
     "x": 445,
     "y": 935,
@@ -1380,7 +1380,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-10"
+      "object-oriented-dunder"
     ],
     "x": 460,
     "y": 1030,
@@ -1517,7 +1517,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-11"
+      "iterators-generators-streams"
     ],
     "x": 445,
     "y": 1125,
@@ -1654,7 +1654,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-12"
+      "context-managers-resources"
     ],
     "x": 460,
     "y": 1220,
@@ -1791,7 +1791,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-13"
+      "algorithmic-complexity-big-o"
     ],
     "x": 445,
     "y": 1315,
@@ -1928,7 +1928,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-14"
+      "sorting-divide-and-conquer"
     ],
     "x": 460,
     "y": 1410,
@@ -2065,8 +2065,8 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-15",
-      "t1-03"
+      "memory-profiling-cpython",
+      "linear-algebra-vectors"
     ],
     "x": 455,
     "y": 1505,
@@ -2210,7 +2210,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-16"
+      "numpy-vectorization"
     ],
     "x": 485,
     "y": 1600,
@@ -2354,7 +2354,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-16"
+      "numpy-vectorization"
     ],
     "x": 455,
     "y": 1695,
@@ -2498,7 +2498,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-17"
+      "numpy-strides-zero-copy"
     ],
     "x": 485,
     "y": 1790,
@@ -2642,7 +2642,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-19"
+      "pandas-loc-iloc-indexing"
     ],
     "x": 455,
     "y": 1885,
@@ -2785,9 +2785,7 @@ export const programmingModules: CurriculumModule[] = [
       "en": "Why do empirical data scientists, machine learning engineers, and analysts routinely report spending 80% of their time cleaning and...",
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
-    "prerequisites": [
-      "cs-21"
-    ],
+    "prerequisites": [],
     "x": 485,
     "y": 1980,
     "beats": [
@@ -2930,7 +2928,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-19"
+      "pandas-loc-iloc-indexing"
     ],
     "x": 480,
     "y": 2075,
@@ -3073,9 +3071,7 @@ export const programmingModules: CurriculumModule[] = [
       "en": "Before the advent of modern SQL databases, retrieving information from computers was a slow and brittle nightmare: software engineers had...",
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
-    "prerequisites": [
-      "cs-23"
-    ],
+    "prerequisites": [],
     "x": 500,
     "y": 2170,
     "beats": [
@@ -3217,9 +3213,7 @@ export const programmingModules: CurriculumModule[] = [
       "en": "What actually occurs under the hood when a database executes a JOIN across two separate tables? Beginner database courses almost...",
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
-    "prerequisites": [
-      "cs-24"
-    ],
+    "prerequisites": [],
     "x": 480,
     "y": 2265,
     "beats": [
@@ -3361,9 +3355,7 @@ export const programmingModules: CurriculumModule[] = [
       "en": "You write SQL queries in one grammatical order, but the relational database execution engine processes them in a completely different...",
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
-    "prerequisites": [
-      "cs-25"
-    ],
+    "prerequisites": [],
     "x": 500,
     "y": 2360,
     "beats": [
@@ -3505,9 +3497,7 @@ export const programmingModules: CurriculumModule[] = [
       "en": "A standard SQL GROUP BY clause behaves like a heavy industrial hydraulic trash compactor: it takes 1,000 distinct employee records in the...",
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
-    "prerequisites": [
-      "cs-26"
-    ],
+    "prerequisites": [],
     "x": 480,
     "y": 2455,
     "beats": [
@@ -3650,7 +3640,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-28"
+      "sql-ctes-recursive-queries"
     ],
     "x": 500,
     "y": 2550,
@@ -3794,8 +3784,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-17",
-      "cs-28"
+      "numpy-strides-zero-copy"
     ],
     "x": 480,
     "y": 2645,
@@ -3938,9 +3927,7 @@ export const programmingModules: CurriculumModule[] = [
       "en": "Why did the modern data engineering, machine learning, and AI lakehouse industry almost completely abandon CSV and JSON files in favor of...",
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
-    "prerequisites": [
-      "cs-29"
-    ],
+    "prerequisites": [],
     "x": 500,
     "y": 2740,
     "beats": [
@@ -4083,8 +4070,7 @@ export const programmingModules: CurriculumModule[] = [
       "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "cs-30",
-      "cs-28"
+      "sql-ctes-recursive-queries"
     ],
     "x": 480,
     "y": 2835,

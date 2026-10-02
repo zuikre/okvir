@@ -5,7 +5,7 @@ title: "The Geometry of Rate of Change & Slopes"
 track: "math"
 module: "mod-01"
 estimated_minutes: 15
-prerequisites: ["t1-01"]
+prerequisites: ["cartesian-coordinate-metric"]
 i18n:
   ar: "هندسة معدل التغير وميل الخطوط"
 ---

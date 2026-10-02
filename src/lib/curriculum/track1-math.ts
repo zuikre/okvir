@@ -147,7 +147,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تدفع دراجة محملة بالحقائب صعوداً على طريق جبلي ممهد بانتظام. في كل مرة تتقدم فيها خطوتين للأمام على هذا المسار، يرتفع موقعك الرأسي..."
     },
     "prerequisites": [
-      "t1-01"
+      "cartesian-coordinate-metric"
     ],
     "x": 175,
     "y": 175,
@@ -284,7 +284,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تجدف بقارب خشبي صغير محاولاً عبور نهر عريض نحو الضفة المقابلة مباشرة. توجه مقدمة قاربك تماماً نحو الشمال وتجدف بعزم ثابت بسرعة 4..."
     },
     "prerequisites": [
-      "t1-01"
+      "cartesian-coordinate-metric"
     ],
     "x": 175,
     "y": 270,
@@ -421,7 +421,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل نفسك في قمرة قيادة مركبة فضائية تجريبية تطفو في الفضاء السحيق. أمامك على لوحة التحكم مقبضان للوقود."
     },
     "prerequisites": [
-      "t1-03"
+      "linear-algebra-vectors"
     ],
     "x": 140,
     "y": 365,
@@ -558,7 +558,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تسحب حقيبة سفر ذات عجلات في صالة المطار. مقبض الحقيبة يرتفع مائلاً بزاوية $45^\\circ$، وأنت تبذل قوة عضلية كبيرة لسحب المقبض في هذا..."
     },
     "prerequisites": [
-      "t1-03"
+      "linear-algebra-vectors"
     ],
     "x": 160,
     "y": 460,
@@ -695,7 +695,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تحاول فك برغي معدني صدئ في محرك سيارة باستخدام مفتاح ربط صلب طويل. تثبت رأس المفتاح على البرغي وتقبض على طرفه الآخر، صانعاً متجه..."
     },
     "prerequisites": [
-      "t1-05"
+      "dot-product-geometry"
     ],
     "x": 140,
     "y": 555,
@@ -832,7 +832,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك رسمت شبكة مربعات منتظمة على غشاء شفاف من المطاط المرن. عند نقطة تقاطع المحورين الرئيسيين، قمت بغرس دبوس معدني حاد يثبت نقطة الأصل..."
     },
     "prerequisites": [
-      "t1-04"
+      "linear-combinations-span"
     ],
     "x": 160,
     "y": 650,
@@ -969,7 +969,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تأمل روتينك الصباحي عند ارتداء ملابسك. إذا ارتديت جواربك أولاً ثم انتعلت حذاءك، ستبدأ يومك براحة وثقة طبيعية."
     },
     "prerequisites": [
-      "t1-07"
+      "linear-maps-transformations"
     ],
     "x": 140,
     "y": 745,
@@ -1106,7 +1106,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تحمل بين يديك مكعباً صغيراً من عجين الخبز الطري أبعاده $1 \\times 1 \\times 1$ سنتيمتر؛ حجمه الفيزيائي يساوي سنتيمتراً مكعباً واحداً..."
     },
     "prerequisites": [
-      "t1-08"
+      "matrix-multiplication-composition"
     ],
     "x": 160,
     "y": 840,
@@ -1243,7 +1243,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك دخلت سوقاً للمزارعين حيث اشترى ثلاثة زبائن سلالاً تحتوي على التفاح والموز والبطيخ، لكن البائع نسي وضع بطاقات الأسعار المنفردة على..."
     },
     "prerequisites": [
-      "t1-07"
+      "linear-maps-transformations"
     ],
     "x": 140,
     "y": 935,
@@ -1380,7 +1380,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تسلط مصباحاً يدوياً ساطعاً على مجسم سلكي معقد في غرفة مظلمة، لتسقط ظله على الجدار المسطح خلفه."
     },
     "prerequisites": [
-      "t1-10"
+      "gaussian-elimination-systems"
     ],
     "x": 160,
     "y": 1030,
@@ -1517,7 +1517,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تقف في بهو قصر فسيح ذي سقف شاهق الارتفاع، وتمسك بزمام طائرة مسيرة صغيرة تطفو في الهواء عند النقطة $\\mathbf{b}$."
     },
     "prerequisites": [
-      "t1-11"
+      "four-fundamental-subspaces"
     ],
     "x": 140,
     "y": 1125,
@@ -1654,7 +1654,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تفرد عجينة بيتزا على طاولة المطبخ، أو تشد شريحة مطاطية مرنة رُسمت عليها أشكال هندسية بيدك في اتجاهين متضادين قطرياً."
     },
     "prerequisites": [
-      "t1-12"
+      "orthogonal-projections"
     ],
     "x": 160,
     "y": 1220,
@@ -1791,8 +1791,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تنقر على غشاء طبلة مشدود بإحكام، أو تعزف على وتر عود مشدود. في الطبيعة الفيزيائية، يُعد التوازن التبادلي قانوناً صارماً: فوفقاً..."
     },
     "prerequisites": [
-      "t1-12",
-      "t1-11"
+      "orthogonal-projections",
+      "four-fundamental-subspaces"
     ],
     "x": 140,
     "y": 1315,
@@ -1929,8 +1929,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تصنع كرة مستديرة تماماً من الصلصال بيديك. الآن، اضغط عليها واسحبها بقوة بين راحتي كفيك في اتجاهات مختلفة."
     },
     "prerequisites": [
-      "t1-12",
-      "t1-09"
+      "orthogonal-projections",
+      "determinant-scaling-factor"
     ],
     "x": 160,
     "y": 1410,
@@ -2067,7 +2067,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تسير في مسار جبلي وعر عند الغسق، متجهاً نحو جسر معلق يمتد فوق وادٍ سحيق. مع كل خطوة تخطوها للأمام، يقترب منسوب حذائك باطراد من..."
     },
     "prerequisites": [
-      "t1-13"
+      "eigenvalues-eigenvectors"
     ],
     "x": 140,
     "y": 1505,
@@ -2211,7 +2211,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تأمل صور كوكب الأرض الملتقطة من مدار القمر: كوكبنا بلا شك كرة زرقاء عملاقة تسبح في ظلمات الفضاء."
     },
     "prerequisites": [
-      "t1-13"
+      "eigenvalues-eigenvectors"
     ],
     "x": 160,
     "y": 1600,
@@ -2355,8 +2355,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل ثلاثة تروس نحاسية مصقولة تتعشق بعناية داخل ساعة يد ميكانيكية عريقة. الترس $A$ يدير الترس $B$، والذي يدير بدوره الترس $C$."
     },
     "prerequisites": [
-      "t1-14",
-      "t1-12"
+      "symmetric-matrices-spectral",
+      "orthogonal-projections"
     ],
     "x": 140,
     "y": 1695,
@@ -2500,7 +2500,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "إذا كانت المشتقة الأولى هي عداد سرعتك—تخبرك بما إذا كنت تصعد الجبل أم تهبطه—فماذا تخبرك المشتقة الثانية؟ إنها تقيس ما يحدث لشدة الانحدار..."
     },
     "prerequisites": [
-      "t1-02"
+      "linear-rate-of-change-slopes"
     ],
     "x": 210,
     "y": 1790,
@@ -2644,7 +2644,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تُعد الدوال المتسامية مثل $\\sin(x)$ و $\\cos(x)$ و $e^x$ و $\\ln(x)$ دوالاً عصية على الحساب الذهني المباشر؛ فلو سألك أحد في الطريق عن القيمة..."
     },
     "prerequisites": [
-      "t1-16"
+      "limits-continuity-foundations"
     ],
     "x": 195,
     "y": 1885,
@@ -2788,7 +2788,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تخوض رحلة استكشافية في محمية جبلية شاسعة في صباح خريفي منعش. عند كل نقطة جغرافية تضع عليها حذاءك—والمحددة بدقة عبر خط العرض $x$..."
     },
     "prerequisites": [
-      "t1-17"
+      "derivative-tangent-slope"
     ],
     "x": 210,
     "y": 1980,
@@ -2932,7 +2932,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تقف على سفح جبل صخري وعر تعصف به الرياح. إذا اقترب منك متسلق آخر وسألك: \"ما هو ميل الجبل عند النقطة التي تقف عليها قدمك تماماً؟\"،..."
     },
     "prerequisites": [
-      "t1-18"
+      "differentiation-rules-chain"
     ],
     "x": 195,
     "y": 2075,
@@ -3076,8 +3076,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "في الدرس السابق، قمنا بقياس انحدار الجبل على طول المحاور الشبكية الصارمة للخريطة: شرقاً وغرباً ($\\frac{\\partial f}{\\partial x}$) وشمالاً..."
     },
     "prerequisites": [
-      "t1-18",
-      "t1-19"
+      "differentiation-rules-chain",
+      "higher-order-derivatives-concavity"
     ],
     "x": 210,
     "y": 2170,
@@ -3221,8 +3221,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "يمثل متجه التدرج بوصلتك الموثوقة: فهو يخبرك بميل التضاريس واتجاهها تحت باطن حذائك مباشرة."
     },
     "prerequisites": [
-      "t1-17",
-      "t1-01"
+      "derivative-tangent-slope",
+      "cartesian-coordinate-metric"
     ],
     "x": 195,
     "y": 2265,
@@ -3366,7 +3366,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "في استكشافاتنا السابقة لعلم الحسبان، كانت دوالنا عبارة عن حقول عددية: تستقبل نقطة متعددة الأبعاد وتُخرج رقماً قياسياً وحيداً—مثل إدخال..."
     },
     "prerequisites": [
-      "t1-21"
+      "multivariable-scalar-fields"
     ],
     "x": 210,
     "y": 2360,
@@ -3510,8 +3510,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل إناء حساء خزفياً أملس ومستديراً موضوعاً على طاولة طعام. لنفترض أنك اخترت أي نقطتين عشوائيتين في أي مكان داخل الحساء أو على حافة الإناء..."
     },
     "prerequisites": [
-      "t1-22",
-      "t1-03"
+      "partial-derivatives-tangents",
+      "linear-algebra-vectors"
     ],
     "x": 195,
     "y": 2455,
@@ -3655,8 +3655,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك معصوب العينين وتقف على سفح جبل صخري وعر يلفه ضباب كثيف لا ترى فيه يدك. لا يمكنك رؤية أي معالم حولك، ولا يمكنك تحديد موقع المخيم..."
     },
     "prerequisites": [
-      "t1-23",
-      "t1-19"
+      "gradient-vector",
+      "higher-order-derivatives-concavity"
     ],
     "x": 210,
     "y": 2550,
@@ -3800,7 +3800,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "لنفترض أنك تتجول في محمية طبيعية محمية وترغب في الوصول إلى أعلى منسوب ممكن على تضاريس جبل شاهق $f(x, y)$."
     },
     "prerequisites": [
-      "t1-01"
+      "cartesian-coordinate-metric"
     ],
     "x": 220,
     "y": 2645,
@@ -3944,8 +3944,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل نفسك واقفاً أمام لوحة خشبية مائلة بزاوية طفيفة، مثبتة عليها مئات الصفوف المتتالية من المسامير النحاسية المتداخلة—وهي الآلة الشهيرة..."
     },
     "prerequisites": [
-      "bayes-theorem",
-      "t1-18"
+      "constrained-optimization-lagrange",
+      "differentiation-rules-chain"
     ],
     "x": 220,
     "y": 2740,

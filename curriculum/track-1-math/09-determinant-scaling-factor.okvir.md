@@ -5,7 +5,7 @@ title: "The Determinant as Area/Volume Scaling Factor"
 track: "math"
 module: "mod-03"
 estimated_minutes: 15
-prerequisites: ["t1-08"]
+prerequisites: ["matrix-multiplication-composition"]
 i18n:
   ar: "المحدد كمعامل تمدد للمساحات والحجوم"
 ---

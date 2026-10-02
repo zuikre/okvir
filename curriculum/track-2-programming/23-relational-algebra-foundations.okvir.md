@@ -5,7 +5,7 @@ title: "Formal Relational Algebra Foundations"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-23"]
+prerequisites: []
 i18n:
   ar: "أسس الجبر العلائقي (Relational Algebra) ونظرية كود"
 ---

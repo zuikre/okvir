@@ -5,7 +5,7 @@ title: "Tuples, Immutability & Set Theory Mechanics"
 track: "programming"
 module: "mod-10"
 estimated_minutes: 15
-prerequisites: ["cs-08"]
+prerequisites: ["hash-tables-dict-internals"]
 i18n:
   ar: "الصفوف (Tuples)، اللاقابلية للتغيير، وميكانيكا المجموعات (Sets)"
 ---

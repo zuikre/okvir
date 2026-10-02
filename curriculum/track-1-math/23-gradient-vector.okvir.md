@@ -5,7 +5,7 @@ title: "The Gradient Vector & Directional Derivatives"
 track: "math"
 module: "mod-06"
 estimated_minutes: 15
-prerequisites: ["t1-18", "t1-19"]
+prerequisites: ["differentiation-rules-chain", "higher-order-derivatives-concavity"]
 i18n:
   ar: "متجه التدرج والمشتقات الاتجاهية"
 ---

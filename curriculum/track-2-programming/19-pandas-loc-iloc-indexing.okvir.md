@@ -5,7 +5,7 @@ title: "DataFrame Mental Model: Indexing via `loc` vs `iloc`"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-17"]
+prerequisites: ["numpy-strides-zero-copy"]
 i18n:
   ar: "النموذج الذهني لإطارات البيانات: الفهرسة عبر loc مقابل iloc"
 ---

@@ -5,7 +5,7 @@ title: "The GroupBy Split-Apply-Combine Engine"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-21"]
+prerequisites: []
 i18n:
   ar: "محرك التجميع والتقسيم (Split-Apply-Combine) وتنسيق Tidy Data"
 ---

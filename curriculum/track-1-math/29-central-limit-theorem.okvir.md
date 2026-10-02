@@ -5,7 +5,7 @@ title: "The Central Limit Theorem & Geometric Convergence of Noise"
 track: "math"
 module: "mod-07"
 estimated_minutes: 15
-prerequisites: ["bayes-theorem", "t1-18"]
+prerequisites: ["constrained-optimization-lagrange", "differentiation-rules-chain"]
 i18n:
   ar: "مبرهنة النهاية المركزية والتقارب الهندسي للضوضاء"
 ---

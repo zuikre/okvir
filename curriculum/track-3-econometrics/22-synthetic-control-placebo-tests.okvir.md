@@ -5,7 +5,7 @@ title: "Synthetic Controls Inference & In-Space / In-Time Permutation Tests"
 track: "econometrics"
 module: "mod-28"
 estimated_minutes: 15
-prerequisites: ["synthetic-control-method", "t1-29"]
+prerequisites: ["synthetic-control-method", "central-limit-theorem"]
 i18n:
   ar: "الاستدلال الإحصائي للشبيه الاصطناعي واختبارات المهدئ الوهمي المكانية والزمانية"
 ---

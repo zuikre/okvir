@@ -5,7 +5,7 @@ title: "The Spectral Theorem & Symmetric Eigendecomposition"
 track: "math"
 module: "mod-04"
 estimated_minutes: 15
-prerequisites: ["t1-12", "t1-11"]
+prerequisites: ["orthogonal-projections", "four-fundamental-subspaces"]
 i18n:
   ar: "المبرهنة الطيفية والتفكيك القيمي الذاتي المتناظر"
 ---

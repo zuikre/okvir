@@ -5,7 +5,7 @@ title: "Partial Derivatives & Axis-Aligned Slices"
 track: "math"
 module: "mod-06"
 estimated_minutes: 15
-prerequisites: ["t1-18"]
+prerequisites: ["differentiation-rules-chain"]
 i18n:
   ar: "المشتقات الجزئية وشرائح المحاور المعيارية"
 ---

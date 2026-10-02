@@ -5,7 +5,7 @@ title: "Orthogonal Projections & Least Squares Approximation"
 track: "math"
 module: "mod-04"
 estimated_minutes: 15
-prerequisites: ["t1-11"]
+prerequisites: ["four-fundamental-subspaces"]
 i18n:
   ar: "الإسقاطات المتعامدة وتقريب المربعات الصغرى"
 ---

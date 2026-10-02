@@ -5,7 +5,7 @@ title: "Data Contracts & Runtime Validation with Pydantic"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-19"]
+prerequisites: ["pandas-loc-iloc-indexing"]
 i18n:
   ar: "خوارزمية التجميع والتقسيم والدمج (Split-Apply-Combine) وتطبيع البيانات"
 ---

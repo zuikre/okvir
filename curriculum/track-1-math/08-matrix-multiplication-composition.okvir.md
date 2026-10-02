@@ -5,7 +5,7 @@ title: "Matrix Multiplication as Composition of Transformations"
 track: "math"
 module: "mod-03"
 estimated_minutes: 15
-prerequisites: ["t1-07"]
+prerequisites: ["linear-maps-transformations"]
 i18n:
   ar: "ضرب المصفوفات كتركيب متتالٍ للتحويلات"
 ---

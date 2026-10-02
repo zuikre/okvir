@@ -5,7 +5,7 @@ title: "Scaled Dot-Product Self-Attention & Query-Key Routing"
 track: "deeplearning"
 module: "mod-42"
 estimated_minutes: 15
-prerequisites: ["t1-05", "numerically-stable-softmax-cross-entropy"]
+prerequisites: ["dot-product-geometry", "numerically-stable-softmax-cross-entropy"]
 i18n:
   ar: "آلية الانتباه الذاتي بالضرب النقطي المقاس وتوجيه الاستعلام والمفاتيح"
 ---

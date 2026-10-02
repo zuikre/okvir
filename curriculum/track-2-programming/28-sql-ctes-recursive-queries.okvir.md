@@ -5,7 +5,7 @@ title: "Common Table Expressions & Recursive CTEs"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-17","cs-28"]
+prerequisites: ["numpy-strides-zero-copy"]
 i18n:
   ar: "التعبيرات الجدولية العامة (CTEs) والاستعلامات الذاتية العودية (Recursive CTEs)"
 ---

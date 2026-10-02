@@ -5,7 +5,7 @@ title: "Strided Memory Layout & Zero-Copy Slicing"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-16"]
+prerequisites: ["numpy-vectorization"]
 i18n:
   ar: "تخطيط الذاكرة ذو الخطوات (Strides) وتجزيء المصفوفات دون نسخ"
 ---

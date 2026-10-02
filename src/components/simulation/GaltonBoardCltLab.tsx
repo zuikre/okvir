@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
+import { powerGovernor } from '@/lib/powerGovernor';
 import { PreCanvasBriefing, PostCanvasConsolidation, type TierContent } from '@/components/pedagogy/MultiTierDisclosure';
 import {
   Play,
@@ -535,8 +536,17 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
     if (!ctx) return;
 
     let animId: number;
+    let lastRenderTime = performance.now();
 
-    const render = () => {
+    const render = (now: number) => {
+      // Hardware Power Governor: Drop to 30 FPS target when battery saver is active
+      const targetInterval = powerGovernor.getTargetFrameInterval();
+      if (now - lastRenderTime < targetInterval - 1.5) {
+        animId = requestAnimationFrame(render);
+        return;
+      }
+      lastRenderTime = now;
+
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
       if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {

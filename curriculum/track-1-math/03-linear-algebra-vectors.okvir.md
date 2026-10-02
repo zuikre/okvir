@@ -5,7 +5,7 @@ title: "Vectors as Directed Line Segments & Spatial Displacements"
 track: "math"
 module: "mod-01"
 estimated_minutes: 15
-prerequisites: ["t1-01"]
+prerequisites: ["cartesian-coordinate-metric"]
 i18n:
   ar: "المتجهات كقطع موجهة وإزاحات مكانية"
 ---

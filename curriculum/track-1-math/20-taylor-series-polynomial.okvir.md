@@ -5,7 +5,7 @@ title: "Taylor Series as Polynomial Approximation of Reality"
 track: "math"
 module: "mod-06"
 estimated_minutes: 15
-prerequisites: ["t1-16"]
+prerequisites: ["limits-continuity-foundations"]
 i18n:
   ar: "متسلسلة تايلور كتقريب حدودي للواقع"
 ---

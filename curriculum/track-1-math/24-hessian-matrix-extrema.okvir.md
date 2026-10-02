@@ -5,7 +5,7 @@ title: "The Hessian Matrix, Curvature & Quadratic Approximations"
 track: "math"
 module: "mod-07"
 estimated_minutes: 15
-prerequisites: ["t1-17", "t1-01"]
+prerequisites: ["derivative-tangent-slope", "cartesian-coordinate-metric"]
 i18n:
   ar: "مصفوفة هيسي، الانحناء، والتقريبات التربيعية"
 ---

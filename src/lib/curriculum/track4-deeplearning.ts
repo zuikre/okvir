@@ -12,8 +12,8 @@ export const deeplearningModules: CurriculumModule[] = [
       "ar": "تخيّل خط تجميع ذكي داخل مصنع فائق التطور. تتدفق المواد الأولية من اليسار كمدخلات عددية: يقوم العامل الأول بدمج قطعتين بعملية جمع (c = a +..."
     },
     "prerequisites": [
-      "t1-18",
-      "cs-05"
+      "differentiation-rules-chain",
+      "first-class-closures"
     ],
     "x": 1095,
     "y": 80,
@@ -302,7 +302,7 @@ export const deeplearningModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "reverse-mode-derivative-closures",
-      "cs-04"
+      "pure-functions-recursion"
     ],
     "x": 1055,
     "y": 270,
@@ -881,7 +881,7 @@ export const deeplearningModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "two-layer-mlp-xor-boundary",
-      "t1-18"
+      "differentiation-rules-chain"
     ],
     "x": 975,
     "y": 650,
@@ -1746,7 +1746,7 @@ export const deeplearningModules: CurriculumModule[] = [
       "ar": "التلافيف المكانية (Convolutions) تشبه مصباحاً كاشفاً منزلقاً يمسح أرجاء الصورة بحثاً عن أنماط محلية كالحواف والزوايا."
     },
     "prerequisites": [
-      "cs-17",
+      "numpy-strides-zero-copy",
       "adamw-weight-decay-schedules"
     ],
     "x": 1100,
@@ -2468,7 +2468,7 @@ export const deeplearningModules: CurriculumModule[] = [
       "ar": "كيف يقرأ الذكاء الاصطناعي النصوص؟ إذا عامل كل كلمة كوحدة كاملة، سيتضخم القاموس لملايين الكلمات وسيعجز أمام الكلمات النادرة والاشتقاقات..."
     },
     "prerequisites": [
-      "cs-08"
+      "hash-tables-dict-internals"
     ],
     "x": 1130,
     "y": 1695,
@@ -2756,7 +2756,7 @@ export const deeplearningModules: CurriculumModule[] = [
       "ar": "تخيل أنك في قاعة مزدحمة وتريد الاستماع لشخص معين؛ ستوجه تركيزك كـ 'مصباح تسليط ضوئي' (Spotlight) لوزن الكلمات ذات الصلة وتجاهل الضجيج."
     },
     "prerequisites": [
-      "t1-05",
+      "dot-product-geometry",
       "numerically-stable-softmax-cross-entropy"
     ],
     "x": 1130,
@@ -2902,7 +2902,7 @@ export const deeplearningModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "transformer-attention",
-      "t1-08"
+      "matrix-multiplication-composition"
     ],
     "x": 1115,
     "y": 1980,

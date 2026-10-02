@@ -5,7 +5,7 @@ title: "SQL Declarative Execution Lifecycle"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-25"]
+prerequisites: []
 i18n:
   ar: "دورة حياة التنفيذ التقريري في SQL (ترتيب المعالجة الداخلي)"
 ---

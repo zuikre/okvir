@@ -5,7 +5,7 @@ title: "Algorithmic Complexity, Big-O Notation & Asymptotics"
 track: "programming"
 module: "mod-12"
 estimated_minutes: 15
-prerequisites: ["cs-12"]
+prerequisites: ["context-managers-resources"]
 i18n:
   ar: "التعقيد الخوارزمي، ترميز Big-O والتحليل المقارب"
 ---

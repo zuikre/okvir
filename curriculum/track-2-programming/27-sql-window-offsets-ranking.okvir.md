@@ -5,7 +5,7 @@ title: "Positional Window Offsets, Ranking & Frame Bounds"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-28"]
+prerequisites: ["sql-ctes-recursive-queries"]
 i18n:
   ar: "الإزاحات الموضعية، الترتيب، وحدود أطر النوافذ (ROWS vs RANGE)"
 ---

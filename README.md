@@ -99,19 +99,22 @@ npm run tauri dev
 
 ---
 
-## 🎯 The 4-Beat Cognitive Learning Loop
+## 🎯 The 4-Beat Cognitive Learning Loop & Scaffolding System
 
 Every lesson in Okvir strictly adheres to Cognitive Load Theory ($4 \pm 1$ working memory limit) and executes the **4-Beat Micro-Loop**:
 
 ```
-[Beat 1: Tactile Slider] ──> [Beat 2: Formal Math] ──> [Beat 3: Vectorized Code] ──> [Beat 4: Transfer Quiz]
-  "Touch the physics"           "KaTeX Strict LTR"         "NumPy in Pyodide WASM"     "Socratic Hint Ladder"
+[Beat 1: Tactile Simulation] ──> [Beat 2: Reactive Math] ──> [Beat 3: Faded Code Lab] ──> [Beat 4: Transfer Quiz]
+  "Touch the physics"          "Bret Victor KaTeX Pills"      "3-Tier Faded Scaffolding"    "Authentic Diagnostic"
 ```
 
-1. **Beat 1: Tactile Intuition Slider:** Explore geometry, distributions, and dynamics *before* seeing any formal notation.
-2. **Beat 2: Formal Mathematical Anchor:** The KaTeX equation appears; terms dynamically highlight when hovering over slider parameters.
-3. **Beat 3: Interactive Code Scratchpad:** Implement the 2-to-3 line computational kernel in Python (Pyodide WASM) or DuckDB SQL.
-4. **Beat 4: Reality Transfer Challenge:** Solve an adversarial edge case or inverted scenario to solidify cognitive schema formation.
+1. **Beat 1: Tactile Intuition Simulation:** Explore geometry, distributions, and dynamics with real-time goal invariant tracking (`TargetedGoalManipulator` with $\Delta$ error feedback and audio celebration harmonics) *before* seeing formal notation.
+2. **Beat 2: Bret Victor Reactive Formula Anchor:** The mathematical equation appears with live reactive symbol pills (`ReactiveFormulaAnnotator`). Hovering or clicking decomposes symbols into functional classes (parameters, observations, losses, hyperparameters) linked directly to the simulation state.
+3. **Beat 3: 3-Tier Faded Scaffolding Code Lab:** Implement the computational kernel in Python (Pyodide WASM + Offline AST Micro-Evaluator) or DuckDB SQL with adaptive pedagogical scaffolding:
+   * **Tier 1 (Parsons Puzzle):** Reorder and indent scrambled code blocks to master algorithmic control flow without syntax fatigue.
+   * **Tier 2 (Skeleton Completion):** Fill-in-the-blank critical vectorization statements with structural guardrails.
+   * **Tier 3 (Autonomous Lab):** Write production-grade implementations from scratch against real automated test assertions.
+4. **Beat 4: Authentic Reality Transfer Challenge:** Dynamic conceptual diagnostic anchored directly to the module's mathematical invariant, featuring rigorous domain-specific distractors.
 
 ### 3-Tier Socratic Hint Ladder `[H]`
 Never get stuck. Press `H` at any time to reveal a 3-tier scaffolding ladder:
@@ -142,11 +145,12 @@ Okvir features **125 comprehensive lessons** across 4 interconnected tracks (29 
   │ 💻 PROGRAMMING & DATA        ││ 📈 ECONOMETRICS & ML         │
   │ • SIMD NumPy Vectorization   ││ • OLS Residual Geometry      │
   │ • Columnar DataFrame Anatomy ││ • KNN Search Radar           │
-  │ • SQL Window Functions       ││ • K-Means Voronoi Tessellation│
-  │ • EDA & Anscombe's Quartet   ││ • Decision Tree Laser Cuts   │
-  └──────────────┬───────────────┘│ • L1 vs L2 Regularization    │
-                 │                │ • Causal Confounding (Simpson)│
-                 │                │ • Instrumental Variables 2SLS │
+  │ • SQL Window Functions & CTEs││ • K-Means Voronoi Tessellation│
+  │ • CPython Memory & Refcounts ││ • Decision Tree Laser Cuts   │
+  │ • Hash Table Open Addressing ││ • L1 vs L2 Regularization    │
+  │ • Dynamic Array Geometric Res││ • Causal Confounding (Simpson)│
+  └──────────────┬───────────────┘│ • Instrumental Variables 2SLS │
+                 │                │ • DiD & Synthetic Controls   │
                  │                └──────────────┬───────────────┘
                  │                               │
                  └───────────────┬───────────────┘
@@ -157,14 +161,17 @@ Okvir features **125 comprehensive lessons** across 4 interconnected tracks (29 
                   │ • 3D Loss Manifolds & Momentum│
                   │ • Spatial 2D Convolutions     │
                   │ • Transformer Self-Attention  │
+                  │ • FlashAttention-2 SRAM Tiling│
+                  │ • RoPE Rotary Positional Embed│
+                  │ • LoRA Low-Rank Decomposition │
                   │ • OkvirGrad Reverse Autograd  │
                   │ • Byte-Pair Encoding (BPE)    │
                   └───────────────────────────────┘
 ```
 
 ### 🗺️ Tri-Modal Knowledge Navigation
-1. **Duolingo / Brilliant Serpentine Roadmap (`Roadmap`):** An analytical continuous Bézier spline connecting modular checkpoints with tactile 3D pedestals, flowing energy particle dashes (`river-flow`), beacon ping animations for current active lessons, and unit milestone credential gateways.
-2. **Interactive 2D Prerequisite DAG (`Constellation DAG`):** A cosmic 2D star-map spanning all 4 tracks with 165 directed prerequisite splines, reactive dependency highlights upon node hover/selection, and topological prerequisite resolution.
+1. **Organic Multi-Harmonic Serpentine Roadmap (`Roadmap`):** A natural topographic spline driven by multi-tier harmonic terrain equations ($h_1 + h_2 + h_3$) connecting modular checkpoints with tactile 3D pedestals, flowing energy particle dashes (`river-flow`), beacon ping animations for active lessons, and inward-facing lateral signpost cards (`w-36 sm:w-48`) featuring directional connector notches and zero-collision vertical pacing (`ROW_HEIGHT = 150px`).
+2. **Interactive 2D Prerequisite DAG (`Constellation DAG`):** A cosmic 2D star-map spanning all 4 tracks with **166 validated acyclic directed prerequisite splines (0 cycles)**, reactive dependency highlights upon node hover/selection, and topological prerequisite resolution.
 3. **Track Matrix Architecture (`Matrix`):** A side-by-side columnar view visualizing parallel track progression, mastery percentages, and curriculum completion.
 4. **Hero Progression HUD:** Quick-launch next lesson via `Space`, live mastery percentages, streak counters, and W3C Open Badges 3.0 / Verifiable Credential claims.
 
@@ -172,28 +179,34 @@ Okvir features **125 comprehensive lessons** across 4 interconnected tracks (29 
 
 ## 🎨 Tactile 60 FPS Algorithmic Visualizations
 
-Okvir includes **18 dedicated, zero-garbage-collection interactive simulation engines**:
+Okvir includes **24 dedicated, zero-garbage-collection interactive simulation lab engines** mapping 97 unique simulation environments across the curriculum with zero unhandled fallbacks:
 
 | # | Simulation Engine | Algorithm / Mathematical Principle | Interactive Mechanics |
 | - | :--- | :--- | :--- |
-| **1** | `LinearRegressionResiduals` | Ordinary Least Squares (OLS) | Rotating regression line & shrinking $(y_i - \hat{y}_i)^2$ squares |
-| **2** | `KNNRadar` | K-Nearest Neighbors & Metric Spaces | Concentric radar scan wave, elastic neighbor tethers & voting donut |
-| **3** | `GradientDescentCanvas` | Loss Manifolds & Heavy-Ball Momentum | 3D quadratic bowl, particle trajectory ribbons, $\eta$ & $\beta$ sliders |
-| **4** | `KMeansVoronoi` | K-Means Clustering & Lloyd's Algorithm | Gliding centroids over 400ms & dynamic Voronoi cell boundary morphing |
-| **5** | `DecisionTreeLaser` | Binary Axis-Aligned Recursive Partitions | Orthogonal laser knife-cuts with spark particles minimizing Gini impurity |
-| **6** | `VectorGeometryCanvas` | Euclidean Vector Spaces & Span | Interactive vector dragging, angle arcs & orthogonal projections |
+| **1** | `LinearRegressionResiduals` | Ordinary Least Squares (OLS), FWL, Robust SE | Rotating regression line & shrinking $(y_i - \hat{y}_i)^2$ squares |
+| **2** | `KNNRadar` | K-Nearest Neighbors, Metric Trees & ROC/AUC | Concentric radar scan wave, elastic neighbor tethers & voting donut |
+| **3** | `GradientDescentCanvas` | Loss Manifolds, Contours, Chains & Curvature | 3D quadratic bowl, particle trajectory ribbons, $\eta$ & $\beta$ sliders |
+| **4** | `KMeansVoronoi` | K-Means Clustering, PCA & Manifolds | Gliding centroids over 400ms & dynamic Voronoi cell boundary morphing |
+| **5** | `DecisionTreeLaser` | Binary Axis-Aligned Recursive Partitions & GBDT | Orthogonal laser knife-cuts with spark particles minimizing Gini impurity |
+| **6** | `VectorGeometryCanvas` | Euclidean Vector Spaces, Subspaces & Determinants | Interactive vector dragging, angle arcs & orthogonal projections |
 | **7** | `BayesFrequencyTree` | Prior Odds, Likelihood & Posterior Updates | 10,000-person flow diagram with interactive disease prevalence sliders |
-| **8** | `NeuralActivationCanvas` | Non-Linear Activation Functions | Weight & bias knobs, dead-ReLU detector, Sigmoid, Tanh, LeakyReLU |
-| **9** | `AttentionHeatmapCanvas` | Scaled Dot-Product Self-Attention | Query, Key, Value matrix heatmaps with live pronoun coreference |
-| **10** | `ConvolutionFilterCanvas` | 2D Spatial Convolutions & Feature Maps | Sliding 3×3 kernel filter (Sobel, Blur, Edge) over 6×6 pixel grids |
+| **8** | `NeuralActivationCanvas` | Non-Linear Activation Functions & Sigmoids | Weight & bias knobs, dead-ReLU detector, Sigmoid, Tanh, LeakyReLU |
+| **9** | `AttentionHeatmapCanvas` | Scaled Dot-Product Self-Attention & Transformers | Query, Key, Value matrix heatmaps with live pronoun coreference |
+| **10** | `ConvolutionFilterCanvas` | 2D Spatial Convolutions, Kernels & Pooling | Sliding 3×3 kernel filter (Sobel, Blur, Edge) over 6×6 pixel grids |
 | **11** | `RegularizationGeometryCanvas`| Ridge ($L_2$) vs Lasso ($L_1$) Sparsity | Expanding OLS loss contours striking the sharp corners of the $L_1$ diamond |
-| **12** | `SimpsonsParadoxLab` | Causal Confounding & Stratification | Stratified cohort toggles, subgroup OLS lines, and cluster drag physics |
+| **12** | `SimpsonsParadoxLab` | Causal Confounding, DAGs, DiD & RDD | Stratified cohort toggles, subgroup OLS lines, and cluster drag physics |
 | **13** | `AnscombesQuartetLab` | Exploratory Data Analysis & Outliers | Real-time interactive point drag updating OLS line & HUD stats across 4 sets |
-| **14** | `EigenHunterCanvas` | Eigenvalues & Invariant Directions | Rotary probe vector dial hunting for non-rotating axes $Av = \lambda v$ |
+| **14** | `EigenHunterCanvas` | Eigenvalues, Spectral Theorem & SVD | Rotary probe vector dial hunting for non-rotating axes $Av = \lambda v$ |
 | **15** | `GaltonBoardCltLab` | Central Limit Theorem (CLT) & Binomials | Triangular peg quincunx physics drops assembling empirical Gaussian bell curve |
-| **16** | `InstrumentalVariablesLab` | Causal DAG, Endogeneity & 2SLS | Interactive causal DAG, relevance/exogeneity sliders & 2-stage regression |
-| **17** | `AutogradGraphLab` | OkvirGrad Reverse-Mode Autograd | Interactive computational DAG tracking forward values and reverse chain rule |
+| **16** | `InstrumentalVariablesLab` | Causal DAG, 2SLS, LATE & Synthetic Controls | Interactive causal DAG, relevance/exogeneity sliders & 2-stage regression |
+| **17** | `AutogradGraphLab` | OkvirGrad Reverse-Mode Autograd DAG | Interactive computational DAG tracking forward values and reverse chain rule |
 | **18** | `BpeTokenizerLab` | Byte-Pair Encoding (BPE) Subword Tokenizer | Character-level split, bigram frequency ranking, and greedy token merges |
+| **19** | `FlashAttentionTilingLab` | FlashAttention-2 SRAM Memory Tiling | High-bandwidth HBM to low-latency SRAM block tiling & online softmax accumulator |
+| **20** | `RotaryEmbeddingLab` | Rotary Position Embeddings (RoPE) | Multi-frequency 2D orthogonal Givens rotation planes preserving relative distance |
+| **21** | `LoRADecompositionLab` | Low-Rank Adaptation (LoRA / QLoRA) | Weight freezing $W_0 \in \mathbb{R}^{d \times k}$ and rank-$r$ intrinsic adapter factorization $BA$ |
+| **22** | `EnvironmentFrameCanvas` | CPython Memory, References, Scopes & Protocols | Dynamic stack frames, heap allocations, pointer aliasing, closures & refcounts |
+| **23** | `DynamicArrayGrowthLab` | Geometric Vector Allocation, SIMD & Relational | Geometric buffer doubling ($0 \to 4 \to 8$), stride alignments & relational transforms |
+| **24** | `HashTableInternalsCanvas` | Hash Table Buckets, Probing & Collision Entropy | Compact table array indexing, collision resolution & perturbation probing |
 
 ---
 
@@ -224,6 +237,7 @@ Okvir rejects the generic "AI Slop" aesthetic (purple gradients, glowing blobs, 
 * **Zero Layout Jitter:** All numerical telemetry counters, coordinates, and formula scrubbers use `tabular-nums` monospace fonts to eliminate UI flickering during rapid scrubbing.
 * **Typographic Rigor:** Engineered with `Inter Display` for UI prose, `IBM Plex Sans Arabic` for Arabic typography, and `JetBrains Mono` for computational kernels.
 * **Demand-Driven Rendering:** 60 FPS simulations halt when parameters are stationary, keeping idle CPU usage strictly at `0.0%`.
+* **Hardware Power Governor:** Dynamic battery telemetry listener via Battery Status API; drops simulation frame rates from 60 FPS to 30 FPS under low charge (<25%) to preserve battery life and prevent thermal throttling.
 * **Tactile Haptic Synthesizer:** Micro-sound waveforms and subtle haptic pulses accompany parameter snapping and keystrokes.
 
 ---
@@ -233,21 +247,31 @@ Okvir rejects the generic "AI Slop" aesthetic (purple gradients, glowing blobs, 
 ```
 OKVIR DESKTOP CLIENT
 ├── Native Desktop Shell (Tauri v2 / Rust 1.80+)
-│   ├── Window management (Windows Mica / macOS Vibrancy / Linux Wayland)
-│   ├── Package Manager (.okvir seekable Zstandard archives)
-│   ├── Cryptography: Ed25519 Minisign verification
+│   ├── Frameless Window CSD (OS-Adaptive: macOS Traffic Lights / Win & Linux Captions)
+│   ├── In-App GitHub Releases Auto-Updater (Zero-telemetry community metrics)
+│   ├── Native Spaced Habit Notifications (Tauri Plugin + Web Notification fallback)
+│   ├── Package Manager (.okvir seekable Zstandard archives with Ed25519 Minisign)
+│   ├── Hardware Power Governor (Battery Status API & 30 FPS / 60 FPS frame throttling)
 │   └── Storage: Embedded SQLite engine (WAL mode)
 ├── Presentation Layer (React 18/19 / Vite / Tailwind CSS)
-│   ├── Command Center: Raycast action bar & Cmd+K palette
-│   ├── Typographic Math: KaTeX with strict LTR isolation
+│   ├── Titlebar Command Center: Telemetry HUD, Notification Center Popover, Quick Settings
+│   ├── Typographic Math: KaTeX with strict LTR isolation & Bret Victor pills
 │   ├── Procedural Audio: Web Audio API mathematical synthesizer
-│   └── 60 FPS Visual Canvas: HTML5 2D Canvas + WebGL
-└── In-App Execution Sandbox (Dedicated Web Worker)
+│   ├── 24 Tactile 60 FPS Visual Canvases: HTML5 2D Canvas + WebGL (0 unhandled fallbacks)
+│   └── Adaptive Scaffolding: 3-Tier Faded Scaffolding (Parsons, Skeleton, Autonomous Lab)
+└── In-App Dual Execution Sandbox (Dedicated Web Worker)
     ├── WebAssembly CPython 3.12 (Pyodide v0.26+)
-    ├── 5-Second Infinite Loop Hard Watchdog & Linear Memory Recycling
-    ├── Non-destructive interrupt buffer (SharedArrayBuffer)
-    ├── Offline wheels: NumPy, Pandas, Scikit-learn, SciPy
-    └── Origin Private File System (OPFS) / MEMFS mounts
+    │   ├── 5-Second Infinite Loop Hard Watchdog & Linear Memory Recycling
+    │   ├── Non-destructive interrupt buffer (SharedArrayBuffer)
+    │   ├── Offline wheels: NumPy, Pandas, Scikit-learn, SciPy
+    │   └── Origin Private File System (OPFS) / MEMFS mounts
+    ├── DuckDB WebAssembly (v1.28.0)
+    │   ├── Zero-latency in-memory relational SQL engine
+    │   ├── Seeded enterprise tables (employees, orders, departments)
+    │   └── Full SQL:2016 Window Functions, CTEs, Joins & Aggregations
+    └── Offline AST Micro-Evaluator
+        ├── Zero-dependency Python unit test assertion parser
+        └── Complete elimination of auto-pass loopholes when CDN is disconnected
 ```
 
 ### Concrete Benchmarks (Intel Core i3, 4GB RAM)
@@ -269,6 +293,8 @@ Okvir features a keyboard-first ergonomics system inspired by Linear, Raycast, a
 | Shortcut | Action | Scope / Context |
 | :--- | :--- | :--- |
 | `⌘K` / `Ctrl+K` | Open Universal Command Palette | Global |
+| `F11` | Toggle Native Borderless Fullscreen Mode | Global |
+| `⌃⇧H` / `Ctrl+Shift+H` | Toggle Real-Time Hardware Telemetry HUD | Global |
 | `j` / `↓` | Cycle next module in Constellation / Navigate next lesson in Workbench | Constellation / Workbench |
 | `k` / `↑` | Cycle previous module in Constellation / Navigate previous lesson in Workbench | Constellation / Workbench |
 | `↵` (Enter) | Launch selected module | Constellation DAG |

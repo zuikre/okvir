@@ -5,7 +5,7 @@ title: "Control Flow, Short-Circuit Boolean Logic & Branching Trees"
 track: "programming"
 module: "mod-08"
 estimated_minutes: 15
-prerequisites: ["cs-01"]
+prerequisites: ["name-binding-lifetime"]
 i18n:
   ar: "تدفق التحكم، المنطق البولياني ذو الدارة القصيرة، وشجيرات التفريع"
 ---

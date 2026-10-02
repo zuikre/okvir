@@ -5,7 +5,7 @@ title: "Object-Oriented Protocols & Dunder Methods"
 track: "programming"
 module: "mod-11"
 estimated_minutes: 15
-prerequisites: ["cs-09"]
+prerequisites: ["tuples-immutability-sets"]
 i18n:
   ar: "البروتوكولات كائنية التوجه ودوال بايثون السحرية (Dunder Methods)"
 ---

@@ -5,7 +5,7 @@ title: "Parquet Columnar Storage, Strided Encodings & Pushdown"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-29"]
+prerequisites: []
 i18n:
   ar: "تخزين Parquet العمودي، ترميز الخطوات، وتمرير الشروط (Predicate Pushdown)"
 ---

@@ -150,6 +150,7 @@ export const SettingsView: React.FC = () => {
     deeplearning: 'verified',
   });
   const [streamingTrack, setStreamingTrack] = useState<Record<string, number>>({});
+  const [importStatus, setImportStatus] = useState<string | null>(null);
 
   // Danger zone state
   const [dangerStep, setDangerStep] = useState<1 | 2>(1);
@@ -362,6 +363,34 @@ export const SettingsView: React.FC = () => {
         setStreamingTrack((prev) => ({ ...prev, [trackId]: progress }));
       }
     }, 180);
+  };
+
+  const handleImportOkvir = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setImportStatus('reading');
+      const res = await OkvirChunkEngine.importContainerFile(file);
+      if (res.valid) {
+        audio.playVictoryHarmonics();
+        setImportStatus(`success:${res.lessonCount}`);
+        setTimeout(() => setImportStatus(null), 4000);
+      } else {
+        audio.playErrorDissonance();
+        setImportStatus('invalid');
+        setTimeout(() => setImportStatus(null), 4000);
+      }
+    } catch {
+      audio.playErrorDissonance();
+      setImportStatus('error');
+      setTimeout(() => setImportStatus(null), 4000);
+    }
+  };
+
+  const handleExportOkvir = (trackId: string) => {
+    audio.playClick(1.2);
+    const trackLessons = curriculum.filter((l) => l.trackId === trackId);
+    OkvirChunkEngine.downloadTrackContainer(trackId, trackLessons);
   };
 
   const renderBadgeIcon = (iconName: string, size = 18) => {
@@ -1119,6 +1148,50 @@ export const SettingsView: React.FC = () => {
                 </p>
               </div>
 
+              {/* Offline .okvir Container Import Action Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-primary)]">
+                    <Upload size={14} className="text-sky-400" />
+                    <span>{isRtl ? 'استيراد حاوية منهج غير متصلة (.okvir)' : 'Import Offline .okvir Container'}</span>
+                  </div>
+                  <p className="text-[11px] text-[var(--text-tertiary)]">
+                    {isRtl
+                      ? 'تحميل ومصادقة حزمة مسار تعليمي تم تصديرها من جهاز آخر أو من مستودع GitHub.'
+                      : 'Load and authenticate an educational track package exported from another machine or GitHub release.'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-strong)] hover:bg-[var(--bg-surface-active)] bg-[var(--bg-surface)] text-xs font-mono font-medium text-[var(--text-primary)] transition-all cursor-pointer active:scale-95">
+                    <Upload size={13} className="text-sky-400" />
+                    <span>{isRtl ? 'اختيار ملف .okvir' : 'Select .okvir File'}</span>
+                    <input
+                      type="file"
+                      accept=".okvir"
+                      onChange={handleImportOkvir}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {importStatus && (
+                    <span className="text-[11px] font-mono px-2 py-1 rounded bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
+                      {importStatus.startsWith('success:')
+                        ? isRtl
+                          ? `تم التحقق بنجاح (${importStatus.split(':')[1]} درساً) ✓`
+                          : `Verified OK (${importStatus.split(':')[1]} lessons) ✓`
+                        : importStatus === 'reading'
+                        ? isRtl
+                          ? 'جارٍ التحقق...'
+                          : 'Validating Header...'
+                        : isRtl
+                        ? 'توقيع الحاوية غير صالح ✕'
+                        : 'Invalid Container Signature ✕'}
+                    </span>
+                  )}
+                </div>
+              </div>
+
               {/* Track Modules Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {tracks.map((track) => {
@@ -1214,7 +1287,17 @@ export const SettingsView: React.FC = () => {
                             <span>Ed25519 Signed</span>
                           </div>
 
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <button
+                              type="button"
+                              onClick={() => handleExportOkvir(track.id)}
+                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] hover:border-emerald-500/50 bg-[var(--bg-surface)] text-[11px] font-mono text-[var(--text-secondary)] hover:text-emerald-400 transition-all active:scale-95 cursor-pointer"
+                              title="Export track to offline .okvir binary container"
+                            >
+                              <Download size={12} />
+                              <span>{isRtl ? 'تصدير .okvir' : 'Export .okvir'}</span>
+                            </button>
+
                             {track.id !== 'math' && (
                               <button
                                 type="button"
@@ -1222,7 +1305,7 @@ export const SettingsView: React.FC = () => {
                                 className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] hover:border-sky-500/50 bg-[var(--bg-surface)] text-[11px] font-mono text-[var(--text-secondary)] hover:text-sky-400 transition-all active:scale-95 cursor-pointer"
                                 title="Stream / Refresh container from mirror"
                               >
-                                <Download size={12} />
+                                <RefreshCw size={12} />
                                 <span>{isRtl ? 'إعادة المزامنة' : 'Re-sync'}</span>
                               </button>
                             )}

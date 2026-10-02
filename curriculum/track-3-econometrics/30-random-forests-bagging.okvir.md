@@ -5,7 +5,7 @@ title: "Random Forests, Bagging & Feature Subspace Sampling"
 track: "econometrics"
 module: "mod-32"
 estimated_minutes: 15
-prerequisites: ["decision-trees", "t1-29"]
+prerequisites: ["decision-trees", "central-limit-theorem"]
 i18n:
   ar: "الغابات العشوائية وتقنية التجميع وتعيين الفضاء الجزئي للمتغيرات"
 ---

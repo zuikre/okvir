@@ -5,7 +5,7 @@ title: "The Synthetic Control Method (Abadie et al.)"
 track: "econometrics"
 module: "mod-28"
 estimated_minutes: 15
-prerequisites: ["panel-data-fixed-effects", "t1-12"]
+prerequisites: ["panel-data-fixed-effects", "orthogonal-projections"]
 i18n:
   ar: "طريقة الشبيه الاصطناعي لمقارنة الحالات الفردية"
 ---

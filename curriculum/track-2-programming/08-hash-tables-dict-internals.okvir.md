@@ -5,7 +5,7 @@ title: "Hash Tables & CPython Dictionary Internals"
 track: "programming"
 module: "mod-10"
 estimated_minutes: 15
-prerequisites: ["cs-07"]
+prerequisites: ["python-lists-memory-growth"]
 i18n:
   ar: "جداول التجزئة والمعمارية الداخلية لقواميس CPython"
 ---

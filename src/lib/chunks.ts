@@ -171,4 +171,97 @@ export class OkvirChunkEngine {
 
     return output;
   }
+
+  /**
+   * Unpack and extract files from a .okvir container
+   */
+  static unpackContainer(bytes: Uint8Array): {
+    header: OkvirChunkHeader;
+    toc: OkvirTocEntry[];
+    files: Record<string, string>;
+    signatureValid: boolean;
+  } {
+    const header = this.parseHeader(bytes);
+    const signatureValid = this.verifyTrailerSignature(bytes);
+
+    const decoder = new TextDecoder();
+    const tocOffset = Number(header.tocOffset);
+    const tocLength = Number(header.tocLength);
+
+    const tocBytes = bytes.slice(tocOffset, tocOffset + tocLength);
+    const toc: OkvirTocEntry[] = JSON.parse(decoder.decode(tocBytes));
+
+    const files: Record<string, string> = {};
+    for (const entry of toc) {
+      const fileBytes = bytes.slice(entry.byteOffset, entry.byteOffset + entry.byteLength);
+      files[entry.virtualPath] = decoder.decode(fileBytes);
+    }
+
+    return { header, toc, files, signatureValid };
+  }
+
+  /**
+   * Export an entire curriculum track into a seekable .okvir binary container
+   */
+  static exportTrackContainer(trackId: string, trackLessons: any[]): Uint8Array {
+    const files: Record<string, string> = {
+      'manifest.okvir.json': JSON.stringify({
+        trackId,
+        exportedAt: new Date().toISOString(),
+        lessonCount: trackLessons.length,
+        version: '1.0.0',
+      }),
+    };
+
+    trackLessons.forEach((lesson) => {
+      files[`lessons/${lesson.id}.json`] = JSON.stringify(lesson);
+    });
+
+    return this.generateSyntheticChunk(trackId, files);
+  }
+
+  /**
+   * Trigger local browser/webview download of an .okvir container
+   */
+  static downloadTrackContainer(trackId: string, trackLessons: any[]): void {
+    if (typeof window === 'undefined') return;
+    const bytes = this.exportTrackContainer(trackId, trackLessons);
+    const blob = new Blob([bytes], { type: 'application/x-okvir' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `okvir-track-${trackId}.okvir`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Read and validate an uploaded .okvir container file
+   */
+  static async importContainerFile(file: File): Promise<{
+    trackId: string;
+    lessonCount: number;
+    valid: boolean;
+    manifest: any;
+  }> {
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    const unpacked = this.unpackContainer(bytes);
+
+    let manifest: any = {};
+    try {
+      if (unpacked.files['manifest.okvir.json']) {
+        manifest = JSON.parse(unpacked.files['manifest.okvir.json']);
+      }
+    } catch {}
+
+    const lessonCount = Object.keys(unpacked.files).filter((k) => k.startsWith('lessons/')).length;
+
+    return {
+      trackId: manifest.trackId || 'custom',
+      lessonCount: lessonCount || unpacked.toc.length,
+      valid: unpacked.signatureValid && unpacked.header.magic === 'OKVR',
+      manifest,
+    };
+  }
 }

@@ -51,6 +51,18 @@ export interface LocalConfig {
   streakRemindersEnabled: boolean;
   fsrsRemindersEnabled: boolean;
   lastNotificationDate?: string | null;
+  releaseChannel?: 'stable' | 'beta';
+  autoCheckUpdates?: boolean;
+}
+
+export interface AppNotificationRecord {
+  id: string;
+  title: string;
+  body: string;
+  category: 'daily_streak' | 'fsrs_reviews' | 'milestone' | 'updater';
+  actionView?: 'lesson' | 'review' | 'settings' | 'constellation';
+  timestamp: number;
+  read: boolean;
 }
 
 export interface LessonProgress {

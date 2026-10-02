@@ -9,6 +9,7 @@
  */
 
 import { audio } from './audio';
+import { useOkvirStore } from './store';
 
 export type NotificationCategory = 'daily_streak' | 'fsrs_reviews' | 'milestone' | 'updater';
 
@@ -78,6 +79,18 @@ export class OkvirNotifier {
     if (!granted) {
       console.warn('Notification skipped: permission not granted');
       return false;
+    }
+
+    // Record into notification history for Notification Center Log
+    try {
+      useOkvirStore.getState().addNotificationRecord({
+        title: payload.title,
+        body: payload.body,
+        category: payload.category,
+        actionView: payload.actionView,
+      });
+    } catch {
+      // Store not initialized yet
     }
 
     // Play tactile sound cue based on notification priority

@@ -5,7 +5,7 @@ title: "The Chain Rule as Compositional Scaling & Flow of Sensitivities"
 track: "math"
 module: "mod-05"
 estimated_minutes: 15
-prerequisites: ["t1-14", "t1-12"]
+prerequisites: ["symmetric-matrices-spectral", "orthogonal-projections"]
 i18n:
   ar: "قاعدة السلسلة كتمدد تركيبي وتدفق للحساسية"
 ---

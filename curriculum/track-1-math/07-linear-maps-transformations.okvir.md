@@ -5,7 +5,7 @@ title: "Linear Maps as Space Transformations"
 track: "math"
 module: "mod-03"
 estimated_minutes: 15
-prerequisites: ["t1-04"]
+prerequisites: ["linear-combinations-span"]
 i18n:
   ar: "التحويلات الخطية كعمليات نقل وتحوير للفضاء"
 ---

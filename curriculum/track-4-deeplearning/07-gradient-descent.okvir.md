@@ -5,7 +5,7 @@ title: "Gradient Descent Optimization: Batch, Stochastic & Mini-Batch"
 track: "deeplearning"
 module: "mod-37"
 estimated_minutes: 15
-prerequisites: ["two-layer-mlp-xor-boundary", "t1-18"]
+prerequisites: ["two-layer-mlp-xor-boundary", "differentiation-rules-chain"]
 i18n:
   ar: "خوارزمية الانحدار التدريجي: الدفعة الكاملة، العشوائي، والدفعات المصغرة"
 ---

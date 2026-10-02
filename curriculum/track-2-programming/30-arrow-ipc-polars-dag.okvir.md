@@ -5,7 +5,7 @@ title: "Apache Arrow Zero-Copy & Polars Lazy DAG Optimization"
 track: "programming"
 module: "mod-13"
 estimated_minutes: 15
-prerequisites: ["cs-30","cs-28"]
+prerequisites: ["sql-ctes-recursive-queries"]
 i18n:
   ar: "ذاكرة Apache Arrow دون نسخ، وتحسين مخططات Polars الكسولة (Lazy DAGs)"
 ---

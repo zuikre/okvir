@@ -12,8 +12,8 @@ export const econometricsModules: CurriculumModule[] = [
       "ar": "يُقدَّم الانحدار الخطي العادي (OLS) في الغالب كمسألة حسابية لرسم خط يقلل المسافات الرأسية في رسم بياني ثنائي الأبعاد."
     },
     "prerequisites": [
-      "t1-12",
-      "cs-16"
+      "orthogonal-projections",
+      "numpy-vectorization"
     ],
     "x": 780,
     "y": 80,
@@ -310,7 +310,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "ols-residual-geometry",
-      "t1-29"
+      "central-limit-theorem"
     ],
     "x": 780,
     "y": 270,
@@ -607,7 +607,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "ols-residual-geometry",
-      "t1-08"
+      "matrix-multiplication-composition"
     ],
     "x": 780,
     "y": 460,
@@ -756,7 +756,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "multiple-regression-matrix-calculus",
-      "t1-11"
+      "four-fundamental-subspaces"
     ],
     "x": 760,
     "y": 555,
@@ -1200,7 +1200,7 @@ export const econometricsModules: CurriculumModule[] = [
       "ar": "قبل أن يصوغ جيرزي نيمان ودونالد روبين إطار النتائج المحتملة (Potential Outcomes Framework)، كانت مناقشات السببية حبيسة جدالات فلسفية ولغوية..."
     },
     "prerequisites": [
-      "bayes-theorem"
+      "constrained-optimization-lagrange"
     ],
     "x": 770,
     "y": 840,
@@ -2967,7 +2967,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "panel-data-fixed-effects",
-      "t1-12"
+      "orthogonal-projections"
     ],
     "x": 770,
     "y": 1980,
@@ -3112,7 +3112,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "synthetic-control-method",
-      "t1-29"
+      "central-limit-theorem"
     ],
     "x": 790,
     "y": 2075,
@@ -3257,7 +3257,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "multiple-regression-matrix-calculus",
-      "t1-15"
+      "singular-value-decomposition"
     ],
     "x": 825,
     "y": 2170,
@@ -3402,7 +3402,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "ridge-lasso",
-      "t1-21"
+      "multivariable-scalar-fields"
     ],
     "x": 805,
     "y": 2265,
@@ -3547,7 +3547,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "multiple-regression-matrix-calculus",
-      "t1-18"
+      "differentiation-rules-chain"
     ],
     "x": 825,
     "y": 2360,
@@ -3692,7 +3692,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "logistic-regression-sigmoid",
-      "t1-29"
+      "central-limit-theorem"
     ],
     "x": 805,
     "y": 2455,
@@ -3836,7 +3836,7 @@ export const econometricsModules: CurriculumModule[] = [
       "ar": "تخيل أنك انتقلت حديثاً للعيش في حي سكني جديد داخل مدينة عالمية لا تعرف لغتها ولا عاداتها."
     },
     "prerequisites": [
-      "t1-01",
+      "cartesian-coordinate-metric",
       "multiple-regression-matrix-calculus"
     ],
     "x": 825,
@@ -3982,7 +3982,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "knn-classification",
-      "t1-01"
+      "cartesian-coordinate-metric"
     ],
     "x": 805,
     "y": 2645,
@@ -4272,7 +4272,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "decision-trees",
-      "t1-29"
+      "central-limit-theorem"
     ],
     "x": 805,
     "y": 2835,
@@ -4417,7 +4417,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "random-forests-bagging",
-      "t1-20"
+      "taylor-series-polynomial"
     ],
     "x": 825,
     "y": 2930,
@@ -4561,7 +4561,7 @@ export const econometricsModules: CurriculumModule[] = [
       "ar": "في التعلم الخاضع للإشراف (Supervised Learning)، تسير النماذج تحت إرشاد معلم يقدم تصنيفات مؤكدة $yi$ لكل عينة."
     },
     "prerequisites": [
-      "t1-01",
+      "cartesian-coordinate-metric",
       "multiple-regression-matrix-calculus"
     ],
     "x": 805,
@@ -4706,8 +4706,8 @@ export const econometricsModules: CurriculumModule[] = [
       "ar": "تغمر مجموعات البيانات الحديثة مهندسي البيانات بمئات أو آلاف المتغيرات المتشابكة والمترابطة—مثل النسب المالية للشركات، أو قراءات مجسات..."
     },
     "prerequisites": [
-      "t1-15",
-      "t1-14"
+      "singular-value-decomposition",
+      "symmetric-matrices-spectral"
     ],
     "x": 825,
     "y": 3120,

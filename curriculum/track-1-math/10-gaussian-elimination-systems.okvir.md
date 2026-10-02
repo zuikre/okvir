@@ -5,7 +5,7 @@ title: "Gaussian Elimination, Row Operations & Linear Systems"
 track: "math"
 module: "mod-03"
 estimated_minutes: 15
-prerequisites: ["t1-07"]
+prerequisites: ["linear-maps-transformations"]
 i18n:
   ar: "الحذف الغاوسي والعمليات الصفية وحل المنظومات الخطية"
 ---

@@ -5,7 +5,7 @@ title: "Second Derivatives, Concavity & Curvature"
 track: "math"
 module: "mod-06"
 estimated_minutes: 15
-prerequisites: ["t1-02"]
+prerequisites: ["linear-rate-of-change-slopes"]
 i18n:
   ar: "المشتقة الثانية، التقعر، ومفهوم الانحناء"
 ---

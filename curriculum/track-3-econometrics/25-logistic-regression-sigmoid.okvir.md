@@ -5,7 +5,7 @@ title: "Logistic Regression, Sigmoid Probability & Maximum Likelihood"
 track: "econometrics"
 module: "mod-30"
 estimated_minutes: 15
-prerequisites: ["multiple-regression-matrix-calculus", "t1-18"]
+prerequisites: ["multiple-regression-matrix-calculus", "differentiation-rules-chain"]
 i18n:
   ar: "الانحدار اللوجستي ودالة السجمويد والتعظيم الأرجحي"
 ---

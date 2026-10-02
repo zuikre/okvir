@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Sun, Moon, Languages, Flame, Zap, Settings, Activity, RefreshCw, X, Minus, Square, Copy, Sparkles } from 'lucide-react';
+import { Search, Sun, Moon, Languages, Flame, Zap, Settings, Activity, RefreshCw, X, Minus, Square, Copy, Sparkles, Battery } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
 import { audio } from '@/lib/audio';
 import { tauriBridge } from '@/lib/tauri-bridge';
 import { OkvirUpdateChecker, type GitHubReleaseInfo } from '@/lib/updater';
 import { UpdateModal } from '@/components/updater/UpdateModal';
+import { powerGovernor } from '@/lib/powerGovernor';
+import { NotificationCenterPopover } from '@/components/notifications/NotificationCenterPopover';
 
 function getPlatformOS(): 'macos' | 'windows' | 'linux' {
   if (typeof window === 'undefined') return 'linux';
@@ -30,6 +32,22 @@ export const DesktopTitlebar: React.FC = () => {
   const rafRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(performance.now());
   const frameCountRef = useRef<number>(0);
+  const [powerState, setPowerState] = useState(powerGovernor.getState());
+
+  useEffect(() => {
+    return powerGovernor.subscribe(setPowerState);
+  }, []);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'H' || e.key === 'h')) {
+        e.preventDefault();
+        setIsHudOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -218,6 +236,9 @@ export const DesktopTitlebar: React.FC = () => {
             {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
           </button>
 
+          {/* Notification Center Popover */}
+          <NotificationCenterPopover />
+
           {/* Local Settings / Disk Storage */}
           <button
             onClick={() => setCurrentView('settings')}
@@ -290,13 +311,37 @@ export const DesktopTitlebar: React.FC = () => {
                 <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-1">
                   <span className="text-[var(--text-tertiary)] block">Active Frame Rate</span>
                   <span className="text-lg font-bold text-[var(--math-vector)] tabular-nums">{fps} FPS</span>
-                  <span className="text-[10px] text-[var(--text-secondary)] block">Target: 60.0 FPS</span>
+                  <span className="text-[10px] text-[var(--text-secondary)] block">
+                    Target: {powerState.targetFps}.0 FPS {powerState.isThrottling ? '(Governor Throttled)' : ''}
+                  </span>
                 </div>
                 <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-1">
                   <span className="text-[var(--text-tertiary)] block">Frame Execution Time</span>
                   <span className="text-lg font-bold text-[var(--math-data)] tabular-nums">{frameTimeMs} ms</span>
                   <span className="text-[10px] text-[var(--text-secondary)] block">Budget: 16.67 ms (0.28ms typ)</span>
                 </div>
+              </div>
+
+              {/* Hardware Power Governor Telemetry */}
+              <div className="p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <Battery size={16} className={powerState.charging ? 'text-emerald-400' : 'text-amber-400'} />
+                  <div>
+                    <span className="text-[var(--text-primary)] font-semibold">
+                      Battery: {Math.round(powerState.level * 100)}%
+                    </span>
+                    <span className="text-[10px] text-[var(--text-secondary)] block">
+                      {powerState.charging ? 'AC Power Connected' : 'Discharging on Battery'}
+                    </span>
+                  </div>
+                </div>
+                <span className={`text-[10px] px-2 py-0.5 rounded font-bold font-mono ${
+                  powerState.isThrottling
+                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                    : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                }`}>
+                  {powerState.isThrottling ? 'GOVERNOR: 30 FPS' : 'GOVERNOR: 60 FPS'}
+                </span>
               </div>
 
               {/* Memory Breakdown per PRD Section 16.1 */}

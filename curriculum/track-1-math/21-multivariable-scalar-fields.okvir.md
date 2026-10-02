@@ -5,7 +5,7 @@ title: "Multivariable Scalar Fields & Topographic Elevation Landscapes"
 track: "math"
 module: "mod-06"
 estimated_minutes: 15
-prerequisites: ["t1-17"]
+prerequisites: ["derivative-tangent-slope"]
 i18n:
   ar: "الحقول العددية متعددة المتغيرات وتضاريس الخرائط الطبوغرافية"
 ---

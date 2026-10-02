@@ -39,10 +39,12 @@ import { KaTeXMath } from '@/components/common/KaTeXMath';
 import { MathText } from '@/components/common/MathText';
 import { TactileSlider } from '@/components/common/TactileSlider';
 import { MisconceptionDiagnosticCard } from '@/components/pedagogy/MisconceptionDiagnosticCard';
+import { ReactiveFormulaAnnotator } from '@/components/pedagogy/ReactiveFormulaAnnotator';
+import { TargetedGoalManipulator } from '@/components/pedagogy/TargetedGoalManipulator';
 import { QuizBatteryComponent } from '@/components/quiz/QuizBatteryComponent';
 import { getQuizBatteryForModule, CURRICULUM_QUIZ_BATTERIES } from '@/lib/curriculum-quizzes';
 import { audio } from '@/lib/audio';
-import type { BeatNumber, SimulationType, DiagnosticQuestion } from '@/lib/types';
+import type { BeatNumber, SimulationType, DiagnosticQuestion, ReactiveFormulaToken, TargetedMicroGoal } from '@/lib/types';
 
 /**
  * Progressive Socratic Hint Ladder with tiered disclosure
@@ -652,6 +654,138 @@ export const OkvirWorkbench: React.FC = () => {
     ];
   }, [mod.id]);
 
+  const reactiveTokens: ReactiveFormulaToken[] = useMemo(() => {
+    return formulaTokens.map((tok) => ({
+      symbol: tok.symbol,
+      boundStateKey: tok.symbol,
+      role: (tok.symbol.includes('L') || tok.symbol.includes('Loss') || tok.symbol === 'e_i')
+        ? 'loss'
+        : (tok.symbol.includes('\\alpha') || tok.symbol.includes('k') || tok.symbol.includes('\\lambda'))
+        ? 'hyperparameter'
+        : (tok.symbol.includes('y') || tok.symbol.includes('x') || tok.symbol.includes('Q') || tok.symbol.includes('V'))
+        ? 'observation'
+        : 'parameter',
+      tooltip: { en: tok.label, ar: tok.label },
+      geometricMeaning: {
+        en: `Constitutes the ${tok.label.toLowerCase()} in the formal invariant.`,
+        ar: `يمثل ${tok.label} في الصيغة الرياضية الثابتة.`,
+      },
+    }));
+  }, [formulaTokens]);
+
+  const currentGoal: TargetedMicroGoal | null = useMemo(() => {
+    if (mod.id.includes('ols') || mod.id.includes('regression')) {
+      return {
+        id: `${mod.id}-goal`,
+        title: {
+          en: 'Target Invariant: Minimize Orthogonal Residuals',
+          ar: 'الهدف الرياضي: تقليل البواقي المتعامدة إلى أدنى حد',
+        },
+        instructions: {
+          en: 'Adjust slope (m) to ~1.25 where regression residuals strictly vanish on the orthogonal complement.',
+          ar: 'اضبط الميل (m) إلى حوالي 1.25 حيث تتلاشى البواقي تماماً على المكمل المتعامد.',
+        },
+        targetMetric: 'slope',
+        targetValue: 1.25,
+        tolerance: 0.2,
+        hintLadder: {
+          tier1: {
+            en: 'Look at the direction of the residual lines connecting points to the hyperplane.',
+            ar: 'انظر إلى اتجاه خطوط البواقي التي تصل النقاط بالمستوى الفائق.',
+          },
+          tier2: {
+            en: 'Recall the normal equations: (XᵀX)β = Xᵀy ensures residuals are in the nullspace.',
+            ar: 'تذكر المعادلات الطبيعية: تضمن تعامد البواقي مع فضاء الأعمدة.',
+          },
+          tier3: {
+            en: 'Set slope close to 1.25 to cancel positive and negative error terms.',
+            ar: 'اضبط الميل قرب 1.25 لإلغاء حدود الخطأ الموجبة والسالبة.',
+          },
+        },
+        successCelebration: {
+          en: 'Gauss-Markov BLUE optimality achieved! Residuals are strictly orthogonal.',
+          ar: 'تم الوصول للتقدير الخطي غير المتحيز الأفضل (BLUE)! البواقي متعامدة تماماً.',
+        },
+      };
+    }
+    if (mod.id.includes('knn')) {
+      return {
+        id: `${mod.id}-goal`,
+        title: {
+          en: 'Target Invariant: Calibrate Neighborhood Hyperparameter (k)',
+          ar: 'الهدف الرياضي: معايرة معامل الجوار الفائق (k)',
+        },
+        instructions: {
+          en: 'Set neighborhood size k = 5 to establish smooth decision boundaries.',
+          ar: 'اضبط حجم الجوار k = 5 لتشكيل حدود قرار سلسة ومستقرة.',
+        },
+        targetMetric: 'k',
+        targetValue: 5,
+        tolerance: 0.5,
+        hintLadder: {
+          tier1: {
+            en: 'Small k creates high variance; large k introduces bias.',
+            ar: 'القيمة الصغيرة لـ k تسبب تبايناً عالياً؛ والقيمة الكبيرة تسبب انحيازاً.',
+          },
+          tier2: {
+            en: 'We want odd k to avoid tied votes in binary classifications.',
+            ar: 'نفضل قيمة فردية لـ k لتفادي تعادل الأصوات.',
+          },
+          tier3: {
+            en: 'Slide k directly to 5.',
+            ar: 'حرك المؤشر مباشرة إلى k = 5.',
+          },
+        },
+        successCelebration: {
+          en: 'Optimal bias-variance balance locked in! Decision boundary is smooth.',
+          ar: 'تم تثبيت التوازن الأمثل بين الانحياز والتباين! حدود القرار مستقرة.',
+        },
+      };
+    }
+    if (mod.id.includes('gradient')) {
+      return {
+        id: `${mod.id}-goal`,
+        title: {
+          en: 'Target Invariant: Stable Step Size (Lipschitz Continuity)',
+          ar: 'الهدف الرياضي: خطوة تعلم مستقرة وفق استمرارية ليبشيتز',
+        },
+        instructions: {
+          en: 'Tune learning rate (α) to 0.05 to ensure monotonic descent without oscillation.',
+          ar: 'اضبط معدل التعلم (α) عند 0.05 لضمان الهبوط الرتيب دون تذبذب.',
+        },
+        targetMetric: 'alpha',
+        targetValue: 0.05,
+        tolerance: 0.02,
+        hintLadder: {
+          tier1: {
+            en: 'If learning rate is larger than 2/L, gradient descent diverges exponentially.',
+            ar: 'إذا كان معدل التعلم أكبر من 2/L، فإن الهبوط التدريجي يتباعد بشكل أسي.',
+          },
+          tier2: {
+            en: 'A step size of 0.05 ensures smooth contraction without overshooting.',
+            ar: 'خطوة بحجم 0.05 تضمن انكماشاً سلساً دون تجاوز القاع.',
+          },
+          tier3: {
+            en: 'Set the step slider precisely to 0.05.',
+            ar: 'اضبط مؤشر الخطوة بدقة عند 0.05.',
+          },
+        },
+        successCelebration: {
+          en: 'Optimal contraction mapping! Gradient norm monotonically decreases.',
+          ar: 'تحقق انكماش بنماخ الأمثل! معيار التدرج يتناقص بشكل رتيب.',
+        },
+      };
+    }
+    return null;
+  }, [mod.id]);
+
+  const currentGoalValue = useMemo(() => {
+    if (mod.id.includes('ols') || mod.id.includes('regression')) return slope;
+    if (mod.id.includes('knn')) return knnK;
+    if (mod.id.includes('gradient')) return learningRate;
+    return 0;
+  }, [mod.id, slope, knnK, learningRate]);
+
   return (
     <div
       ref={containerRef}
@@ -967,6 +1101,19 @@ export const OkvirWorkbench: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {currentGoal && (
+              <div className="p-6 bg-[var(--bg-app)] border-t border-[var(--border-subtle)]">
+                <TargetedGoalManipulator
+                  goal={currentGoal}
+                  currentValue={currentGoalValue}
+                  onGoalAchieved={() => {
+                    if (config.soundEnabled) audio.playVictoryHarmonics();
+                    addXp(25);
+                  }}
+                />
+              </div>
+            )}
           </div>
         </section>
 
@@ -992,58 +1139,22 @@ export const OkvirWorkbench: React.FC = () => {
           )}
 
           {/* Large, Beautiful KaTeX Formula Card */}
+          {/* Interactive Bret Victor Reactive Formula Annotator */}
           {beat2.formula && (
-            <div className="p-8 rounded-3xl border border-[var(--border-strong)] bg-[var(--bg-surface)] space-y-6 shadow-sm">
-              <div className="flex items-center justify-between text-xs text-[var(--text-tertiary)]">
-                <span className="flex items-center gap-2 text-[var(--math-gradient)] font-bold">
-                  <Sparkles className="w-4 h-4" />
-                  <span>{isAr ? 'المعادلة الأساسية الصارمة' : 'Core Analytical Formula'}</span>
-                </span>
-                <span className="text-[11px] font-medium">{isAr ? 'انقر على أي رمز لتوضيحه' : 'Click symbol to inspect'}</span>
-              </div>
-
-              {/* KaTeX Block Display */}
-              <div dir="ltr" className="py-6 px-4 rounded-2xl bg-[var(--bg-app)] border border-[var(--border-subtle)] text-center overflow-x-auto text-xl md:text-2xl text-[var(--text-primary)] shadow-inner">
-                <KaTeXMath
-                  math={beat2.formula}
-                  block
-                  onHoverVariable={(v) => setActiveToken(v, 'formula')}
-                />
-              </div>
-
-              {/* Interactive Symbol Breakdown Pills */}
-              <div className="space-y-2">
-                <span className="text-xs text-[var(--text-tertiary)] font-semibold block">
-                  {isAr ? 'شرح مكونات المعادلة:' : 'Variable Breakdown:'}
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {formulaTokens.map((tok) => {
-                    const isActive = activeToken === tok.symbol;
-                    return (
-                      <button
-                        key={tok.symbol}
-                        onClick={() => {
-                          setActiveToken(isActive ? null : tok.symbol, 'formula');
-                          if (config.soundEnabled) audio.playClick();
-                        }}
-                        className={`px-3 py-1.5 rounded-xl text-xs transition-all cursor-pointer ${
-                          isActive
-                            ? 'bg-[var(--math-prediction)] text-white shadow-md ring-2 ring-white/20 font-bold'
-                            : 'bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)]'
-                        }`}
-                      >
-                        <span className="font-mono font-bold">{tok.symbol}</span>
-                        <span className="opacity-75 ms-1.5 font-medium">({tok.label})</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+            <div className="space-y-4">
+              <ReactiveFormulaAnnotator
+                formula={beat2.formula}
+                tokens={reactiveTokens}
+                className="shadow-sm"
+              />
 
               {beat2.formulaNote && (
-                <p className="text-xs text-[var(--text-secondary)] border-t border-[var(--border-subtle)] pt-4 leading-relaxed font-normal">
+                <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] leading-relaxed">
+                  <span className="font-bold text-[var(--text-primary)] block mb-1">
+                    {isAr ? 'ملاحظة تحليلية:' : 'Analytical Note:'}
+                  </span>
                   {isAr ? beat2.formulaNote.ar : beat2.formulaNote.en}
-                </p>
+                </div>
               )}
             </div>
           )}
