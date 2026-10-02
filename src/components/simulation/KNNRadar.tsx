@@ -500,15 +500,15 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = true }) =>
           className="w-full h-80 rounded-xl cursor-crosshair touch-none"
         />
 
-        {/* Instructions Badge */}
-        <div className="absolute top-4 start-4 px-2.5 py-1 rounded-md bg-[var(--bg-surface)]/80 backdrop-blur-md border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-tertiary)]">
+        {/* Instructions Badge (Repositioned to bottom-start to avoid collision with top-end result card) */}
+        <div className="absolute bottom-3 start-3 px-2.5 py-1 rounded-md bg-[var(--bg-surface)]/85 backdrop-blur-md border border-[var(--border-subtle)] text-[10px] sm:text-[11px] font-mono text-[var(--text-tertiary)] shadow-xs pointer-events-none">
           {language === 'ar'
-            ? 'اسحب نقطة الاستعلام • انقر لإضافة بيانات • انقر يمين لحذف نقطة'
+            ? 'اسحب نقطة الاستعلام • انقر لإضافة بيانات • انقر بالزر الأيمن للحذف'
             : 'Drag query point • Click to add data • Right-click to remove'}
         </div>
 
         {/* Classification Result Floating Card */}
-        <div className="absolute top-4 end-4 flex items-center gap-3 px-3 py-1.5 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-xs font-mono shadow-sm">
+        <div className="absolute top-3 end-3 flex items-center gap-3 px-3 py-1.5 rounded-lg bg-[var(--bg-surface)]/90 backdrop-blur-md border border-[var(--border-subtle)] text-xs font-mono shadow-sm">
           <div>
             <span className="text-[var(--text-tertiary)]">Class: </span>
             <span
@@ -516,7 +516,7 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = true }) =>
                 prediction === 0 ? 'text-sky-400' : 'text-amber-400'
               }`}
             >
-              {prediction === 0 ? 'Class A (Blue)' : 'Class B (Amber)'}
+              {prediction === 0 ? (language === 'ar' ? 'فئة أ (أزرق)' : 'Class A (Blue)') : (language === 'ar' ? 'فئة ب (كهرماني)' : 'Class B (Amber)')}
             </span>
           </div>
           <div className="w-px h-3 bg-[var(--border-subtle)]" />
@@ -527,85 +527,99 @@ export const KNNRadar: React.FC<{ compact?: boolean }> = ({ compact = true }) =>
         </div>
       </div>
 
-      {/* Interactive Parameter Controls */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-        {/* K Slider */}
-        <div className="space-y-1.5">
-          <div className="flex justify-between text-xs font-mono">
-            <span className="text-[var(--text-secondary)]">Neighbors (K):</span>
-            <span className="text-purple-400 font-bold tabular-nums">{knnK}</span>
+      {/* Interactive Parameter Controls (Spacious Multi-Tier Responsive Footer) */}
+      <div className="p-3.5 sm:p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-3.5 shadow-xs">
+        {/* Tier 1: K Slider with Full-Width Breathability */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4">
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+            <span className="text-xs font-mono text-[var(--text-secondary)]">
+              {language === 'ar' ? 'عدد الجيران (K):' : 'Neighbors (K):'}{' '}
+              <strong className="text-purple-400 font-bold tabular-nums text-sm">{knnK}</strong>
+            </span>
           </div>
-          <input
-            type="range"
-            min="1"
-            max="15"
-            step="2" // Odd numbers to prevent ties
-            value={knnK}
-            onChange={(e) => {
-              setKnnK(parseInt(e.target.value, 10));
-              if (config.soundEnabled) audio.playClick();
-            }}
-            className="w-full accent-purple-500 cursor-pointer"
-          />
-          <div className="text-[10px] text-[var(--text-tertiary)] font-mono flex justify-between">
-            <span>K=1 (Local Voronoi)</span>
-            <span>K=15 (Smooth Boundary)</span>
+
+          <div className="flex items-center gap-3 flex-1">
+            <input
+              type="range"
+              min="1"
+              max="15"
+              step="2" // Odd numbers to prevent ties
+              value={knnK}
+              onChange={(e) => {
+                setKnnK(parseInt(e.target.value, 10));
+                if (config.soundEnabled) audio.playClick();
+              }}
+              className="flex-1 accent-purple-500 cursor-pointer min-w-28"
+            />
+            <span className="text-[11px] font-mono font-bold shrink-0 px-2.5 py-0.5 rounded-md bg-[var(--bg-app)] border border-[var(--border-subtle)] text-purple-300 shadow-xs">
+              {knnK === 1
+                ? (language === 'ar' ? 'K=1 (جزر فورونوي حادة)' : 'K=1 (Voronoi Islands)')
+                : knnK <= 5
+                ? (language === 'ar' ? 'K منخفض (تفاصيل موضعية)' : 'Low K (Local Detail)')
+                : (language === 'ar' ? 'K مرتفع (حدود ناعمة)' : 'High K (Smooth Boundary)')}
+            </span>
           </div>
         </div>
 
-        {/* Metric Selector */}
-        <div className="space-y-1.5">
-          <span className="text-xs font-mono text-[var(--text-secondary)] block">
-            {language === 'ar' ? 'المعيار المتري للمسافة:' : 'Distance Metric:'}
-          </span>
-          <div className="flex gap-1.5">
-            {(['L2', 'L1', 'Linf'] as DistanceMetric[]).map((m) => (
+        {/* Tier 2: Metric Space & Data Injection Controls */}
+        <div className="pt-3 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 text-xs">
+          {/* Distance Metric Selector */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] font-mono text-[var(--text-tertiary)] shrink-0">
+              {language === 'ar' ? 'المعيار المتري:' : 'Distance Metric:'}
+            </span>
+            <div className="flex items-center gap-1 bg-[var(--bg-app)] p-0.5 rounded-lg border border-[var(--border-subtle)]">
+              {(['L2', 'L1', 'Linf'] as DistanceMetric[]).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => {
+                    setMetric(m);
+                    if (config.soundEnabled) audio.playClick();
+                  }}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-mono transition-all cursor-pointer ${
+                    metric === m
+                      ? 'bg-[var(--bg-surface)] text-[var(--math-data)] font-bold shadow-xs border border-[var(--border-subtle)]'
+                      : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+                  }`}
+                >
+                  {m === 'L2' && (language === 'ar' ? 'L₂ إقليدي' : 'L₂ Euclidean')}
+                  {m === 'L1' && (language === 'ar' ? 'L₁ مانهاتن' : 'L₁ Manhattan')}
+                  {m === 'Linf' && (language === 'ar' ? 'L∞ تشيبيشيف' : 'L∞ Chebyshev')}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Add Class Toggle */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-mono text-[var(--text-tertiary)] shrink-0">
+              {language === 'ar' ? 'إضافة نقطة:' : 'Click to Add:'}
+            </span>
+            <div className="flex items-center gap-1 bg-[var(--bg-app)] p-0.5 rounded-lg border border-[var(--border-subtle)]">
               <button
-                key={m}
-                onClick={() => {
-                  setMetric(m);
-                  if (config.soundEnabled) audio.playClick();
-                }}
-                className={`flex-1 py-1.5 text-xs font-mono rounded-lg border transition-all ${
-                  metric === m
-                    ? 'border-[var(--math-data)] bg-[var(--math-data)]/15 text-[var(--math-data)] font-bold'
-                    : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
+                onClick={() => setAddModeClass(0)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono transition-all cursor-pointer ${
+                  addModeClass === 0
+                    ? 'bg-sky-500/15 text-sky-400 font-bold shadow-xs border border-sky-500/30'
+                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
                 }`}
               >
-                {m === 'L2' && 'L₂ (Euclidean)'}
-                {m === 'L1' && 'L₁ (Manhattan)'}
-                {m === 'Linf' && 'L∞ (Chebyshev)'}
+                <span className="w-2 h-2 rounded-full bg-sky-400" />
+                <span>{language === 'ar' ? 'فئة أ (أزرق)' : 'Class A (Blue)'}</span>
               </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Add Class Toggle */}
-        <div className="space-y-1.5">
-          <span className="text-xs font-mono text-[var(--text-secondary)] block">
-            {language === 'ar' ? 'فئة النقطة الجديدة:' : 'Click to Add:'}
-          </span>
-          <div className="flex gap-1.5">
-            <button
-              onClick={() => setAddModeClass(0)}
-              className={`flex-1 py-1.5 text-xs font-mono rounded-lg border transition-all ${
-                addModeClass === 0
-                  ? 'border-[var(--math-data)] bg-[var(--math-data)]/15 text-[var(--math-data)] font-bold'
-                  : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
-              }`}
-            >
-              Class A (Blue)
-            </button>
-            <button
-              onClick={() => setAddModeClass(1)}
-              className={`flex-1 py-1.5 text-xs font-mono rounded-lg border transition-all ${
-                addModeClass === 1
-                  ? 'border-[var(--math-gradient)] bg-[var(--math-gradient)]/15 text-[var(--math-gradient)] font-bold'
-                  : 'border-[var(--border-subtle)] text-[var(--text-secondary)]'
-              }`}
-            >
-              Class B (Amber)
-            </button>
+              <button
+                onClick={() => setAddModeClass(1)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono transition-all cursor-pointer ${
+                  addModeClass === 1
+                    ? 'bg-amber-500/15 text-amber-400 font-bold shadow-xs border border-amber-500/30'
+                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span>{language === 'ar' ? 'فئة ب (كهرماني)' : 'Class B (Amber)'}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
