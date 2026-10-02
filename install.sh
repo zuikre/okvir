@@ -335,7 +335,6 @@ DESKTOP_ENTRY_EOF
     INSTALLED=true
     echo "${GREEN}✔ Installed Native Desktop Engine (v${RESOLVED_VERSION}) to ${DESKTOP_TARGET}${RESET}"
     echo "${GREEN}✔ Configured Unified Terminal CLI Launcher at ${INSTALL_DIR}/okvir${RESET}"
-  fi
 
 elif [ "${PLATFORM}" = "macos" ]; then
   DMG_TMP="$(mktemp -d)/okvir.dmg"
