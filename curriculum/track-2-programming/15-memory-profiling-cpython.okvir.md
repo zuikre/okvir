@@ -5,7 +5,7 @@ title: "CPython Memory Architecture & Cache Locality"
 track: "programming"
 module: "mod-12"
 estimated_minutes: 15
-prerequisites: ["sorting-divide-and-conquer"]
+prerequisites: ["cs-14"]
 i18n:
   ar: "معمارية ذاكرة CPython، تجميع القمامة، وتمركز الذاكرة المخبأة (Cache Locality)"
 ---

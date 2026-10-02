@@ -1,11 +1,11 @@
 ---
-id: "linear-maps-transformations"
+id: "t1-07"
 version: "1.0.0"
 title: "Linear Maps as Space Transformations"
 track: "math"
 module: "mod-03"
 estimated_minutes: 15
-prerequisites: ["linear-combinations-span"]
+prerequisites: ["t1-04"]
 i18n:
   ar: "التحويلات الخطية كعمليات نقل وتحوير للفضاء"
 ---
@@ -99,7 +99,7 @@ $$
    $$T(\mathbf{0}) = T(0 \cdot \mathbf{v}) = 0 \cdot T(\mathbf{v}) = \mathbf{0}$$
    فإذا تسببت أي دالة في إزاحة نقطة الأصل عن موضعها ($T(\mathbf{0}) \ne \mathbf{0}$)، فإنها تفقد خاصية الخطية وتصبح إزاحة تآلفية وليست تحويلاً خطياً صرفاً.
 
-:::python-challenge{id="py-linear-maps-transformations"}
+:::python-challenge{id="py-t1-07"}
 ---
 timeout_ms: 3000
 test_cases:

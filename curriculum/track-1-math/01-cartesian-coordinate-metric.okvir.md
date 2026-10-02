@@ -1,5 +1,5 @@
 ---
-id: "cartesian-coordinate-metric"
+id: "t1-01"
 version: "1.0.0"
 title: "Cartesian Coordinate Systems & The Euclidean Metric"
 track: "math"
@@ -91,7 +91,7 @@ $$
 3. **لماذا نجمع عبر كافة الأبعاد؟** بما أن محاور الإحداثيات الديكارتية متعامدة تماماً، فإن حركتك على المحور الأفقي لا تؤثر إطلاقاً على موقعك على المحور الرأسي، مما يسمح بجمع المساهمات التربيعية للأبعاد مباشرة: $d^2 = \Delta x^2 + \Delta y^2 + \Delta z^2$.
 4. **لماذا نأخذ الجذر التربيعي في النهاية؟** جمع المربعات ينتج قيمة مقاسة بوحدات تربيعية (مثل $\text{متر}^2$)؛ لذا فإن الجذر التربيعي يعيد الناتج إلى وحدة الطول الخطية الأصلية للمسطرة ($\text{متر}$).
 
-:::python-challenge{id="py-cartesian-coordinate-metric"}
+:::python-challenge{id="py-t1-01"}
 ---
 timeout_ms: 3000
 test_cases:

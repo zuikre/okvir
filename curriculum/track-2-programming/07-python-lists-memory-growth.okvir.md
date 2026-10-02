@@ -5,7 +5,7 @@ title: "Python Lists & Dynamic Array Memory Growth"
 track: "programming"
 module: "mod-10"
 estimated_minutes: 15
-prerequisites: ["scope-resolution-legb"]
+prerequisites: ["cs-06"]
 i18n:
   ar: "قوائم بايثون والنمو الذاكري للمصفوفات الديناميكية"
 ---

@@ -1,11 +1,11 @@
 ---
-id: "cross-product-orthogonality"
+id: "t1-06"
 version: "1.0.0"
 title: "The Cross Product, Orthogonality & Oriented Area"
 track: "math"
 module: "mod-02"
 estimated_minutes: 15
-prerequisites: ["dot-product-geometry"]
+prerequisites: ["t1-05"]
 i18n:
   ar: "الجداء الاتجاهي والتعامد والمساحة الموجهة"
 ---
@@ -107,7 +107,7 @@ $$
 3. **لماذا يقلب تبديل المتجهين إشارة الناتج؟**
    في جبر المصفوفات، تبديل أي صفين في المحدد يعكس إشارة الناتج تلقائياً. وحيث أن المتجهين يشغلان الصفين الثاني والثالث، فإن عكسهما يقلب إشارات كافة المركبات.
 
-:::python-challenge{id="py-cross-product-orthogonality"}
+:::python-challenge{id="py-t1-06"}
 ---
 timeout_ms: 3000
 test_cases:

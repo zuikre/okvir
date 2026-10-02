@@ -1,12 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Sun, Moon, Languages, Flame, Zap, Settings, Activity, RefreshCw, X } from 'lucide-react';
+import { Search, Sun, Moon, Languages, Flame, Zap, Settings, Activity, RefreshCw, X, Minus, Square, Copy, Sparkles } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
 import { audio } from '@/lib/audio';
+import { tauriBridge } from '@/lib/tauri-bridge';
+import { OkvirUpdateChecker, type GitHubReleaseInfo } from '@/lib/updater';
+import { UpdateModal } from '@/components/updater/UpdateModal';
+
+function getPlatformOS(): 'macos' | 'windows' | 'linux' {
+  if (typeof window === 'undefined') return 'linux';
+  const ua = window.navigator.userAgent.toLowerCase();
+  const platform = ((window.navigator as unknown as { userAgentData?: { platform?: string } }).userAgentData?.platform || window.navigator.platform || '').toLowerCase();
+  if (platform.includes('mac') || ua.includes('macintosh') || ua.includes('mac os')) return 'macos';
+  if (platform.includes('win') || ua.includes('windows')) return 'windows';
+  return 'linux';
+}
 
 export const DesktopTitlebar: React.FC = () => {
   const { theme, language, toggleTheme, setLanguage, xp, streakDays, setCommandPaletteOpen, setCurrentView, config } = useOkvirStore();
 
+  const [os, setOs] = useState<'macos' | 'windows' | 'linux'>('linux');
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [availableUpdate, setAvailableUpdate] = useState<GitHubReleaseInfo | null>(null);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [fps, setFps] = useState(60);
   const [frameTimeMs, setFrameTimeMs] = useState(0.28);
   const [isHudOpen, setIsHudOpen] = useState(false);
@@ -42,6 +58,31 @@ export const DesktopTitlebar: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    setOs(getPlatformOS());
+    if (tauriBridge.isTauri()) {
+      tauriBridge.isWindowMaximized().then(setIsMaximized);
+    }
+
+    // Check for updates in the background
+    OkvirUpdateChecker.checkLatestRelease().then((release) => {
+      if (release && release.hasUpdate) {
+        setAvailableUpdate(release);
+      }
+    });
+  }, []);
+
+  const handleToggleMaximize = async () => {
+    await tauriBridge.toggleMaximizeWindow();
+    const max = await tauriBridge.isWindowMaximized();
+    setIsMaximized(max);
+  };
+
+  const handleTitlebarDoubleClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button, input, [role="button"]')) return;
+    handleToggleMaximize();
+  };
+
   const handleRecycleMemory = () => {
     setMemoryRecycled(true);
     if (config.soundEnabled) audio.playClick();
@@ -50,56 +91,79 @@ export const DesktopTitlebar: React.FC = () => {
 
   return (
     <>
-      <div className="h-12 flex items-center justify-between px-3.5 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] select-none shrink-0 sticky top-0 z-30">
-        {/* Left: Native Window Controls & Brand Wordmark */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <span
-              className="w-3 h-3 rounded-full bg-[#ff5f57] inline-block cursor-pointer hover:brightness-110 border border-black/10"
-              title={tr('close', language)}
-            />
-            <span
-              className="w-3 h-3 rounded-full bg-[#febc2e] inline-block cursor-pointer hover:brightness-110 border border-black/10"
-              title={tr('minimize', language)}
-            />
-            <span
-              className="w-3 h-3 rounded-full bg-[#28c840] inline-block cursor-pointer hover:brightness-110 border border-black/10"
-              title={tr('maximize', language)}
-            />
-          </div>
+      <div
+        dir="ltr"
+        data-tauri-drag-region
+        onDoubleClick={handleTitlebarDoubleClick}
+        className="h-12 flex items-center justify-between px-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] select-none shrink-0 sticky top-0 z-30"
+      >
+        {/* Left: macOS Traffic Lights (if macOS) & Brand Wordmark */}
+        <div className="flex items-center gap-3 shrink-0" data-tauri-drag-region>
+          {os === 'macos' && (
+            <div className="flex items-center gap-1.5 pe-1">
+              <button
+                onClick={() => tauriBridge.closeWindow()}
+                className="w-3 h-3 rounded-full bg-[#ff5f57] hover:brightness-110 border border-black/10 transition-all cursor-pointer"
+                title={tr('close', language)}
+                aria-label="Close"
+              />
+              <button
+                onClick={() => tauriBridge.minimizeWindow()}
+                className="w-3 h-3 rounded-full bg-[#febc2e] hover:brightness-110 border border-black/10 transition-all cursor-pointer"
+                title={tr('minimize', language)}
+                aria-label="Minimize"
+              />
+              <button
+                onClick={handleToggleMaximize}
+                className="w-3 h-3 rounded-full bg-[#28c840] hover:brightness-110 border border-black/10 transition-all cursor-pointer"
+                title={tr('maximize', language)}
+                aria-label="Maximize"
+              />
+            </div>
+          )}
 
-          <span className="w-px h-4 bg-[var(--border-subtle)]" />
+          {os === 'macos' && <span className="w-px h-4 bg-[var(--border-subtle)]" />}
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" data-tauri-drag-region>
             <span className="text-xs font-bold tracking-wider font-mono text-[var(--text-primary)]">
               OKVIR
             </span>
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--border-subtle)] text-[var(--text-secondary)] border border-[var(--border-strong)]">
               v1.0.1
             </span>
+            {availableUpdate && (
+              <button
+                onClick={() => setIsUpdateModalOpen(true)}
+                className="flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all animate-pulse cursor-pointer shrink-0"
+                title={language === 'ar' ? `تحديث جديد متاح: ${availableUpdate.tagName}` : `Update Available: ${availableUpdate.tagName}`}
+              >
+                <Sparkles size={10} />
+                <span>{availableUpdate.tagName}</span>
+              </button>
+            )}
           </div>
         </div>
 
         {/* Center: Command Palette Trigger */}
-        <div className="flex items-center justify-center flex-1 max-w-lg mx-4">
+        <div className="flex items-center justify-center flex-1 max-w-lg mx-4" data-tauri-drag-region>
           <button
             onClick={() => setCommandPaletteOpen(true)}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] text-[var(--text-tertiary)] hover:border-[var(--border-strong)] hover:text-[var(--text-secondary)] transition-colors w-full justify-between group shadow-sm"
           >
-            <div className="flex items-center gap-2 min-w-0">
+            <div className="flex items-center gap-2 min-w-0" dir={language === 'ar' ? 'rtl' : 'ltr'}>
               <Search size={13} className="shrink-0 text-[var(--text-tertiary)]" />
               <span className="text-xs truncate">
                 {language === 'ar' ? 'ابحث عن مفهوم أو درس...' : 'Quick Search or Jump to Concept...'}
               </span>
             </div>
             <kbd className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-[var(--border-subtle)] text-[var(--text-tertiary)] border border-[var(--border-strong)] shrink-0">
-              ⌘K
+              {os === 'macos' ? '⌘K' : 'Ctrl+K'}
             </kbd>
           </button>
         </div>
 
-        {/* Right Utilities: Hardware HUD, Gamification & Preferences */}
-        <div className="flex items-center gap-2.5">
+        {/* Right Utilities: Hardware HUD, Gamification & Preferences & Native Window Controls */}
+        <div className="flex items-center gap-2 shrink-0">
           {/* Performance & Hardware HUD Pill (PRD Section 2.2 & 16) */}
           <button
             onClick={() => setIsHudOpen(true)}
@@ -148,7 +212,7 @@ export const DesktopTitlebar: React.FC = () => {
           {/* Theme Switcher */}
           <button
             onClick={toggleTheme}
-            className="p-1.5 rounded-md border border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--bg-app)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            className="p-1.5 rounded-md border border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--bg-app)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
             title={theme === 'dark' ? 'Switch to Warm Paper (Light)' : 'Switch to OLED Charcoal (Dark)'}
           >
             {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
@@ -157,11 +221,48 @@ export const DesktopTitlebar: React.FC = () => {
           {/* Local Settings / Disk Storage */}
           <button
             onClick={() => setCurrentView('settings')}
-            className="p-1.5 rounded-md border border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--bg-app)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            className="p-1.5 rounded-md border border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--bg-app)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
             title={language === 'ar' ? 'الإعدادات والتخزين المحلي' : 'Settings & Local Storage'}
           >
             <Settings size={13} />
           </button>
+
+          {/* Windows & Linux Native Window Controls */}
+          {os !== 'macos' && (
+            <>
+              <span className="w-px h-4 bg-[var(--border-subtle)] shrink-0" />
+              <div className="flex items-center gap-0.5">
+                <button
+                  onClick={() => tauriBridge.minimizeWindow()}
+                  className="w-8 h-7 flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)] rounded transition-colors cursor-pointer"
+                  title={tr('minimize', language)}
+                  aria-label="Minimize"
+                >
+                  <Minus size={13} strokeWidth={2} />
+                </button>
+                <button
+                  onClick={handleToggleMaximize}
+                  className="w-8 h-7 flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)] rounded transition-colors cursor-pointer"
+                  title={tr('maximize', language)}
+                  aria-label="Maximize"
+                >
+                  {isMaximized ? (
+                    <Copy size={11} className="rotate-180" strokeWidth={2} />
+                  ) : (
+                    <Square size={11} strokeWidth={2} />
+                  )}
+                </button>
+                <button
+                  onClick={() => tauriBridge.closeWindow()}
+                  className="w-8 h-7 flex items-center justify-center text-[var(--text-secondary)] hover:text-white hover:bg-rose-600 active:bg-rose-700 rounded transition-colors cursor-pointer"
+                  title={tr('close', language)}
+                  aria-label="Close"
+                >
+                  <X size={14} strokeWidth={2} />
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -237,6 +338,15 @@ export const DesktopTitlebar: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {availableUpdate && (
+        <UpdateModal
+          release={availableUpdate}
+          isOpen={isUpdateModalOpen}
+          onClose={() => setIsUpdateModalOpen(false)}
+          language={language}
+        />
       )}
     </>
   );

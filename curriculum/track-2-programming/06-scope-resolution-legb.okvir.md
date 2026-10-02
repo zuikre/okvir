@@ -5,7 +5,7 @@ title: "Scope Resolution & The LEGB Rule"
 track: "programming"
 module: "mod-09"
 estimated_minutes: 15
-prerequisites: ["first-class-closures"]
+prerequisites: ["cs-05"]
 i18n:
   ar: "استبانة النطاق وقاعدة LEGB (Local, Enclosing, Global, Built-in)"
 ---

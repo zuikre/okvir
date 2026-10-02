@@ -1,11 +1,11 @@
 ---
-id: "orthogonal-projections"
+id: "t1-12"
 version: "1.0.0"
 title: "Orthogonal Projections & Least Squares Approximation"
 track: "math"
 module: "mod-04"
 estimated_minutes: 15
-prerequisites: ["four-fundamental-subspaces"]
+prerequisites: ["t1-11"]
 i18n:
   ar: "الإسقاطات المتعامدة وتقريب المربعات الصغرى"
 ---
@@ -117,7 +117,7 @@ $$
    لاحظ المقدار في المنتصف: $[(\mathbf{A}^T\mathbf{A})^{-1}][\mathbf{A}^T\mathbf{A}] = \mathbf{I}$ (مصفوفة الوحدة المحايدة)، فيختزل التعبير فوراً إلى:
    $$\mathbf{P}^2 = \mathbf{A}(\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T = \mathbf{P}$$
 
-:::python-challenge{id="py-orthogonal-projections"}
+:::python-challenge{id="py-t1-12"}
 ---
 timeout_ms: 3000
 test_cases:

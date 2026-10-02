@@ -5,7 +5,7 @@ title: "Pure Functions, Referential Transparency & Stack Frames"
 track: "programming"
 module: "mod-09"
 estimated_minutes: 15
-prerequisites: ["iteration-state-accumulation"]
+prerequisites: ["cs-03"]
 i18n:
   ar: "الدوال النقية، الشفافية الإسنادية، وأطر مكدس الاستدعاء"
 ---

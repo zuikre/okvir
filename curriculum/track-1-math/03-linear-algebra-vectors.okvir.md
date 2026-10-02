@@ -1,11 +1,11 @@
 ---
-id: "linear-algebra-vectors"
+id: "t1-03"
 version: "1.0.0"
 title: "Vectors as Directed Line Segments & Spatial Displacements"
 track: "math"
 module: "mod-01"
 estimated_minutes: 15
-prerequisites: ["cartesian-coordinate-metric"]
+prerequisites: ["t1-01"]
 i18n:
   ar: "المتجهات كقطع موجهة وإزاحات مكانية"
 ---
@@ -89,7 +89,7 @@ $$
 2. **لماذا يعكس المعامل القياسي السالب اتجاه المتجه $180^\circ$؟** عند ضرب المركبة $u_i$ في $-1$، تنقلب الإشارات الموجبة إلى سالبة والسالصة إلى موجبة؛ هندسياً، هذا ينشئ انعكاساً عبر نقطة الأصل فيشير السهم للاتجاه المعاكس تماماً مع الحفاظ على طوله الأصلي ($\|-1 \cdot \mathbf{u}\| = \|\mathbf{u}\|$).
 3. **لماذا تصح متباينة المثلث دائماً ($\|\mathbf{u} + \mathbf{v}\| \le \|\mathbf{u}\| + \|\mathbf{v}\|$؟** يشكل المتجهان ومحصلتهما أضلاع مثلث في الفضاء. وأقصر مسار بين نقطتين هو الخط المستقيم دائماً؛ وما لم يكن المتجهان يشيران لنفس الاتجاه تماماً، فإن وجود أي زاوية بينهما يصنع مساراً مختصراً يجعل طول المحصلة أقل قطعاً من مجموع مسافتي الرحلتين.
 
-:::python-challenge{id="py-linear-algebra-vectors"}
+:::python-challenge{id="py-t1-03"}
 ---
 timeout_ms: 3000
 test_cases:

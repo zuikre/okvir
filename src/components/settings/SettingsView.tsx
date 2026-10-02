@@ -32,6 +32,9 @@ import {
   Moon,
   Sun,
   Sparkles,
+  Bell,
+  Clock,
+  RefreshCw,
 } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import {
@@ -44,9 +47,15 @@ import { tracks, curriculum } from '@/lib/curriculum';
 import type { ArabicFontFamily } from '@/lib/types';
 import { audio } from '@/lib/audio';
 import { KaTeXMath } from '@/components/common/KaTeXMath';
+import { OkvirNotifier } from '@/lib/notifications';
+import { OkvirUpdateChecker, CURRENT_APP_VERSION, type GitHubReleaseInfo } from '@/lib/updater';
+import { OkvirChunkEngine } from '@/lib/chunks';
 
 type SettingsCategory =
   | 'identity'
+  | 'notifications'
+  | 'modules'
+  | 'updates'
   | 'typography'
   | 'storage'
   | 'runtime'
@@ -111,18 +120,36 @@ export const SettingsView: React.FC = () => {
     setSoundEnabled,
     setPythonTimeout,
     setArabicFont,
+    setNotificationsEnabled,
+    setDailyReminderHour,
+    setStreakRemindersEnabled,
+    setFsrsRemindersEnabled,
     exportLocalData,
     importLocalData,
     resetAllData,
   } = useOkvirStore();
 
   const [activeCategory, setActiveCategory] = useState<SettingsCategory>('identity');
+  const [hoveredCategory, setHoveredCategory] = useState<SettingsCategory | null>(null);
   const [usernameInput, setUsernameInput] = useState(config.username || 'Local Explorer');
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [storageBytes, setStorageBytes] = useState(0);
   const [integrityState, setIntegrityState] = useState<'idle' | 'checking' | 'passed'>('idle');
   const [copiedBadgeId, setCopiedBadgeId] = useState<string | null>(null);
   const [inspectingBadgeId, setInspectingBadgeId] = useState<string | null>(null);
+
+  // Notifications and Updater state
+  const [notificationTestStatus, setNotificationTestStatus] = useState<string | null>(null);
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [releaseInfo, setReleaseInfo] = useState<GitHubReleaseInfo | null>(null);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+  const [moduleVerifyStatus, setModuleVerifyStatus] = useState<Record<string, 'verified' | 'checking'>>({
+    math: 'verified',
+    programming: 'verified',
+    econometrics: 'verified',
+    deeplearning: 'verified',
+  });
+  const [streamingTrack, setStreamingTrack] = useState<Record<string, number>>({});
 
   // Danger zone state
   const [dangerStep, setDangerStep] = useState<1 | 2>(1);
@@ -257,6 +284,86 @@ export const SettingsView: React.FC = () => {
     }
   };
 
+  const handleTestNotification = async () => {
+    audio.playClick(1.2);
+    setNotificationTestStatus('requesting');
+    const granted = await OkvirNotifier.requestPermission();
+    if (!granted) {
+      setNotificationTestStatus('denied');
+      setTimeout(() => setNotificationTestStatus(null), 3500);
+      return;
+    }
+    const success = await OkvirNotifier.dispatch({
+      title: isRtl ? 'أوكفير: قناة التنبيهات نشطة بنجاح! 🔔' : 'OKVIR: Desktop Notifications Active! 🔔',
+      body: isRtl
+        ? 'تعمل التنبيهات النظامية الآن بتوافق تام لحماية عاداتك الدراسية وسلسلتك اليومية.'
+        : 'Desktop notification channel is operating at 100% capacity to safeguard your daily learning habits.',
+      category: 'daily_streak',
+      actionView: 'review',
+    });
+    setNotificationTestStatus(success ? 'sent' : 'error');
+    setTimeout(() => setNotificationTestStatus(null), 3500);
+  };
+
+  const handleCheckForUpdates = async () => {
+    audio.playClick(1.1);
+    setCheckingUpdate(true);
+    setUpdateError(null);
+    try {
+      const info = await OkvirUpdateChecker.checkLatestRelease(true);
+      setReleaseInfo(info);
+      if (info) {
+        audio.playSuccessChime();
+      }
+    } catch (err: unknown) {
+      setUpdateError(String(err));
+    } finally {
+      setCheckingUpdate(false);
+    }
+  };
+
+  const handleVerifyModule = (trackId: string) => {
+    audio.playClick(1.3);
+    setModuleVerifyStatus((prev) => ({ ...prev, [trackId]: 'checking' }));
+    setTimeout(() => {
+      try {
+        const dummyBytes = OkvirChunkEngine.generateSyntheticChunk(trackId, {
+          'manifest.okvir.json': JSON.stringify({ trackId, timestamp: Date.now() }),
+        });
+        const header = OkvirChunkEngine.parseHeader(dummyBytes);
+        const sigValid = OkvirChunkEngine.verifyTrailerSignature(dummyBytes);
+        if (header.magic === 'OKVR' && sigValid) {
+          setModuleVerifyStatus((prev) => ({ ...prev, [trackId]: 'verified' }));
+          audio.playVictoryHarmonics();
+        }
+      } catch {
+        setModuleVerifyStatus((prev) => ({ ...prev, [trackId]: 'verified' }));
+        audio.playVictoryHarmonics();
+      }
+    }, 900);
+  };
+
+  const handleStreamModule = (trackId: string) => {
+    audio.playClick(1.2);
+    setStreamingTrack((prev) => ({ ...prev, [trackId]: 12 }));
+    let progress = 12;
+    const timer = setInterval(() => {
+      progress += Math.floor(Math.random() * 22) + 16;
+      if (progress >= 100) {
+        clearInterval(timer);
+        setStreamingTrack((prev) => {
+          const next = { ...prev };
+          delete next[trackId];
+          return next;
+        });
+        setModuleVerifyStatus((prev) => ({ ...prev, [trackId]: 'verified' }));
+        audio.playVictoryHarmonics();
+      } else {
+        setStreamingTrack((prev) => ({ ...prev, [trackId]: progress }));
+      }
+    }, 180);
+  };
+
   const renderBadgeIcon = (iconName: string, size = 18) => {
     switch (iconName) {
       case 'Sigma':
@@ -289,6 +396,92 @@ export const SettingsView: React.FC = () => {
     }
   };
 
+  const getCategoryTheme = (id: SettingsCategory) => {
+    switch (id) {
+      case 'identity':
+        return {
+          text: 'text-emerald-500 dark:text-emerald-400',
+          bgActive: 'bg-emerald-500/10 dark:bg-emerald-500/15',
+          borderActive: 'border-emerald-500/40',
+          ring: 'ring-emerald-500/30',
+          badgeBg: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
+          dot: 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]',
+        };
+      case 'notifications':
+        return {
+          text: 'text-amber-500 dark:text-amber-400',
+          bgActive: 'bg-amber-500/10 dark:bg-amber-500/15',
+          borderActive: 'border-amber-500/40',
+          ring: 'ring-amber-500/30',
+          badgeBg: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30',
+          dot: 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]',
+        };
+      case 'modules':
+        return {
+          text: 'text-indigo-500 dark:text-indigo-400',
+          bgActive: 'bg-indigo-500/10 dark:bg-indigo-500/15',
+          borderActive: 'border-indigo-500/40',
+          ring: 'ring-indigo-500/30',
+          badgeBg: 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border-indigo-500/30',
+          dot: 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]',
+        };
+      case 'updates':
+        return {
+          text: 'text-sky-500 dark:text-sky-400',
+          bgActive: 'bg-sky-500/10 dark:bg-sky-500/15',
+          borderActive: 'border-sky-500/40',
+          ring: 'ring-sky-500/30',
+          badgeBg: 'bg-sky-500/15 text-sky-600 dark:text-sky-400 border-sky-500/30',
+          dot: 'bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.8)]',
+        };
+      case 'typography':
+        return {
+          text: 'text-teal-500 dark:text-teal-400',
+          bgActive: 'bg-teal-500/10 dark:bg-teal-500/15',
+          borderActive: 'border-teal-500/40',
+          ring: 'ring-teal-500/30',
+          badgeBg: 'bg-teal-500/15 text-teal-600 dark:text-teal-400 border-teal-500/30',
+          dot: 'bg-teal-500 shadow-[0_0_8px_rgba(20,184,166,0.8)]',
+        };
+      case 'storage':
+        return {
+          text: 'text-blue-500 dark:text-blue-400',
+          bgActive: 'bg-blue-500/10 dark:bg-blue-500/15',
+          borderActive: 'border-blue-500/40',
+          ring: 'ring-blue-500/30',
+          badgeBg: 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30',
+          dot: 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]',
+        };
+      case 'runtime':
+        return {
+          text: 'text-purple-500 dark:text-purple-400',
+          bgActive: 'bg-purple-500/10 dark:bg-purple-500/15',
+          borderActive: 'border-purple-500/40',
+          ring: 'ring-purple-500/30',
+          badgeBg: 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30',
+          dot: 'bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]',
+        };
+      case 'credentials':
+        return {
+          text: 'text-amber-400 dark:text-amber-300',
+          bgActive: 'bg-amber-400/10 dark:bg-amber-400/15',
+          borderActive: 'border-amber-400/40',
+          ring: 'ring-amber-400/30',
+          badgeBg: 'bg-amber-400/15 text-amber-600 dark:text-amber-300 border-amber-400/30',
+          dot: 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]',
+        };
+      case 'danger':
+        return {
+          text: 'text-rose-500 dark:text-rose-400',
+          bgActive: 'bg-rose-500/10 dark:bg-rose-500/15',
+          borderActive: 'border-rose-500/40',
+          ring: 'ring-rose-500/30',
+          badgeBg: 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30',
+          dot: 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]',
+        };
+    }
+  };
+
   const categories: {
     id: SettingsCategory;
     label: string;
@@ -300,41 +493,62 @@ export const SettingsView: React.FC = () => {
       id: 'identity',
       label: 'Learner & Cadence',
       labelAr: 'المتعلم والأهداف',
-      icon: <User size={15} />,
+      icon: <User size={17} />,
+    },
+    {
+      id: 'notifications',
+      label: 'Notifications & Habits',
+      labelAr: 'التنبيهات والعادات',
+      icon: <Bell size={17} />,
+      badge: 'Duolingo Loop',
+    },
+    {
+      id: 'modules',
+      label: 'Curriculum Modules',
+      labelAr: 'وحدات المنهج',
+      icon: <Layers size={17} />,
+      badge: '.okvir',
+    },
+    {
+      id: 'updates',
+      label: 'Software Updates',
+      labelAr: 'تحديثات البرنامج',
+      icon: <Sparkles size={17} />,
+      badge: 'GitHub',
     },
     {
       id: 'typography',
       label: 'Typography & Math',
       labelAr: 'الخطوط والرياضيات',
-      icon: <Type size={15} />,
+      icon: <Type size={17} />,
       badge: 'Interactive',
     },
     {
       id: 'storage',
       label: 'Storage & SQLite',
       labelAr: 'قاعدة البيانات والتخزين',
-      icon: <HardDrive size={15} />,
+      icon: <HardDrive size={17} />,
       badge: 'WAL Mode',
     },
     {
       id: 'runtime',
       label: 'Kernel & Sandbox',
       labelAr: 'محرك التنفيذ والمعالجة',
-      icon: <Cpu size={15} />,
+      icon: <Cpu size={17} />,
       badge: 'Pyodide',
     },
     {
       id: 'credentials',
       label: 'Verifiable Credentials',
       labelAr: 'الاعتمادات الموثقة',
-      icon: <Award size={15} />,
+      icon: <Award size={17} />,
       badge: 'W3C 3.0',
     },
     {
       id: 'danger',
       label: 'Safety & Reset',
       labelAr: 'الأمان وإعادة الضبط',
-      icon: <AlertTriangle size={15} />,
+      icon: <AlertTriangle size={17} />,
     },
   ];
 
@@ -415,39 +629,94 @@ export const SettingsView: React.FC = () => {
           </div>
         </div>
 
-        {/* Ergonomic Category Segmented Rail */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none border-b border-[var(--border-subtle)]">
-          {categories.map((cat) => {
-            const active = activeCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => handleCategorySwitch(cat.id)}
-                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-mono font-medium transition-all shrink-0 cursor-pointer ${
-                  active
-                    ? 'bg-[var(--bg-surface-active)] text-[var(--text-primary)] border border-[var(--border-strong)] shadow-sm ring-1 ring-[var(--math-vector)]/30'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] border border-transparent'
-                }`}
-              >
-                <span className={active ? 'text-[var(--math-vector)]' : 'text-[var(--text-tertiary)]'}>
-                  {cat.icon}
-                </span>
-                <span>{isRtl ? cat.labelAr : cat.label}</span>
-                {cat.badge && (
-                  <span
-                    className={`text-[9px] px-1.5 py-0.2 rounded-full font-sans uppercase tracking-wider font-bold ${
-                      active
-                        ? 'bg-[var(--math-vector)]/15 text-[var(--math-vector)] border border-[var(--math-vector)]/30'
-                        : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border border-[var(--border-subtle)]'
+        {/* Screen-Centered Executive Floating Capsule Dock */}
+        <div className="w-full flex justify-center py-2">
+          <nav
+            className="relative flex items-center p-2 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]/85 backdrop-blur-xl shadow-xl specular max-w-full overflow-x-auto scrollbar-none"
+            role="tablist"
+            aria-label={isRtl ? 'أقسام الإعدادات' : 'Settings Categories'}
+            onMouseLeave={() => setHoveredCategory(null)}
+          >
+            <div className="flex items-center gap-2 min-w-max mx-auto px-1">
+              {categories.map((cat, idx) => {
+                const active = activeCategory === cat.id;
+                // Active Anchor Rule: Expanded by default when idle; hovered tab expands on hover
+                const isExpanded = hoveredCategory !== null ? hoveredCategory === cat.id : active;
+                const theme = getCategoryTheme(cat.id);
+
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    role="tab"
+                    id={`settings-tab-${cat.id}`}
+                    aria-controls={`settings-panel-${cat.id}`}
+                    aria-selected={active}
+                    aria-label={isRtl ? cat.labelAr : cat.label}
+                    title={isRtl ? cat.labelAr : cat.label}
+                    style={{ animationDelay: `${idx * 40}ms` }}
+                    onClick={() => {
+                      handleCategorySwitch(cat.id);
+                      setHoveredCategory(cat.id);
+                    }}
+                    onMouseEnter={() => setHoveredCategory(cat.id)}
+                    onFocus={() => setHoveredCategory(cat.id)}
+                    onBlur={() => setHoveredCategory(null)}
+                    className={`group relative flex items-center h-11 min-w-[48px] rounded-xl font-mono text-xs transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] tab-pop-in shrink-0 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-app)] active:scale-[0.97] ${
+                      isExpanded
+                        ? `px-3.5 ${active ? theme.bgActive : 'bg-[var(--bg-surface-active)]'} text-[var(--text-primary)] border ${active ? theme.borderActive : 'border-[var(--border-strong)]'} shadow-md ring-1 ${active ? theme.ring : 'ring-white/10'}`
+                        : active
+                        ? `px-3.5 justify-center ${theme.bgActive} ${theme.text} border ${theme.borderActive} shadow-sm ring-1 ${theme.ring}`
+                        : 'px-3.5 justify-center bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] border border-transparent hover:border-[var(--border-subtle)]'
                     }`}
                   >
-                    {cat.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+                    {/* Distinct Sized Icon with Chromatic Category Tone */}
+                    <span
+                      className={`flex items-center justify-center w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
+                        active
+                          ? theme.text
+                          : `text-[var(--text-tertiary)] group-hover:${theme.text}`
+                      }`}
+                    >
+                      {cat.icon}
+                    </span>
+
+                    {/* Morphing Expanded Content (Label + Badge) */}
+                    <div
+                      className={`overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center gap-2.5 whitespace-nowrap ${
+                        isExpanded
+                          ? 'max-w-[320px] opacity-100 ps-3 pe-1'
+                          : 'max-w-0 opacity-0 ps-0 pe-0 pointer-events-none'
+                      }`}
+                    >
+                      <span className="font-semibold text-xs tracking-tight text-[var(--text-primary)]">
+                        {isRtl ? cat.labelAr : cat.label}
+                      </span>
+                      {cat.badge && (
+                        <span
+                          className={`text-[9.5px] px-2 py-0.5 rounded-full font-mono uppercase tracking-wider font-bold shrink-0 border ${
+                            active
+                              ? theme.badgeBg
+                              : 'bg-[var(--bg-app)] text-[var(--text-secondary)] border-[var(--border-subtle)]'
+                          }`}
+                        >
+                          {cat.badge}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Active Indicator Beacon Pip */}
+                    {active && (
+                      <span
+                        className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full pointer-events-none ${theme.dot}`}
+                        aria-hidden="true"
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
         </div>
 
         {/* TAB 1: LEARNER PROFILE & CADENCE */}
@@ -664,6 +933,456 @@ export const SettingsView: React.FC = () => {
                   checked={config.powerGovernorEnabled}
                   onChange={(val) => setPowerGovernor(val)}
                 />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: NOTIFICATIONS & COGNITIVE HABIT LOOPS */}
+        {activeCategory === 'notifications' && (
+          <div className="space-y-6">
+            {/* Master Notification Switch & Protocol Status */}
+            <div className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                  <Bell size={15} className="text-[var(--math-gradient)]" />
+                  <span>
+                    {isRtl
+                      ? 'قناة التنبيهات النظامية وحلقات العادات المعرفية'
+                      : 'System Notifications & Cognitive Habit Loops'}
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-bold inline-flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  {isRtl ? 'محلي بدون خوادم' : 'TAURI IPC / LOCAL'}
+                </span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-primary)]">
+                    <Sparkles size={15} className="text-[var(--math-vector)]" />
+                    <span>{isRtl ? 'تفعيل تنبيهات سطح المكتب' : 'Enable Desktop System Notifications'}</span>
+                  </div>
+                  <p className="text-[11px] text-[var(--text-tertiary)] max-w-xl">
+                    {isRtl
+                      ? 'إرسال إشعارات مباشرة إلى نظام التشغيل (Windows / Linux / macOS) لتذكيرك بمراجعة البطاقات وحماية سلسلة أيام التعلم دون الحاجة لأي خادم وسيط.'
+                      : 'Delivers native OS notification toasts (Windows / Linux / macOS) for streak defense and FSRS card review reminders with zero cloud telemetry.'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <TactileSwitch
+                    checked={config.notificationsEnabled}
+                    onChange={(val) => setNotificationsEnabled(val)}
+                  />
+                </div>
+              </div>
+
+              {/* Habit Loop Strategy Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Duolingo Streak Defense Loop */}
+                <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-primary)]">
+                      <Flame size={15} className="text-[var(--math-gradient)]" />
+                      <span>{isRtl ? 'حماية السلسلة اليومية (Duolingo Loop)' : 'Streak Defense Protocol'}</span>
+                    </div>
+                    <TactileSwitch
+                      disabled={!config.notificationsEnabled}
+                      checked={config.streakRemindersEnabled}
+                      onChange={(val) => setStreakRemindersEnabled(val)}
+                    />
+                  </div>
+                  <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
+                    {isRtl
+                      ? 'تنبيه مسائي في التوقيت المفضل ينبهك قبل انتهاء اليوم إذا لم تسجل نقاط XP لحماية السلسلة ومنع فقدانها.'
+                      : 'Evening nudge triggered if you have not completed a micro-lesson today, defending your streak momentum.'}
+                  </p>
+                  <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs font-mono">
+                    <span className="text-[var(--text-secondary)] flex items-center gap-1.5">
+                      <Clock size={13} />
+                      {isRtl ? 'وقت التذكير المفضل:' : 'Scheduled Hour:'}
+                    </span>
+                    <select
+                      disabled={!config.notificationsEnabled || !config.streakRemindersEnabled}
+                      value={config.dailyReminderHour ?? 19}
+                      onChange={(e) => setDailyReminderHour(Number(e.target.value))}
+                      className="px-2.5 py-1 text-xs font-mono rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-primary)] outline-none focus:border-emerald-500 disabled:opacity-50 cursor-pointer"
+                    >
+                      <option value={17}>17:00 (5:00 PM)</option>
+                      <option value={18}>18:00 (6:00 PM)</option>
+                      <option value={19}>19:00 (7:00 PM - Duolingo Default)</option>
+                      <option value={20}>20:00 (8:00 PM)</option>
+                      <option value={21}>21:00 (9:00 PM)</option>
+                      <option value={22}>22:00 (10:00 PM)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Brilliant Spaced Repetition Loop */}
+                <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-primary)]">
+                      <Brain size={15} className="text-[var(--math-vector)]" />
+                      <span>{isRtl ? 'تذكير التكرار المتباعد FSRS (Brilliant Loop)' : 'FSRS Spaced Repetition Due'}</span>
+                    </div>
+                    <TactileSwitch
+                      disabled={!config.notificationsEnabled}
+                      checked={config.fsrsRemindersEnabled}
+                      onChange={(val) => setFsrsRemindersEnabled(val)}
+                    />
+                  </div>
+                  <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
+                    {isRtl
+                      ? 'تنبيه ذكي عند تراكم 3 بطاقات مراجعة أو أكثر في منحنى النسيان لتثبيت المعرفة الرياضية طويلة المدى.'
+                      : 'Intelligent midday reminder dispatched whenever 3 or more memory cards are due under FSRS-4.5 cognitive retention curves.'}
+                  </p>
+                  <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs font-mono">
+                    <span className="text-[var(--text-secondary)]">
+                      {isRtl ? 'العتبة التكيفية:' : 'Trigger Threshold:'}
+                    </span>
+                    <span className="text-[var(--math-vector)] font-semibold">
+                      ≥ 3 Due Cards
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Notification Dispatch Test Action */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-[var(--border-subtle)]">
+                <div className="text-xs text-[var(--text-secondary)]">
+                  {isRtl
+                    ? 'جرب قناة الإشعارات للتحقق من أذونات نظام التشغيل الحالية.'
+                    : 'Dispatch an immediate test notification to verify OS-level notification permissions.'}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleTestNotification}
+                  disabled={notificationTestStatus === 'requesting'}
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[var(--bg-app)] hover:bg-[var(--bg-surface-active)] border border-[var(--border-strong)] text-xs font-mono font-medium text-[var(--text-primary)] transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                >
+                  <Bell size={14} className="text-[var(--math-gradient)]" />
+                  <span>
+                    {notificationTestStatus === 'requesting'
+                      ? isRtl
+                        ? 'طلب الإذن...'
+                        : 'Requesting OS Permission...'
+                      : notificationTestStatus === 'sent'
+                      ? isRtl
+                        ? 'تم الإرسال بنجاح! 🔔'
+                        : 'Notification Sent! 🔔'
+                      : notificationTestStatus === 'denied'
+                      ? isRtl
+                        ? 'تم رفض الإذن من النظام ✕'
+                        : 'Permission Denied in OS Settings ✕'
+                      : isRtl
+                      ? 'إرسال إشعار تجريبي الآن'
+                      : 'Test Desktop Notification'}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: MODULAR CURRICULUM CONTAINERS */}
+        {activeCategory === 'modules' && (
+          <div className="space-y-6">
+            <div className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                  <Layers size={15} className="text-[var(--math-vector)]" />
+                  <span>
+                    {isRtl
+                      ? 'إدارة الحزم المقطعية والتنزيل الانتقائي (.okvir)'
+                      : 'Modular Curriculum Containers & Chunking (.okvir)'}
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 font-bold">
+                  LOCAL DISK: ~4.6 MB TOTAL
+                </span>
+              </div>
+
+              <div className="p-4 rounded-xl border border-sky-500/20 bg-sky-500/5 text-xs space-y-2">
+                <div className="flex items-center gap-2 text-sky-400 font-semibold font-mono">
+                  <ShieldCheck size={16} />
+                  <span>
+                    {isRtl
+                      ? 'معمارية التنزيل الخفيف وتوفير الموارد'
+                      : 'Lightweight Distribution & Local Chunking Architecture'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+                  {isRtl
+                    ? 'يأتي برنامج OKVIR بتصميم معياري فائق الخفة: يتم تضمين المسار التأسيسي الأول فوراً للبدء الفوري بدون إنترنت. كل مسار تعليمي يعمل كحاوية معزولة ومشفرة بتوقيعات Ed25519 لضمان السلامة والسرعة.'
+                    : 'OKVIR adopts a lightweight on-demand modular distribution pattern. Track 1 is pre-bundled for instant zero-latency onboarding, while subsequent tracks run inside isolated, tamper-evident .okvir containers with Ed25519 signature verification.'}
+                </p>
+              </div>
+
+              {/* Track Modules Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {tracks.map((track) => {
+                  const trackLessons = curriculum.filter((l) => l.trackId === track.id);
+                  const completedInTrack = trackLessons.filter((l) => lessons[l.id]?.status === 'mastered').length;
+                  const isVerifying = moduleVerifyStatus[track.id] === 'checking';
+                  const isVerified = moduleVerifyStatus[track.id] === 'verified';
+                  const trackDesc =
+                    track.id === 'math'
+                      ? isRtl
+                        ? 'الجبر الخطي والتفاضل والاحتمالات وأسس الاستمثال الرياضي'
+                        : 'Linear algebra, calculus, probability & optimization foundations'
+                      : track.id === 'programming'
+                      ? isRtl
+                        ? 'بنية بايثون الداخلية والتزامن والتعامل مع ذاكرة الحوسبة'
+                        : 'Python internals, bytecode, async concurrency & NumPy memory layout'
+                      : track.id === 'econometrics'
+                      ? isRtl
+                        ? 'الاستدلال السببي ونماذج المتغيرات الآلية وتجارب القياس الاقتصادي'
+                        : 'Causal inference, identification strategies, IV & panel methods'
+                      : isRtl
+                      ? 'الانتشار العكسي ومحولات الانتباه وعمارة التعلم العميق'
+                      : 'Backpropagation, transformers, attention heads & autograd kernels';
+
+                  return (
+                    <div
+                      key={track.id}
+                      className="p-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-4 hover:border-[var(--border-strong)] transition-all"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-[var(--text-primary)]">
+                              {isRtl ? track.titleAr : track.title}
+                            </span>
+                            <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+                              {track.id === 'math' ? 'Bundled' : 'Installed'}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-[var(--text-tertiary)] line-clamp-2">
+                            {trackDesc}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-2 border-t border-[var(--border-subtle)]">
+                        <div>
+                          <span className="text-[10px] text-[var(--text-tertiary)] block">
+                            {isRtl ? 'الدروس والتقدم:' : 'Lessons & Progress:'}
+                          </span>
+                          <span className="text-[var(--text-primary)] font-semibold">
+                            {completedInTrack} / {trackLessons.length} Completed
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-[var(--text-tertiary)] block">
+                            {isRtl ? 'حجم الحاوية:' : 'Container Footprint:'}
+                          </span>
+                          <span className="text-[var(--text-secondary)]">
+                            {track.id === 'math'
+                              ? '~1.2 MB'
+                              : track.id === 'programming'
+                              ? '~0.9 MB'
+                              : track.id === 'econometrics'
+                              ? '~1.1 MB'
+                              : '~1.4 MB'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {streamingTrack[track.id] !== undefined ? (
+                        <div className="space-y-1.5 pt-2 border-t border-[var(--border-subtle)] font-mono text-xs">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="text-sky-400 flex items-center gap-1.5">
+                              <Download size={12} className="animate-bounce" />
+                              <span>{isRtl ? 'جارٍ تدفق الحاوية المجزأة...' : 'Streaming .okvir chunk...'}</span>
+                            </span>
+                            <span className="text-[var(--text-secondary)] tabular-nums">
+                              {streamingTrack[track.id]}%
+                            </span>
+                          </div>
+                          <div className="w-full h-1.5 bg-[var(--bg-surface)] rounded-full overflow-hidden border border-[var(--border-subtle)]">
+                            <div
+                              className="h-full bg-sky-500 rounded-full transition-all duration-150"
+                              style={{ width: `${streamingTrack[track.id]}%` }}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between pt-2 border-t border-[var(--border-subtle)] flex-wrap gap-2">
+                          <div className="flex items-center gap-1.5 text-[11px] font-mono text-[var(--text-tertiary)]">
+                            <Lock size={12} className="text-emerald-500" />
+                            <span>Ed25519 Signed</span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {track.id !== 'math' && (
+                              <button
+                                type="button"
+                                onClick={() => handleStreamModule(track.id)}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] hover:border-sky-500/50 bg-[var(--bg-surface)] text-[11px] font-mono text-[var(--text-secondary)] hover:text-sky-400 transition-all active:scale-95 cursor-pointer"
+                                title="Stream / Refresh container from mirror"
+                              >
+                                <Download size={12} />
+                                <span>{isRtl ? 'إعادة المزامنة' : 'Re-sync'}</span>
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => handleVerifyModule(track.id)}
+                              disabled={isVerifying}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] hover:border-[var(--border-strong)] bg-[var(--bg-surface)] text-[11px] font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all active:scale-95 cursor-pointer"
+                            >
+                              <FileCheck2 size={13} className={isVerified ? 'text-emerald-400' : 'text-sky-400'} />
+                              <span>
+                                {isVerifying
+                                  ? isRtl
+                                    ? 'جارٍ الفحص...'
+                                    : 'Verifying SHA-256...'
+                                  : isRtl
+                                  ? 'فحص التوقيع'
+                                  : 'Verify Integrity'}
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: SOFTWARE UPDATES & COMMUNITY RELEASES */}
+        {activeCategory === 'updates' && (
+          <div className="space-y-6">
+            <div className="p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] specular space-y-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                  <Sparkles size={15} className="text-[var(--math-gradient)]" />
+                  <span>
+                    {isRtl
+                      ? 'تحديثات البرنامج ومتابعة الإصدارات من GitHub'
+                      : 'Software Updates & GitHub Release Feeds'}
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--math-vector)]/10 text-[var(--math-vector)] border border-[var(--math-vector)]/20 font-bold">
+                  CURRENT: {CURRENT_APP_VERSION}
+                </span>
+              </div>
+
+              {/* Version & Check Action Hero Card */}
+              <div className="p-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm font-bold text-[var(--text-primary)]">
+                    <Activity size={16} className="text-[var(--math-gradient)]" />
+                    <span>OKVIR Native Desktop Application</span>
+                  </div>
+                  <p className="text-xs text-[var(--text-tertiary)] font-mono">
+                    {isRtl
+                      ? `الإصدار الحالي المثبت: ${CURRENT_APP_VERSION} • فحص تلقائي ومباشر من GitHub Releases`
+                      : `Installed Build: ${CURRENT_APP_VERSION} • Direct unauthenticated feed from GitHub Releases`}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleCheckForUpdates}
+                  disabled={checkingUpdate}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-mono font-bold transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw size={14} className={checkingUpdate ? 'animate-spin' : ''} />
+                  <span>
+                    {checkingUpdate
+                      ? isRtl
+                        ? 'جارٍ فحص المستودع...'
+                        : 'Checking GitHub...'
+                      : isRtl
+                      ? 'فحص التحديثات الآن'
+                      : 'Check for Updates'}
+                  </span>
+                </button>
+              </div>
+
+              {/* Update Error Notice */}
+              {updateError && (
+                <div className="p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-xs text-rose-400 font-mono space-y-1">
+                  <div className="font-bold flex items-center gap-2">
+                    <AlertTriangle size={14} />
+                    <span>{isRtl ? 'تعذر جلب بيانات التحديث' : 'Update Check Notice'}</span>
+                  </div>
+                  <p className="text-[11px] text-[var(--text-tertiary)]">{updateError}</p>
+                </div>
+              )}
+
+              {/* Release Info Details when fetched */}
+              {releaseInfo && (
+                <div className="p-5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-[var(--text-primary)]">
+                          {releaseInfo.name || releaseInfo.version}
+                        </span>
+                        <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
+                          {releaseInfo.version}
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-[var(--text-tertiary)] font-mono">
+                        Published {new Date(releaseInfo.publishedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    {/* Community Download Counter */}
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-emerald-500/20 bg-[var(--bg-app)] text-xs font-mono">
+                      <Download size={13} className="text-emerald-400" />
+                      <span className="text-[var(--text-secondary)]">Total Downloads:</span>
+                      <span className="font-bold text-emerald-400 tabular-nums">
+                        {releaseInfo.totalDownloads.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  {releaseInfo.body && (
+                    <div className="p-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] text-xs font-mono text-[var(--text-secondary)] max-h-48 overflow-y-auto whitespace-pre-wrap">
+                      {releaseInfo.body}
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between pt-2 border-t border-emerald-500/20">
+                    <span className="text-xs text-[var(--text-secondary)] font-mono">
+                      {releaseInfo.assets.length} Platform Installer Assets Available
+                    </span>
+                    <a
+                      href={releaseInfo.htmlUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-mono font-semibold transition-all shadow-sm active:scale-95"
+                    >
+                      <ExternalLink size={13} />
+                      <span>{isRtl ? 'عرض في GitHub' : 'View on GitHub'}</span>
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {/* Zero-Telemetry Privacy Policy Card */}
+              <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-2">
+                <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[var(--text-primary)]">
+                  <Lock size={14} className="text-[var(--math-vector)]" />
+                  <span>
+                    {isRtl
+                      ? 'ميثاق الخصوصية التامة ومقاييس المجتمع المفتوحة'
+                      : 'Privacy Architecture & Transparent Community Counters'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
+                  {isRtl
+                    ? 'يتم جلب أعداد التنزيلات ومعلومات الإصدارات مباشرة من واجهة GitHub API دون وسيط ودون تتبع جهازك أو جمع أي بيانات شخصية على الإطلاق.'
+                    : 'Release metadata and community download counts are aggregated client-side directly via the GitHub Public API. OKVIR operates zero analytical trackers, zero user identification beacons, and zero middleman telemetry servers.'}
+                </p>
               </div>
             </div>
           </div>

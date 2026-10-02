@@ -1,11 +1,11 @@
 ---
-id: "gaussian-elimination-systems"
+id: "t1-10"
 version: "1.0.0"
 title: "Gaussian Elimination, Row Operations & Linear Systems"
 track: "math"
 module: "mod-03"
 estimated_minutes: 15
-prerequisites: ["linear-maps-transformations"]
+prerequisites: ["t1-07"]
 i18n:
   ar: "الحذف الغاوسي والعمليات الصفية وحل المنظومات الخطية"
 ---
@@ -105,7 +105,7 @@ $$
    $$U_{nn} x_n = c_n \implies x_n = \frac{c_n}{U_{nn}}$$
    بما أن جميع المتغيرات الأخرى تم تصفيرها، ينعدم أي تشويش! وبمجرد معرفة $x_n$، يصبح الصف الذي يعلوه محتوياً على مجهول واحد فقط. وبالصعود درجة درجة على السلم، تتحول كل معادلة إلى مسألة مجهول واحد وأرقام معلومة.
 
-:::python-challenge{id="py-gaussian-elimination-systems"}
+:::python-challenge{id="py-t1-10"}
 ---
 timeout_ms: 3000
 test_cases:

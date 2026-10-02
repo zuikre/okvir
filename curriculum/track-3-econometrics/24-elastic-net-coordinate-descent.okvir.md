@@ -5,7 +5,7 @@ title: "Lasso Regression (L1), Polyhedral Geometry & Elastic Net"
 track: "econometrics"
 module: "mod-29"
 estimated_minutes: 15
-prerequisites: ["ridge-lasso", "multivariable-scalar-fields"]
+prerequisites: ["ridge-lasso", "t1-21"]
 i18n:
   ar: "انحدار لاسو وهندسة متعدد السطوح وشبكة المرونة"
 ---

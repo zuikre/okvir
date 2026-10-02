@@ -1,11 +1,11 @@
 ---
-id: "dot-product-geometry"
+id: "t1-05"
 version: "1.0.0"
 title: "The Dot Product & Geometric Projection Duality"
 track: "math"
 module: "mod-02"
 estimated_minutes: 15
-prerequisites: ["linear-algebra-vectors"]
+prerequisites: ["t1-03"]
 i18n:
   ar: "الجداء النقطي وثنائية الإسقاط الهندسي"
 ---
@@ -103,7 +103,7 @@ $$
    فالصيغة الحسابية الإحداثية والصيغة المثلثية وجهان لحقيقة هندسية واحدة!
 2. **لماذا ينتج عن التعامد حاصل ضرب نقطي يساوي صفراً؟** لأن جيب تمام الزاوية القائمة $\cos(90^\circ) = 0$؛ وإسقاط أي متجه عمودياً على متجه آخر يصنع ظلاً طوله صفر، مما يجعل جداءهما الداخلي ينعدم تماماً.
 
-:::python-challenge{id="py-dot-product-geometry"}
+:::python-challenge{id="py-t1-05"}
 ---
 timeout_ms: 3000
 test_cases:

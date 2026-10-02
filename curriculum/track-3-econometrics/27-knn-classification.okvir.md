@@ -5,7 +5,7 @@ title: "K-Nearest Neighbors (KNN), Metric Spaces & Non-Parametric Boundaries"
 track: "econometrics"
 module: "mod-31"
 estimated_minutes: 15
-prerequisites: ["cartesian-coordinate-metric", "multiple-regression-matrix-calculus"]
+prerequisites: ["t1-01", "multiple-regression-matrix-calculus"]
 i18n:
   ar: "الجيران الأقرب (KNN) وفضاءات المسافة والحدود غير المعلمية"
 ---

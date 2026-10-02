@@ -5,7 +5,7 @@ title: "Multiple Regression Algebra & Matrix Calculus"
 track: "econometrics"
 module: "mod-20"
 estimated_minutes: 15
-prerequisites: ["ols-residual-geometry", "matrix-multiplication-composition"]
+prerequisites: ["ols-residual-geometry", "t1-08"]
 i18n:
   ar: "جبر الانحدار المتعدد وحسبان المصفوفات"
 ---

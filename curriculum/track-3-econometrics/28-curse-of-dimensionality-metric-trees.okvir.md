@@ -5,7 +5,7 @@ title: "The Curse of Dimensionality & Metric Trees (KD-Trees)"
 track: "econometrics"
 module: "mod-31"
 estimated_minutes: 15
-prerequisites: ["knn-classification", "cartesian-coordinate-metric"]
+prerequisites: ["knn-classification", "t1-01"]
 i18n:
   ar: "لعنة الأبعاد وأشجار المسافات المكانية (KD-Trees)"
 ---

@@ -5,7 +5,7 @@ title: "Multi-Head Attention (MHA) & Subspace Projections"
 track: "deeplearning"
 module: "mod-42"
 estimated_minutes: 15
-prerequisites: ["transformer-attention", "matrix-multiplication-composition"]
+prerequisites: ["transformer-attention", "t1-08"]
 i18n:
   ar: "الانتباه متعدد الرؤوس (MHA) وإسقاطات الفضاءات الجزئية"
 ---

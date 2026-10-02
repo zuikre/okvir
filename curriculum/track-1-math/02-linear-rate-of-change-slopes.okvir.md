@@ -1,11 +1,11 @@
 ---
-id: "linear-rate-of-change-slopes"
+id: "t1-02"
 version: "1.0.0"
 title: "The Geometry of Rate of Change & Slopes"
 track: "math"
 module: "mod-01"
 estimated_minutes: 15
-prerequisites: ["cartesian-coordinate-metric"]
+prerequisites: ["t1-01"]
 i18n:
   ar: "هندسة معدل التغير وميل الخطوط"
 ---
@@ -97,7 +97,7 @@ $$
 3. **لماذا يساوي الميل ظل الزاوية $\tan(\theta)$؟** ارسم خطا مستقيماً وأسقط تحته مثلثاً قائم الزاوية. الضلع الأفقي هو المجاور ($\Delta x$)، والضلع الرأسي هو المقابل ($\Delta y$). بحسب تعريف حساب المثلثات، فإن ظل الزاوية $\theta$ هو $\frac{\text{المقابل}}{\text{المجاور}} = \frac{\Delta y}{\Delta x}$. وهذا يربط ميل الجبر بزوايا الانحدار الفيزيائية.
 4. **لماذا تعتبر الحالة $\Delta x = 0$ غير معرّفة؟** عندما تتطابق $x_1$ مع $x_2$ تصبح القسمة على صفر، وهو ما يمثل جداراً عمودياً شاهقاً: صعود رأسي بلا أي حركة أفقية ($\theta = 90^\circ$ وظلها يؤول للمالانهاية).
 
-:::python-challenge{id="py-linear-rate-of-change-slopes"}
+:::python-challenge{id="py-t1-02"}
 ---
 timeout_ms: 3000
 test_cases:

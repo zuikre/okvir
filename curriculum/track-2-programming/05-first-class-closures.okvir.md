@@ -5,7 +5,7 @@ title: "First-Class Functions & Lexical Closures"
 track: "programming"
 module: "mod-09"
 estimated_minutes: 15
-prerequisites: ["pure-functions-recursion"]
+prerequisites: ["cs-04"]
 i18n:
   ar: "دوال الرتبة الأولى والأغلفة المعجمية (Closures)"
 ---

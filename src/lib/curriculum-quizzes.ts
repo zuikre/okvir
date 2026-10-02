@@ -1157,13 +1157,13 @@ export function getQuizBatteryForModule(moduleId: string, moduleTitle: string, m
         },
         {
           text: {
-            en: `The algorithm only failing if executed on a Tuesday due to calendar date encoding`,
-            ar: 'فشل الخوارزمية فقط عند تشغيلها يوم الثلاثاء بسبب ترميز التاريخ',
+            en: `Unnormalized input distributions causing asymptotic bottlenecks and severe gradient scaling issues`,
+            ar: 'توزيعات المدخلات غير الموحدة تسبب اختناقات تقاربية ومشاكل حادة في تحجيم التدرج',
           },
           correct: false,
           diagnosticFeedback: {
-            en: 'Nonsensical distractor; algorithms are invariant to system calendar days.',
-            ar: 'خيار غير منطقي؛ الخوارزميات مستقلة عن أيام الأسبوع.',
+            en: 'While unnormalized data impacts convergence speed, it is a conditioning issue, not the structural failure mode of the core algorithm.',
+            ar: 'رغم أن البيانات غير الموحدة تؤثر على سرعة التقارب، إلا أنها مشكلة تكييف وليست نمط الفشل الهيكلي للخوارزمية الأساسية.',
           },
         },
       ],

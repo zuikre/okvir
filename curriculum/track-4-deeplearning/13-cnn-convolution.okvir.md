@@ -5,7 +5,7 @@ title: "2D Convolutions & Spatial Feature Extraction"
 track: "deeplearning"
 module: "mod-39"
 estimated_minutes: 15
-prerequisites: ["numpy-strides-indexing", "adamw-weight-decay-schedules"]
+prerequisites: ["cs-17", "adamw-weight-decay-schedules"]
 i18n:
   ar: "التلافيف المكانية ثنائية الأبعاد واستخراج الميزات البصرية"
 ---

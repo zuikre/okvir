@@ -21,6 +21,9 @@ import { BpeTokenizerLab } from './BpeTokenizerLab';
 import { FlashAttentionTilingLab } from './FlashAttentionTilingLab';
 import { RotaryEmbeddingLab } from './RotaryEmbeddingLab';
 import { LoRADecompositionLab } from './LoRADecompositionLab';
+import { EnvironmentFrameCanvas } from './EnvironmentFrameCanvas';
+import { DynamicArrayGrowthLab } from './DynamicArrayGrowthLab';
+import { HashTableInternalsCanvas } from './HashTableInternalsCanvas';
 
 interface Props {
   type: SimulationType;
@@ -214,6 +217,42 @@ export const SimulationView: React.FC<Props> = ({ type, compact = true, highligh
   }
   if (normType === 'anscombe' || normType.includes('anscombe')) {
     return <AnscombesQuartetLab compact={compact} />;
+  }
+
+  if (
+    normType.includes('memory') ||
+    normType.includes('pointer') ||
+    normType.includes('scope') ||
+    normType.includes('closure') ||
+    normType.includes('binding') ||
+    normType.includes('alias') ||
+    normType.includes('frame') ||
+    normType.includes('lifetime')
+  ) {
+    return <EnvironmentFrameCanvas compact={compact} />;
+  }
+
+  if (
+    normType.includes('array') ||
+    normType.includes('list') ||
+    normType.includes('growth') ||
+    normType.includes('capacity') ||
+    normType.includes('dynamic') ||
+    normType.includes('allocation') ||
+    normType.includes('buffer')
+  ) {
+    return <DynamicArrayGrowthLab compact={compact} />;
+  }
+
+  if (
+    normType.includes('hash') ||
+    normType.includes('dict') ||
+    normType.includes('collision') ||
+    normType.includes('probe') ||
+    normType.includes('set') ||
+    normType.includes('internals')
+  ) {
+    return <HashTableInternalsCanvas compact={compact} />;
   }
 
   // Default fallback: OLS Residual Geometry

@@ -78,6 +78,11 @@ export interface OkvirState {
   setSoundEnabled: (enabled: boolean) => void;
   setPythonTimeout: (timeoutMs: number) => void;
   setArabicFont: (font: ArabicFontFamily) => void;
+  setNotificationsEnabled: (enabled: boolean) => void;
+  setDailyReminderHour: (hour: number) => void;
+  setStreakRemindersEnabled: (enabled: boolean) => void;
+  setFsrsRemindersEnabled: (enabled: boolean) => void;
+  setLastNotificationDate: (dateStr: string) => void;
   exportLocalData: () => string;
   importLocalData: (jsonData: string) => boolean;
   resetAllData: () => void;
@@ -223,6 +228,11 @@ export const useOkvirStore = create<OkvirState>()(
         pythonTimeoutMs: 5000,
         soundEnabled: true,
         arabicFont: 'ibm',
+        notificationsEnabled: true,
+        dailyReminderHour: 19,
+        streakRemindersEnabled: true,
+        fsrsRemindersEnabled: true,
+        lastNotificationDate: null,
       },
 
       recordActivityToday: () => {
@@ -311,6 +321,21 @@ export const useOkvirStore = create<OkvirState>()(
         set((state) => ({ config: { ...state.config, arabicFont } }));
       },
 
+      setNotificationsEnabled: (notificationsEnabled) =>
+        set((state) => ({ config: { ...state.config, notificationsEnabled } })),
+
+      setDailyReminderHour: (dailyReminderHour) =>
+        set((state) => ({ config: { ...state.config, dailyReminderHour } })),
+
+      setStreakRemindersEnabled: (streakRemindersEnabled) =>
+        set((state) => ({ config: { ...state.config, streakRemindersEnabled } })),
+
+      setFsrsRemindersEnabled: (fsrsRemindersEnabled) =>
+        set((state) => ({ config: { ...state.config, fsrsRemindersEnabled } })),
+
+      setLastNotificationDate: (lastNotificationDate) =>
+        set((state) => ({ config: { ...state.config, lastNotificationDate } })),
+
       exportLocalData: () => {
         const state = get();
         const exportPayload = {
@@ -355,6 +380,12 @@ export const useOkvirStore = create<OkvirState>()(
             powerGovernorEnabled: true,
             pythonTimeoutMs: 5000,
             soundEnabled: true,
+            arabicFont: 'ibm',
+            notificationsEnabled: true,
+            dailyReminderHour: 19,
+            streakRemindersEnabled: true,
+            fsrsRemindersEnabled: true,
+            lastNotificationDate: null,
           },
           activeLessonId: 'cartesian-coordinate-metric',
           lessons: recalculateLessonStatuses(initialLessons),

@@ -1,11 +1,11 @@
 ---
-id: "four-fundamental-subspaces"
+id: "t1-11"
 version: "1.0.0"
 title: "The Four Fundamental Subspaces"
 track: "math"
 module: "mod-04"
 estimated_minutes: 15
-prerequisites: ["gaussian-elimination-systems"]
+prerequisites: ["t1-10"]
 i18n:
   ar: "الفضاءات الجزئية الأربعة الأساسية"
 ---
@@ -113,7 +113,7 @@ $$
 2. **لماذا تتساوى رتبة الصفوف مع رتبة الأعمدة دائماً؟**
    إحدى أعظم مبرهنات الجبر: حتى لو كانت المصفوفة مستطيلة بأبعاد متباعدة (مثل $1000 \times 3$)، فإن أقصى عدد من الصفوف المستقلة خطياً يطابق دائماً وبدقة أقصى عدد من الأعمدة المستقلة خطياً!
 
-:::python-challenge{id="py-four-fundamental-subspaces"}
+:::python-challenge{id="py-t1-11"}
 ---
 timeout_ms: 3000
 test_cases:

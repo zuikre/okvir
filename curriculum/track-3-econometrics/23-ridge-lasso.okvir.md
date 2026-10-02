@@ -5,7 +5,7 @@ title: "Ridge Regression (L2) & SVD Spectral Shrinkage"
 track: "econometrics"
 module: "mod-29"
 estimated_minutes: 15
-prerequisites: ["multiple-regression-matrix-calculus", "singular-value-decomposition"]
+prerequisites: ["multiple-regression-matrix-calculus", "t1-15"]
 i18n:
   ar: "انحدار ريدج والانكماش الطيفي عبر تفكيك القيم المنفردة"
 ---

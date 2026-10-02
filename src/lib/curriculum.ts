@@ -12,7 +12,7 @@ export const tracks: Track[] = [
     color: '#38bdf8',
     colorAr: '#38bdf8',
     icon: 'Sigma',
-    modules: ["cartesian-coordinate-metric", "linear-rate-of-change-slopes", "linear-algebra-vectors", "linear-combinations-span", "dot-product-geometry", "cross-product-orthogonality", "linear-maps-transformations", "matrix-multiplication-composition", "determinant-scaling-factor", "gaussian-elimination-systems", "four-fundamental-subspaces", "orthogonal-projections", "gram-schmidt-orthogonalization", "least-squares-approximation", "eigenvalues-eigenvectors", "diagonalization-powers", "symmetric-matrices-spectral", "singular-value-decomposition", "limits-continuity-foundations", "derivative-tangent-slope", "differentiation-rules-chain", "higher-order-derivatives-concavity", "taylor-series-polynomial", "multivariable-scalar-fields", "partial-derivatives-tangents", "gradient-vector", "hessian-matrix-extrema", "bayes-theorem", "central-limit-theorem"],
+    modules: ["t1-01","t1-02","t1-03","t1-04","t1-05","t1-06","t1-07","t1-08","t1-09","t1-10","t1-11","t1-12","t1-13","t1-14","t1-15","t1-16","t1-17","t1-18","t1-19","t1-20","t1-21","t1-22","t1-23","t1-24","t1-25","t1-26","t1-27","t1-28","t1-29"],
   },
   {
     id: 'programming',
@@ -21,7 +21,7 @@ export const tracks: Track[] = [
     color: '#10b981',
     colorAr: '#10b981',
     icon: 'Code2',
-    modules: ["name-binding-lifetime", "control-flow-branching", "iteration-state-accumulation", "pure-functions-recursion", "first-class-closures", "scope-resolution-legb", "python-lists-memory-growth", "hash-tables-dict-internals", "tuples-immutability-sets", "object-oriented-dunder", "iterators-generators-streams", "context-managers-resources", "algorithmic-complexity-big-o", "sorting-divide-and-conquer", "memory-profiling-cpython", "numpy-vectorization", "numpy-broadcasting-rules", "numpy-strides-indexing", "pandas-dataframe", "pandas-split-apply-combine", "eda-anscombe", "relational-algebra-select-filter", "sql-joins-relational-merges", "sql-aggregations-group-by", "sql-window-functions", "sql-ctes-recursive-queries", "sql-indexing-query-plans", "columnar-storage-parquet", "arrow-ipc-zero-copy", "polars-lazy-dataframe-dag"],
+    modules: ["cs-01","cs-02","cs-03","cs-04","cs-05","cs-06","cs-07","cs-08","cs-09","cs-10","cs-11","cs-12","cs-13","cs-14","cs-15","cs-16","cs-17","cs-18","cs-19","cs-20","cs-21","cs-22","cs-23","cs-24","cs-25","cs-26","cs-27","cs-28","cs-29","cs-30"],
   },
   {
     id: 'econometrics',

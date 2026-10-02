@@ -5,7 +5,7 @@ title: "Iterators, Generators & Lazy Streams"
 track: "programming"
 module: "mod-11"
 estimated_minutes: 15
-prerequisites: ["object-oriented-dunder"]
+prerequisites: ["cs-10"]
 i18n:
   ar: "المكررات، المولدات الكسولة، وتدفق البيانات غير المحدود"
 ---

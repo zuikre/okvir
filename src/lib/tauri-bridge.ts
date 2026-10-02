@@ -277,6 +277,91 @@ class TauriBridge {
     }
     return { charging: true, level: 1.0, recommendedFps: 60 };
   }
+
+  isTauri(): boolean {
+    return this.isTauriAvailable();
+  }
+
+  async minimizeWindow(): Promise<void> {
+    if (this.isTauriAvailable()) {
+      const internals = (window as unknown as { __TAURI_INTERNALS__?: { invoke: (cmd: string, args?: unknown) => Promise<unknown> } }).__TAURI_INTERNALS__;
+      if (internals?.invoke) {
+        try {
+          await internals.invoke('plugin:window|minimize');
+          return;
+        } catch (e) {
+          console.warn('Tauri minimize error:', e);
+        }
+      }
+      const tauri = this.getTauri();
+      if (tauri?.core) {
+        try {
+          await tauri.core.invoke('plugin:window|minimize');
+        } catch (e) {
+          console.warn('Tauri core minimize error:', e);
+        }
+      }
+    }
+  }
+
+  async toggleMaximizeWindow(): Promise<void> {
+    if (this.isTauriAvailable()) {
+      const internals = (window as unknown as { __TAURI_INTERNALS__?: { invoke: (cmd: string, args?: unknown) => Promise<unknown> } }).__TAURI_INTERNALS__;
+      if (internals?.invoke) {
+        try {
+          await internals.invoke('plugin:window|internal_toggle_maximize');
+          return;
+        } catch (e) {
+          console.warn('Tauri toggle maximize error:', e);
+        }
+      }
+      const tauri = this.getTauri();
+      if (tauri?.core) {
+        try {
+          await tauri.core.invoke('plugin:window|internal_toggle_maximize');
+        } catch (e) {
+          console.warn('Tauri core toggle maximize error:', e);
+        }
+      }
+    }
+  }
+
+  async closeWindow(): Promise<void> {
+    if (this.isTauriAvailable()) {
+      const internals = (window as unknown as { __TAURI_INTERNALS__?: { invoke: (cmd: string, args?: unknown) => Promise<unknown> } }).__TAURI_INTERNALS__;
+      if (internals?.invoke) {
+        try {
+          await internals.invoke('plugin:window|close');
+          return;
+        } catch (e) {
+          console.warn('Tauri close error:', e);
+        }
+      }
+      const tauri = this.getTauri();
+      if (tauri?.core) {
+        try {
+          await tauri.core.invoke('plugin:window|close');
+        } catch (e) {
+          console.warn('Tauri core close error:', e);
+        }
+      }
+    }
+  }
+
+  async isWindowMaximized(): Promise<boolean> {
+    if (this.isTauriAvailable()) {
+      const internals = (window as unknown as { __TAURI_INTERNALS__?: { invoke: (cmd: string, args?: unknown) => Promise<unknown> } }).__TAURI_INTERNALS__;
+      if (internals?.invoke) {
+        try {
+          const res = await internals.invoke('plugin:window|is_maximized');
+          return Boolean(res);
+        } catch {
+          return false;
+        }
+      }
+    }
+    return false;
+  }
 }
 
 export const tauriBridge = new TauriBridge();

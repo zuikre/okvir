@@ -46,6 +46,11 @@ export interface LocalConfig {
   pythonTimeoutMs: number;
   soundEnabled: boolean;
   arabicFont?: ArabicFontFamily;
+  notificationsEnabled: boolean;
+  dailyReminderHour: number; // e.g. 19 for 19:30
+  streakRemindersEnabled: boolean;
+  fsrsRemindersEnabled: boolean;
+  lastNotificationDate?: string | null;
 }
 
 export interface LessonProgress {

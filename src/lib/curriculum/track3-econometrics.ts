@@ -12,8 +12,8 @@ export const econometricsModules: CurriculumModule[] = [
       "ar": "يُقدَّم الانحدار الخطي العادي (OLS) في الغالب كمسألة حسابية لرسم خط يقلل المسافات الرأسية في رسم بياني ثنائي الأبعاد."
     },
     "prerequisites": [
-      "least-squares-approximation",
-      "numpy-vectorization"
+      "t1-12",
+      "cs-16"
     ],
     "x": 780,
     "y": 80,
@@ -310,7 +310,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "ols-residual-geometry",
-      "central-limit-theorem"
+      "t1-29"
     ],
     "x": 780,
     "y": 270,
@@ -607,7 +607,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "ols-residual-geometry",
-      "matrix-multiplication-composition"
+      "t1-08"
     ],
     "x": 780,
     "y": 460,
@@ -756,7 +756,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "multiple-regression-matrix-calculus",
-      "four-fundamental-subspaces"
+      "t1-11"
     ],
     "x": 760,
     "y": 555,
@@ -2967,7 +2967,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "panel-data-fixed-effects",
-      "least-squares-approximation"
+      "t1-12"
     ],
     "x": 770,
     "y": 1980,
@@ -3112,7 +3112,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "synthetic-control-method",
-      "central-limit-theorem"
+      "t1-29"
     ],
     "x": 790,
     "y": 2075,
@@ -3257,7 +3257,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "multiple-regression-matrix-calculus",
-      "singular-value-decomposition"
+      "t1-15"
     ],
     "x": 825,
     "y": 2170,
@@ -3402,7 +3402,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "ridge-lasso",
-      "multivariable-scalar-fields"
+      "t1-21"
     ],
     "x": 805,
     "y": 2265,
@@ -3547,7 +3547,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "multiple-regression-matrix-calculus",
-      "differentiation-rules-chain"
+      "t1-18"
     ],
     "x": 825,
     "y": 2360,
@@ -3692,7 +3692,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "logistic-regression-sigmoid",
-      "central-limit-theorem"
+      "t1-29"
     ],
     "x": 805,
     "y": 2455,
@@ -3836,7 +3836,7 @@ export const econometricsModules: CurriculumModule[] = [
       "ar": "تخيل أنك انتقلت حديثاً للعيش في حي سكني جديد داخل مدينة عالمية لا تعرف لغتها ولا عاداتها."
     },
     "prerequisites": [
-      "cartesian-coordinate-metric",
+      "t1-01",
       "multiple-regression-matrix-calculus"
     ],
     "x": 825,
@@ -3982,7 +3982,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "knn-classification",
-      "cartesian-coordinate-metric"
+      "t1-01"
     ],
     "x": 805,
     "y": 2645,
@@ -4272,7 +4272,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "decision-trees",
-      "central-limit-theorem"
+      "t1-29"
     ],
     "x": 805,
     "y": 2835,
@@ -4417,7 +4417,7 @@ export const econometricsModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "random-forests-bagging",
-      "taylor-series-polynomial"
+      "t1-20"
     ],
     "x": 825,
     "y": 2930,
@@ -4561,7 +4561,7 @@ export const econometricsModules: CurriculumModule[] = [
       "ar": "في التعلم الخاضع للإشراف (Supervised Learning)، تسير النماذج تحت إرشاد معلم يقدم تصنيفات مؤكدة $yi$ لكل عينة."
     },
     "prerequisites": [
-      "cartesian-coordinate-metric",
+      "t1-01",
       "multiple-regression-matrix-calculus"
     ],
     "x": 805,
@@ -4706,8 +4706,8 @@ export const econometricsModules: CurriculumModule[] = [
       "ar": "تغمر مجموعات البيانات الحديثة مهندسي البيانات بمئات أو آلاف المتغيرات المتشابكة والمترابطة—مثل النسب المالية للشركات، أو قراءات مجسات..."
     },
     "prerequisites": [
-      "singular-value-decomposition",
-      "symmetric-matrices-spectral"
+      "t1-15",
+      "t1-14"
     ],
     "x": 825,
     "y": 3120,

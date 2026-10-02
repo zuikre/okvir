@@ -2,7 +2,7 @@ import type { CurriculumModule } from '../types';
 
 export const mathModules: CurriculumModule[] = [
   {
-    "id": "cartesian-coordinate-metric",
+    "id": "t1-01",
     "title": "Cartesian Coordinate Systems & The Euclidean Metric",
     "titleAr": "نظام الإحداثيات الديكارتية والمقياس الإقليدي",
     "trackId": "math",
@@ -29,8 +29,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "d_2(\\mathbf{p}, \\mathbf{q}) \\coloneqq \\|\\mathbf{p} - \\mathbf{q}\\|_2 = \\sqrt{\\sum_{i=1}^n (p_i - q_i)^2} = \\sqrt{(\\mathbf{p} - \\mathbf{q})^T (\\mathbf{p} - \\mathbf{q})}",
         "formulaNote": {
-          "en": "The Euclidean distance metric as the L2 norm of the spatial displacement vector.",
-          "ar": "مقياس المسافة الإقليدية كمعيار L2 لمتجه الإزاحة المكانية."
+          "en": "Mathematical anchor for Cartesian Coordinate Systems & The Euclidean Metric.",
+          "ar": "المرساة الرياضية لـ نظام الإحداثيات الديكارتية والمقياس الإقليدي."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $\\mathbf{p}, \\mathbf{q} \\in \\mathbb{R}^n$ | Position vectors | Coordinate vectors identifying the exact spatial positions of two points across $n$ dimensions. |\n| $\\mathbf{p} - \\mathbf{q}$ | Displacement vector | The directional vector pointing straight from destination $\\mathbf{q}$ to source $\\mathbf{p}$. |\n| $p_i - q_i$ | Coordinate difference | The linear distance gap separated along dimension $i$ alone (the length of one leg of the triangle). |\n| $(p_i - q_i)^2$ | Squared difference | Multiplies the gap by itself. This erases negative signs and scales larger errors quadratically. |\n| $\\sum_{i=1}^n$ | Dimension accumulator | Adds up the independent squared contributions from all $n$ mutually orthogonal (perpendicular) axes. |\n| $\\sqrt{\\dots}$ | Square root operator | Inverts the squaring operation, converting area-like squared units back to linear ruler units (e.g., meters). |\n| $(\\mathbf{p}-\\mathbf{q})^T(\\mathbf{p}-\\mathbf{q})$ | Inner product (Dot product) | Compact algebraic matrix notation: multiplying a row vector by a column vector computes the sum of squares. |\n\n##### Why the Math Works Step-by-Step\n1. **Why subtract coordinates?** The difference $p_i - q_i$ isolates the exact horizontal or vertical distance separating the two points along a single axis, ignoring all other axes.\n2. **Why square each difference?** If you walk 3 meters backward ($-3$), your physical distance traveled is still positive. Squaring eliminates negative signs, preventing displacements like $+5$ and $-5$ from falsely canceling out to $0$. Furthermore, the Pythagorean theorem dictates that in flat space, the hypotenuse relates to the *sum of squares* of orthogonal legs.\n3. **Why sum across dimensions?** Because Cartesian axes are strictly perpendicular (orthogonal), movement along the $X$-axis does not affect your coordinate on the $Y$-axis. By iterating Pythagoras in higher dimensions, independent squared steps add directly: $d^2 = \\Delta x^2 + \\Delta y^2 + \\Delta z^2 + \\dots$.\n4. **Why take the square root at the end?** Summing squares yields a quantity measured in square units (e.g., $\\text{meters}^2$). Taking the square root restores the metric to physical units of linear length ($\\text{meters}$).\n\n---",
@@ -41,8 +41,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-cartesian-coordinate-metric",
-          "starterCode": "import numpy as np\n\ndef euclidean_distance(p: np.ndarray, q: np.ndarray) -> float:\n    \"\"\"\n    Compute the straight-line Euclidean (L2) distance between two points p and q.\n\n    Intuition\n    ---------\n    In any dimensional space, the Euclidean distance represents the direct\n    ruler distance between two locations. It computes the net displacement along\n    each axis, squares them (invoking the Pythagorean theorem across all\n    perpendicular dimensions), sums the squares, and takes the square root.\n\n    Parameters\n    ----------\n    p : np.ndarray of shape (D,)\n        First spatial position or feature embedding vector.\n    q : np.ndarray of shape (D,)\n        Second spatial position or feature embedding vector.\n\n    Returns\n    -------\n    float\n        The straight-line Euclidean distance between p and q.\n    \"\"\"\n    # Step 1: Compute the element-wise difference vector (displacement)\n    # diff = p - q\n\n    # Step 2: Square each component of the difference vector\n    # squared_diff = diff ** 2\n\n    # Step 3: Sum the squared components and compute the square root\n    # return float(np.sqrt(np.sum(squared_diff)))\n    pass",
+          "id": "py-t1-01",
+          "starterCode": "def euclidean_distance(p: np.ndarray, q: np.ndarray) -> float:\n    \"\"\"\n    Compute the straight-line Euclidean (L2) distance between two points p and q.\n\n    Intuition\n    ---------\n    In any dimensional space, the Euclidean distance represents the direct\n    ruler distance between two locations. It computes the net displacement along\n    each axis, squares them (invoking the Pythagorean theorem across all\n    perpendicular dimensions), sums the squares, and takes the square root.\n\n    Parameters\n    ----------\n    p : np.ndarray of shape (D,)\n        First spatial position or feature embedding vector.\n    q : np.ndarray of shape (D,)\n        Second spatial position or feature embedding vector.\n\n    Returns\n    -------\n    float\n        The straight-line Euclidean distance between p and q.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "euclidean_distance(np.array([0.0, 0.0]), np.array([3.0, 4.0]))",
@@ -60,24 +60,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "5.0",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef euclidean_distance(p: np.ndarray, q: np.ndarray) -> float:\n    \"\"\"\n    Compute the straight-line Euclidean (L2) distance between two points p and q.\n\n    Intuition\n    ---------\n    In any dimensional space, the Euclidean distance represents the direct\n    ruler distance between two locations. It computes the net displacement along\n    each axis, squares them (invoking the Pythagorean theorem across all\n    perpendicular dimensions), sums the squares, and takes the square root.\n\n    Parameters\n    ----------\n    p : np.ndarray of shape (D,)\n        First spatial position or feature embedding vector.\n    q : np.ndarray of shape (D,)\n        Second spatial position or feature embedding vector.\n\n    Returns\n    -------\n    float\n        The straight-line Euclidean distance between p and q.\n    \"\"\"\n    # Step 1: Compute the element-wise difference vector (displacement)\n    # diff = p - q\n\n    # Step 2: Square each component of the difference vector\n    # squared_diff = diff ** 2\n\n    # Step 3: Sum the squared components and compute the square root\n    # return float(np.sqrt(np.sum(squared_diff)))\n    pass",
+              "starterCode": "def euclidean_distance(p: np.ndarray, q: np.ndarray) -> float:\n    \"\"\"\n    Compute the straight-line Euclidean (L2) distance between two points p and q.\n\n    Intuition\n    ---------\n    In any dimensional space, the Euclidean distance represents the direct\n    ruler distance between two locations. It computes the net displacement along\n    each axis, squares them (invoking the Pythagorean theorem across all\n    perpendicular dimensions), sums the squares, and takes the square root.\n\n    Parameters\n    ----------\n    p : np.ndarray of shape (D,)\n        First spatial position or feature embedding vector.\n    q : np.ndarray of shape (D,)\n        Second spatial position or feature embedding vector.\n\n    Returns\n    -------\n    float\n        The straight-line Euclidean distance between p and q.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "5.0"
             }
           },
-          "solution": "import numpy as np\n\ndef euclidean_distance(p: np.ndarray, q: np.ndarray) -> float:\n    diff = p - q\n    squared_diff = diff ** 2\n    return float(np.sqrt(np.sum(squared_diff)))"
+          "solution": "import numpy as np\n\ndef euclidean_distance(p: np.ndarray, q: np.ndarray) -> float:\n    \"\"\"\n    Compute the straight-line Euclidean (L2) distance between two points p and q.\n\n    Intuition\n    ---------\n    In any dimensional space, the Euclidean distance represents the direct\n    ruler distance between two locations. It computes the net displacement along\n    each axis, squares them (invoking the Pythagorean theorem across all\n    perpendicular dimensions), sums the squares, and takes the square root.\n\n    Parameters\n    ----------\n    p : np.ndarray of shape (D,)\n        First spatial position or feature embedding vector.\n    q : np.ndarray of shape (D,)\n        Second spatial position or feature embedding vector.\n\n    Returns\n    -------\n    float\n        The straight-line Euclidean distance between p and q.\n    \"\"\"\n    # Step 1: Compute the element-wise difference vector (displacement)\n    # diff = p - q\n\n    # Step 2: Square each component of the difference vector\n    # squared_diff = diff ** 2\n\n    # Step 3: Sum the squared components and compute the square root\n    # return float(np.sqrt(np.sum(squared_diff)))\n    pass"
         },
         "hints": {
           "tier1": {
-            "en": "Subtract point q from point p directly using NumPy's element-wise array subtraction: diff = p - q.",
-            "ar": "اطرح النقطة q من النقطة p مباشرة باستخدام طرح المصفوفات في نَمباي: diff = p - q."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Square the difference vector element-wise with diff ** 2 or np.square(diff).",
-            "ar": "قم بتربيع عناصر متجه الفارق باستخدام diff ** 2 أو np.square(diff)."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Sum all squared differences with np.sum() and wrap with np.sqrt(): return float(np.sqrt(np.sum(diff ** 2))).",
-            "ar": "اجمع كافة الفروق المربعة بـ np.sum() وطبق الجذر التربيعي: return float(np.sqrt(np.sum(diff ** 2)))."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -137,7 +137,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "linear-rate-of-change-slopes",
+    "id": "t1-02",
     "title": "The Geometry of Rate of Change & Slopes",
     "titleAr": "هندسة معدل التغير وميل الخطوط",
     "trackId": "math",
@@ -147,7 +147,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تدفع دراجة محملة بالحقائب صعوداً على طريق جبلي ممهد بانتظام. في كل مرة تتقدم فيها خطوتين للأمام على هذا المسار، يرتفع موقعك الرأسي..."
     },
     "prerequisites": [
-      "cartesian-coordinate-metric"
+      "t1-01"
     ],
     "x": 175,
     "y": 175,
@@ -166,8 +166,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "m \\coloneqq \\frac{\\Delta y}{\\Delta x} = \\frac{y_2 - y_1}{x_2 - x_1} = \\tan(\\theta), \\quad \\Delta x \\ne 0",
         "formulaNote": {
-          "en": "The constant linear slope as the ratio of vertical displacement (rise) to horizontal displacement (run).",
-          "ar": "الميل الخطي الثابت كنسبة بين الإزاحة الرأسية (الارتفاع) والإزاحة الأفقية (الامتداد)."
+          "en": "Mathematical anchor for The Geometry of Rate of Change & Slopes.",
+          "ar": "المرساة الرياضية لـ هندسة معدل التغير وميل الخطوط."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $m$ | Slope / Rate of Change | The constant sensitivity factor: how much $y$ changes when $x$ advances by $+1$. |\n| $\\Delta y = y_2 - y_1$ | Rise (Vertical Displacement) | The signed vertical difference: positive for upward climb, negative for downward drop. |\n| $\\Delta x = x_2 - x_1$ | Run (Horizontal Displacement) | The signed horizontal difference representing the baseline progress along the input axis. |\n| $\\frac{\\Delta y}{\\Delta x}$ | Differential Quotient | The ratio normalizing vertical change per single unit of horizontal movement. |\n| $\\theta$ | Angle of Inclination | The physical angle between the inclined line and the positive horizontal axis. |\n| $\\tan(\\theta)$ | Trigonometric Tangent | Geometric bridge: in a right triangle, $\\tan(\\theta) = \\frac{\\text{opposite}}{\\text{adjacent}} = \\frac{\\text{rise}}{\\text{run}}$. |\n| $\\Delta x \\ne 0$ | Non-degeneracy condition | Prevents division by zero; vertical lines have undefined slope because run is zero. |\n\n##### Why the Math Works Step-by-Step\n1. **Why division instead of subtraction?** If someone climbs 10 meters, did they climb steeply? You cannot know until you know how far forward they walked! Climbing 10 meters over 10 meters forward ($m=1$) is steep; climbing 10 meters over 1,000 meters forward ($m=0.01$) is a very gentle ramp. Division normalizes the rise by the run, giving a pure rate per unit step.\n2. **Why do we preserve signed order $(y_2 - y_1)$ and $(x_2 - x_1)$?** Direction matters in physics. Moving from left to right ($\\Delta x > 0$) while climbing higher ($\\Delta y > 0$) gives a positive slope ($m > 0$). Moving from left to right while sinking lower ($\\Delta y < 0$) produces a negative slope ($m < 0$). Reversing the point order negates both numerator and denominator simultaneously: $\\frac{y_1 - y_2}{x_1 - x_2} = \\frac{-\\Delta y}{-\\Delta x} = \\frac{\\Delta y}{\\Delta x} = m$, maintaining strict invariance!\n3. **Why does slope equal $\\tan(\\theta)$?** Draw a straight line and construct a right-angled triangle underneath it. The horizontal leg is the adjacent side ($\\Delta x$), and the vertical leg is the opposite side ($\\Delta y$). By definition, the tangent of angle $\\theta$ is $\\frac{\\text{opposite}}{\\text{adjacent}} = \\frac{\\Delta y}{\\Delta x}$. This links algebraic slopes directly to spatial angular orientation.\n4. **Why is $\\Delta x = 0$ undefined?** If $x_2 = x_1$, you are attempting to divide by zero. Physically, this corresponds to a vertical wall: an infinite rise achieved with zero forward movement ($\\theta = 90^\\circ$, and $\\tan(90^\\circ) = \\infty$).\n\n---",
@@ -178,8 +178,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-linear-rate-of-change-slopes",
-          "starterCode": "import numpy as np\n\ndef compute_slope(p1: np.ndarray, p2: np.ndarray) -> float:\n    \"\"\"\n    Compute the linear rate of change (slope) between two 2D points.\n\n    Intuition\n    ---------\n    Slope measures the sensitivity of the vertical coordinate y relative to\n    horizontal progress x. It computes rise (delta_y) divided by run (delta_x).\n    A positive slope ascends, a negative slope descends, and a zero slope is flat.\n\n    Parameters\n    ----------\n    p1 : np.ndarray of shape (2,)\n        First point coordinates [x1, y1].\n    p2 : np.ndarray of shape (2,)\n        Second point coordinates [x2, y2].\n\n    Returns\n    -------\n    float\n        The rate of change m = (y2 - y1) / (x2 - x1).\n\n    Raises\n    ------\n    ZeroDivisionError\n        If x2 == x1 (vertical line with undefined slope).\n    \"\"\"\n    # Step 1: Compute vertical rise (delta_y = y2 - y1)\n    # delta_y = float(p2[1] - p1[1])\n\n    # Step 2: Compute horizontal run (delta_x = x2 - x1)\n    # delta_x = float(p2[0] - p1[0])\n\n    # Step 3: Guard against division by zero for vertical lines\n    # if np.isclose(delta_x, 0.0):\n    #     raise ZeroDivisionError(\"Vertical line has undefined slope\")\n\n    # Step 4: Return the slope ratio (rise / run)\n    # return delta_y / delta_x\n    pass",
+          "id": "py-t1-02",
+          "starterCode": "def compute_slope(p1: np.ndarray, p2: np.ndarray) -> float:\n    \"\"\"\n    Compute the linear rate of change (slope) between two 2D points.\n\n    Intuition\n    ---------\n    Slope measures the sensitivity of the vertical coordinate y relative to\n    horizontal progress x. It computes rise (delta_y) divided by run (delta_x).\n    A positive slope ascends, a negative slope descends, and a zero slope is flat.\n\n    Parameters\n    ----------\n    p1 : np.ndarray of shape (2,)\n        First point coordinates [x1, y1].\n    p2 : np.ndarray of shape (2,)\n        Second point coordinates [x2, y2].\n\n    Returns\n    -------\n    float\n        The rate of change m = (y2 - y1) / (x2 - x1).\n\n    Raises\n    ------\n    ZeroDivisionError\n        If x2 == x1 (vertical line with undefined slope).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "compute_slope(np.array([0.0, 0.0]), np.array([2.0, 6.0]))",
@@ -197,24 +197,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "3.0",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef compute_slope(p1: np.ndarray, p2: np.ndarray) -> float:\n    \"\"\"\n    Compute the linear rate of change (slope) between two 2D points.\n\n    Intuition\n    ---------\n    Slope measures the sensitivity of the vertical coordinate y relative to\n    horizontal progress x. It computes rise (delta_y) divided by run (delta_x).\n    A positive slope ascends, a negative slope descends, and a zero slope is flat.\n\n    Parameters\n    ----------\n    p1 : np.ndarray of shape (2,)\n        First point coordinates [x1, y1].\n    p2 : np.ndarray of shape (2,)\n        Second point coordinates [x2, y2].\n\n    Returns\n    -------\n    float\n        The rate of change m = (y2 - y1) / (x2 - x1).\n\n    Raises\n    ------\n    ZeroDivisionError\n        If x2 == x1 (vertical line with undefined slope).\n    \"\"\"\n    # Step 1: Compute vertical rise (delta_y = y2 - y1)\n    # delta_y = float(p2[1] - p1[1])\n\n    # Step 2: Compute horizontal run (delta_x = x2 - x1)\n    # delta_x = float(p2[0] - p1[0])\n\n    # Step 3: Guard against division by zero for vertical lines\n    # if np.isclose(delta_x, 0.0):\n    #     raise ZeroDivisionError(\"Vertical line has undefined slope\")\n\n    # Step 4: Return the slope ratio (rise / run)\n    # return delta_y / delta_x\n    pass",
+              "starterCode": "def compute_slope(p1: np.ndarray, p2: np.ndarray) -> float:\n    \"\"\"\n    Compute the linear rate of change (slope) between two 2D points.\n\n    Intuition\n    ---------\n    Slope measures the sensitivity of the vertical coordinate y relative to\n    horizontal progress x. It computes rise (delta_y) divided by run (delta_x).\n    A positive slope ascends, a negative slope descends, and a zero slope is flat.\n\n    Parameters\n    ----------\n    p1 : np.ndarray of shape (2,)\n        First point coordinates [x1, y1].\n    p2 : np.ndarray of shape (2,)\n        Second point coordinates [x2, y2].\n\n    Returns\n    -------\n    float\n        The rate of change m = (y2 - y1) / (x2 - x1).\n\n    Raises\n    ------\n    ZeroDivisionError\n        If x2 == x1 (vertical line with undefined slope).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "3.0"
             }
           },
-          "solution": "import numpy as np\n\ndef compute_slope(p1: np.ndarray, p2: np.ndarray) -> float:\n    delta_y = float(p2[1] - p1[1])\n    delta_x = float(p2[0] - p1[0])\n    if delta_x == 0.0:\n        raise ZeroDivisionError(\"Slope is undefined for vertical lines (delta_x = 0).\")\n    return delta_y / delta_x"
+          "solution": "import numpy as np\n\ndef compute_slope(p1: np.ndarray, p2: np.ndarray) -> float:\n    \"\"\"\n    Compute the linear rate of change (slope) between two 2D points.\n\n    Intuition\n    ---------\n    Slope measures the sensitivity of the vertical coordinate y relative to\n    horizontal progress x. It computes rise (delta_y) divided by run (delta_x).\n    A positive slope ascends, a negative slope descends, and a zero slope is flat.\n\n    Parameters\n    ----------\n    p1 : np.ndarray of shape (2,)\n        First point coordinates [x1, y1].\n    p2 : np.ndarray of shape (2,)\n        Second point coordinates [x2, y2].\n\n    Returns\n    -------\n    float\n        The rate of change m = (y2 - y1) / (x2 - x1).\n\n    Raises\n    ------\n    ZeroDivisionError\n        If x2 == x1 (vertical line with undefined slope).\n    \"\"\"\n    # Step 1: Compute vertical rise (delta_y = y2 - y1)\n    # delta_y = float(p2[1] - p1[1])\n\n    # Step 2: Compute horizontal run (delta_x = x2 - x1)\n    # delta_x = float(p2[0] - p1[0])\n\n    # Step 3: Guard against division by zero for vertical lines\n    # if np.isclose(delta_x, 0.0):\n    #     raise ZeroDivisionError(\"Vertical line has undefined slope\")\n\n    # Step 4: Return the slope ratio (rise / run)\n    # return delta_y / delta_x\n    pass"
         },
         "hints": {
           "tier1": {
-            "en": "Extract the coordinates: delta_y = p2[1] - p1[1] and delta_x = p2[0] - p1[0].",
-            "ar": "استخرج الإحداثيات: delta_y = p2[1] - p1[1] و delta_x = p2[0] - p1[0]."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Guard against zero division when delta_x == 0.0 by raising ZeroDivisionError.",
-            "ar": "تأكد من فحص حالة القسمة على الصفر عندما delta_x == 0.0 برفع استثناء ZeroDivisionError."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Return delta_y / delta_x as a float: return float(delta_y / delta_x).",
-            "ar": "أرجع النسبة delta_y / delta_x كعدد حقيقي: return float(delta_y / delta_x)."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -274,7 +274,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "linear-algebra-vectors",
+    "id": "t1-03",
     "title": "Vectors as Directed Line Segments & Spatial Displacements",
     "titleAr": "المتجهات كقطع موجهة وإزاحات مكانية",
     "trackId": "math",
@@ -284,7 +284,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تجدف بقارب خشبي صغير محاولاً عبور نهر عريض نحو الضفة المقابلة مباشرة. توجه مقدمة قاربك تماماً نحو الشمال وتجدف بعزم ثابت بسرعة 4..."
     },
     "prerequisites": [
-      "cartesian-coordinate-metric"
+      "t1-01"
     ],
     "x": 175,
     "y": 270,
@@ -303,8 +303,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbf{w} = \\alpha \\mathbf{u} + \\beta \\mathbf{v} = \\begin{bmatrix} \\alpha u_1 + \\beta v_1 \\\\ \\vdots \\\\ \\alpha u_n + \\beta v_n \\end{bmatrix}, \\quad \\|\\mathbf{v}\\|_2 = \\sqrt{\\sum_{i=1}^n v_i^2}",
         "formulaNote": {
-          "en": "Linear combination and L2 norm of spatial displacement vectors.",
-          "ar": "التركيب الخطي ومعيار L2 لمتجهات الإزاحة المكانية."
+          "en": "Mathematical anchor for Vectors as Directed Line Segments & Spatial Displacements.",
+          "ar": "المرساة الرياضية لـ المتجهات كقطع موجهة وإزاحات مكانية."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $\\mathbf{u}, \\mathbf{v} \\in \\mathbb{R}^n$ | Vector Operands | Directed line segments representing individual physical movements or forces in $n$-dimensional space. |\n| $\\alpha, \\beta \\in \\mathbb{R}$ | Scalar Multipliers | Real numbers that amplify, compress, or reverse the directions of vectors without rotating them. |\n| $\\mathbf{w}$ | Linear Combination | The resultant vector formed by scaling and tip-to-tail vector addition. |\n| $\\alpha u_i + \\beta v_i$ | Component-wise Arithmetic | Shows that operations along each axis occur independently without cross-talk between orthogonal directions. |\n| $\\|\\mathbf{v}\\|_2$ | Vector Magnitude / Norm | The straight ruler length of the vector arrow from tail to tip, computed via the Pythagorean theorem. |\n\n##### Why the Math Works Step-by-Step\n1. **Why does vector addition operate component-by-component?** In a Cartesian space, the coordinate axes are orthogonal (perpendicular). Walking East has zero effect on your North-South position. Thus, total displacement along axis $i$ is strictly the sum of individual displacements along axis $i$: $w_i = u_i + v_i$.\n2. **Why does a negative scalar flip the vector $180^\\circ$?** When you multiply coordinate $u_i$ by $-1$, positive values become negative and negative values become positive. Geometrically, this reflects the arrow through the origin, pointing it in the exact opposite direction while preserving its absolute length ($\\|-1 \\cdot \\mathbf{u}\\| = |-1| \\cdot \\|\\mathbf{u}\\| = \\|\\mathbf{u}\\|$).\n3. **Why does the Triangle Inequality hold ($\\|\\mathbf{u} + \\mathbf{v}\\| \\le \\|\\mathbf{u}\\| + \\|\\mathbf{v}\\|$)?** Geometrically, two vectors and their sum form a triangle. The straight-line path between two points is always the shortest possible path. Unless the two vectors point in the exact same direction (collinear), combining them creates an angular bend, guaranteeing that the direct shortcut $\\|\\mathbf{u} + \\mathbf{v}\\|$ is strictly shorter than traveling the two legs sequentially.\n\n---",
@@ -315,8 +315,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-linear-algebra-vectors",
-          "starterCode": "import numpy as np\n\ndef vector_linear_combination(u: np.ndarray, v: np.ndarray, alpha: float, beta: float) -> np.ndarray:\n    \"\"\"\n    Compute the linear combination w = alpha * u + beta * v.\n\n    Intuition\n    ---------\n    A linear combination scales two spatial displacement vectors by scalar\n    factors alpha and beta, then adds them tip-to-tail across each orthogonal\n    coordinate axis independently.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (D,)\n        First displacement vector.\n    v : np.ndarray of shape (D,)\n        Second displacement vector.\n    alpha : float\n        Scalar multiplier for vector u.\n    beta : float\n        Scalar multiplier for vector v.\n\n    Returns\n    -------\n    np.ndarray of shape (D,)\n        The combined resultant vector w.\n    \"\"\"\n    # Step 1: Scale displacement vector u by scalar alpha\n    # scaled_u = alpha * u\n\n    # Step 2: Scale displacement vector v by scalar beta\n    # scaled_v = beta * v\n\n    # Step 3: Add the two scaled displacement vectors element-wise\n    # return scaled_u + scaled_v\n    pass",
+          "id": "py-t1-03",
+          "starterCode": "def vector_linear_combination(u: np.ndarray, v: np.ndarray, alpha: float, beta: float) -> np.ndarray:\n    \"\"\"\n    Compute the linear combination w = alpha * u + beta * v.\n\n    Intuition\n    ---------\n    A linear combination scales two spatial displacement vectors by scalar\n    factors alpha and beta, then adds them tip-to-tail across each orthogonal\n    coordinate axis independently.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (D,)\n        First displacement vector.\n    v : np.ndarray of shape (D,)\n        Second displacement vector.\n    alpha : float\n        Scalar multiplier for vector u.\n    beta : float\n        Scalar multiplier for vector v.\n\n    Returns\n    -------\n    np.ndarray of shape (D,)\n        The combined resultant vector w.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "vector_linear_combination(np.array([1.0, 2.0]), np.array([3.0, -1.0]), 2.0, 3.0)",
@@ -334,24 +334,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "array([11.,  1.])",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef vector_linear_combination(u: np.ndarray, v: np.ndarray, alpha: float, beta: float) -> np.ndarray:\n    \"\"\"\n    Compute the linear combination w = alpha * u + beta * v.\n\n    Intuition\n    ---------\n    A linear combination scales two spatial displacement vectors by scalar\n    factors alpha and beta, then adds them tip-to-tail across each orthogonal\n    coordinate axis independently.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (D,)\n        First displacement vector.\n    v : np.ndarray of shape (D,)\n        Second displacement vector.\n    alpha : float\n        Scalar multiplier for vector u.\n    beta : float\n        Scalar multiplier for vector v.\n\n    Returns\n    -------\n    np.ndarray of shape (D,)\n        The combined resultant vector w.\n    \"\"\"\n    # Step 1: Scale displacement vector u by scalar alpha\n    # scaled_u = alpha * u\n\n    # Step 2: Scale displacement vector v by scalar beta\n    # scaled_v = beta * v\n\n    # Step 3: Add the two scaled displacement vectors element-wise\n    # return scaled_u + scaled_v\n    pass",
+              "starterCode": "def vector_linear_combination(u: np.ndarray, v: np.ndarray, alpha: float, beta: float) -> np.ndarray:\n    \"\"\"\n    Compute the linear combination w = alpha * u + beta * v.\n\n    Intuition\n    ---------\n    A linear combination scales two spatial displacement vectors by scalar\n    factors alpha and beta, then adds them tip-to-tail across each orthogonal\n    coordinate axis independently.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (D,)\n        First displacement vector.\n    v : np.ndarray of shape (D,)\n        Second displacement vector.\n    alpha : float\n        Scalar multiplier for vector u.\n    beta : float\n        Scalar multiplier for vector v.\n\n    Returns\n    -------\n    np.ndarray of shape (D,)\n        The combined resultant vector w.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "array([11.,  1.])"
             }
           },
-          "solution": "import numpy as np\n\ndef vector_linear_combination(u: np.ndarray, v: np.ndarray, alpha: float, beta: float) -> np.ndarray:\n    scaled_u = alpha * u\n    scaled_v = beta * v\n    return scaled_u + scaled_v"
+          "solution": "import numpy as np\n\ndef vector_linear_combination(u: np.ndarray, v: np.ndarray, alpha: float, beta: float) -> np.ndarray:\n    \"\"\"\n    Compute the linear combination w = alpha * u + beta * v.\n\n    Intuition\n    ---------\n    A linear combination scales two spatial displacement vectors by scalar\n    factors alpha and beta, then adds them tip-to-tail across each orthogonal\n    coordinate axis independently.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (D,)\n        First displacement vector.\n    v : np.ndarray of shape (D,)\n        Second displacement vector.\n    alpha : float\n        Scalar multiplier for vector u.\n    beta : float\n        Scalar multiplier for vector v.\n\n    Returns\n    -------\n    np.ndarray of shape (D,)\n        The combined resultant vector w.\n    \"\"\"\n    # Step 1: Scale displacement vector u by scalar alpha\n    # scaled_u = alpha * u\n\n    # Step 2: Scale displacement vector v by scalar beta\n    # scaled_v = beta * v\n\n    # Step 3: Add the two scaled displacement vectors element-wise\n    # return scaled_u + scaled_v\n    pass"
         },
         "hints": {
           "tier1": {
-            "en": "NumPy handles scalar multiplication directly: alpha * u scales every element of u.",
-            "ar": "يتعامل نَمباي مع الضرب القياسي مباشرة: alpha * u يضرب كافة عناصر المتجه u."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Compute scaled_u = alpha * u and scaled_v = beta * v separately or in one line.",
-            "ar": "احسب scaled_u = alpha * u و scaled_v = beta * v بشكل منفصل أو في سطر واحد."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Sum them directly: return alpha * u + beta * v.",
-            "ar": "اجمعهما مباشرة: return alpha * u + beta * v."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -411,7 +411,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "linear-combinations-span",
+    "id": "t1-04",
     "title": "Linear Combinations, Span & Linear Independence",
     "titleAr": "التراكيب الخطية ومدى المتجهات والاستقلال الخطي",
     "trackId": "math",
@@ -421,7 +421,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل نفسك في قمرة قيادة مركبة فضائية تجريبية تطفو في الفضاء السحيق. أمامك على لوحة التحكم مقبضان للوقود."
     },
     "prerequisites": [
-      "linear-algebra-vectors"
+      "t1-03"
     ],
     "x": 140,
     "y": 365,
@@ -440,8 +440,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\operatorname{span}(\\mathbf{v}_1, \\dots, \\mathbf{v}_k) = \\left\\{ \\sum_{i=1}^k c_i \\mathbf{v}_i \\;\\middle|\\; c_i \\in \\mathbb{R} \\right\\}, \\quad \\sum_{i=1}^k c_i \\mathbf{v}_i = \\mathbf{0} \\iff c_1 = \\dots = c_k = 0",
         "formulaNote": {
-          "en": "The span as the subspace of all reachable linear combinations, and linear independence as non-redundancy.",
-          "ar": "المدى كفضاء فرعي لكافة التراكيب الخطية الممكنة، والاستقلال الخطي كغياب التكرار والتكرار التراكمي."
+          "en": "Mathematical anchor for Linear Combinations, Span & Linear Independence.",
+          "ar": "المرساة الرياضية لـ التراكيب الخطية ومدى المتجهات والاستقلال الخطي."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $\\operatorname{span}(\\mathbf{v}_1, \\dots, \\mathbf{v}_k)$ | Vector Span | The complete geometric territory (line, plane, or higher volume) reachable by combining these vectors. |\n| $c_i \\in \\mathbb{R}$ | Linear Coefficients / Weights | The throttle knobs: real numbers that stretch, shrink, or reverse each individual directional vector. |\n| $\\sum_{i=1}^k c_i \\mathbf{v}_i$ | Linear Combination | The resultant destination reached by blending scaled copies of the available vectors. |\n| $\\sum_{i=1}^k c_i \\mathbf{v}_i = \\mathbf{0}$ | Homogeneous Zero Test | The ultimate litmus test: Can you return to the origin using some non-zero push from the engines? |\n| $c_1 = \\dots = c_k = 0$ | Strict Trivial Solution | Linear Independence condition: the ONLY way to end up at the origin is by doing nothing (all knobs set to zero). |\n\n##### Why the Math Works Step-by-Step\n1. **Why does reaching zero with non-zero weights prove dependency?** Suppose three engines satisfy $2\\mathbf{v}_1 - 5\\mathbf{v}_2 + 3\\mathbf{v}_3 = \\mathbf{0}$. We can rearrange this algebra cleanly to isolate $\\mathbf{v}_3$:\n   $$\\mathbf{v}_3 = -\\frac{2}{3}\\mathbf{v}_1 + \\frac{5}{3}\\mathbf{v}_2$$\n   This proves beyond doubt that vector $\\mathbf{v}_3$ offers zero new territory: any location it points to could already be reached simply by pushing $-2/3$ of engine 1 and $+5/3$ of engine 2! Thus $\\mathbf{v}_3$ is redundant.\n2. **Why does independence require $c_1 = c_2 = \\dots = c_k = 0$?** If no vector can be expressed as a combination of the others, no loop exists in their directional arrows. The only way their sum can ever cancel out to zero is if every single weight is identically zero.\n3. **What is the dimension of the span?** The geometric dimension of $\\operatorname{span}(\\mathbf{v}_1, \\dots, \\mathbf{v}_k)$ is exactly the maximum number of mutually linearly independent vectors in the set. Two independent vectors span a 2D plane; three span 3D volume; $n$ independent vectors span the entire space $\\mathbb{R}^n$.\n\n---",
@@ -452,8 +452,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-linear-combinations-span",
-          "starterCode": "import numpy as np\n\ndef check_linear_independence_2d(v1: np.ndarray, v2: np.ndarray, tol: float = 1e-9) -> bool:\n    \"\"\"\n    Check whether two 2D vectors are linearly independent.\n\n    Intuition\n    ---------\n    Two vectors in 2D space are linearly independent if and only if they do\n    not point along the same straight line (non-collinear). Geometrically,\n    this means the parallelogram spanned by them has non-zero area, which\n    equals the absolute determinant |ad - bc| of the matrix formed by them.\n\n    Parameters\n    ----------\n    v1 : np.ndarray of shape (2,)\n        First vector [v1_x, v1_y].\n    v2 : np.ndarray of shape (2,)\n        Second vector [v2_x, v2_y].\n    tol : float\n        Numerical tolerance threshold to handle floating point imprecision.\n\n    Returns\n    -------\n    bool\n        True if the vectors span a full 2D plane (linearly independent),\n        False if they are collinear (linearly dependent).\n    \"\"\"\n    # Step 1: Arrange vectors as columns in a 2x2 matrix\n    # A = np.column_stack((v1, v2))\n\n    # Step 2: Compute the 2D determinant (v1_x * v2_y - v1_y * v2_x)\n    # det = np.linalg.det(A)\n\n    # Step 3: Return True if the absolute determinant exceeds the numerical tolerance\n    # return bool(abs(det) > tol)\n    pass",
+          "id": "py-t1-04",
+          "starterCode": "def check_linear_independence_2d(v1: np.ndarray, v2: np.ndarray, tol: float = 1e-9) -> bool:\n    \"\"\"\n    Check whether two 2D vectors are linearly independent.\n\n    Intuition\n    ---------\n    Two vectors in 2D space are linearly independent if and only if they do\n    not point along the same straight line (non-collinear). Geometrically,\n    this means the parallelogram spanned by them has non-zero area, which\n    equals the absolute determinant |ad - bc| of the matrix formed by them.\n\n    Parameters\n    ----------\n    v1 : np.ndarray of shape (2,)\n        First vector [v1_x, v1_y].\n    v2 : np.ndarray of shape (2,)\n        Second vector [v2_x, v2_y].\n    tol : float\n        Numerical tolerance threshold to handle floating point imprecision.\n\n    Returns\n    -------\n    bool\n        True if the vectors span a full 2D plane (linearly independent),\n        False if they are collinear (linearly dependent).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "check_linear_independence_2d(np.array([1.0, 0.0]), np.array([0.0, 1.0]))",
@@ -471,24 +471,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "True",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef check_linear_independence_2d(v1: np.ndarray, v2: np.ndarray, tol: float = 1e-9) -> bool:\n    \"\"\"\n    Check whether two 2D vectors are linearly independent.\n\n    Intuition\n    ---------\n    Two vectors in 2D space are linearly independent if and only if they do\n    not point along the same straight line (non-collinear). Geometrically,\n    this means the parallelogram spanned by them has non-zero area, which\n    equals the absolute determinant |ad - bc| of the matrix formed by them.\n\n    Parameters\n    ----------\n    v1 : np.ndarray of shape (2,)\n        First vector [v1_x, v1_y].\n    v2 : np.ndarray of shape (2,)\n        Second vector [v2_x, v2_y].\n    tol : float\n        Numerical tolerance threshold to handle floating point imprecision.\n\n    Returns\n    -------\n    bool\n        True if the vectors span a full 2D plane (linearly independent),\n        False if they are collinear (linearly dependent).\n    \"\"\"\n    # Step 1: Arrange vectors as columns in a 2x2 matrix\n    # A = np.column_stack((v1, v2))\n\n    # Step 2: Compute the 2D determinant (v1_x * v2_y - v1_y * v2_x)\n    # det = np.linalg.det(A)\n\n    # Step 3: Return True if the absolute determinant exceeds the numerical tolerance\n    # return bool(abs(det) > tol)\n    pass",
+              "starterCode": "def check_linear_independence_2d(v1: np.ndarray, v2: np.ndarray, tol: float = 1e-9) -> bool:\n    \"\"\"\n    Check whether two 2D vectors are linearly independent.\n\n    Intuition\n    ---------\n    Two vectors in 2D space are linearly independent if and only if they do\n    not point along the same straight line (non-collinear). Geometrically,\n    this means the parallelogram spanned by them has non-zero area, which\n    equals the absolute determinant |ad - bc| of the matrix formed by them.\n\n    Parameters\n    ----------\n    v1 : np.ndarray of shape (2,)\n        First vector [v1_x, v1_y].\n    v2 : np.ndarray of shape (2,)\n        Second vector [v2_x, v2_y].\n    tol : float\n        Numerical tolerance threshold to handle floating point imprecision.\n\n    Returns\n    -------\n    bool\n        True if the vectors span a full 2D plane (linearly independent),\n        False if they are collinear (linearly dependent).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "True"
             }
           },
-          "solution": "import numpy as np\n\ndef check_linear_independence_2d(v1: np.ndarray, v2: np.ndarray, tol: float = 1e-9) -> bool:\n    det = float(v1[0] * v2[1] - v1[1] * v2[0])\n    return abs(det) > tol"
+          "solution": "import numpy as np\n\ndef check_linear_independence_2d(v1: np.ndarray, v2: np.ndarray, tol: float = 1e-9) -> bool:\n    \"\"\"\n    Check whether two 2D vectors are linearly independent.\n\n    Intuition\n    ---------\n    Two vectors in 2D space are linearly independent if and only if they do\n    not point along the same straight line (non-collinear). Geometrically,\n    this means the parallelogram spanned by them has non-zero area, which\n    equals the absolute determinant |ad - bc| of the matrix formed by them.\n\n    Parameters\n    ----------\n    v1 : np.ndarray of shape (2,)\n        First vector [v1_x, v1_y].\n    v2 : np.ndarray of shape (2,)\n        Second vector [v2_x, v2_y].\n    tol : float\n        Numerical tolerance threshold to handle floating point imprecision.\n\n    Returns\n    -------\n    bool\n        True if the vectors span a full 2D plane (linearly independent),\n        False if they are collinear (linearly dependent).\n    \"\"\"\n    # Step 1: Arrange vectors as columns in a 2x2 matrix\n    # A = np.column_stack((v1, v2))\n\n    # Step 2: Compute the 2D determinant (v1_x * v2_y - v1_y * v2_x)\n    # det = np.linalg.det(A)\n\n    # Step 3: Return True if the absolute determinant exceeds the numerical tolerance\n    # return bool(abs(det) > tol)\n    pass"
         },
         "hints": {
           "tier1": {
-            "en": "Two 2D vectors are independent if the area of the parallelogram they span (the determinant) is non-zero.",
-            "ar": "يكون متجهان ثنائيا الأبعاد مستقلين إذا كانت مساحة متوازي الأضلاع الذي يشكلانه (المحدد) غير صفرية."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Compute det = v1[0] * v2[1] - v1[1] * v2[0] directly without matrix overhead.",
-            "ar": "احسب المحدد مباشرة عبر det = v1[0] * v2[1] - v1[1] * v2[0]."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Compare abs(det) > tol: return abs(det) > tol.",
-            "ar": "قارن القيمة المطلقة مع حد التسامح: return abs(det) > tol."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -548,7 +548,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "dot-product-geometry",
+    "id": "t1-05",
     "title": "The Dot Product & Geometric Projection Duality",
     "titleAr": "الجداء النقطي وثنائية الإسقاط الهندسي",
     "trackId": "math",
@@ -558,7 +558,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تسحب حقيبة سفر ذات عجلات في صالة المطار. مقبض الحقيبة يرتفع مائلاً بزاوية $45^\\circ$، وأنت تبذل قوة عضلية كبيرة لسحب المقبض في هذا..."
     },
     "prerequisites": [
-      "linear-algebra-vectors"
+      "t1-03"
     ],
     "x": 160,
     "y": 460,
@@ -577,8 +577,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbf{u} \\cdot \\mathbf{v} = \\mathbf{u}^T \\mathbf{v} = \\sum_{i=1}^n u_i v_i = \\|\\mathbf{u}\\|_2 \\|\\mathbf{v}\\|_2 \\cos \\theta, \\quad \\cos\\theta = \\frac{\\mathbf{u} \\cdot \\mathbf{v}}{\\|\\mathbf{u}\\|_2 \\|\\mathbf{v}\\|_2}",
         "formulaNote": {
-          "en": "The algebraic inner product equates to the projected shadow length scaled by magnitude, measuring angular alignment.",
-          "ar": "الجداء الداخلي الجبري يطابق هندسياً طول الظل المسقط مضروباً في المقدار، كاشفاً عن التوافق الزاوي."
+          "en": "Mathematical anchor for The Dot Product & Geometric Projection Duality.",
+          "ar": "المرساة الرياضية لـ الجداء النقطي وثنائية الإسقاط الهندسي."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $\\mathbf{u} \\cdot \\mathbf{v}$ | Dot Product / Inner Product | The scalar number quantifying the directional alignment and mutual shadow of two vectors. |\n| $\\mathbf{u}^T \\mathbf{v}$ | Matrix Product Form | Compact algebraic representation: transposing column vector $\\mathbf{u}$ into a $1 \\times n$ row, then multiplying by column $\\mathbf{v}$. |\n| $\\sum_{i=1}^n u_i v_i$ | Coordinate Formulation | Pure computation: multiply matching coordinates along each axis, then sum all $n$ products together. |\n| $\\|\\mathbf{u}\\|_2 \\|\\mathbf{v}\\|_2$ | Length Magnification Factor | The product of the vectors' physical lengths, setting the maximum possible scale of the dot product. |\n| $\\cos\\theta$ | Alignment Gauge ($\\in [-1, 1]$) | Directional filter: $+1$ when pointing together ($0^\\circ$), $0$ when orthogonal ($90^\\circ$), and $-1$ when opposite ($180^\\circ$). |\n| $\\theta = 90^\\circ \\implies \\mathbf{u} \\cdot \\mathbf{v} = 0$ | Orthogonality Condition | The definitive geometric test of perpendicularity in any dimensional space. |\n\n##### Why the Math Works Step-by-Step\n1. **Why does the coordinate sum $\\sum u_i v_i$ equal the geometric form $\\|\\mathbf{u}\\| \\|\\mathbf{v}\\| \\cos\\theta$?**\n   Consider the triangle formed by vectors $\\mathbf{u}$, $\\mathbf{v}$, and the displacement $\\mathbf{u} - \\mathbf{v}$. By the geometric Law of Cosines:\n   $$\\|\\mathbf{u} - \\mathbf{v}\\|^2 = \\|\\mathbf{u}\\|^2 + \\|\\mathbf{v}\\|^2 - 2 \\|\\mathbf{u}\\| \\|\\mathbf{v}\\| \\cos\\theta$$\n   Now expand the left-hand side using the coordinate definition of squared Euclidean norm:\n   $$\\|\\mathbf{u} - \\mathbf{v}\\|^2 = \\sum_{i=1}^n (u_i - v_i)^2 = \\sum_{i=1}^n u_i^2 - 2\\sum_{i=1}^n u_i v_i + \\sum_{i=1}^n v_i^2 = \\|\\mathbf{u}\\|^2 - 2 \\left(\\sum_{i=1}^n u_i v_i\\right) + \\|\\mathbf{v}\\|^2$$\n   Equating the two expressions and canceling $\\|\\mathbf{u}\\|^2 + \\|\\mathbf{v}\\|^2$ from both sides immediately proves:\n   $$\\sum_{i=1}^n u_i v_i = \\|\\mathbf{u}\\| \\|\\mathbf{v}\\| \\cos\\theta$$\n   The algebraic coordinate sum and the geometric angle formula are identical twins of the same mathematical truth!\n2. **Why does orthogonality produce zero?** When two vectors meet at a $90^\\circ$ angle, $\\cos(90^\\circ) = 0$. Projecting one vector straight down onto the other yields a shadow of zero length. Hence, their inner product vanishes completely.\n\n---",
@@ -589,8 +589,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-dot-product-geometry",
-          "starterCode": "import numpy as np\n\ndef cosine_similarity(u: np.ndarray, v: np.ndarray, eps: float = 1e-12) -> float:\n    \"\"\"\n    Compute the cosine similarity cos(theta) = (u . v) / (||u|| * ||v||).\n\n    Intuition\n    ---------\n    Cosine similarity normalizes the dot product by the lengths of both\n    vectors, isolating pure directional alignment. The result is strictly\n    bounded in [-1.0, 1.0], where 1.0 indicates identical orientation,\n    0.0 represents orthogonality (perpendicularity), and -1.0 is anti-parallel.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (D,)\n        First vector (e.g., query embedding).\n    v : np.ndarray of shape (D,)\n        Second vector (e.g., document embedding).\n    eps : float\n        Numerical guard to prevent division by zero for null vectors.\n\n    Returns\n    -------\n    float\n        Cosine similarity bounded within [-1.0, 1.0].\n    \"\"\"\n    # Step 1: Compute the algebraic dot product between u and v\n    # dot_product = float(np.dot(u, v))\n\n    # Step 2: Compute Euclidean L2 norms of both vectors\n    # norm_u = float(np.linalg.norm(u))\n    # norm_v = float(np.linalg.norm(v))\n\n    # Step 3: Divide dot product by product of norms with eps safety guard\n    # denominator = max(norm_u * norm_v, eps)\n    # return dot_product / denominator\n    pass",
+          "id": "py-t1-05",
+          "starterCode": "def cosine_similarity(u: np.ndarray, v: np.ndarray, eps: float = 1e-12) -> float:\n    \"\"\"\n    Compute the cosine similarity cos(theta) = (u . v) / (||u|| * ||v||).\n\n    Intuition\n    ---------\n    Cosine similarity normalizes the dot product by the lengths of both\n    vectors, isolating pure directional alignment. The result is strictly\n    bounded in [-1.0, 1.0], where 1.0 indicates identical orientation,\n    0.0 represents orthogonality (perpendicularity), and -1.0 is anti-parallel.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (D,)\n        First vector (e.g., query embedding).\n    v : np.ndarray of shape (D,)\n        Second vector (e.g., document embedding).\n    eps : float\n        Numerical guard to prevent division by zero for null vectors.\n\n    Returns\n    -------\n    float\n        Cosine similarity bounded within [-1.0, 1.0].\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "cosine_similarity(np.array([1.0, 0.0]), np.array([0.0, 1.0]))",
@@ -608,24 +608,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "0.0",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef cosine_similarity(u: np.ndarray, v: np.ndarray, eps: float = 1e-12) -> float:\n    \"\"\"\n    Compute the cosine similarity cos(theta) = (u . v) / (||u|| * ||v||).\n\n    Intuition\n    ---------\n    Cosine similarity normalizes the dot product by the lengths of both\n    vectors, isolating pure directional alignment. The result is strictly\n    bounded in [-1.0, 1.0], where 1.0 indicates identical orientation,\n    0.0 represents orthogonality (perpendicularity), and -1.0 is anti-parallel.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (D,)\n        First vector (e.g., query embedding).\n    v : np.ndarray of shape (D,)\n        Second vector (e.g., document embedding).\n    eps : float\n        Numerical guard to prevent division by zero for null vectors.\n\n    Returns\n    -------\n    float\n        Cosine similarity bounded within [-1.0, 1.0].\n    \"\"\"\n    # Step 1: Compute the algebraic dot product between u and v\n    # dot_product = float(np.dot(u, v))\n\n    # Step 2: Compute Euclidean L2 norms of both vectors\n    # norm_u = float(np.linalg.norm(u))\n    # norm_v = float(np.linalg.norm(v))\n\n    # Step 3: Divide dot product by product of norms with eps safety guard\n    # denominator = max(norm_u * norm_v, eps)\n    # return dot_product / denominator\n    pass",
+              "starterCode": "def cosine_similarity(u: np.ndarray, v: np.ndarray, eps: float = 1e-12) -> float:\n    \"\"\"\n    Compute the cosine similarity cos(theta) = (u . v) / (||u|| * ||v||).\n\n    Intuition\n    ---------\n    Cosine similarity normalizes the dot product by the lengths of both\n    vectors, isolating pure directional alignment. The result is strictly\n    bounded in [-1.0, 1.0], where 1.0 indicates identical orientation,\n    0.0 represents orthogonality (perpendicularity), and -1.0 is anti-parallel.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (D,)\n        First vector (e.g., query embedding).\n    v : np.ndarray of shape (D,)\n        Second vector (e.g., document embedding).\n    eps : float\n        Numerical guard to prevent division by zero for null vectors.\n\n    Returns\n    -------\n    float\n        Cosine similarity bounded within [-1.0, 1.0].\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "0.0"
             }
           },
-          "solution": "import numpy as np\n\ndef cosine_similarity(u: np.ndarray, v: np.ndarray, eps: float = 1e-12) -> float:\n    dot_product = float(np.dot(u, v))\n    norm_u = float(np.linalg.norm(u))\n    norm_v = float(np.linalg.norm(v))\n    denom = max(norm_u * norm_v, eps)\n    return float(np.clip(dot_product / denom, -1.0, 1.0))"
+          "solution": "import numpy as np\n\ndef cosine_similarity(u: np.ndarray, v: np.ndarray, eps: float = 1e-12) -> float:\n    \"\"\"\n    Compute the cosine similarity cos(theta) = (u . v) / (||u|| * ||v||).\n\n    Intuition\n    ---------\n    Cosine similarity normalizes the dot product by the lengths of both\n    vectors, isolating pure directional alignment. The result is strictly\n    bounded in [-1.0, 1.0], where 1.0 indicates identical orientation,\n    0.0 represents orthogonality (perpendicularity), and -1.0 is anti-parallel.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (D,)\n        First vector (e.g., query embedding).\n    v : np.ndarray of shape (D,)\n        Second vector (e.g., document embedding).\n    eps : float\n        Numerical guard to prevent division by zero for null vectors.\n\n    Returns\n    -------\n    float\n        Cosine similarity bounded within [-1.0, 1.0].\n    \"\"\"\n    # Step 1: Compute the algebraic dot product between u and v\n    # dot_product = float(np.dot(u, v))\n\n    # Step 2: Compute Euclidean L2 norms of both vectors\n    # norm_u = float(np.linalg.norm(u))\n    # norm_v = float(np.linalg.norm(v))\n\n    # Step 3: Divide dot product by product of norms with eps safety guard\n    # denominator = max(norm_u * norm_v, eps)\n    # return dot_product / denominator\n    pass"
         },
         "hints": {
           "tier1": {
-            "en": "Use np.dot(u, v) for the numerator and np.linalg.norm() for lengths.",
-            "ar": "استخدم np.dot(u, v) للبسط و np.linalg.norm() لحساب الأطوال."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Compute denom = max(norm_u * norm_v, eps) to ensure safe floating-point division.",
-            "ar": "احسب المقام بـ max(norm_u * norm_v, eps) لضمان قسمة عددية آمنة دون أخطاء."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Clip the result to [-1.0, 1.0] to prevent floating point drift: float(np.clip(dot / denom, -1.0, 1.0)).",
-            "ar": "قم بقص الناتج في النطاق [-1.0, 1.0] لتفادي انحرافات الفاصلة العائمة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -685,7 +685,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "cross-product-orthogonality",
+    "id": "t1-06",
     "title": "The Cross Product, Orthogonality & Oriented Area",
     "titleAr": "الجداء الاتجاهي والتعامد والمساحة الموجهة",
     "trackId": "math",
@@ -695,7 +695,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تحاول فك برغي معدني صدئ في محرك سيارة باستخدام مفتاح ربط صلب طويل. تثبت رأس المفتاح على البرغي وتقبض على طرفه الآخر، صانعاً متجه..."
     },
     "prerequisites": [
-      "dot-product-geometry"
+      "t1-05"
     ],
     "x": 140,
     "y": 555,
@@ -714,8 +714,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbf{u} \\times \\mathbf{v} = \\begin{bmatrix} u_2 v_3 - u_3 v_2 \\\\ u_3 v_1 - u_1 v_3 \\\\ u_1 v_2 - u_2 v_1 \\end{bmatrix} = \\det\\begin{bmatrix} \\mathbf{i} & \\mathbf{j} & \\mathbf{k} \\\\ u_1 & u_2 & u_3 \\\\ v_1 & v_2 & v_3 \\end{bmatrix}, \\quad \\|\\mathbf{u} \\times \\mathbf{v}\\|_2 = \\|\\mathbf{u}\\|_2 \\|\\mathbf{v}\\|_2 \\sin\\theta",
         "formulaNote": {
-          "en": "The cross product constructs a mutually orthogonal normal vector whose magnitude equals the oriented area of the spanned parallelogram.",
-          "ar": "يبني الجداء الاتجاهي متجهاً عمودياً مشتركاً يساوي مقداره مساحة متوازي الأضلاع الموجهة."
+          "en": "Mathematical anchor for The Cross Product, Orthogonality & Oriented Area.",
+          "ar": "المرساة الرياضية لـ الجداء الاتجاهي والتعامد والمساحة الموجهة."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $\\mathbf{u} \\times \\mathbf{v}$ | Cross Product | The 3D vector-producing operator yielding a perpendicular vector whose length equals parallelogram area. |\n| $\\mathbf{i}, \\mathbf{j}, \\mathbf{k}$ | Standard Basis Unit Vectors | Unit vectors of length 1 pointing along the positive $X$, $Y$, and $Z$ axes respectively. |\n| $\\det[\\dots]_{3 \\times 3}$ | Formal Determinant Mnemonic | A symbolic determinant structure organizing the alternating signs and coordinate cross-multiplications. |\n| $u_2 v_3 - u_3 v_2$ | Component-wise Differences | The net 2D oriented area projected onto the orthogonal coordinate planes ($YZ$, $ZX$, and $XY$). |\n| $\\|\\mathbf{u} \\times \\mathbf{v}\\|_2$ | Magnitude / Norm | The physical area of the 2D parallelogram spanned by vectors $\\mathbf{u}$ and $\\mathbf{v}$ in 3D space. |\n| $\\sin\\theta$ | Perpendicularity Factor | Angle multiplier: maximum ($1.0$) when vectors are perpendicular ($90^\\circ$), and zero when collinear. |\n| $\\mathbf{u} \\times \\mathbf{v} = -(\\mathbf{v} \\times \\mathbf{u})$ | Anti-commutativity | Swapping inputs flips the direction $180^\\circ$ backwards, following the Right-Hand Rule. |\n\n##### Why the Math Works Step-by-Step\n1. **Why is the resulting vector strictly perpendicular to both inputs?**\n   Let us mathematically test whether $\\mathbf{u} \\times \\mathbf{v}$ is perpendicular to $\\mathbf{u}$ by taking their dot product:\n   $$(\\mathbf{u} \\times \\mathbf{v}) \\cdot \\mathbf{u} = u_1 (u_2 v_3 - u_3 v_2) + u_2 (u_3 v_1 - u_1 v_3) + u_3 (u_1 v_2 - u_2 v_1)$$\n   Multiplying out the terms:\n   $$= u_1 u_2 v_3 - u_1 u_3 v_2 + u_2 u_3 v_1 - u_1 u_2 v_3 + u_1 u_3 v_2 - u_2 u_3 v_1$$\n   Notice the beautiful symmetry: $u_1 u_2 v_3$ cancels with $-u_1 u_2 v_3$, $-u_1 u_3 v_2$ cancels with $+u_1 u_3 v_2$, and $u_2 u_3 v_1$ cancels with $-u_2 u_3 v_1$. The sum is identically and unconditionally **$0$**! The exact same cancellation occurs for $(\\mathbf{u} \\times \\mathbf{v}) \\cdot \\mathbf{v} = 0$. This proves that the cross product is perpendicular to both original vectors.\n2. **Why does the magnitude equal the parallelogram area?**\n   In geometry, the area of a parallelogram is $\\text{base} \\times \\text{height}$. Choosing $\\mathbf{u}$ as the base gives length $\\|\\mathbf{u}\\|$. The height perpendicular to that base is $\\|\\mathbf{v}\\| \\sin\\theta$. Their product is $\\|\\mathbf{u}\\| \\|\\mathbf{v}\\| \\sin\\theta$, which algebraically matches the Euclidean norm of the cross product vector.\n3. **Why does swapping vectors flip the sign?**\n   In matrix algebra, swapping two rows in a determinant reverses its sign. Because $\\mathbf{u}$ and $\\mathbf{v}$ occupy rows 2 and 3, swapping their positions negates every single coordinate of the result.\n\n---",
@@ -726,8 +726,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-cross-product-orthogonality",
-          "starterCode": "import numpy as np\n\ndef cross_product_3d(u: np.ndarray, v: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the 3D cross product u x v.\n\n    Intuition\n    ---------\n    The cross product constructs a vector perpendicular to both input vectors\n    in 3D space according to the Right-Hand Rule. Its length corresponds to\n    the geometric area of the parallelogram formed by the two vectors.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (3,)\n        First 3D vector [u_x, u_y, u_z].\n    v : np.ndarray of shape (3,)\n        Second 3D vector [v_x, v_y, v_z].\n\n    Returns\n    -------\n    np.ndarray of shape (3,)\n        Resultant vector perpendicular to both u and v.\n    \"\"\"\n    # Step 1: Compute x component: u_y * v_z - u_z * v_y\n    # cx = float(u[1] * v[2] - u[2] * v[1])\n\n    # Step 2: Compute y component: u_z * v_x - u_x * v_z\n    # cy = float(u[2] * v[0] - u[0] * v[2])\n\n    # Step 3: Compute z component: u_x * v_y - u_y * v_x\n    # cz = float(u[0] * v[1] - u[1] * v[0])\n\n    # Step 4: Assemble and return the orthogonal vector array\n    # return np.array([cx, cy, cz], dtype=float)\n    pass",
+          "id": "py-t1-06",
+          "starterCode": "def cross_product_3d(u: np.ndarray, v: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the 3D cross product u x v.\n\n    Intuition\n    ---------\n    The cross product constructs a vector perpendicular to both input vectors\n    in 3D space according to the Right-Hand Rule. Its length corresponds to\n    the geometric area of the parallelogram formed by the two vectors.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (3,)\n        First 3D vector [u_x, u_y, u_z].\n    v : np.ndarray of shape (3,)\n        Second 3D vector [v_x, v_y, v_z].\n\n    Returns\n    -------\n    np.ndarray of shape (3,)\n        Resultant vector perpendicular to both u and v.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "cross_product_3d(np.array([1.0, 0.0, 0.0]), np.array([0.0, 1.0, 0.0]))",
@@ -745,24 +745,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "array([0., 0., 1.])",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef cross_product_3d(u: np.ndarray, v: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the 3D cross product u x v.\n\n    Intuition\n    ---------\n    The cross product constructs a vector perpendicular to both input vectors\n    in 3D space according to the Right-Hand Rule. Its length corresponds to\n    the geometric area of the parallelogram formed by the two vectors.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (3,)\n        First 3D vector [u_x, u_y, u_z].\n    v : np.ndarray of shape (3,)\n        Second 3D vector [v_x, v_y, v_z].\n\n    Returns\n    -------\n    np.ndarray of shape (3,)\n        Resultant vector perpendicular to both u and v.\n    \"\"\"\n    # Step 1: Compute x component: u_y * v_z - u_z * v_y\n    # cx = float(u[1] * v[2] - u[2] * v[1])\n\n    # Step 2: Compute y component: u_z * v_x - u_x * v_z\n    # cy = float(u[2] * v[0] - u[0] * v[2])\n\n    # Step 3: Compute z component: u_x * v_y - u_y * v_x\n    # cz = float(u[0] * v[1] - u[1] * v[0])\n\n    # Step 4: Assemble and return the orthogonal vector array\n    # return np.array([cx, cy, cz], dtype=float)\n    pass",
+              "starterCode": "def cross_product_3d(u: np.ndarray, v: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the 3D cross product u x v.\n\n    Intuition\n    ---------\n    The cross product constructs a vector perpendicular to both input vectors\n    in 3D space according to the Right-Hand Rule. Its length corresponds to\n    the geometric area of the parallelogram formed by the two vectors.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (3,)\n        First 3D vector [u_x, u_y, u_z].\n    v : np.ndarray of shape (3,)\n        Second 3D vector [v_x, v_y, v_z].\n\n    Returns\n    -------\n    np.ndarray of shape (3,)\n        Resultant vector perpendicular to both u and v.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "array([0., 0., 1.])"
             }
           },
-          "solution": "import numpy as np\n\ndef cross_product_3d(u: np.ndarray, v: np.ndarray) -> np.ndarray:\n    cx = float(u[1] * v[2] - u[2] * v[1])\n    cy = float(u[2] * v[0] - u[0] * v[2])\n    cz = float(u[0] * v[1] - u[1] * v[0])\n    return np.array([cx, cy, cz], dtype=float)"
+          "solution": "import numpy as np\n\ndef cross_product_3d(u: np.ndarray, v: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute the 3D cross product u x v.\n\n    Intuition\n    ---------\n    The cross product constructs a vector perpendicular to both input vectors\n    in 3D space according to the Right-Hand Rule. Its length corresponds to\n    the geometric area of the parallelogram formed by the two vectors.\n\n    Parameters\n    ----------\n    u : np.ndarray of shape (3,)\n        First 3D vector [u_x, u_y, u_z].\n    v : np.ndarray of shape (3,)\n        Second 3D vector [v_x, v_y, v_z].\n\n    Returns\n    -------\n    np.ndarray of shape (3,)\n        Resultant vector perpendicular to both u and v.\n    \"\"\"\n    # Step 1: Compute x component: u_y * v_z - u_z * v_y\n    # cx = float(u[1] * v[2] - u[2] * v[1])\n\n    # Step 2: Compute y component: u_z * v_x - u_x * v_z\n    # cy = float(u[2] * v[0] - u[0] * v[2])\n\n    # Step 3: Compute z component: u_x * v_y - u_y * v_x\n    # cz = float(u[0] * v[1] - u[1] * v[0])\n\n    # Step 4: Assemble and return the orthogonal vector array\n    # return np.array([cx, cy, cz], dtype=float)\n    pass"
         },
         "hints": {
           "tier1": {
-            "en": "Implement the determinant formula: cx = u[1]*v[2] - u[2]*v[1].",
-            "ar": "طبق صيغة المحدد: cx = u[1]*v[2] - u[2]*v[1]."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Be careful with the sign of the y component: cy = u[2]*v[0] - u[0]*v[2].",
-            "ar": "انتبه لإشارة المركبة الصادية: cy = u[2]*v[0] - u[0]*v[2]."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "cz = u[0]*v[1] - u[1]*v[0]. Return as np.array([cx, cy, cz], dtype=float).",
-            "ar": "cz = u[0]*v[1] - u[1]*v[0]. أرجع الناتج كمصفوفة نَمباي ثلاثية."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -822,7 +822,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "linear-maps-transformations",
+    "id": "t1-07",
     "title": "Linear Maps as Space Transformations",
     "titleAr": "التحويلات الخطية كعمليات نقل وتحوير للفضاء",
     "trackId": "math",
@@ -832,7 +832,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك رسمت شبكة مربعات منتظمة على غشاء شفاف من المطاط المرن. عند نقطة تقاطع المحورين الرئيسيين، قمت بغرس دبوس معدني حاد يثبت نقطة الأصل..."
     },
     "prerequisites": [
-      "linear-combinations-span"
+      "t1-04"
     ],
     "x": 160,
     "y": 650,
@@ -851,8 +851,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "T(\\alpha \\mathbf{u} + \\beta \\mathbf{v}) = \\alpha T(\\mathbf{u}) + \\beta T(\\mathbf{v}), \\quad T(\\mathbf{x}) = \\mathbf{A}\\mathbf{x} = x_1 T(\\mathbf{e}_1) + x_2 T(\\mathbf{e}_2) = \\begin{bmatrix} | & | \\\\ T(\\mathbf{e}_1) & T(\\mathbf{e}_2) \\\\ | & | \\end{bmatrix} \\begin{bmatrix} x_1 \\\\ x_2 \\end{bmatrix}",
         "formulaNote": {
-          "en": "Linearity preserves vector addition and scalar multiplication; the columns of matrix A are the landing sites of the standard basis vectors.",
-          "ar": "يحافظ التحويل الخطي على جمع المتجهات والضرب القياسي؛ وأعمدة المصفوفة A هي مواقع استقرار متجهات الأساس المعياري."
+          "en": "Mathematical anchor for Linear Maps as Space Transformations.",
+          "ar": "المرساة الرياضية لـ التحويلات الخطية كعمليات نقل وتحوير للفضاء."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $T(\\mathbf{x})$ | Linear Transformation | A function mapping vectors from input space to output space while strictly preserving grid geometry. |\n| $T(\\alpha \\mathbf{u} + \\beta \\mathbf{v})$ | Axiom of Linearity | Guarantees two properties: additivity ($T(\\mathbf{u}+\\mathbf{v}) = T(\\mathbf{u}) + T(\\mathbf{v})$) and homogeneity ($T(\\alpha \\mathbf{u}) = \\alpha T(\\mathbf{u})$). |\n| $\\mathbf{e}_1, \\mathbf{e}_2$ | Standard Unit Basis Vectors | The pristine coordinate unit arrows: $\\mathbf{e}_1 = \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$ along $X$, and $\\mathbf{e}_2 = \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix}$ along $Y$. |\n| $T(\\mathbf{e}_1), T(\\mathbf{e}_2)$ | Transformed Basis Columns | Where the unit basis arrows land after the space morphs; they literally form the vertical columns of matrix $\\mathbf{A}$. |\n| $\\mathbf{A}\\mathbf{x}$ | Matrix-Vector Product | A weighted linear combination of the columns of $\\mathbf{A}$, where each column is scaled by the corresponding coordinate $x_i$. |\n\n##### Why the Math Works Step-by-Step\n1. **Why does tracking basis vectors determine the transformation of everything?**\n   Every vector $\\mathbf{x} \\in \\mathbb{R}^2$ can be uniquely written as $\\mathbf{x} = x_1 \\mathbf{e}_1 + x_2 \\mathbf{e}_2$. Applying transformation $T$ and invoking linearity yields:\n   $$T(\\mathbf{x}) = T(x_1 \\mathbf{e}_1 + x_2 \\mathbf{e}_2) = x_1 T(\\mathbf{e}_1) + x_2 T(\\mathbf{e}_2)$$\n   Because $x_1$ and $x_2$ are plain scalar numbers, they pull right outside the operator! This proves that once you know the landing vectors $T(\\mathbf{e}_1)$ and $T(\\mathbf{e}_2)$, calculating $T(\\mathbf{x})$ for any point is purely a weighted combination of those two columns.\n2. **Why must a linear transformation always map origin to origin ($T(\\mathbf{0}) = \\mathbf{0}$)?**\n   By the homogeneity property of linearity, choose scalar $\\alpha = 0$:\n   $$T(\\mathbf{0}) = T(0 \\cdot \\mathbf{v}) = 0 \\cdot T(\\mathbf{v}) = \\mathbf{0}$$\n   If a mapping shifts the origin to a non-zero position ($T(\\mathbf{0}) \\ne \\mathbf{0}$), it violates homogeneity and is an affine translation, not a pure linear transformation.\n\n---",
@@ -863,8 +863,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-linear-maps-transformations",
-          "starterCode": "import numpy as np\n\ndef apply_linear_transform(A: np.ndarray, x: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Apply linear transformation matrix A to vector x.\n\n    Intuition\n    ---------\n    Multiplying matrix A by vector x computes a linear combination of the\n    columns of A, weighted by the coordinate components of x. Each column of\n    A represents the transformed landing position of a unit basis vector.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (M, N)\n        Transformation matrix whose columns represent transformed basis vectors.\n    x : np.ndarray of shape (N,)\n        Input coordinate vector.\n\n    Returns\n    -------\n    np.ndarray of shape (M,)\n        Transformed coordinate vector Ax.\n\n    Raises\n    ------\n    ValueError\n        If the inner dimensions do not match (A.shape[1] != len(x)).\n    \"\"\"\n    # Step 1: Validate dimension compatibility between matrix columns and vector length\n    # if A.shape[1] != len(x):\n    #     raise ValueError(f\"Incompatible shapes: Matrix {A.shape} and Vector {x.shape}\")\n\n    # Step 2: Compute matrix-vector product Ax (linear combination of columns)\n    # result = np.matmul(A, x)\n\n    # Step 3: Return the transformed coordinate vector\n    # return result\n    pass",
+          "id": "py-t1-07",
+          "starterCode": "def apply_linear_transform(A: np.ndarray, x: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Apply linear transformation matrix A to vector x.\n\n    Intuition\n    ---------\n    Multiplying matrix A by vector x computes a linear combination of the\n    columns of A, weighted by the coordinate components of x. Each column of\n    A represents the transformed landing position of a unit basis vector.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (M, N)\n        Transformation matrix whose columns represent transformed basis vectors.\n    x : np.ndarray of shape (N,)\n        Input coordinate vector.\n\n    Returns\n    -------\n    np.ndarray of shape (M,)\n        Transformed coordinate vector Ax.\n\n    Raises\n    ------\n    ValueError\n        If the inner dimensions do not match (A.shape[1] != len(x)).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "apply_linear_transform(np.array([[2.0, 0.0], [0.0, 3.0]]), np.array([1.0, 1.0]))",
@@ -882,24 +882,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "array([2., 3.])",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef apply_linear_transform(A: np.ndarray, x: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Apply linear transformation matrix A to vector x.\n\n    Intuition\n    ---------\n    Multiplying matrix A by vector x computes a linear combination of the\n    columns of A, weighted by the coordinate components of x. Each column of\n    A represents the transformed landing position of a unit basis vector.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (M, N)\n        Transformation matrix whose columns represent transformed basis vectors.\n    x : np.ndarray of shape (N,)\n        Input coordinate vector.\n\n    Returns\n    -------\n    np.ndarray of shape (M,)\n        Transformed coordinate vector Ax.\n\n    Raises\n    ------\n    ValueError\n        If the inner dimensions do not match (A.shape[1] != len(x)).\n    \"\"\"\n    # Step 1: Validate dimension compatibility between matrix columns and vector length\n    # if A.shape[1] != len(x):\n    #     raise ValueError(f\"Incompatible shapes: Matrix {A.shape} and Vector {x.shape}\")\n\n    # Step 2: Compute matrix-vector product Ax (linear combination of columns)\n    # result = np.matmul(A, x)\n\n    # Step 3: Return the transformed coordinate vector\n    # return result\n    pass",
+              "starterCode": "def apply_linear_transform(A: np.ndarray, x: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Apply linear transformation matrix A to vector x.\n\n    Intuition\n    ---------\n    Multiplying matrix A by vector x computes a linear combination of the\n    columns of A, weighted by the coordinate components of x. Each column of\n    A represents the transformed landing position of a unit basis vector.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (M, N)\n        Transformation matrix whose columns represent transformed basis vectors.\n    x : np.ndarray of shape (N,)\n        Input coordinate vector.\n\n    Returns\n    -------\n    np.ndarray of shape (M,)\n        Transformed coordinate vector Ax.\n\n    Raises\n    ------\n    ValueError\n        If the inner dimensions do not match (A.shape[1] != len(x)).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "array([2., 3.])"
             }
           },
-          "solution": "import numpy as np\n\ndef apply_linear_transform(A: np.ndarray, x: np.ndarray) -> np.ndarray:\n    if A.shape[1] != len(x):\n        raise ValueError(f\"Matrix columns {A.shape[1]} must match vector length {len(x)}.\")\n    return np.asarray(A @ x, dtype=float)"
+          "solution": "import numpy as np\n\ndef apply_linear_transform(A: np.ndarray, x: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Apply linear transformation matrix A to vector x.\n\n    Intuition\n    ---------\n    Multiplying matrix A by vector x computes a linear combination of the\n    columns of A, weighted by the coordinate components of x. Each column of\n    A represents the transformed landing position of a unit basis vector.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (M, N)\n        Transformation matrix whose columns represent transformed basis vectors.\n    x : np.ndarray of shape (N,)\n        Input coordinate vector.\n\n    Returns\n    -------\n    np.ndarray of shape (M,)\n        Transformed coordinate vector Ax.\n\n    Raises\n    ------\n    ValueError\n        If the inner dimensions do not match (A.shape[1] != len(x)).\n    \"\"\"\n    # Step 1: Validate dimension compatibility between matrix columns and vector length\n    # if A.shape[1] != len(x):\n    #     raise ValueError(f\"Incompatible shapes: Matrix {A.shape} and Vector {x.shape}\")\n\n    # Step 2: Compute matrix-vector product Ax (linear combination of columns)\n    # result = np.matmul(A, x)\n\n    # Step 3: Return the transformed coordinate vector\n    # return result\n    pass"
         },
         "hints": {
           "tier1": {
-            "en": "Verify A.shape[1] == len(x) before performing matrix multiplication.",
-            "ar": "تحقق من تطابق أبعاد المصفوفة مع طول المتجه A.shape[1] == len(x)."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "In NumPy, matrix-vector multiplication is performed via the @ operator: A @ x.",
-            "ar": "في نَمباي، يُجرى ضرب المصفوفات في المتجهات باستخدام المعامل @: A @ x."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Return as float array: return np.asarray(A @ x, dtype=float).",
-            "ar": "أرجع الناتج كمصفوفة أعداد حقيقية: return np.asarray(A @ x, dtype=float)."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -959,7 +959,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "matrix-multiplication-composition",
+    "id": "t1-08",
     "title": "Matrix Multiplication as Composition of Transformations",
     "titleAr": "ضرب المصفوفات كتركيب متتالٍ للتحويلات",
     "trackId": "math",
@@ -969,7 +969,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تأمل روتينك الصباحي عند ارتداء ملابسك. إذا ارتديت جواربك أولاً ثم انتعلت حذاءك، ستبدأ يومك براحة وثقة طبيعية."
     },
     "prerequisites": [
-      "linear-maps-transformations"
+      "t1-07"
     ],
     "x": 140,
     "y": 745,
@@ -988,8 +988,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "(\\mathbf{B}\\mathbf{A})\\mathbf{x} = \\mathbf{B}(\\mathbf{A}\\mathbf{x}), \\quad (\\mathbf{B}\\mathbf{A})_{ij} = \\sum_{k=1}^m B_{ik} A_{kj}",
         "formulaNote": {
-          "en": "Matrix multiplication represents applying successive geometric transformations; non-commutativity arises because sequential physical actions do not commute.",
-          "ar": "ضرب المصفوفات يمثل تطبيق تحويلات هندسية متتالية؛ وتنشأ اللا تبادلية لأن الأفعال الحركية المتتابعة لا تتبادل عموماً."
+          "en": "Mathematical anchor for Matrix Multiplication as Composition of Transformations.",
+          "ar": "المرساة الرياضية لـ ضرب المصفوفات كتركيب متتالٍ للتحويلات."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $\\mathbf{B}\\mathbf{A}$ | Matrix Product (Composite Map) | A single combined transformation matrix that executes the action of $\\mathbf{A}$ followed by $\\mathbf{B}$. |\n| $(\\mathbf{B}\\mathbf{A})\\mathbf{x}$ | Right-to-Left Action Flow | Read like function composition: $\\mathbf{x}$ enters $\\mathbf{A}$ first; the resulting output vector is then fed into $\\mathbf{B}$. |\n| $(\\mathbf{B}\\mathbf{A})_{ij}$ | Element at Row $i$, Column $j$ | The landing coordinate on axis $i$ when basis vector $\\mathbf{e}_j$ undergoes both consecutive transformations. |\n| $\\sum_{k=1}^m B_{ik} A_{kj}$ | Row-Column Inner Product | The dot product between Row $i$ of the left matrix $\\mathbf{B}$ and Column $j$ of the right matrix $\\mathbf{A}$. |\n| $\\mathbf{A}\\mathbf{B} \\ne \\mathbf{B}\\mathbf{A}$ | Non-Commutativity | Applying geometric actions in reverse chronological order alters the physical orientation of space. |\n\n##### Why the Math Works Step-by-Step\n1. **Why does the formula use the dot product of Row $i$ of $\\mathbf{B}$ with Column $j$ of $\\mathbf{A}$?**\n   Let $\\mathbf{e}_j$ be the $j$-th standard basis vector. When first transform $\\mathbf{A}$ acts on $\\mathbf{e}_j$, it produces the $j$-th column of $\\mathbf{A}$, which we denote $\\mathbf{A}_{:, j}$.\n   Now, apply the second transformation $\\mathbf{B}$ to this transformed vector. By the definition of matrix-vector multiplication:\n   $$\\text{Output} = \\mathbf{B} \\cdot \\mathbf{A}_{:, j}$$\n   The $i$-th coordinate of this output vector is precisely the dot product of Row $i$ of $\\mathbf{B}$ with the column $\\mathbf{A}_{:, j}$:\n   $$(\\mathbf{B}\\mathbf{A})_{ij} = \\sum_{k=1}^m B_{ik} A_{kj}$$\n   The mechanical \"row-times-column\" rule is not arbitrary; it is the direct mathematical tracking of basis vectors passing through two successive linear transformations!\n2. **Why is matrix multiplication associative ($(\\mathbf{C}\\mathbf{B})\\mathbf{A} = \\mathbf{C}(\\mathbf{B}\\mathbf{A})$)?**\n   Function composition is naturally associative: applying three sequential steps $A$, then $B$, then $C$ produces the same final result whether you package $(A \\text{ and } B)$ first, or package $(B \\text{ and } C)$ first.\n\n---",
@@ -1000,8 +1000,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-matrix-multiplication-composition",
-          "starterCode": "import numpy as np\n\ndef compose_transformations(B: np.ndarray, A: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute composite transformation matrix C = B @ A.\n\n    Intuition\n    ---------\n    Matrix multiplication composes two successive linear transformations.\n    Transform A is applied first, followed by transform B. The resulting\n    composite matrix C carries out both actions simultaneously, with each\n    entry C[i, j] representing the dot product of Row i of B with Column j of A.\n\n    Parameters\n    ----------\n    B : np.ndarray of shape (L, M)\n        Second transformation matrix applied.\n    A : np.ndarray of shape (M, N)\n        First transformation matrix applied.\n\n    Returns\n    -------\n    np.ndarray of shape (L, N)\n        Composite transformation matrix C = B @ A.\n\n    Raises\n    ------\n    ValueError\n        If the inner dimensions do not match (B.shape[1] != A.shape[0]).\n    \"\"\"\n    # Step 1: Validate inner dimension compatibility (B.shape[1] == A.shape[0])\n    # if B.shape[1] != A.shape[0]:\n    #     raise ValueError(f\"Inner dimension mismatch: {B.shape} and {A.shape}\")\n\n    # Step 2: Compute composite matrix product via matrix multiplication\n    # C = np.matmul(B, A)\n\n    # Step 3: Return the composite transformation matrix\n    # return C\n    pass",
+          "id": "py-t1-08",
+          "starterCode": "def compose_transformations(B: np.ndarray, A: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute composite transformation matrix C = B @ A.\n\n    Intuition\n    ---------\n    Matrix multiplication composes two successive linear transformations.\n    Transform A is applied first, followed by transform B. The resulting\n    composite matrix C carries out both actions simultaneously, with each\n    entry C[i, j] representing the dot product of Row i of B with Column j of A.\n\n    Parameters\n    ----------\n    B : np.ndarray of shape (L, M)\n        Second transformation matrix applied.\n    A : np.ndarray of shape (M, N)\n        First transformation matrix applied.\n\n    Returns\n    -------\n    np.ndarray of shape (L, N)\n        Composite transformation matrix C = B @ A.\n\n    Raises\n    ------\n    ValueError\n        If the inner dimensions do not match (B.shape[1] != A.shape[0]).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "compose_transformations(np.array([[1.0, 2.0], [3.0, 4.0]]), np.array([[1.0, 0.0], [0.0, 1.0]]))",
@@ -1019,24 +1019,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "array([[1., 2.],\n       [3., 4.]])",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef compose_transformations(B: np.ndarray, A: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute composite transformation matrix C = B @ A.\n\n    Intuition\n    ---------\n    Matrix multiplication composes two successive linear transformations.\n    Transform A is applied first, followed by transform B. The resulting\n    composite matrix C carries out both actions simultaneously, with each\n    entry C[i, j] representing the dot product of Row i of B with Column j of A.\n\n    Parameters\n    ----------\n    B : np.ndarray of shape (L, M)\n        Second transformation matrix applied.\n    A : np.ndarray of shape (M, N)\n        First transformation matrix applied.\n\n    Returns\n    -------\n    np.ndarray of shape (L, N)\n        Composite transformation matrix C = B @ A.\n\n    Raises\n    ------\n    ValueError\n        If the inner dimensions do not match (B.shape[1] != A.shape[0]).\n    \"\"\"\n    # Step 1: Validate inner dimension compatibility (B.shape[1] == A.shape[0])\n    # if B.shape[1] != A.shape[0]:\n    #     raise ValueError(f\"Inner dimension mismatch: {B.shape} and {A.shape}\")\n\n    # Step 2: Compute composite matrix product via matrix multiplication\n    # C = np.matmul(B, A)\n\n    # Step 3: Return the composite transformation matrix\n    # return C\n    pass",
+              "starterCode": "def compose_transformations(B: np.ndarray, A: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute composite transformation matrix C = B @ A.\n\n    Intuition\n    ---------\n    Matrix multiplication composes two successive linear transformations.\n    Transform A is applied first, followed by transform B. The resulting\n    composite matrix C carries out both actions simultaneously, with each\n    entry C[i, j] representing the dot product of Row i of B with Column j of A.\n\n    Parameters\n    ----------\n    B : np.ndarray of shape (L, M)\n        Second transformation matrix applied.\n    A : np.ndarray of shape (M, N)\n        First transformation matrix applied.\n\n    Returns\n    -------\n    np.ndarray of shape (L, N)\n        Composite transformation matrix C = B @ A.\n\n    Raises\n    ------\n    ValueError\n        If the inner dimensions do not match (B.shape[1] != A.shape[0]).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "array([[1., 2.],\n       [3., 4.]])"
             }
           },
-          "solution": "import numpy as np\n\ndef compose_transformations(B: np.ndarray, A: np.ndarray) -> np.ndarray:\n    if B.shape[1] != A.shape[0]:\n        raise ValueError(f\"Inner dimensions mismatch: B has {B.shape[1]} cols, A has {A.shape[0]} rows.\")\n    return np.asarray(B @ A, dtype=float)"
+          "solution": "import numpy as np\n\ndef compose_transformations(B: np.ndarray, A: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Compute composite transformation matrix C = B @ A.\n\n    Intuition\n    ---------\n    Matrix multiplication composes two successive linear transformations.\n    Transform A is applied first, followed by transform B. The resulting\n    composite matrix C carries out both actions simultaneously, with each\n    entry C[i, j] representing the dot product of Row i of B with Column j of A.\n\n    Parameters\n    ----------\n    B : np.ndarray of shape (L, M)\n        Second transformation matrix applied.\n    A : np.ndarray of shape (M, N)\n        First transformation matrix applied.\n\n    Returns\n    -------\n    np.ndarray of shape (L, N)\n        Composite transformation matrix C = B @ A.\n\n    Raises\n    ------\n    ValueError\n        If the inner dimensions do not match (B.shape[1] != A.shape[0]).\n    \"\"\"\n    # Step 1: Validate inner dimension compatibility (B.shape[1] == A.shape[0])\n    # if B.shape[1] != A.shape[0]:\n    #     raise ValueError(f\"Inner dimension mismatch: {B.shape} and {A.shape}\")\n\n    # Step 2: Compute composite matrix product via matrix multiplication\n    # C = np.matmul(B, A)\n\n    # Step 3: Return the composite transformation matrix\n    # return C\n    pass"
         },
         "hints": {
           "tier1": {
-            "en": "Check dimension matching: B.shape[1] must equal A.shape[0].",
-            "ar": "تحقق من تطابق الأبعاد الداخلية: B.shape[1] يجب أن يساوي A.shape[0]."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Use NumPy matrix multiplication: C = B @ A.",
-            "ar": "استخدم ضرب المصفوفات في نَمباي: C = B @ A."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Return as float array: return np.asarray(B @ A, dtype=float).",
-            "ar": "أرجع الناتج كمصفوفة أعداد حقيقية: return np.asarray(B @ A, dtype=float)."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1096,7 +1096,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "determinant-scaling-factor",
+    "id": "t1-09",
     "title": "The Determinant as Area/Volume Scaling Factor",
     "titleAr": "المحدد كمعامل تمدد للمساحات والحجوم",
     "trackId": "math",
@@ -1106,7 +1106,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تحمل بين يديك مكعباً صغيراً من عجين الخبز الطري أبعاده $1 \\times 1 \\times 1$ سنتيمتر؛ حجمه الفيزيائي يساوي سنتيمتراً مكعباً واحداً..."
     },
     "prerequisites": [
-      "matrix-multiplication-composition"
+      "t1-08"
     ],
     "x": 160,
     "y": 840,
@@ -1125,8 +1125,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\det(\\mathbf{A}) \\coloneqq \\frac{\\operatorname{Area}(T(S))}{\\operatorname{Area}(S)}, \\quad \\det\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} = ad - bc",
         "formulaNote": {
-          "en": "The determinant measures the signed factor by which a linear transformation scales areas in 2D and hypervolumes in nD.",
-          "ar": "يقيس المحدد المعامل الجبري الموجه لتمدد المساحات في بعدين والحجوم الفائقة في n بعداً."
+          "en": "Mathematical anchor for The Determinant as Area/Volume Scaling Factor.",
+          "ar": "المرساة الرياضية لـ المحدد كمعامل تمدد للمساحات والحجوم."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $\\det(\\mathbf{A})$ | Matrix Determinant | The signed hypervolume magnification factor of the linear space transformation. |\n| $\\operatorname{Area}(T(S))$ | Transformed Area | The surface area of any arbitrary 2D geometric shape $S$ after transformation by matrix $\\mathbf{A}$. |\n| $\\operatorname{Area}(S)$ | Original Reference Area | The original surface area of shape $S$ prior to applying the linear transformation. |\n| $ad$ | Main Diagonal Product | The area of the large outer bounding box formed by the principal components of the transformed basis vectors. |\n| $- bc$ | Off-Diagonal Shear Correction | The area subtracted from the outer bounding box to strip away the corner triangles and isolate the parallelogram. |\n| $\\det(\\mathbf{A}) = 0$ | Singularity Condition | Signals dimensional collapse (rank deficiency): the transformation squashes space, destroying invertibility. |\n\n##### Why the Math Works Step-by-Step\n1. **Why is the 2D formula precisely $ad - bc$?**\n   Consider the pristine unit square spanned by standard basis vectors $\\mathbf{e}_1 = \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$ and $\\mathbf{e}_2 = \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix}$, with area $1 \\times 1 = 1$.\n   Under transformation $\\mathbf{A} = \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}$, these basis vectors land at $\\begin{bmatrix} a \\\\ c \\end{bmatrix}$ and $\\begin{bmatrix} b \\\\ d \\end{bmatrix}$, forming a tilted parallelogram.\n   Enclose this parallelogram inside a large outer rectangle of width $(a + b)$ and height $(c + d)$. The total area of this rectangle is $(a + b)(c + d) = ac + ad + bc + bd$.\n   Now subtract the non-parallelogram pieces:\n   - Two bottom/top right triangles of area $\\frac{1}{2}ac$ each (total area $ac$).\n   - Two left/right right triangles of area $\\frac{1}{2}bd$ each (total area $bd$).\n   - Two corner rectangles of area $bc$ each (total area $2bc$).\n   Subtracting these areas:\n   $$\\text{Area} = (ac + ad + bc + bd) - ac - bd - 2bc = ad - bc$$\n   The classic algebraic formula $ad - bc$ is the exact geometric area of the transformed unit square!\n2. **Why does $\\det(\\mathbf{A}) = 0$ destroy the inverse?**\n   If $\\det(\\mathbf{A}) = 0$, the parallelogram has collapsed into a line segment of zero area. Information along that lost dimension has been completely erased. A mathematical inverse would have to guess which of the infinitely many collapsed points was the original input—an impossible task.\n\n---",
@@ -1137,8 +1137,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-determinant-scaling-factor",
-          "starterCode": "import numpy as np\n\ndef compute_2d_determinant(A: np.ndarray) -> float:\n    \"\"\"\n    Compute the determinant of a 2x2 matrix A.\n\n    Intuition\n    ---------\n    The determinant measures the signed area scaling factor of the 2D\n    transformation. It calculates ad - bc, representing the net area of the\n    parallelogram spanned by the transformed standard basis vectors.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (2, 2)\n        2D linear transformation matrix.\n\n    Returns\n    -------\n    float\n        The signed area scaling factor det(A) = ad - bc.\n\n    Raises\n    ------\n    ValueError\n        If the input matrix is not of shape (2, 2).\n    \"\"\"\n    # Step 1: Validate that the matrix is 2x2\n    # if A.shape != (2, 2):\n    #     raise ValueError(f\"Expected 2x2 matrix, got shape {A.shape}\")\n\n    # Step 2: Extract elements a, b, c, d\n    # a, b = float(A[0, 0]), float(A[0, 1])\n    # c, d = float(A[1, 0]), float(A[1, 1])\n\n    # Step 3: Compute signed determinant ad - bc\n    # return (a * d) - (b * c)\n    pass",
+          "id": "py-t1-09",
+          "starterCode": "def compute_2d_determinant(A: np.ndarray) -> float:\n    \"\"\"\n    Compute the determinant of a 2x2 matrix A.\n\n    Intuition\n    ---------\n    The determinant measures the signed area scaling factor of the 2D\n    transformation. It calculates ad - bc, representing the net area of the\n    parallelogram spanned by the transformed standard basis vectors.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (2, 2)\n        2D linear transformation matrix.\n\n    Returns\n    -------\n    float\n        The signed area scaling factor det(A) = ad - bc.\n\n    Raises\n    ------\n    ValueError\n        If the input matrix is not of shape (2, 2).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "compute_2d_determinant(np.array([[3.0, 0.0], [0.0, 2.0]]))",
@@ -1156,24 +1156,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "6.0",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef compute_2d_determinant(A: np.ndarray) -> float:\n    \"\"\"\n    Compute the determinant of a 2x2 matrix A.\n\n    Intuition\n    ---------\n    The determinant measures the signed area scaling factor of the 2D\n    transformation. It calculates ad - bc, representing the net area of the\n    parallelogram spanned by the transformed standard basis vectors.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (2, 2)\n        2D linear transformation matrix.\n\n    Returns\n    -------\n    float\n        The signed area scaling factor det(A) = ad - bc.\n\n    Raises\n    ------\n    ValueError\n        If the input matrix is not of shape (2, 2).\n    \"\"\"\n    # Step 1: Validate that the matrix is 2x2\n    # if A.shape != (2, 2):\n    #     raise ValueError(f\"Expected 2x2 matrix, got shape {A.shape}\")\n\n    # Step 2: Extract elements a, b, c, d\n    # a, b = float(A[0, 0]), float(A[0, 1])\n    # c, d = float(A[1, 0]), float(A[1, 1])\n\n    # Step 3: Compute signed determinant ad - bc\n    # return (a * d) - (b * c)\n    pass",
+              "starterCode": "def compute_2d_determinant(A: np.ndarray) -> float:\n    \"\"\"\n    Compute the determinant of a 2x2 matrix A.\n\n    Intuition\n    ---------\n    The determinant measures the signed area scaling factor of the 2D\n    transformation. It calculates ad - bc, representing the net area of the\n    parallelogram spanned by the transformed standard basis vectors.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (2, 2)\n        2D linear transformation matrix.\n\n    Returns\n    -------\n    float\n        The signed area scaling factor det(A) = ad - bc.\n\n    Raises\n    ------\n    ValueError\n        If the input matrix is not of shape (2, 2).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "6.0"
             }
           },
-          "solution": "import numpy as np\n\ndef compute_2d_determinant(A: np.ndarray) -> float:\n    a, b = float(A[0, 0]), float(A[0, 1])\n    c, d = float(A[1, 0]), float(A[1, 1])\n    return float(a * d - b * c)"
+          "solution": "import numpy as np\n\ndef compute_2d_determinant(A: np.ndarray) -> float:\n    \"\"\"\n    Compute the determinant of a 2x2 matrix A.\n\n    Intuition\n    ---------\n    The determinant measures the signed area scaling factor of the 2D\n    transformation. It calculates ad - bc, representing the net area of the\n    parallelogram spanned by the transformed standard basis vectors.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (2, 2)\n        2D linear transformation matrix.\n\n    Returns\n    -------\n    float\n        The signed area scaling factor det(A) = ad - bc.\n\n    Raises\n    ------\n    ValueError\n        If the input matrix is not of shape (2, 2).\n    \"\"\"\n    # Step 1: Validate that the matrix is 2x2\n    # if A.shape != (2, 2):\n    #     raise ValueError(f\"Expected 2x2 matrix, got shape {A.shape}\")\n\n    # Step 2: Extract elements a, b, c, d\n    # a, b = float(A[0, 0]), float(A[0, 1])\n    # c, d = float(A[1, 0]), float(A[1, 1])\n\n    # Step 3: Compute signed determinant ad - bc\n    # return (a * d) - (b * c)\n    pass"
         },
         "hints": {
           "tier1": {
-            "en": "For a 2x2 matrix [[a, b], [c, d]], the formula is ad - bc.",
-            "ar": "للمصفوفة 2x2 التي عناصرها [[a, b], [c, d]]، الصيغة هي ad - bc."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Extract: a = A[0,0], b = A[0,1], c = A[1,0], d = A[1,1].",
-            "ar": "استخرج العناصر: a = A[0,0], b = A[0,1], c = A[1,0], d = A[1,1]."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Return float(a * d - b * c).",
-            "ar": "أرجع القيمة كعدد حقيقي: float(a * d - b * c)."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1233,7 +1233,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "gaussian-elimination-systems",
+    "id": "t1-10",
     "title": "Gaussian Elimination, Row Operations & Linear Systems",
     "titleAr": "الحذف الغاوسي والعمليات الصفية وحل المنظومات الخطية",
     "trackId": "math",
@@ -1243,7 +1243,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك دخلت سوقاً للمزارعين حيث اشترى ثلاثة زبائن سلالاً تحتوي على التفاح والموز والبطيخ، لكن البائع نسي وضع بطاقات الأسعار المنفردة على..."
     },
     "prerequisites": [
-      "linear-maps-transformations"
+      "t1-07"
     ],
     "x": 140,
     "y": 935,
@@ -1262,8 +1262,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbf{A}\\mathbf{x} = \\mathbf{b} \\xrightarrow{\\text{Pivoting}} \\mathbf{U}\\mathbf{x} = \\mathbf{c}, \\quad x_i = \\frac{c_i - \\sum_{j=i+1}^n U_{ij} x_j}{U_{ii}}",
         "formulaNote": {
-          "en": "Elementary row operations transform a system into upper triangular form, enabling exact backward substitution.",
-          "ar": "تحول العمليات الصفية الأولية المنظومة إلى شكل مثلثي علوي، مما يتيح التعويض العكسي الدقيق."
+          "en": "Mathematical anchor for Gaussian Elimination, Row Operations & Linear Systems.",
+          "ar": "المرساة الرياضية لـ الحذف الغاوسي والعمليات الصفية وحل المنظومات الخطية."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $\\mathbf{A}\\mathbf{x} = \\mathbf{b}$ | Original Linear System | The initial simultaneous system: $\\mathbf{A}$ is the matrix of plane normal coefficients, and $\\mathbf{b}$ is the offset vector. |\n| $\\mathbf{U}\\mathbf{x} = \\mathbf{c}$ | Upper-Triangular System | The stair-stepped echelon form after eliminating all coefficients below the main diagonal ($U_{ij} = 0$ for $i > j$). |\n| $U_{ii}$ | Pivot Element | The diagonal anchor entry in row $i$; must be non-zero to allow dividing without causing a zero-division error. |\n| $\\sum_{j=i+1}^n U_{ij} x_j$ | Already-Resolved Variables | The sum of known contributions from variables $x_{i+1}, \\dots, x_n$ previously solved in lower rows. |\n| $x_i = \\dots$ | Back-Substitution Formula | The cascading upward solver: isolates $x_i$ by subtracting known terms from $c_i$ and dividing by pivot $U_{ii}$. |\n\n##### Why the Math Works Step-by-Step\n1. **Why do elementary row operations preserve the exact intersection point?**\n   Consider two true equations: $\\text{Eq}_1 = \\text{val}_1$ and $\\text{Eq}_2 = \\text{val}_2$. If you multiply $\\text{Eq}_1$ by scalar $k$, you get $k \\cdot \\text{Eq}_1 = k \\cdot \\text{val}_1$, which is still undeniably true. If you add that to $\\text{Eq}_2$, you are adding equal quantities to both sides of the equation. Any point $(x, y, z)$ that satisfied the original planes *must* satisfy this new combined plane. Hence, the solution set is strictly preserved.\n2. **Why is the upper-triangular form so easy to solve?**\n   Look at the bottom row of an upper-triangular matrix:\n   $$U_{nn} x_n = c_n \\implies x_n = \\frac{c_n}{U_{nn}}$$\n   Because all other variables were eliminated, there is no cross-talk! Once $x_n$ is known, row $n-1$ has only one remaining unknown ($x_{n-1}$). By stepping upward row by row, every single equation contains exactly one unknown variable and several already-computed constants.\n\n---",
@@ -1274,7 +1274,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-gaussian-elimination-systems",
+          "id": "py-t1-10",
           "starterCode": "def back_substitution(U: np.ndarray, c: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Solve an upper-triangular linear system U x = c via backward substitution.\n\n    Intuition\n    ---------\n    In an upper-triangular matrix, the bottom equation contains only the last\n    variable x[n-1]. We solve for it directly, then substitute it upward row\n    by row into the preceding equations to systematically unlock all unknowns.\n\n    Parameters\n    ----------\n    U : np.ndarray of shape (N, N)\n        Upper-triangular matrix with non-zero diagonal pivot elements.\n    c : np.ndarray of shape (N,)\n        Right-hand side target vector.\n\n    Returns\n    -------\n    np.ndarray of shape (N,)\n        Solution vector x satisfying U x = c.\n\n    Raises\n    ------\n    ZeroDivisionError\n        If any diagonal pivot element U[i, i] is zero.\n    \"\"\"\n    # Step 1: Iterate backwards through rows from bottom (n - 1) to top (0)\n    # Step 2: Guard against zero diagonal pivot\n    # Step 3: Compute sum of known terms from already-computed variables to the right\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -1301,16 +1301,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Iterate backwards: for i in range(n - 1, -1, -1).",
-            "ar": "ابدأ التكرار من الأسفل للأعلى: for i in range(n - 1, -1, -1)."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Subtract known terms using dot product: sum_known = np.dot(U[i, i+1:], x[i+1:]).",
-            "ar": "اطرح الحدود المحسوبة مسبقاً باستخدام الجداء النقطي: sum_known = np.dot(U[i, i+1:], x[i+1:])."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Divide by pivot: x[i] = (c[i] - sum_known) / U[i, i].",
-            "ar": "اقسم على عنصر الارتكاز: x[i] = (c[i] - sum_known) / U[i, i]."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1370,7 +1370,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "four-fundamental-subspaces",
+    "id": "t1-11",
     "title": "The Four Fundamental Subspaces",
     "titleAr": "الفضاءات الجزئية الأربعة الأساسية",
     "trackId": "math",
@@ -1380,7 +1380,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تسلط مصباحاً يدوياً ساطعاً على مجسم سلكي معقد في غرفة مظلمة، لتسقط ظله على الجدار المسطح خلفه."
     },
     "prerequisites": [
-      "gaussian-elimination-systems"
+      "t1-10"
     ],
     "x": 160,
     "y": 1030,
@@ -1399,8 +1399,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbb{R}^n = C(\\mathbf{A}^T) \\oplus N(\\mathbf{A}), \\quad \\mathbb{R}^m = C(\\mathbf{A}) \\oplus N(\\mathbf{A}^T), \\quad \\operatorname{rank}(\\mathbf{A}) + \\operatorname{nullity}(\\mathbf{A}) = n",
         "formulaNote": {
-          "en": "Strang's Big Picture: Any linear map partitions its domain and codomain into pairs of mutually orthogonal complementary subspaces.",
-          "ar": "الصورة الكبرى لسترانج: يقسم أي تحويل خطي مجاله ومجاله المقابل إلى أزواج من الفضاءات الجزئية المتعامدة المتكاملة."
+          "en": "Mathematical anchor for The Four Fundamental Subspaces.",
+          "ar": "المرساة الرياضية لـ الفضاءات الجزئية الأربعة الأساسية."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $C(\\mathbf{A}) \\subset \\mathbb{R}^m$ | Column Space (Range) | The subspace of all outputs reachable by taking linear combinations of $\\mathbf{A}$'s columns. Dimension $= r$. |\n| $N(\\mathbf{A}) \\subset \\mathbb{R}^n$ | Nullspace (Kernel) | The subspace of all inputs crushed to absolute zero ($\\mathbf{A}\\mathbf{x} = \\mathbf{0}$). Dimension $= n - r$. |\n| $C(\\mathbf{A}^T) \\subset \\mathbb{R}^n$ | Row Space | The active input directions spanned by the rows of $\\mathbf{A}$. Orthogonal complement to $N(\\mathbf{A})$. Dimension $= r$. |\n| $N(\\mathbf{A}^T) \\subset \\mathbb{R}^m$ | Left Nullspace | All output directions orthogonal to the column space ($\\mathbf{A}^T\\mathbf{y} = \\mathbf{0}$). Dimension $= m - r$. |\n| $\\oplus$ | Direct Sum | Every vector decomposes uniquely into two perpendicular pieces: $\\mathbf{x} = \\mathbf{x}_{\\text{row}} + \\mathbf{x}_{\\text{null}}$ where $\\mathbf{x}_{\\text{row}} \\perp \\mathbf{x}_{\\text{null}}$. |\n| $r + (n - r) = n$ | Rank-Nullity Theorem | Conservation of dimensions: every input dimension is either active ($r$) or crushed into the nullspace ($n - r$). |\n\n##### Why the Math Works Step-by-Step\n1. **Why is the Nullspace strictly perpendicular to the Row Space?**\n   Suppose vector $\\mathbf{x}$ lies in the Nullspace of $\\mathbf{A}$. By definition:\n   $$\\mathbf{A}\\mathbf{x} = \\mathbf{0} \\implies \\begin{bmatrix} \\text{row}_1 \\\\ \\text{row}_2 \\\\ \\vdots \\\\ \\text{row}_m \\end{bmatrix} \\mathbf{x} = \\begin{bmatrix} 0 \\\\ 0 \\\\ \\vdots \\\\ 0 \\end{bmatrix}$$\n   Look at each coordinate of the resulting zero vector:\n   $$\\text{row}_1 \\cdot \\mathbf{x} = 0, \\quad \\text{row}_2 \\cdot \\mathbf{x} = 0, \\quad \\dots, \\quad \\text{row}_m \\cdot \\mathbf{x} = 0$$\n   This proves that $\\mathbf{x}$ has a dot product of zero with *every single row* of matrix $\\mathbf{A}$! Since any vector $\\mathbf{v}$ in the Row Space is a linear combination of these rows ($\\mathbf{v} = \\sum c_i \\text{row}_i$), taking the dot product gives $\\mathbf{v} \\cdot \\mathbf{x} = \\sum c_i (\\text{row}_i \\cdot \\mathbf{x}) = 0$. Therefore, every vector in the nullspace is strictly perpendicular to the entire row space: $C(\\mathbf{A}^T) \\perp N(\\mathbf{A})$.\n2. **Why does $\\operatorname{rank}(\\mathbf{A}) = \\operatorname{rank}(\\mathbf{A}^T)$ (Row Rank equals Column Rank)?**\n   One of the deepest theorems in mathematics: although $\\mathbf{A}$ can have wildly different numbers of rows and columns (e.g. $1000 \\times 3$), the number of linearly independent rows always strictly equals the number of linearly independent columns!\n\n---",
@@ -1411,7 +1411,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-four-fundamental-subspaces",
+          "id": "py-t1-11",
           "starterCode": "def subspace_dimensions(m: int, n: int, rank: int) -> dict[str, int]:\n    \"\"\"\n    Compute the dimensions of Gilbert Strang's Four Fundamental Subspaces\n    for an m x n matrix with rank r.\n\n    Intuition\n    ---------\n    - Column Space C(A) in R^m has dimension equal to rank r.\n    - Row Space C(A^T) in R^n has dimension equal to rank r.\n    - Nullspace N(A) in R^n has dimension n - r (Rank-Nullity Theorem).\n    - Left Nullspace N(A^T) in R^m has dimension m - r.\n\n    Parameters\n    ----------\n    m : int\n        Number of rows (output space dimension).\n    n : int\n        Number of columns (input space dimension).\n    rank : int\n        Matrix rank r (r <= min(m, n)).\n\n    Returns\n    -------\n    dict with keys 'col_space', 'nullspace', 'row_space', 'left_nullspace'\n        The geometric dimensions of each of the four fundamental subspaces.\n\n    Raises\n    ------\n    ValueError\n        If rank exceeds min(m, n) or is negative.\n    \"\"\"\n    # Step 1: Column space and row space dimensions both strictly equal rank r\n    # Step 2: Nullspace dimension equals input dimension minus rank (n - r)\n    # Step 3: Left nullspace dimension equals output dimension minus rank (m - r)\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -1438,16 +1438,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Remember the fundamental identity: dim(Col) = dim(Row) = rank.",
-            "ar": "تذكر التطابق الأساسي: بعد فضاء الأعمدة = بعد فضاء الصفوف = الرتبة."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Rank-Nullity theorem states: rank + dim(Null) = n (columns).",
-            "ar": "تنص مبرهنة الرتبة والنواة على: الرتبة + بعد الفضاء الصفري = n (عدد الأعمدة)."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Left nullspace dimension is m - rank: dim(LeftNull) = m - rank.",
-            "ar": "بعد الفضاء الصفري الأيسر هو m - rank."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1507,7 +1507,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "orthogonal-projections",
+    "id": "t1-12",
     "title": "Orthogonal Projections & Least Squares Approximation",
     "titleAr": "الإسقاطات المتعامدة وتقريب المربعات الصغرى",
     "trackId": "math",
@@ -1517,7 +1517,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تقف في بهو قصر فسيح ذي سقف شاهق الارتفاع، وتمسك بزمام طائرة مسيرة صغيرة تطفو في الهواء عند النقطة $\\mathbf{b}$."
     },
     "prerequisites": [
-      "four-fundamental-subspaces"
+      "t1-11"
     ],
     "x": 140,
     "y": 1125,
@@ -1536,8 +1536,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbf{p} = \\mathbf{P}\\mathbf{b} = \\mathbf{A}(\\mathbf{A}^T\\mathbf{A})^{-1}\\mathbf{A}^T\\mathbf{b}, \\quad \\mathbf{P}^2 = \\mathbf{P}, \\quad \\mathbf{P}^T = \\mathbf{P}",
         "formulaNote": {
-          "en": "The orthogonal projection operator onto col(A) minimizes distance ||b - p||2 via an idempotent, symmetric projection matrix.",
-          "ar": "مؤثر الإسقاط المتعامد على فضاء أعمدة A يقلل المسافة ||b - p||2 عبر مصفوفة إسقاط متناظرة وصامدة أمام التكرار."
+          "en": "Mathematical anchor for Orthogonal Projections & Least Squares Approximation.",
+          "ar": "المرساة الرياضية لـ الإسقاطات المتعامدة وتقريب المربعات الصغرى."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $\\mathbf{p} = \\mathbf{P}\\mathbf{b}$ | Orthogonal Projection Vector | The point inside subspace $C(\\mathbf{A})$ closest to external target vector $\\mathbf{b}$. |\n| $\\mathbf{P} = \\mathbf{A}(\\mathbf{A}^T\\mathbf{A})^{-1}\\mathbf{A}^T$ | Projection Matrix Operator | The linear operator that projects any vector perpendicularly onto the column space of $\\mathbf{A}$. |\n| $\\mathbf{A}^T\\mathbf{A}$ | Gram Matrix | The symmetric square matrix of column inner products; invertible if $\\mathbf{A}$ has full column rank. |\n| $\\mathbf{e} = \\mathbf{b} - \\mathbf{p}$ | Residual Error Vector | The plumb line vector: represents the perpendicular difference dropped from $\\mathbf{b}$ onto $\\mathbf{p}$. |\n| $\\mathbf{P}^2 = \\mathbf{P}$ | Idempotence | Dropping an already-projected vector onto the subspace leaves it strictly unchanged. |\n| $\\mathbf{P}^T = \\mathbf{P}$ | Symmetry | Algebraic guarantee that the projection angle is strictly perpendicular ($90^\\circ$ orthogonal). |\n\n##### Why the Math Works Step-by-Step\n1. **Deriving the master projection formula $\\mathbf{P} = \\mathbf{A}(\\mathbf{A}^T\\mathbf{A})^{-1}\\mathbf{A}^T$:**\n   Since the projection $\\mathbf{p}$ must live inside the column space $C(\\mathbf{A})$, it can be written as some linear combination of the columns of $\\mathbf{A}$:\n   $$\\mathbf{p} = \\mathbf{A}\\hat{\\mathbf{x}}$$\n   The plumb line error vector is $\\mathbf{e} = \\mathbf{b} - \\mathbf{p} = \\mathbf{b} - \\mathbf{A}\\hat{\\mathbf{x}}$.\n   To be the closest possible point, this error vector must stand at a strict $90^\\circ$ right angle to *every single column* of matrix $\\mathbf{A}$:\n   $$\\mathbf{A}^T \\mathbf{e} = \\mathbf{0} \\implies \\mathbf{A}^T (\\mathbf{b} - \\mathbf{A}\\hat{\\mathbf{x}}) = \\mathbf{0}$$\n   Expanding and distributing $\\mathbf{A}^T$:\n   $$\\mathbf{A}^T \\mathbf{b} - \\mathbf{A}^T\\mathbf{A}\\hat{\\mathbf{x}} = \\mathbf{0} \\implies \\mathbf{A}^T\\mathbf{A}\\hat{\\mathbf{x}} = \\mathbf{A}^T\\mathbf{b}$$\n   These are the famous **Normal Equations**! Assuming the columns of $\\mathbf{A}$ are linearly independent, the square matrix $\\mathbf{A}^T\\mathbf{A}$ is invertible:\n   $$\\hat{\\mathbf{x}} = (\\mathbf{A}^T\\mathbf{A})^{-1}\\mathbf{A}^T\\mathbf{b}$$\n   To find the physical projected vector $\\mathbf{p}$, substitute $\\hat{\\mathbf{x}}$ back into $\\mathbf{p} = \\mathbf{A}\\hat{\\mathbf{x}}$:\n   $$\\mathbf{p} = \\mathbf{A} [(\\mathbf{A}^T\\mathbf{A})^{-1}\\mathbf{A}^T\\mathbf{b}] = \\left[\\mathbf{A}(\\mathbf{A}^T\\mathbf{A})^{-1}\\mathbf{A}^T\\right] \\mathbf{b} = \\mathbf{P}\\mathbf{b}$$\n2. **Proof of Idempotence ($\\mathbf{P}^2 = \\mathbf{P}$):**\n   $$\\mathbf{P}^2 = \\left[\\mathbf{A}(\\mathbf{A}^T\\mathbf{A})^{-1}\\mathbf{A}^T\\right] \\left[\\mathbf{A}(\\mathbf{A}^T\\mathbf{A})^{-1}\\mathbf{A}^T\\right]$$\n   Notice the middle terms: $[(\\mathbf{A}^T\\mathbf{A})^{-1}][\\mathbf{A}^T\\mathbf{A}] = \\mathbf{I}$ (the identity matrix). Thus:\n   $$\\mathbf{P}^2 = \\mathbf{A} \\cdot \\mathbf{I} \\cdot (\\mathbf{A}^T\\mathbf{A})^{-1}\\mathbf{A}^T = \\mathbf{A}(\\mathbf{A}^T\\mathbf{A})^{-1}\\mathbf{A}^T = \\mathbf{P}$$\n\n---",
@@ -1548,7 +1548,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-orthogonal-projections",
+          "id": "py-t1-12",
           "starterCode": "def project_onto_line(a: np.ndarray, b: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Project target vector b orthogonally onto the 1D subspace line spanned by vector a.\n\n    Intuition\n    ---------\n    Orthogonal projection finds the point p along line a closest to point b.\n    Geometrically, the error vector (b - p) is perpendicular to direction a,\n    yielding scalar multiplier c = (a . b) / (a . a) and projection p = c * a.\n\n    Parameters\n    ----------\n    a : np.ndarray of shape (D,)\n        Direction vector defining the 1D line subspace (must be non-zero).\n    b : np.ndarray of shape (D,)\n        Target vector to be projected.\n\n    Returns\n    -------\n    np.ndarray of shape (D,)\n        Projected vector p = (a^T b / a^T a) * a.\n\n    Raises\n    ------\n    ValueError\n        If direction vector a is a zero vector.\n    \"\"\"\n    # Step 1: Compute the dot product of direction vector a with itself (squared length)\n    # Step 2: Compute the dot product of direction vector a with target vector b\n    # Step 3: Compute scalar projection coefficient c = (a . b) / (a . a)\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -1575,16 +1575,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Compute dot_ab = np.dot(a, b) and dot_aa = np.dot(a, a).",
-            "ar": "احسب dot_ab = np.dot(a, b) و dot_aa = np.dot(a, a)."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "The scalar projection factor is dot_ab / dot_aa.",
-            "ar": "معامل الإسقاط القياسي هو dot_ab / dot_aa."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Multiply the scalar factor by vector a: return (dot_ab / dot_aa) * a.",
-            "ar": "اضرب المعامل في المتجه a: return (dot_ab / dot_aa) * a."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1644,7 +1644,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "gram-schmidt-orthogonalization",
+    "id": "t1-13",
     "title": "Eigenvalues & Eigenvectors: Invariant Directions of Space",
     "titleAr": "القيم الذاتية والمتجهات الذاتية: الاتجاهات الصامدة في الفضاء",
     "trackId": "math",
@@ -1654,7 +1654,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تفرد عجينة بيتزا على طاولة المطبخ، أو تشد شريحة مطاطية مرنة رُسمت عليها أشكال هندسية بيدك في اتجاهين متضادين قطرياً."
     },
     "prerequisites": [
-      "orthogonal-projections"
+      "t1-12"
     ],
     "x": 160,
     "y": 1220,
@@ -1673,8 +1673,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbf{A}\\mathbf{v} = \\lambda \\mathbf{v} \\iff (\\mathbf{A} - \\lambda \\mathbf{I})\\mathbf{v} = \\mathbf{0}, \\quad \\det(\\mathbf{A} - \\lambda \\mathbf{I}) = 0",
         "formulaNote": {
-          "en": "Eigenvectors identify invariant spatial directions that experience zero angular rotation under transformation A, scaling only by eigenvalue lambda.",
-          "ar": "تكشف المتجهات الذاتية عن الاتجاهات المكانية الصامدة التي لا تعاني أي دوران زاوي تحت التحويل A، وتكتفي بالتمدد بالقيمة الذاتية لامدا."
+          "en": "Mathematical anchor for Eigenvalues & Eigenvectors: Invariant Directions of Space.",
+          "ar": "المرساة الرياضية لـ القيم الذاتية والمتجهات الذاتية: الاتجاهات الصامدة في الفضاء."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $\\mathbf{A} \\in \\mathbb{R}^{n \\times n}$ | Transformation Matrix | A square linear operator that transforms vectors in $n$-dimensional space. |\n| $\\mathbf{v} \\in \\mathbb{R}^n \\setminus \\{\\mathbf{0}\\}$ | Eigenvector | A non-zero directional arrow that experiences zero rotation when operated on by $\\mathbf{A}$. |\n| $\\lambda \\in \\mathbb{R}$ (or $\\mathbb{C}$) | Eigenvalue | The scalar scaling factor indicating how much vector $\\mathbf{v}$ stretches, shrinks, or flips. |\n| $\\mathbf{A}\\mathbf{v}$ | Matrix-Vector Product | The actual spatial output when matrix $\\mathbf{A}$ acts on coordinate vector $\\mathbf{v}$. |\n| $\\lambda \\mathbf{v}$ | Scaled Vector | Proves that the matrix action is geometrically identical to pure scalar multiplication along line $\\mathbf{v}$. |\n| $\\mathbf{I} \\in \\mathbb{R}^{n \\times n}$ | Identity Matrix | The matrix equivalent of the number $1$; enables subtracting scalar $\\lambda$ from matrix $\\mathbf{A}$. |\n| $\\mathbf{A} - \\lambda \\mathbf{I}$ | Shifted Characteristic Matrix | The transformation shifted by $\\lambda$; squashes the eigenvector direction into the zero vector. |\n| $\\det(\\mathbf{A} - \\lambda \\mathbf{I}) = 0$ | Characteristic Equation | Polynomial root condition; ensures matrix $(\\mathbf{A} - \\lambda \\mathbf{I})$ collapses volume and has a non-trivial nullspace. |\n\n##### Why the Math Works Step-by-Step\n1. **Why can matrix action become scalar multiplication?** For arbitrary vectors, matrix multiplication $\\mathbf{A}\\mathbf{x}$ changes both length and direction. But along an eigenvector, the directional output $\\mathbf{A}\\mathbf{v}$ is parallel to the input $\\mathbf{v}$. Thus, the complex matrix operation collapses to simple scaling: $\\mathbf{A}\\mathbf{v} = \\lambda \\mathbf{v}$.\n2. **Why do we insert the identity matrix $\\mathbf{I}$?** In algebra, moving terms to one side yields $\\mathbf{A}\\mathbf{v} - \\lambda \\mathbf{v} = \\mathbf{0}$. We cannot factor out $\\mathbf{v}$ as $(\\mathbf{A} - \\lambda)\\mathbf{v}$ because subtracting a scalar $\\lambda$ from a 2D matrix $\\mathbf{A}$ is mathematically undefined. Multiplying $\\lambda$ by the identity matrix $\\mathbf{I}$ creates an $n \\times n$ diagonal matrix, allowing valid matrix subtraction: $(\\mathbf{A} - \\lambda \\mathbf{I})\\mathbf{v} = \\mathbf{0}$.\n3. **Why must the determinant equal zero?** The equation $(\\mathbf{A} - \\lambda \\mathbf{I})\\mathbf{v} = \\mathbf{0}$ states that the matrix $(\\mathbf{A} - \\lambda \\mathbf{I})$ maps a non-zero vector $\\mathbf{v}$ to $\\mathbf{0}$. If $(\\mathbf{A} - \\lambda \\mathbf{I})$ were invertible, we could multiply both sides by its inverse to get $\\mathbf{v} = (\\mathbf{A} - \\lambda \\mathbf{I})^{-1}\\mathbf{0} = \\mathbf{0}$, which contradicts the definition of an eigenvector ($\\mathbf{v} \\ne \\mathbf{0}$). Therefore, the matrix must be singular (non-invertible), which requires its volume scaling factor—the determinant—to equal zero: $\\det(\\mathbf{A} - \\lambda \\mathbf{I}) = 0$.\n4. **Why are eigenvectors lines rather than isolated points?** If $\\mathbf{A}\\mathbf{v} = \\lambda \\mathbf{v}$, then for any scalar $c \\ne 0$, we have $\\mathbf{A}(c\\mathbf{v}) = c(\\mathbf{A}\\mathbf{v}) = c(\\lambda \\mathbf{v}) = \\lambda(c\\mathbf{v})$. Scaling an eigenvector produces another eigenvector with the exact same eigenvalue. Thus, an eigenvector defines an entire invariant 1D subspace (a line through the origin), often standardized to unit length ($\\|\\mathbf{v}\\|_2 = 1$).\n\n---",
@@ -1685,8 +1685,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-gram-schmidt-orthogonalization",
-          "starterCode": "import numpy as np\n\ndef power_iteration(A: np.ndarray, num_iter: int = 50) -> tuple[float, np.ndarray]:\n    \"\"\"\n    Compute the dominant eigenvalue and eigenvector of matrix A via power iteration.\n\n    Intuition\n    ---------\n    Repeatedly applying matrix A to a generic vector stretches the component\n    along the dominant eigenvector faster than any other direction. Normalizing\n    the vector at each step prevents numerical overflow and causes the vector\n    to converge directly onto the principal invariant axis. The Rayleigh quotient\n    then computes the corresponding dominant eigenvalue.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (N, N)\n        Square matrix with a distinct dominant eigenvalue.\n    num_iter : int\n        Number of power iteration steps.\n\n    Returns\n    -------\n    tuple[float, np.ndarray]\n        dominant_eigenvalue: Estimated Rayleigh quotient scalar lambda.\n        dominant_eigenvector: Normalized unit eigenvector v.\n    \"\"\"\n    # Step 1: Initialize a normalized uniform unit vector v of length N\n    # v = np.ones(A.shape[0]) / np.sqrt(A.shape[0])\n\n    # Step 2: Iteratively multiply by matrix A and normalize to unit length\n    # for _ in range(num_iter):\n    #     v = A @ v\n    #     v = v / np.linalg.norm(v)\n\n    # Step 3: Compute Rayleigh quotient eigenvalue lambda = v^T @ A @ v and return\n    # lam = float(v.T @ A @ v)\n    # return lam, v\n    pass",
+          "id": "py-t1-13",
+          "starterCode": "def power_iteration(A: np.ndarray, num_iter: int = 50) -> tuple[float, np.ndarray]:\n    \"\"\"\n    Compute the dominant eigenvalue and eigenvector of matrix A via power iteration.\n\n    Intuition\n    ---------\n    Repeatedly applying matrix A to a generic vector stretches the component\n    along the dominant eigenvector faster than any other direction. Normalizing\n    the vector at each step prevents numerical overflow and causes the vector\n    to converge directly onto the principal invariant axis. The Rayleigh quotient\n    then computes the corresponding dominant eigenvalue.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (N, N)\n        Square matrix with a distinct dominant eigenvalue.\n    num_iter : int\n        Number of power iteration steps.\n\n    Returns\n    -------\n    tuple[float, np.ndarray]\n        dominant_eigenvalue: Estimated Rayleigh quotient scalar lambda.\n        dominant_eigenvector: Normalized unit eigenvector v.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "round(power_iteration(np.array([[2.0, 0.0], [0.0, 5.0]]), 50)[0], 2)",
@@ -1704,24 +1704,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "5.0",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef power_iteration(A: np.ndarray, num_iter: int = 50) -> tuple[float, np.ndarray]:\n    \"\"\"\n    Compute the dominant eigenvalue and eigenvector of matrix A via power iteration.\n\n    Intuition\n    ---------\n    Repeatedly applying matrix A to a generic vector stretches the component\n    along the dominant eigenvector faster than any other direction. Normalizing\n    the vector at each step prevents numerical overflow and causes the vector\n    to converge directly onto the principal invariant axis. The Rayleigh quotient\n    then computes the corresponding dominant eigenvalue.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (N, N)\n        Square matrix with a distinct dominant eigenvalue.\n    num_iter : int\n        Number of power iteration steps.\n\n    Returns\n    -------\n    tuple[float, np.ndarray]\n        dominant_eigenvalue: Estimated Rayleigh quotient scalar lambda.\n        dominant_eigenvector: Normalized unit eigenvector v.\n    \"\"\"\n    # Step 1: Initialize a normalized uniform unit vector v of length N\n    # v = np.ones(A.shape[0]) / np.sqrt(A.shape[0])\n\n    # Step 2: Iteratively multiply by matrix A and normalize to unit length\n    # for _ in range(num_iter):\n    #     v = A @ v\n    #     v = v / np.linalg.norm(v)\n\n    # Step 3: Compute Rayleigh quotient eigenvalue lambda = v^T @ A @ v and return\n    # lam = float(v.T @ A @ v)\n    # return lam, v\n    pass",
+              "starterCode": "def power_iteration(A: np.ndarray, num_iter: int = 50) -> tuple[float, np.ndarray]:\n    \"\"\"\n    Compute the dominant eigenvalue and eigenvector of matrix A via power iteration.\n\n    Intuition\n    ---------\n    Repeatedly applying matrix A to a generic vector stretches the component\n    along the dominant eigenvector faster than any other direction. Normalizing\n    the vector at each step prevents numerical overflow and causes the vector\n    to converge directly onto the principal invariant axis. The Rayleigh quotient\n    then computes the corresponding dominant eigenvalue.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (N, N)\n        Square matrix with a distinct dominant eigenvalue.\n    num_iter : int\n        Number of power iteration steps.\n\n    Returns\n    -------\n    tuple[float, np.ndarray]\n        dominant_eigenvalue: Estimated Rayleigh quotient scalar lambda.\n        dominant_eigenvector: Normalized unit eigenvector v.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "5.0"
             }
           },
-          "solution": "import numpy as np\n\ndef power_iteration(A: np.ndarray, num_iter: int = 50) -> tuple[float, np.ndarray]:\n    n = A.shape[0]\n    v = np.ones(n, dtype=float) / np.sqrt(n)\n    for _ in range(num_iter):\n        w = A @ v\n        norm_w = float(np.linalg.norm(w))\n        if norm_w == 0.0:\n            return 0.0, v\n        v = w / norm_w\n    lam = float(v.T @ (A @ v))\n    return lam, v"
+          "solution": "import numpy as np\n\ndef power_iteration(A: np.ndarray, num_iter: int = 50) -> tuple[float, np.ndarray]:\n    \"\"\"\n    Compute the dominant eigenvalue and eigenvector of matrix A via power iteration.\n\n    Intuition\n    ---------\n    Repeatedly applying matrix A to a generic vector stretches the component\n    along the dominant eigenvector faster than any other direction. Normalizing\n    the vector at each step prevents numerical overflow and causes the vector\n    to converge directly onto the principal invariant axis. The Rayleigh quotient\n    then computes the corresponding dominant eigenvalue.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (N, N)\n        Square matrix with a distinct dominant eigenvalue.\n    num_iter : int\n        Number of power iteration steps.\n\n    Returns\n    -------\n    tuple[float, np.ndarray]\n        dominant_eigenvalue: Estimated Rayleigh quotient scalar lambda.\n        dominant_eigenvector: Normalized unit eigenvector v.\n    \"\"\"\n    # Step 1: Initialize a normalized uniform unit vector v of length N\n    # v = np.ones(A.shape[0]) / np.sqrt(A.shape[0])\n\n    # Step 2: Iteratively multiply by matrix A and normalize to unit length\n    # for _ in range(num_iter):\n    #     v = A @ v\n    #     v = v / np.linalg.norm(v)\n\n    # Step 3: Compute Rayleigh quotient eigenvalue lambda = v^T @ A @ v and return\n    # lam = float(v.T @ A @ v)\n    # return lam, v\n    pass"
         },
         "hints": {
           "tier1": {
-            "en": "Initialize a non-zero starting vector: v = np.ones(A.shape[0]) / np.sqrt(A.shape[0]).",
-            "ar": "ابدأ بمتجه غير صفري موحد: v = np.ones(A.shape[0]) / np.sqrt(A.shape[0])."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "In each loop, multiply w = A @ v and renormalize v = w / np.linalg.norm(w).",
-            "ar": "في كل دورة، اضرب w = A @ v ثم أعد التوحيد v = w / np.linalg.norm(w)."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Compute eigenvalue using Rayleigh quotient: lam = float(v.T @ A @ v).",
-            "ar": "احسب القيمة الذاتية بكسر رايلي: lam = float(v.T @ A @ v)."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1781,7 +1781,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "least-squares-approximation",
+    "id": "t1-14",
     "title": "The Spectral Theorem & Symmetric Eigendecomposition",
     "titleAr": "المبرهنة الطيفية والتفكيك القيمي الذاتي المتناظر",
     "trackId": "math",
@@ -1791,8 +1791,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تنقر على غشاء طبلة مشدود بإحكام، أو تعزف على وتر عود مشدود. في الطبيعة الفيزيائية، يُعد التوازن التبادلي قانوناً صارماً: فوفقاً..."
     },
     "prerequisites": [
-      "orthogonal-projections",
-      "four-fundamental-subspaces"
+      "t1-12",
+      "t1-11"
     ],
     "x": 140,
     "y": 1315,
@@ -1811,8 +1811,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbf{A} \\in \\mathbb{R}^{n \\times n}, \\quad \\mathbf{A} = \\mathbf{A}^T \\implies \\mathbf{A} = \\mathbf{Q} \\mathbf{\\Lambda} \\mathbf{Q}^T = \\sum_{i=1}^n \\lambda_i \\mathbf{q}_i \\mathbf{q}_i^T",
         "formulaNote": {
-          "en": "The Spectral Theorem guarantees that any real symmetric matrix admits purely real eigenvalues and an orthonormal basis of mutually perpendicular eigenvectors.",
-          "ar": "تضمن المبرهنة الطيفية أن أي مصفوفة متناظرة حقيقية تمتلك قيماً ذاتية حقيقية بالكامل وأساساً متعامداً من المتجهات الذاتية المتعامدة مثنى مثنى."
+          "en": "Mathematical anchor for The Spectral Theorem & Symmetric Eigendecomposition.",
+          "ar": "المرساة الرياضية لـ المبرهنة الطيفية والتفكيك القيمي الذاتي المتناظر."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $\\mathbf{A} = \\mathbf{A}^T$ | Symmetry Condition | The matrix equals its transpose; row interactions perfectly match column interactions ($A_{ij} = A_{ji}$). |\n| $\\mathbf{Q} \\in \\mathbb{R}^{n \\times n}$ | Orthogonal Eigenvector Matrix | A rigid rotation matrix whose columns are the mutually perpendicular unit eigenvectors ($\\mathbf{Q}^T\\mathbf{Q} = \\mathbf{I}$). |\n| $\\mathbf{\\Lambda} = \\operatorname{diag}(\\lambda_1, \\dots, \\lambda_n)$ | Diagonal Eigenvalue Matrix | Contains the purely real scaling factors along the perpendicular eigenvector axes. |\n| $\\mathbf{Q}^T$ | Transposed Eigenbasis Transform | Projects arbitrary space onto the orthogonal eigenbasis; because $\\mathbf{Q}$ is orthogonal, $\\mathbf{Q}^{-1} = \\mathbf{Q}^T$. |\n| $\\mathbf{q}_i \\in \\mathbb{R}^n$ | Orthonormal Eigenvector | A unit-length vector ($\\|\\mathbf{q}_i\\|_2 = 1$) identifying an unrotated, independent axis of the transformation. |\n| $\\lambda_i \\in \\mathbb{R}$ | Real Eigenvalue | The physical stretch factor along axis $\\mathbf{q}_i$; guaranteed real with zero imaginary component. |\n| $\\mathbf{q}_i \\mathbf{q}_i^T \\in \\mathbb{R}^{n \\times n}$ | Rank-1 Projection Matrix | The outer product operator that projects any incoming vector orthogonally onto the 1D line spanned by $\\mathbf{q}_i$. |\n| $\\sum_{i=1}^n \\lambda_i \\mathbf{q}_i \\mathbf{q}_i^T$ | Spectral Expansion | Expresses the entire complex matrix as a weighted sum of independent, 1D orthogonal projections. |\n\n##### Why the Math Works Step-by-Step\n1. **Why are all eigenvalues of a symmetric matrix guaranteed to be real?** Suppose $\\mathbf{A}\\mathbf{v} = \\lambda \\mathbf{v}$ where $\\lambda$ and $\\mathbf{v}$ might potentially be complex. Taking the conjugate transpose product yields $\\mathbf{v}^* \\mathbf{A} \\mathbf{v} = \\mathbf{v}^* (\\lambda \\mathbf{v}) = \\lambda \\|\\mathbf{v}\\|^2$. Taking the conjugate transpose of that scalar gives $(\\mathbf{v}^* \\mathbf{A} \\mathbf{v})^* = \\mathbf{v}^* \\mathbf{A}^T \\mathbf{v} = \\mathbf{v}^* \\mathbf{A} \\mathbf{v} = \\bar{\\lambda} \\|\\mathbf{v}\\|^2$. Thus $\\lambda \\|\\mathbf{v}\\|^2 = \\bar{\\lambda} \\|\\mathbf{v}\\|^2$. Since $\\mathbf{v} \\ne \\mathbf{0}$, $\\lambda = \\bar{\\lambda}$, proving $\\lambda$ must be strictly real.\n2. **Why are eigenvectors of distinct eigenvalues automatically orthogonal?** Let $\\mathbf{A}\\mathbf{q}_1 = \\lambda_1 \\mathbf{q}_1$ and $\\mathbf{A}\\mathbf{q}_2 = \\lambda_2 \\mathbf{q}_2$ with $\\lambda_1 \\ne \\lambda_2$. Computing the inner product: $\\lambda_1 (\\mathbf{q}_1 \\cdot \\mathbf{q}_2) = (\\mathbf{A}\\mathbf{q}_1) \\cdot \\mathbf{q}_2 = \\mathbf{q}_1^T \\mathbf{A}^T \\mathbf{q}_2 = \\mathbf{q}_1^T \\mathbf{A} \\mathbf{q}_2 = \\mathbf{q}_1 \\cdot (\\mathbf{A}\\mathbf{q}_2) = \\lambda_2 (\\mathbf{q}_1 \\cdot \\mathbf{q}_2)$. Rearranging gives $(\\lambda_1 - \\lambda_2)(\\mathbf{q}_1 \\cdot \\mathbf{q}_2) = 0$. Since $\\lambda_1 \\ne \\lambda_2$, the dot product $\\mathbf{q}_1 \\cdot \\mathbf{q}_2$ must equal 0, proving perpendicularity!\n3. **Why does $\\mathbf{Q}^{-1} = \\mathbf{Q}^T$?** The columns of $\\mathbf{Q}$ are orthonormal ($\\mathbf{q}_i \\cdot \\mathbf{q}_j = 1$ if $i=j$, and $0$ otherwise). Multiplying $\\mathbf{Q}^T \\mathbf{Q}$ produces entries that are precisely the dot products of the columns of $\\mathbf{Q}$, yielding the identity matrix $\\mathbf{I}$. Inverting a coordinate change requires zero matrix inversion algorithms—just a simple transpose.\n4. **Why is the outer product $\\mathbf{q}_i \\mathbf{q}_i^T$ an orthogonal projector?** Multiplying $(\\mathbf{q}_i \\mathbf{q}_i^T)\\mathbf{x} = \\mathbf{q}_i (\\mathbf{q}_i^T \\mathbf{x}) = (\\mathbf{q}_i \\cdot \\mathbf{x})\\mathbf{q}_i$. It takes the scalar shadow of $\\mathbf{x}$ along $\\mathbf{q}_i$ and points it in direction $\\mathbf{q}_i$. Squaring the operator $(\\mathbf{q}_i \\mathbf{q}_i^T)^2 = \\mathbf{q}_i (\\mathbf{q}_i^T \\mathbf{q}_i) \\mathbf{q}_i^T = \\mathbf{q}_i (1) \\mathbf{q}_i^T = \\mathbf{q}_i \\mathbf{q}_i^T$, satisfying the idempotent geometric definition of a projection.\n\n---",
@@ -1823,8 +1823,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-least-squares-approximation",
-          "starterCode": "import numpy as np\n\ndef spectral_reconstruction_2d(Q: np.ndarray, lambdas: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Reconstruct a 2x2 symmetric matrix from its spectral decomposition A = Q Lambda Q^T.\n\n    Intuition\n    ---------\n    According to the Spectral Theorem, any symmetric matrix can be factored\n    into an orthogonal rotation Q, diagonal stretching by eigenvalues lambdas,\n    and the reverse rotation Q^T. This function reverses that process, taking\n    the eigenbasis and eigenvalues to reconstruct the original matrix.\n\n    Parameters\n    ----------\n    Q : np.ndarray of shape (2, 2)\n        Orthogonal matrix whose columns are unit eigenvectors.\n    lambdas : np.ndarray of shape (2,)\n        Real eigenvalues [lambda_1, lambda_2].\n\n    Returns\n    -------\n    np.ndarray of shape (2, 2)\n        Reconstructed symmetric matrix A.\n    \"\"\"\n    # Step 1: Form the diagonal eigenvalue matrix Lambda = np.diag(lambdas)\n    # Lambda = np.diag(lambdas)\n\n    # Step 2: Compute matrix product Q @ Lambda @ Q.T\n    # A = Q @ Lambda @ Q.T\n\n    # Step 3: Return the reconstructed symmetric matrix\n    # return A\n    pass",
+          "id": "py-t1-14",
+          "starterCode": "def spectral_reconstruction_2d(Q: np.ndarray, lambdas: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Reconstruct a 2x2 symmetric matrix from its spectral decomposition A = Q Lambda Q^T.\n\n    Intuition\n    ---------\n    According to the Spectral Theorem, any symmetric matrix can be factored\n    into an orthogonal rotation Q, diagonal stretching by eigenvalues lambdas,\n    and the reverse rotation Q^T. This function reverses that process, taking\n    the eigenbasis and eigenvalues to reconstruct the original matrix.\n\n    Parameters\n    ----------\n    Q : np.ndarray of shape (2, 2)\n        Orthogonal matrix whose columns are unit eigenvectors.\n    lambdas : np.ndarray of shape (2,)\n        Real eigenvalues [lambda_1, lambda_2].\n\n    Returns\n    -------\n    np.ndarray of shape (2, 2)\n        Reconstructed symmetric matrix A.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "spectral_reconstruction_2d(np.eye(2), np.array([3.0, 5.0]))",
@@ -1842,24 +1842,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "array([[3., 0.],\n       [0., 5.]])",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef spectral_reconstruction_2d(Q: np.ndarray, lambdas: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Reconstruct a 2x2 symmetric matrix from its spectral decomposition A = Q Lambda Q^T.\n\n    Intuition\n    ---------\n    According to the Spectral Theorem, any symmetric matrix can be factored\n    into an orthogonal rotation Q, diagonal stretching by eigenvalues lambdas,\n    and the reverse rotation Q^T. This function reverses that process, taking\n    the eigenbasis and eigenvalues to reconstruct the original matrix.\n\n    Parameters\n    ----------\n    Q : np.ndarray of shape (2, 2)\n        Orthogonal matrix whose columns are unit eigenvectors.\n    lambdas : np.ndarray of shape (2,)\n        Real eigenvalues [lambda_1, lambda_2].\n\n    Returns\n    -------\n    np.ndarray of shape (2, 2)\n        Reconstructed symmetric matrix A.\n    \"\"\"\n    # Step 1: Form the diagonal eigenvalue matrix Lambda = np.diag(lambdas)\n    # Lambda = np.diag(lambdas)\n\n    # Step 2: Compute matrix product Q @ Lambda @ Q.T\n    # A = Q @ Lambda @ Q.T\n\n    # Step 3: Return the reconstructed symmetric matrix\n    # return A\n    pass",
+              "starterCode": "def spectral_reconstruction_2d(Q: np.ndarray, lambdas: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Reconstruct a 2x2 symmetric matrix from its spectral decomposition A = Q Lambda Q^T.\n\n    Intuition\n    ---------\n    According to the Spectral Theorem, any symmetric matrix can be factored\n    into an orthogonal rotation Q, diagonal stretching by eigenvalues lambdas,\n    and the reverse rotation Q^T. This function reverses that process, taking\n    the eigenbasis and eigenvalues to reconstruct the original matrix.\n\n    Parameters\n    ----------\n    Q : np.ndarray of shape (2, 2)\n        Orthogonal matrix whose columns are unit eigenvectors.\n    lambdas : np.ndarray of shape (2,)\n        Real eigenvalues [lambda_1, lambda_2].\n\n    Returns\n    -------\n    np.ndarray of shape (2, 2)\n        Reconstructed symmetric matrix A.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "array([[3., 0.],\n       [0., 5.]])"
             }
           },
-          "solution": "import numpy as np\n\ndef spectral_reconstruction_2d(Q: np.ndarray, lambdas: np.ndarray) -> np.ndarray:\n    Lambda = np.diag(lambdas)\n    A = Q @ Lambda @ Q.T\n    return np.asarray(A, dtype=float)"
+          "solution": "import numpy as np\n\ndef spectral_reconstruction_2d(Q: np.ndarray, lambdas: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Reconstruct a 2x2 symmetric matrix from its spectral decomposition A = Q Lambda Q^T.\n\n    Intuition\n    ---------\n    According to the Spectral Theorem, any symmetric matrix can be factored\n    into an orthogonal rotation Q, diagonal stretching by eigenvalues lambdas,\n    and the reverse rotation Q^T. This function reverses that process, taking\n    the eigenbasis and eigenvalues to reconstruct the original matrix.\n\n    Parameters\n    ----------\n    Q : np.ndarray of shape (2, 2)\n        Orthogonal matrix whose columns are unit eigenvectors.\n    lambdas : np.ndarray of shape (2,)\n        Real eigenvalues [lambda_1, lambda_2].\n\n    Returns\n    -------\n    np.ndarray of shape (2, 2)\n        Reconstructed symmetric matrix A.\n    \"\"\"\n    # Step 1: Form the diagonal eigenvalue matrix Lambda = np.diag(lambdas)\n    # Lambda = np.diag(lambdas)\n\n    # Step 2: Compute matrix product Q @ Lambda @ Q.T\n    # A = Q @ Lambda @ Q.T\n\n    # Step 3: Return the reconstructed symmetric matrix\n    # return A\n    pass"
         },
         "hints": {
           "tier1": {
-            "en": "Construct diagonal matrix: Lambda = np.diag(lambdas).",
-            "ar": "اصنع المصفوفة القطرية: Lambda = np.diag(lambdas)."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Compute A = Q @ Lambda @ Q.T.",
-            "ar": "احسب A = Q @ Lambda @ Q.T."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Return float array: return np.asarray(A, dtype=float).",
-            "ar": "أرجع المصفوفة: return np.asarray(A, dtype=float)."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1919,7 +1919,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "eigenvalues-eigenvectors",
+    "id": "t1-15",
     "title": "Singular Value Decomposition (SVD) & Spectral Geometry",
     "titleAr": "تفكيك القيم المفردة (SVD) والهندسة الطيفية",
     "trackId": "math",
@@ -1929,8 +1929,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تصنع كرة مستديرة تماماً من الصلصال بيديك. الآن، اضغط عليها واسحبها بقوة بين راحتي كفيك في اتجاهات مختلفة."
     },
     "prerequisites": [
-      "least-squares-approximation",
-      "determinant-scaling-factor"
+      "t1-12",
+      "t1-09"
     ],
     "x": 160,
     "y": 1410,
@@ -1949,8 +1949,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbf{A} \\in \\mathbb{R}^{m \\times n}, \\quad \\mathbf{A} = \\mathbf{U} \\mathbf{\\Sigma} \\mathbf{V}^T = \\sum_{i=1}^r \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^T, \\quad \\sigma_1 \\ge \\sigma_2 \\ge \\dots \\ge \\sigma_r > 0",
         "formulaNote": {
-          "en": "The SVD factors any matrix into an input rotation (V^T), coordinate axis scaling by singular values (Sigma), and an output rotation (U).",
-          "ar": "يفكك SVD أي مصفوفة إلى دوران في فضاء المدخلات (V^T)، وتمدد إحداثي بالقيم المفردة (Sigma)، ودوران في فضاء المخرجات (U)."
+          "en": "Mathematical anchor for Singular Value Decomposition (SVD) & Spectral Geometry.",
+          "ar": "المرساة الرياضية لـ تفكيك القيم المفردة (SVD) والهندسة الطيفية."
         },
         "narrative": {
           "en": "#### Demystifying the Equation\n\n| Symbol | Mathematical Term | Plain English Translation & Intuition |\n| :--- | :--- | :--- |\n| $\\mathbf{A} \\in \\mathbb{R}^{m \\times n}$ | Arbitrary Data Matrix | Any generic linear transformation mapping $n$-dimensional inputs to $m$-dimensional outputs. |\n| $\\mathbf{U} \\in \\mathbb{R}^{m \\times m}$ | Left Singular Vectors Matrix | An orthogonal matrix whose columns $\\mathbf{u}_i$ are unit eigenvectors of $\\mathbf{A}\\mathbf{A}^T$, spanning the output space. |\n| $\\mathbf{\\Sigma} \\in \\mathbb{R}^{m \\times n}$ | Singular Value Matrix | A rectangular diagonal matrix containing non-negative stretch factors $\\sigma_i = \\sqrt{\\lambda_i(\\mathbf{A}^T\\mathbf{A})}$. |\n| $\\mathbf{V}^T \\in \\mathbb{R}^{n \\times n}$ | Right Singular Vectors Matrix | An orthogonal matrix whose rows $\\mathbf{v}_i^T$ are unit eigenvectors of $\\mathbf{A}^T\\mathbf{A}$, spanning the input space. |\n| $\\sigma_i \\in \\mathbb{R}_{\\ge 0}$ | Singular Value | The length of the $i$-th semi-axis of the hyper-ellipsoid, quantifying the energy/variance along direction $\\mathbf{u}_i$. |\n| $\\mathbf{u}_i \\mathbf{v}_i^T \\in \\mathbb{R}^{m \\times n}$ | Rank-1 Outer Product Matrix | A foundational building block mapping direction $\\mathbf{v}_i$ in input space directly to direction $\\mathbf{u}_i$ in output space. |\n| $\\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^T$ | Truncated Eckart-Young Sum | The provably optimal rank-$k$ approximation ($\\mathbf{A}_k$) retaining the maximal possible variance. |\n\n##### Why the Math Works Step-by-Step\n1. **Why does SVD factorize into Rotate $\\to$ Stretch $\\to$ Rotate?** Any linear transformation maps the unit sphere $\\{\\mathbf{x} : \\|\\mathbf{x}\\|_2 = 1\\}$ into an ellipsoid. Rotating the input coordinate frame by $\\mathbf{V}^T$ aligns the sphere with the axes that undergo maximal stretching. Diagonal matrix $\\mathbf{\\Sigma}$ applies those stretches $\\sigma_i$. Finally, rotation $\\mathbf{U}$ points the resulting principal axes in their proper directions in output space.\n2. **Why are singular values the square roots of eigenvalues ($\\sigma_i = \\sqrt{\\lambda_i(\\mathbf{A}^T\\mathbf{A})}$)?** Notice that the symmetric matrix $\\mathbf{A}^T\\mathbf{A} = (\\mathbf{U}\\mathbf{\\Sigma}\\mathbf{V}^T)^T (\\mathbf{U}\\mathbf{\\Sigma}\\mathbf{V}^T) = \\mathbf{V}\\mathbf{\\Sigma}^T\\mathbf{U}^T\\mathbf{U}\\mathbf{\\Sigma}\\mathbf{V}^T$. Because $\\mathbf{U}$ is orthogonal ($\\mathbf{U}^T\\mathbf{U} = \\mathbf{I}$), this simplifies to $\\mathbf{V}(\\mathbf{\\Sigma}^T\\mathbf{\\Sigma})\\mathbf{V}^T$. Since $\\mathbf{\\Sigma}^T\\mathbf{\\Sigma}$ has diagonal entries $\\sigma_i^2$, the singular values of $\\mathbf{A}$ are precisely the positive square roots of the eigenvalues of the symmetric matrix $\\mathbf{A}^T\\mathbf{A}$.\n3. **Why are $\\mathbf{U}$ and $\\mathbf{V}$ guaranteed to be orthogonal?** The matrices $\\mathbf{A}^T\\mathbf{A}$ ($n \\times n$) and $\\mathbf{A}\\mathbf{A}^T$ ($m \\times m$) are always symmetric and positive semi-definite. By the Spectral Theorem, every symmetric matrix has a complete orthonormal basis of eigenvectors. $\\mathbf{V}$ is the orthonormal eigenbasis of $\\mathbf{A}^T\\mathbf{A}$, and $\\mathbf{U}$ is the orthonormal eigenbasis of $\\mathbf{A}\\mathbf{A}^T$.\n4. **Why is the truncated sum optimal (Eckart-Young Theorem)?** The total variance (squared Frobenius norm $\\|\\mathbf{A}\\|_F^2$) equals $\\sum_{i=1}^r \\sigma_i^2$. Because the singular values are sorted in descending order ($\\sigma_1 \\ge \\sigma_2 \\ge \\dots$), truncating the sum at index $k$ discards the smallest possible variance ($\\sum_{i=k+1}^r \\sigma_i^2$), provably minimizing the approximation error $\\|\\mathbf{A} - \\mathbf{B}\\|_F$ among all matrices $\\mathbf{B}$ of rank at most $k$.\n\n---",
@@ -1961,8 +1961,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-eigenvalues-eigenvectors",
-          "starterCode": "import numpy as np\n\ndef svd_rank_k_approx(A: np.ndarray, k: int) -> tuple[np.ndarray, float]:\n    \"\"\"\n    Compute Eckart-Young optimal rank-k approximation and retained energy ratio.\n\n    Intuition\n    ---------\n    Truncating the SVD of matrix A to its top k singular values retains the\n    maximum possible variance and energy while eliminating noise. The retained\n    energy ratio measures the proportion of total variance captured by the\n    rank-k reconstruction.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (M, N)\n        Input rectangular or square data matrix.\n    k : int\n        Target approximation rank (1 <= k <= min(M, N)).\n\n    Returns\n    -------\n    tuple[np.ndarray, float]\n        A_k: Optimal rank-k reconstructed matrix of shape (M, N).\n        energy_ratio: Fraction of variance retained (sum top-k sigma^2 / sum all sigma^2).\n    \"\"\"\n    # Step 1: Compute thin SVD using np.linalg.svd(A, full_matrices=False)\n    # U, S, Vt = np.linalg.svd(A, full_matrices=False)\n\n    # Step 2: Truncate to top k components: Uk = U[:, :k], Sk = S[:k], Vtk = Vt[:k, :]\n    # Uk = U[:, :k]\n    # Sk = S[:k]\n    # Vtk = Vt[:k, :]\n\n    # Step 3: Reconstruct A_k = Uk @ np.diag(Sk) @ Vtk and compute retained energy ratio\n    # A_k = Uk @ np.diag(Sk) @ Vtk\n    # energy_ratio = float(np.sum(Sk ** 2) / np.sum(S ** 2))\n    # return A_k, energy_ratio\n    pass",
+          "id": "py-t1-15",
+          "starterCode": "def svd_rank_k_approx(A: np.ndarray, k: int) -> tuple[np.ndarray, float]:\n    \"\"\"\n    Compute Eckart-Young optimal rank-k approximation and retained energy ratio.\n\n    Intuition\n    ---------\n    Truncating the SVD of matrix A to its top k singular values retains the\n    maximum possible variance and energy while eliminating noise. The retained\n    energy ratio measures the proportion of total variance captured by the\n    rank-k reconstruction.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (M, N)\n        Input rectangular or square data matrix.\n    k : int\n        Target approximation rank (1 <= k <= min(M, N)).\n\n    Returns\n    -------\n    tuple[np.ndarray, float]\n        A_k: Optimal rank-k reconstructed matrix of shape (M, N).\n        energy_ratio: Fraction of variance retained (sum top-k sigma^2 / sum all sigma^2).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "round(svd_rank_k_approx(np.array([[3.0, 0.0], [0.0, 4.0]]), 1)[1], 2)",
@@ -1980,24 +1980,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "0.64",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef svd_rank_k_approx(A: np.ndarray, k: int) -> tuple[np.ndarray, float]:\n    \"\"\"\n    Compute Eckart-Young optimal rank-k approximation and retained energy ratio.\n\n    Intuition\n    ---------\n    Truncating the SVD of matrix A to its top k singular values retains the\n    maximum possible variance and energy while eliminating noise. The retained\n    energy ratio measures the proportion of total variance captured by the\n    rank-k reconstruction.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (M, N)\n        Input rectangular or square data matrix.\n    k : int\n        Target approximation rank (1 <= k <= min(M, N)).\n\n    Returns\n    -------\n    tuple[np.ndarray, float]\n        A_k: Optimal rank-k reconstructed matrix of shape (M, N).\n        energy_ratio: Fraction of variance retained (sum top-k sigma^2 / sum all sigma^2).\n    \"\"\"\n    # Step 1: Compute thin SVD using np.linalg.svd(A, full_matrices=False)\n    # U, S, Vt = np.linalg.svd(A, full_matrices=False)\n\n    # Step 2: Truncate to top k components: Uk = U[:, :k], Sk = S[:k], Vtk = Vt[:k, :]\n    # Uk = U[:, :k]\n    # Sk = S[:k]\n    # Vtk = Vt[:k, :]\n\n    # Step 3: Reconstruct A_k = Uk @ np.diag(Sk) @ Vtk and compute retained energy ratio\n    # A_k = Uk @ np.diag(Sk) @ Vtk\n    # energy_ratio = float(np.sum(Sk ** 2) / np.sum(S ** 2))\n    # return A_k, energy_ratio\n    pass",
+              "starterCode": "def svd_rank_k_approx(A: np.ndarray, k: int) -> tuple[np.ndarray, float]:\n    \"\"\"\n    Compute Eckart-Young optimal rank-k approximation and retained energy ratio.\n\n    Intuition\n    ---------\n    Truncating the SVD of matrix A to its top k singular values retains the\n    maximum possible variance and energy while eliminating noise. The retained\n    energy ratio measures the proportion of total variance captured by the\n    rank-k reconstruction.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (M, N)\n        Input rectangular or square data matrix.\n    k : int\n        Target approximation rank (1 <= k <= min(M, N)).\n\n    Returns\n    -------\n    tuple[np.ndarray, float]\n        A_k: Optimal rank-k reconstructed matrix of shape (M, N).\n        energy_ratio: Fraction of variance retained (sum top-k sigma^2 / sum all sigma^2).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "0.64"
             }
           },
-          "solution": "import numpy as np\n\ndef svd_rank_k_approx(A: np.ndarray, k: int) -> tuple[np.ndarray, float]:\n    U, S, Vt = np.linalg.svd(A, full_matrices=False)\n    k = max(1, min(k, len(S)))\n    Uk = U[:, :k]\n    Sk = S[:k]\n    Vtk = Vt[:k, :]\n    A_k = Uk @ np.diag(Sk) @ Vtk\n    total_energy = float(np.sum(S ** 2))\n    retained_energy = float(np.sum(Sk ** 2)) / total_energy if total_energy > 0 else 1.0\n    return A_k, float(retained_energy)"
+          "solution": "import numpy as np\n\ndef svd_rank_k_approx(A: np.ndarray, k: int) -> tuple[np.ndarray, float]:\n    \"\"\"\n    Compute Eckart-Young optimal rank-k approximation and retained energy ratio.\n\n    Intuition\n    ---------\n    Truncating the SVD of matrix A to its top k singular values retains the\n    maximum possible variance and energy while eliminating noise. The retained\n    energy ratio measures the proportion of total variance captured by the\n    rank-k reconstruction.\n\n    Parameters\n    ----------\n    A : np.ndarray of shape (M, N)\n        Input rectangular or square data matrix.\n    k : int\n        Target approximation rank (1 <= k <= min(M, N)).\n\n    Returns\n    -------\n    tuple[np.ndarray, float]\n        A_k: Optimal rank-k reconstructed matrix of shape (M, N).\n        energy_ratio: Fraction of variance retained (sum top-k sigma^2 / sum all sigma^2).\n    \"\"\"\n    # Step 1: Compute thin SVD using np.linalg.svd(A, full_matrices=False)\n    # U, S, Vt = np.linalg.svd(A, full_matrices=False)\n\n    # Step 2: Truncate to top k components: Uk = U[:, :k], Sk = S[:k], Vtk = Vt[:k, :]\n    # Uk = U[:, :k]\n    # Sk = S[:k]\n    # Vtk = Vt[:k, :]\n\n    # Step 3: Reconstruct A_k = Uk @ np.diag(Sk) @ Vtk and compute retained energy ratio\n    # A_k = Uk @ np.diag(Sk) @ Vtk\n    # energy_ratio = float(np.sum(Sk ** 2) / np.sum(S ** 2))\n    # return A_k, energy_ratio\n    pass"
         },
         "hints": {
           "tier1": {
-            "en": "Use U, S, Vt = np.linalg.svd(A, full_matrices=False) to obtain economic SVD.",
-            "ar": "استخدم U, S, Vt = np.linalg.svd(A, full_matrices=False) للحصول على SVD المدمج."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Slice the top k components: Uk = U[:, :k], Sk = S[:k], Vtk = Vt[:k, :].",
-            "ar": "اقتطع أول k مركبة: Uk = U[:, :k], Sk = S[:k], Vtk = Vt[:k, :]."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Reconstruct: A_k = Uk @ np.diag(Sk) @ Vtk. Energy is np.sum(Sk**2) / np.sum(S**2).",
-            "ar": "أعد البناء: A_k = Uk @ np.diag(Sk) @ Vtk. ونسبة الطاقة هي مجموع مربعات Sk مقسوماً على مجموع مربعات S."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2057,7 +2057,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "diagonalization-powers",
+    "id": "t1-16",
     "title": "Limits, Continuity & The Infinitesimal Neighborhood",
     "titleAr": "النهايات، الاتصال، والجوار المتناهي في الصغر",
     "trackId": "math",
@@ -2067,7 +2067,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تسير في مسار جبلي وعر عند الغسق، متجهاً نحو جسر معلق يمتد فوق وادٍ سحيق. مع كل خطوة تخطوها للأمام، يقترب منسوب حذائك باطراد من..."
     },
     "prerequisites": [
-      "eigenvalues-eigenvectors"
+      "t1-13"
     ],
     "x": 140,
     "y": 1505,
@@ -2086,8 +2086,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\lim_{x \\to c} f(x) = L \\iff \\forall \\epsilon > 0, \\; \\exists \\delta > 0 \\; \\text{s.t.} \\; 0 < |x - c| < \\delta \\implies |f(x) - L| < \\epsilon",
         "formulaNote": {
-          "en": "Core invariant for Limits, Continuity & The Infinitesimal Neighborhood.",
-          "ar": "الخاصية الرياضية الجوهرية لـ النهايات، الاتصال، والجوار المتناهي في الصغر."
+          "en": "Mathematical anchor for Limits, Continuity & The Infinitesimal Neighborhood.",
+          "ar": "المرساة الرياضية لـ النهايات، الاتصال، والجوار المتناهي في الصغر."
         },
         "narrative": {
           "en": "$$\nf \\text{ is continuous at } c \\iff \\lim_{x \\to c} f(x) = f(c)\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $c$ | $\\mathbb{R}$ | Target coordinate on the horizontal input domain axis | The center anchor of our domain exploration window |\n| $L$ | $\\mathbb{R}$ | Limiting target value on the vertical codomain axis | The presumed horizontal convergence altitude of the function |\n| $\\epsilon$ (Epsilon) | $\\mathbb{R}_{> 0}$ | Arbitrarily tiny vertical error tolerance band | The challenge window $(L - \\epsilon, L + \\epsilon)$ proposed by an adversary |\n| $\\delta$ (Delta) | $\\mathbb{R}_{> 0}$ | Corresponding horizontal neighborhood radius | The safety corridor $(c - \\delta, c + \\delta)$ that guarantees safe landing |\n| $0 < |x - c|$ | Strict inequality | Punctured neighborhood excluding $x = c$ itself | Insulates the limit from whether $f(c)$ is defined, broken, or missing |\n\n#### Intuitive Rationale for the Formulation\nThe famous $(\\epsilon, \\delta)$ definition created by Cauchy and Weierstrass looks intimidating at first glance, but it is actually a simple mathematical game between two players: a skeptic and a defender. \n1. The skeptic challenges: *\"I don't believe the function converges to $L$. To test you, I demand that the output stays within a microscopic vertical error corridor of width $\\pm \\epsilon$, say $\\epsilon = 0.0001$.\"*\n2. The defender wins if they can always reply: *\"Accepted. If you restrict your input steps within a horizontal radius $\\delta = 0.00005$ around $c$, every single function value is trapped securely inside your error band.\"*\nBecause this challenge can be met for *any* $\\epsilon > 0$, no matter how tiny, the convergence toward $L$ is rock-solid and undeniable.",
@@ -2098,7 +2098,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-diagonalization-powers",
+          "id": "py-t1-16",
           "starterCode": "def richardson_extrapolated_derivative(f: Callable[[float], float], x: float, h: float = 0.1) -> float:\n    \"\"\"\n    Compute 4th-order accurate numerical derivative using Richardson extrapolation.\n    Cancels the leading O(h^2) Taylor truncation error by combining step h and h/2.\n    \n    Parameters\n    ----------\n    f : Callable[[float], float]\n        Target scalar function.\n    x : float\n        Evaluation coordinate.\n    h : float\n        Base step size (default 0.1).\n        \n    Returns\n    -------\n    float\n        4th-order accurate derivative estimate.\n    \"\"\"\n    # Step 1: Compute central difference quotient with full step size h: (f(x+h) - f(x-h)) / (2*h)\n    # Step 2: Compute central difference quotient with half step size h/2: (f(x+h/2) - f(x-h/2)) / h\n    # Step 3: Apply Richardson combination: (4 * d2 - d1) / 3 to eliminate O(h^2) error\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -2121,16 +2121,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Error convergence is only 2nd-order rather than 4th-order.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Using simple average `(d1 + d2) / 2` does not eliminate the leading $h^2$ Taylor coefficient.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Apply exact Richardson cancellation: `(4.0 * d2 - d1) / 3.0`.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2201,7 +2201,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "symmetric-matrices-spectral",
+    "id": "t1-17",
     "title": "The Derivative as Local Linearization & Tangent Slope",
     "titleAr": "المشتقة كتقريب خطي محلي وميل المماس",
     "trackId": "math",
@@ -2211,7 +2211,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تأمل صور كوكب الأرض الملتقطة من مدار القمر: كوكبنا بلا شك كرة زرقاء عملاقة تسبح في ظلمات الفضاء."
     },
     "prerequisites": [
-      "eigenvalues-eigenvectors"
+      "t1-13"
     ],
     "x": 160,
     "y": 1600,
@@ -2230,8 +2230,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "f'(x) \\coloneqq \\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}",
         "formulaNote": {
-          "en": "Core invariant for The Derivative as Local Linearization & Tangent Slope.",
-          "ar": "الخاصية الرياضية الجوهرية لـ المشتقة كتقريب خطي محلي وميل المماس."
+          "en": "Mathematical anchor for The Derivative as Local Linearization & Tangent Slope.",
+          "ar": "المرساة الرياضية لـ المشتقة كتقريب خطي محلي وميل المماس."
         },
         "narrative": {
           "en": "$$\nf(x_0 + \\Delta x) = f(x_0) + f'(x_0)\\Delta x + \\mathcal{O}(\\Delta x^2) \\implies L(x) = f(x_0) + f'(x_0)(x - x_0)\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $x_0$ | $\\mathbb{R}$ | Expansion center on domain axis | Anchor coordinate where the tangent line touches the curve |\n| $\\Delta x$ | $\\mathbb{R}$ | Input perturbation / horizontal step $(x - x_0)$ | Distance traveled away from the linearization center |\n| $f'(x_0)$ | $\\mathbb{R}$ | Tangent slope at the expansion center | Multiplicative sensitivity scaling factor relating input nudge to output change |\n| $L(x)$ | $\\mathbb{R}$ | Local linear approximation (tangent line) | Evaluates the flat tangent line height at any nearby query point |\n| $\\mathcal{O}(\\Delta x^2)$ | Error Term | Quadratic curvature remainder | Quantifies how rapidly the true curve pulls away from the tangent line |\n\n#### Intuitive Rationale for the Formula\nThe local linearization $L(x) = f(x_0) + f'(x_0)(x - x_0)$ consists of two intuitive parts:\n1. **The Starting Altitude $f(x_0)$:** If you don't take any step ($\\Delta x = 0$), your estimated height is simply your current altitude.\n2. **The Projected Change $f'(x_0)\\Delta x$:** If you take a step of size $\\Delta x$, your height changes by the slope multiplied by the step distance.\nBecause the true function curves while the tangent line remains straight, an error $\\mathcal{O}(\\Delta x^2)$ emerges. Crucially, because this error is quadratic, if you cut your step size in half ($\\Delta x \\to \\Delta x / 2$), the approximation error drops by a factor of *four* ($1/4$). For small steps, the tangent line is a breathtakingly accurate mirror of the curve.",
@@ -2242,7 +2242,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-symmetric-matrices-spectral",
+          "id": "py-t1-17",
           "starterCode": "def linear_approximation_eval(\n    f: Callable[[np.ndarray], np.ndarray],\n    df: Callable[[float], float],\n    x0: float,\n    query_points: np.ndarray\n) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Evaluate local tangent line approximation and pointwise absolute errors.\n    \n    Parameters\n    ----------\n    f : Callable\n        Vectorized target function.\n    df : Callable\n        Analytical derivative function evaluated at x0.\n    x0 : float\n        Linearization center point.\n    query_points : np.ndarray\n        Array of evaluation points of shape (N,).\n        \n    Returns\n    -------\n    tuple[np.ndarray, np.ndarray]\n        L : Tangent line values at query points, shape (N,).\n        errors : Absolute pointwise errors |f(x) - L(x)|, shape (N,).\n    \"\"\"\n    # Step 1: Compute tangent line values L(x) = f(x0) + df(x0) * (x - x0)\n    # Step 2: Evaluate exact function values on query points\n    # Step 3: Compute absolute approximation error |f(x) - L(x)|\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -2265,16 +2265,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "`ValueError: operands could not be broadcast together` or scalar result returned.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Converting `query_points` into a scalar float or iterating in a loop.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Keep `query_points` as a NumPy array: `f(x0) + df(x0) * (query_points - x0)`.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2345,7 +2345,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "singular-value-decomposition",
+    "id": "t1-18",
     "title": "The Chain Rule as Compositional Scaling & Flow of Sensitivities",
     "titleAr": "قاعدة السلسلة كتمدد تركيبي وتدفق للحساسية",
     "trackId": "math",
@@ -2355,8 +2355,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل ثلاثة تروس نحاسية مصقولة تتعشق بعناية داخل ساعة يد ميكانيكية عريقة. الترس $A$ يدير الترس $B$، والذي يدير بدوره الترس $C$."
     },
     "prerequisites": [
-      "symmetric-matrices-spectral",
-      "gram-schmidt-orthogonalization"
+      "t1-14",
+      "t1-12"
     ],
     "x": 140,
     "y": 1695,
@@ -2375,8 +2375,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "(f \\circ g)'(x) = f'(g(x)) \\cdot g'(x) \\iff \\frac{dy}{dx} = \\frac{dy}{du} \\cdot \\frac{du}{dx}",
         "formulaNote": {
-          "en": "Core invariant for The Chain Rule as Compositional Scaling & Flow of Sensitivities.",
-          "ar": "الخاصية الرياضية الجوهرية لـ قاعدة السلسلة كتمدد تركيبي وتدفق للحساسية."
+          "en": "Mathematical anchor for The Chain Rule as Compositional Scaling & Flow of Sensitivities.",
+          "ar": "المرساة الرياضية لـ قاعدة السلسلة كتمدد تركيبي وتدفق للحساسية."
         },
         "narrative": {
           "en": "$$\n\\frac{dz}{dx_1} = \\prod_{i=1}^{k-1} \\frac{dx_{i+1}}{dx_i} = \\frac{dx_k}{dx_{k-1}} \\frac{dx_{k-1}}{dx_{k-2}} \\cdots \\frac{dx_2}{dx_1}\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $x$ | $\\mathbb{R}$ | Primary input coordinate | The original knob or slider adjusted by the user |\n| $u = g(x)$ | $\\mathbb{R}$ | Intermediate hidden state / activation | Output of the inner function, input to the outer function |\n| $y = f(u)$ | $\\mathbb{R}$ | Final scalar output response | The ultimate output whose sensitivity we seek to measure |\n| $g'(x)$ | $\\mathbb{R}$ | Local stretching factor of the inner map | First gear ratio in the compositional sequence |\n| $f'(g(x))$ | $\\mathbb{R}$ | Local stretching factor of outer map evaluated at state $u$ | Second gear ratio evaluated at the active intermediate state |\n| $\\frac{dy}{dx}$ | $\\mathbb{R}$ | End-to-end composite sensitivity | Compounded multiplicative gradient across the full pipeline |\n\n#### Intuitive Rationale for the Formula\nThe single most common beginner mistake in calculus is writing $f'(x) \\cdot g'(x)$. Why is this fatally wrong? Because the outer function $f$ never touches or sees the original input $x$! \nThink back to the interlocking gears: Gear $C$ is not connected to Gear $A$; it is physically touched only by Gear $B$. Therefore, Gear $C$'s sensitivity must be measured relative to where Gear $B$ is currently positioned ($g(x)$). The outer derivative must *always* be evaluated at the active intermediate state $u = g(x)$, not the distant starting point $x$.",
@@ -2387,8 +2387,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-singular-value-decomposition",
-          "starterCode": "import numpy as np\n\ndef composite_chain_rule(\n    x: np.ndarray,\n    w: float,\n    u: float,\n    b1: float,\n    b2: float\n) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute forward activation and backward chain rule sensitivity for a 2-layer pipeline:\n        z1 = u * x + b1\n        a1 = tanh(z1)\n        z2 = w * a1 + b2\n        y  = sigmoid(z2)\n        \n    Parameters\n    ----------\n    x : np.ndarray\n        Input batch array of shape (N,).\n    w, u, b1, b2 : float\n        Scalar weights and bias parameters.\n        \n    Returns\n    -------\n    tuple[np.ndarray, np.ndarray]\n        y : Output activation array, shape (N,).\n        dy_dx : Analytical derivative dy/dx across all samples, shape (N,).\n    \"\"\"\n    # Step 1: Forward pass through layer 1 linear transformation\n    z1 = u * x + b1\n    \n    # Step 2: Forward pass through hyperbolic tangent activation\n    a1 = np.tanh(z1)\n    \n    # Step 3: Forward pass through layer 2 linear transformation\n    z2 = w * a1 + b2\n    \n    # Step 4: Forward pass through output sigmoid activation\n    y = 1.0 / (1.0 + np.exp(-z2))\n    \n    # Step 5: Backward pass: compute local sensitivities via chain rule\n    # d(sigmoid)/dz2 = y * (1 - y)\n    dy_dz2 = y * (1.0 - y)\n    \n    # dz2/da1 = w\n    dz2_da1 = w\n    \n    # d(tanh)/dz1 = 1 - a1^2\n    da1_dz1 = 1.0 - a1 ** 2\n    \n    # dz1/dx = u\n    dz1_dx = u\n    \n    # Multiply all gear ratios together\n    dy_dx = dy_dz2 * dz2_da1 * da1_dz1 * dz1_dx\n    \n    return y, dy_dx",
+          "id": "py-t1-18",
+          "starterCode": "def composite_chain_rule(\n    x: np.ndarray,\n    w: float,\n    u: float,\n    b1: float,\n    b2: float\n) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute forward activation and backward chain rule sensitivity for a 2-layer pipeline:\n        z1 = u * x + b1\n        a1 = tanh(z1)\n        z2 = w * a1 + b2\n        y  = sigmoid(z2)\n        \n    Parameters\n    ----------\n    x : np.ndarray\n        Input batch array of shape (N,).\n    w, u, b1, b2 : float\n        Scalar weights and bias parameters.\n        \n    Returns\n    -------\n    tuple[np.ndarray, np.ndarray]\n        y : Output activation array, shape (N,).\n        dy_dx : Analytical derivative dy/dx across all samples, shape (N,).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "y, dy = composite_chain_rule(np.array([0.0]), 1.0, 1.0, 0.0, 0.0); (float(y[0]), float(dy[0]))",
@@ -2402,24 +2402,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "(0.5, 0.25)",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef composite_chain_rule(\n    x: np.ndarray,\n    w: float,\n    u: float,\n    b1: float,\n    b2: float\n) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute forward activation and backward chain rule sensitivity for a 2-layer pipeline:\n        z1 = u * x + b1\n        a1 = tanh(z1)\n        z2 = w * a1 + b2\n        y  = sigmoid(z2)\n        \n    Parameters\n    ----------\n    x : np.ndarray\n        Input batch array of shape (N,).\n    w, u, b1, b2 : float\n        Scalar weights and bias parameters.\n        \n    Returns\n    -------\n    tuple[np.ndarray, np.ndarray]\n        y : Output activation array, shape (N,).\n        dy_dx : Analytical derivative dy/dx across all samples, shape (N,).\n    \"\"\"\n    # Step 1: Forward pass through layer 1 linear transformation\n    z1 = u * x + b1\n    \n    # Step 2: Forward pass through hyperbolic tangent activation\n    a1 = np.tanh(z1)\n    \n    # Step 3: Forward pass through layer 2 linear transformation\n    z2 = w * a1 + b2\n    \n    # Step 4: Forward pass through output sigmoid activation\n    y = 1.0 / (1.0 + np.exp(-z2))\n    \n    # Step 5: Backward pass: compute local sensitivities via chain rule\n    # d(sigmoid)/dz2 = y * (1 - y)\n    dy_dz2 = y * (1.0 - y)\n    \n    # dz2/da1 = w\n    dz2_da1 = w\n    \n    # d(tanh)/dz1 = 1 - a1^2\n    da1_dz1 = 1.0 - a1 ** 2\n    \n    # dz1/dx = u\n    dz1_dx = u\n    \n    # Multiply all gear ratios together\n    dy_dx = dy_dz2 * dz2_da1 * da1_dz1 * dz1_dx\n    \n    return y, dy_dx",
+              "starterCode": "def composite_chain_rule(\n    x: np.ndarray,\n    w: float,\n    u: float,\n    b1: float,\n    b2: float\n) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute forward activation and backward chain rule sensitivity for a 2-layer pipeline:\n        z1 = u * x + b1\n        a1 = tanh(z1)\n        z2 = w * a1 + b2\n        y  = sigmoid(z2)\n        \n    Parameters\n    ----------\n    x : np.ndarray\n        Input batch array of shape (N,).\n    w, u, b1, b2 : float\n        Scalar weights and bias parameters.\n        \n    Returns\n    -------\n    tuple[np.ndarray, np.ndarray]\n        y : Output activation array, shape (N,).\n        dy_dx : Analytical derivative dy/dx across all samples, shape (N,).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "(0.5, 0.25)"
             }
           },
-          "solution": "import numpy as np\n\ndef composite_chain_rule(x: np.ndarray, w: float, u: float, b1: float, b2: float) -> tuple[np.ndarray, np.ndarray]:\n    z1 = u * x + b1\n    a1 = np.tanh(z1)\n    z2 = w * a1 + b2\n    y = 1.0 / (1.0 + np.exp(-z2))\n    dy_dz2 = y * (1.0 - y)\n    dz2_da1 = w\n    da1_dz1 = 1.0 - a1 ** 2\n    dz1_dx = u\n    dy_dx = dy_dz2 * dz2_da1 * da1_dz1 * dz1_dx\n    return y, dy_dx"
+          "solution": "import numpy as np\n\ndef composite_chain_rule(\n    x: np.ndarray,\n    w: float,\n    u: float,\n    b1: float,\n    b2: float\n) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute forward activation and backward chain rule sensitivity for a 2-layer pipeline:\n        z1 = u * x + b1\n        a1 = tanh(z1)\n        z2 = w * a1 + b2\n        y  = sigmoid(z2)\n        \n    Parameters\n    ----------\n    x : np.ndarray\n        Input batch array of shape (N,).\n    w, u, b1, b2 : float\n        Scalar weights and bias parameters.\n        \n    Returns\n    -------\n    tuple[np.ndarray, np.ndarray]\n        y : Output activation array, shape (N,).\n        dy_dx : Analytical derivative dy/dx across all samples, shape (N,).\n    \"\"\"\n    # Step 1: Forward pass through layer 1 linear transformation\n    z1 = u * x + b1\n    \n    # Step 2: Forward pass through hyperbolic tangent activation\n    a1 = np.tanh(z1)\n    \n    # Step 3: Forward pass through layer 2 linear transformation\n    z2 = w * a1 + b2\n    \n    # Step 4: Forward pass through output sigmoid activation\n    y = 1.0 / (1.0 + np.exp(-z2))\n    \n    # Step 5: Backward pass: compute local sensitivities via chain rule\n    # d(sigmoid)/dz2 = y * (1 - y)\n    dy_dz2 = y * (1.0 - y)\n    \n    # dz2/da1 = w\n    dz2_da1 = w\n    \n    # d(tanh)/dz1 = 1 - a1^2\n    da1_dz1 = 1.0 - a1 ** 2\n    \n    # dz1/dx = u\n    dz1_dx = u\n    \n    # Multiply all gear ratios together\n    dy_dx = dy_dz2 * dz2_da1 * da1_dz1 * dz1_dx\n    \n    return y, dy_dx"
         },
         "hints": {
           "tier1": {
-            "en": "Analytical gradient disagrees with numerical gradient by sign or scale.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Using $\\text{sech}^2(x)$ directly can overflow or recomputing $\\tanh(z_1)$ is redundant. Notice $\\frac{d}{dz}\\tanh(z) = 1 - \\tanh^2(z) = 1 - a_1^2$.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Express local derivatives in terms of cached forward activations: `1.0 - a1**2` and `y * (1.0 - y)`.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2490,7 +2490,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "limits-continuity-foundations",
+    "id": "t1-19",
     "title": "Second Derivatives, Concavity & Curvature",
     "titleAr": "المشتقة الثانية، التقعر، ومفهوم الانحناء",
     "trackId": "math",
@@ -2500,7 +2500,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "إذا كانت المشتقة الأولى هي عداد سرعتك—تخبرك بما إذا كنت تصعد الجبل أم تهبطه—فماذا تخبرك المشتقة الثانية؟ إنها تقيس ما يحدث لشدة الانحدار..."
     },
     "prerequisites": [
-      "linear-rate-of-change-slopes"
+      "t1-02"
     ],
     "x": 210,
     "y": 1790,
@@ -2519,8 +2519,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "f''(x) \\coloneqq \\frac{d^2 f}{dx^2} = \\lim_{h \\to 0} \\frac{f'(x + h) - f'(x)}{h} = \\lim_{h \\to 0} \\frac{f(x+h) - 2f(x) + f(x-h)}{h^2}",
         "formulaNote": {
-          "en": "Core invariant for Second Derivatives, Concavity & Curvature.",
-          "ar": "الخاصية الرياضية الجوهرية لـ المشتقة الثانية، التقعر، ومفهوم الانحناء."
+          "en": "Mathematical anchor for Second Derivatives, Concavity & Curvature.",
+          "ar": "المرساة الرياضية لـ المشتقة الثانية، التقعر، ومفهوم الانحناء."
         },
         "narrative": {
           "en": "$$\n\\kappa(x) \\coloneqq \\frac{|f''(x)|}{\\left(1 + [f'(x)]^2\\right)^{3/2}} \\quad (\\text{Intrinsic Geometric Curvature})\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $f'(x)$ | $\\mathbb{R}$ | Slope of the tangent line | First-order rate of change / instantaneous velocity |\n| $f''(x)$ | $\\mathbb{R}$ | Rate of change of the tangent slope | Second-order acceleration / bending rate of the curve |\n| $\\kappa(x)$ | $\\mathbb{R}_{\\ge 0}$ | Intrinsic curvature: reciprocal of the osculating circle radius ($1/R$) | Coordinate-invariant bending intensity of the spatial path |\n| $f''(c) > 0$ | Condition | Convex bowl holding water | Certifies that a flat critical point $f'(c) = 0$ is a strict local minimum |\n| $f''(c) < 0$ | Condition | Concave dome shedding water | Certifies that a flat critical point $f'(c) = 0$ is a strict local maximum |\n\n#### Intuitive Rationale for the Stencil\nNotice the beautiful symmetry of the 3-point central difference formula:\n$$\n\\frac{f(x+h) - 2f(x) + f(x-h)}{h^2} = \\frac{\\frac{f(x+h) + f(x-h)}{2} - f(x)}{\\frac{h^2}{2}}\n$$\nLook closely at the numerator: $\\frac{f(x+h) + f(x-h)}{2}$ is simply the **average height of the two neighbors**! The formula asks a beautifully simple question: *\"Is the center point lower or higher than the average of its neighbors?\"*\n- If the center is lower than its neighbors, the difference is positive ($f''(x) > 0$), meaning the ground dips into a valley.\n- If the center is higher than its neighbors, the difference is negative ($f''(x) < 0$), meaning the ground rises into a peak.",
@@ -2531,7 +2531,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-limits-continuity-foundations",
+          "id": "py-t1-19",
           "starterCode": "def curve_curvature(y: np.ndarray, dx: float) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Compute second derivative and geometric curvature on interior nodes of a curve.\n    \n    Parameters\n    ----------\n    y : np.ndarray\n        Array of 1D curve samples of shape (N,) with N >= 3.\n    dx : float\n        Uniform sample step spacing along horizontal axis.\n        \n    Returns\n    -------\n    tuple[np.ndarray, np.ndarray]\n        d2y : Second derivative values on interior nodes, shape (N - 2,).\n        curvature : Intrinsic geometric curvature kappa, shape (N - 2,).\n    \"\"\"\n    # Step 1: Compute central first derivative on interior nodes: (y[i+1] - y[i-1]) / (2*dx)\n    # Step 2: Compute central second derivative stencil: (y[i+1] - 2*y[i] + y[i-1]) / (dx^2)\n    # Step 3: Compute intrinsic curvature kappa = |d2y| / (1 + dy^2)^(1.5)\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -2554,16 +2554,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Curvature is off by power of $dx$ or shape mismatch.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Dividing by `2.0 * dx` instead of `dx ** 2`. The second derivative stencil has dimension $\\Delta y / \\Delta x^2$.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Use `(y[2:] - 2.0 * y[1:-1] + y[:-2]) / (dx ** 2)`.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2634,7 +2634,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "derivative-tangent-slope",
+    "id": "t1-20",
     "title": "Taylor Series as Polynomial Approximation of Reality",
     "titleAr": "متسلسلة تايلور كتقريب حدودي للواقع",
     "trackId": "math",
@@ -2644,7 +2644,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تُعد الدوال المتسامية مثل $\\sin(x)$ و $\\cos(x)$ و $e^x$ و $\\ln(x)$ دوالاً عصية على الحساب الذهني المباشر؛ فلو سألك أحد في الطريق عن القيمة..."
     },
     "prerequisites": [
-      "limits-continuity-foundations"
+      "t1-16"
     ],
     "x": 195,
     "y": 1885,
@@ -2663,8 +2663,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "f(x) = \\sum_{k=0}^K \\frac{f^{(k)}(a)}{k!} (x - a)^k + R_K(x)",
         "formulaNote": {
-          "en": "Core invariant for Taylor Series as Polynomial Approximation of Reality.",
-          "ar": "الخاصية الرياضية الجوهرية لـ متسلسلة تايلور كتقريب حدودي للواقع."
+          "en": "Mathematical anchor for Taylor Series as Polynomial Approximation of Reality.",
+          "ar": "المرساة الرياضية لـ متسلسلة تايلور كتقريب حدودي للواقع."
         },
         "narrative": {
           "en": "$$\nR_K(x) = \\frac{f^{(K+1)}(\\xi)}{(K+1)!} (x - a)^{K+1} \\quad \\text{for some } \\xi \\in (a, x)\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $a$ | $\\mathbb{R}$ | Expansion anchor center coordinate | The home base where all derivative measurements are sampled |\n| $x - a$ | $\\mathbb{R}$ | Horizontal displacement from anchor | The lever arm determining how far you are venturing from home |\n| $f^{(k)}(a)$ | $\\mathbb{R}$ | $k$-th derivative of $f$ evaluated at point $a$ | The geometric probe measuring the $k$-th order wiggle rate |\n| $k!$ (Factorial) | Integer | Normalization constant ($k \\times (k-1) \\times \\dots \\times 1$) | Compensates for the repeated power-rule differentiation: $\\frac{d^k}{dx^k}(x^k) = k!$ |\n| $R_K(x)$ | $\\mathbb{R}$ | Lagrange remainder / truncation error | The mathematical guarantee bounding the worst-case approximation error |\n\n#### Intuitive Rationale for the Factorial $k!$\nWhy does the factorial $k!$ appear in the denominator? \nConsider what happens when you take the derivative of a power term like $x^3$:\n- First derivative: $3x^2$\n- Second derivative: $3 \\times 2 x$\n- Third derivative: $3 \\times 2 \\times 1 = 6 = 3!$\nEvery time you differentiate a power, the exponent drops down as a multiplier. If we want the $k$-th derivative of our approximating polynomial at $x = a$ to match $f^{(k)}(a)$ with 100% exactness without accumulating unwanted multipliers, we *must* divide that term by $k!$ in advance! Furthermore, because $k!$ grows with blinding speed ($10! \\approx 3.6 \\times 10^6$), the denominators quickly crush higher-order terms toward zero, guaranteeing rapid numerical convergence.",
@@ -2675,8 +2675,8 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-derivative-tangent-slope",
-          "starterCode": "import numpy as np\n\ndef taylor_polynomial_series(coeffs: np.ndarray, a: float, x: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Vectorized evaluation of degree-K Taylor polynomial across query points x.\n    Uses broadcasting and cumulative factorials to eliminate Python loops.\n    \n    Parameters\n    ----------\n    coeffs : np.ndarray\n        Array of derivatives [f(a), f'(a), ..., f^{(K)}(a)] of length K+1.\n    a : float\n        Expansion center coordinate.\n    x : np.ndarray\n        Query evaluation points of shape (N,).\n        \n    Returns\n    -------\n    np.ndarray\n        Taylor approximation values T_K(x) of shape (N,).\n    \"\"\"\n    k = np.arange(len(coeffs))\n    \n    # Step 1: Compute factorial normalizations [0!, 1!, 2!, ..., K!]\n    factorials = np.ones(len(coeffs), dtype=float)\n    if len(coeffs) > 1:\n        factorials[1:] = np.cumprod(np.arange(1, len(coeffs)))\n        \n    # Step 2: Normalize coefficients: coeffs[k] / k!\n    norm_coeffs = coeffs / factorials\n    \n    # Step 3: Compute displacement powers (x - a)^k via 2D broadcasting (N, K+1)\n    powers = (x[:, None] - a) ** k[None, :]\n    \n    # Step 4: Sum weighted power terms across degree axis\n    return np.sum(powers * norm_coeffs[None, :], axis=1)",
+          "id": "py-t1-20",
+          "starterCode": "def taylor_polynomial_series(coeffs: np.ndarray, a: float, x: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Vectorized evaluation of degree-K Taylor polynomial across query points x.\n    Uses broadcasting and cumulative factorials to eliminate Python loops.\n    \n    Parameters\n    ----------\n    coeffs : np.ndarray\n        Array of derivatives [f(a), f'(a), ..., f^{(K)}(a)] of length K+1.\n    a : float\n        Expansion center coordinate.\n    x : np.ndarray\n        Query evaluation points of shape (N,).\n        \n    Returns\n    -------\n    np.ndarray\n        Taylor approximation values T_K(x) of shape (N,).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "float(taylor_polynomial_series(np.array([1.0, 1.0, 1.0]), 0.0, np.array([0.0]))[0])",
@@ -2690,24 +2690,24 @@ export const mathModules: CurriculumModule[] = [
           "expectedOutput": "1.0",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef taylor_polynomial_series(coeffs: np.ndarray, a: float, x: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Vectorized evaluation of degree-K Taylor polynomial across query points x.\n    Uses broadcasting and cumulative factorials to eliminate Python loops.\n    \n    Parameters\n    ----------\n    coeffs : np.ndarray\n        Array of derivatives [f(a), f'(a), ..., f^{(K)}(a)] of length K+1.\n    a : float\n        Expansion center coordinate.\n    x : np.ndarray\n        Query evaluation points of shape (N,).\n        \n    Returns\n    -------\n    np.ndarray\n        Taylor approximation values T_K(x) of shape (N,).\n    \"\"\"\n    k = np.arange(len(coeffs))\n    \n    # Step 1: Compute factorial normalizations [0!, 1!, 2!, ..., K!]\n    factorials = np.ones(len(coeffs), dtype=float)\n    if len(coeffs) > 1:\n        factorials[1:] = np.cumprod(np.arange(1, len(coeffs)))\n        \n    # Step 2: Normalize coefficients: coeffs[k] / k!\n    norm_coeffs = coeffs / factorials\n    \n    # Step 3: Compute displacement powers (x - a)^k via 2D broadcasting (N, K+1)\n    powers = (x[:, None] - a) ** k[None, :]\n    \n    # Step 4: Sum weighted power terms across degree axis\n    return np.sum(powers * norm_coeffs[None, :], axis=1)",
+              "starterCode": "def taylor_polynomial_series(coeffs: np.ndarray, a: float, x: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Vectorized evaluation of degree-K Taylor polynomial across query points x.\n    Uses broadcasting and cumulative factorials to eliminate Python loops.\n    \n    Parameters\n    ----------\n    coeffs : np.ndarray\n        Array of derivatives [f(a), f'(a), ..., f^{(K)}(a)] of length K+1.\n    a : float\n        Expansion center coordinate.\n    x : np.ndarray\n        Query evaluation points of shape (N,).\n        \n    Returns\n    -------\n    np.ndarray\n        Taylor approximation values T_K(x) of shape (N,).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "1.0"
             }
           },
-          "solution": "import numpy as np\n\ndef taylor_polynomial_series(coeffs: np.ndarray, a: float, x: np.ndarray) -> np.ndarray:\n    k = np.arange(len(coeffs))\n    factorials = np.ones(len(coeffs), dtype=float)\n    if len(coeffs) > 1:\n        factorials[1:] = np.cumprod(np.arange(1, len(coeffs)))\n    norm_coeffs = coeffs / factorials\n    powers = (x[:, None] - a) ** k[None, :]\n    return np.sum(powers * norm_coeffs[None, :], axis=1)"
+          "solution": "import numpy as np\n\ndef taylor_polynomial_series(coeffs: np.ndarray, a: float, x: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Vectorized evaluation of degree-K Taylor polynomial across query points x.\n    Uses broadcasting and cumulative factorials to eliminate Python loops.\n    \n    Parameters\n    ----------\n    coeffs : np.ndarray\n        Array of derivatives [f(a), f'(a), ..., f^{(K)}(a)] of length K+1.\n    a : float\n        Expansion center coordinate.\n    x : np.ndarray\n        Query evaluation points of shape (N,).\n        \n    Returns\n    -------\n    np.ndarray\n        Taylor approximation values T_K(x) of shape (N,).\n    \"\"\"\n    k = np.arange(len(coeffs))\n    \n    # Step 1: Compute factorial normalizations [0!, 1!, 2!, ..., K!]\n    factorials = np.ones(len(coeffs), dtype=float)\n    if len(coeffs) > 1:\n        factorials[1:] = np.cumprod(np.arange(1, len(coeffs)))\n        \n    # Step 2: Normalize coefficients: coeffs[k] / k!\n    norm_coeffs = coeffs / factorials\n    \n    # Step 3: Compute displacement powers (x - a)^k via 2D broadcasting (N, K+1)\n    powers = (x[:, None] - a) ** k[None, :]\n    \n    # Step 4: Sum weighted power terms across degree axis\n    return np.sum(powers * norm_coeffs[None, :], axis=1)"
         },
         "hints": {
           "tier1": {
-            "en": "Loop detected in submission or slow performance on large $N$.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Writing `for k in range(K)` incurs Python interpreter dispatch overhead.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Create 2D power matrix via 2D broadcasting: `powers = (x[:, None] - a) ** k[None, :]` and reduce along axis 1.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2778,7 +2778,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "differentiation-rules-chain",
+    "id": "t1-21",
     "title": "Multivariable Scalar Fields & Topographic Elevation Landscapes",
     "titleAr": "الحقول العددية متعددة المتغيرات وتضاريس الخرائط الطبوغرافية",
     "trackId": "math",
@@ -2788,7 +2788,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تخوض رحلة استكشافية في محمية جبلية شاسعة في صباح خريفي منعش. عند كل نقطة جغرافية تضع عليها حذاءك—والمحددة بدقة عبر خط العرض $x$..."
     },
     "prerequisites": [
-      "derivative-tangent-slope"
+      "t1-17"
     ],
     "x": 210,
     "y": 1980,
@@ -2807,8 +2807,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "f: \\mathbb{R}^n \\to \\mathbb{R}, \\quad \\mathbf{x} = \\begin{bmatrix} x_1 \\\\ \\vdots \\\\ x_n \\end{bmatrix} \\mapsto f(\\mathbf{x}) \\in \\mathbb{R}",
         "formulaNote": {
-          "en": "Core invariant for Multivariable Scalar Fields & Topographic Elevation Landscapes.",
-          "ar": "الخاصية الرياضية الجوهرية لـ الحقول العددية متعددة المتغيرات وتضاريس الخرائط الطبوغرافية."
+          "en": "Mathematical anchor for Multivariable Scalar Fields & Topographic Elevation Landscapes.",
+          "ar": "المرساة الرياضية لـ الحقول العددية متعددة المتغيرات وتضاريس الخرائط الطبوغرافية."
         },
         "narrative": {
           "en": "$$\n\\mathcal{L}_c(f) \\coloneqq \\left\\{ \\mathbf{x} \\in \\mathbb{R}^n \\;\\middle|\\; f(\\mathbf{x}) = c \\right\\} \\quad (\\text{Level Set / Contour Curve at Elevation } c)\n$$\n$$\n\\|\\nabla Z\\|_{i, j} = \\sqrt{ \\left( \\frac{\\partial Z}{\\partial x} \\right)^2 + \\left( \\frac{\\partial Z}{\\partial y} \\right)^2 }\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $\\mathbf{x}$ | $\\mathbb{R}^n$ (Vector) | Position coordinates in input domain | Model parameter vector or geographical location $(x, y)$ |\n| $f(\\mathbf{x})$ | $\\mathbb{R}$ (Scalar) | Scalar quantity (elevation, temperature, loss) | The primary objective or physical value evaluated at $\\mathbf{x}$ |\n| $\\mathcal{L}_c(f)$ | Submanifold of dim $n-1$ | Contour line (in 2D) or isosurface (in 3D) | Equipotential trajectory where instantaneous change $\\Delta f = 0$ |\n| $c$ | $\\mathbb{R}$ | Constant elevation slicing level | Slicing height intersecting the continuous surface |\n| $\\|\\nabla Z\\|$ | $\\mathbb{R}_{\\ge 0}$ | Gradient magnitude / slope steepness | Quantifies local surface steepness per unit horizontal step |\n\n#### Intuitive Rationale: Why Contour Lines Never Cross\nCan two distinct contour lines—say, the $1,000\\text{ m}$ line and the $1,200\\text{ m}$ line—ever cross or intersect on a smooth landscape?\nThe answer is a resounding **never**. If they did intersect at coordinate $(x_0, y_0)$, that single physical spot on Earth would have to simultaneously be at an elevation of 1,000 meters *and* 1,200 meters, which is a physical and mathematical impossibility for any well-defined single-valued function. Distinct level curves remain forever separated, packing closely together in cliffs and flowing apart in valleys, providing an unambiguous topological map of the terrain.",
@@ -2819,7 +2819,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-differentiation-rules-chain",
+          "id": "py-t1-21",
           "starterCode": "def scalar_field_gradient_magnitude(Z: np.ndarray, dx: float, dy: float) -> np.ndarray:\n    \"\"\"\n    Compute 2D spatial gradient magnitude matrix for interior grid nodes.\n    \n    Parameters\n    ----------\n    Z : np.ndarray\n        2D scalar field elevation matrix of shape (H, W) with H, W >= 3.\n    dx : float\n        Uniform grid step along column axis (x).\n    dy : float\n        Uniform grid step along row axis (y).\n        \n    Returns\n    -------\n    np.ndarray\n        Interior gradient magnitudes of shape (H - 2, W - 2).\n    \"\"\"\n    # Step 1: Central difference along column axis (x, axis 1): (Z[i, j+1] - Z[i, j-1]) / (2*dx)\n    # Step 2: Central difference along row axis (y, axis 0): (Z[i+1, j] - Z[i-1, j]) / (2*dy)\n    # Step 3: Compute Euclidean gradient norm sqrt((dz/dx)^2 + (dz/dy)^2)\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -2842,16 +2842,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Shape mismatch `(H-2, W)` or axis confusion between $x$ and $y$.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "In NumPy indexing `Z[row, col]`, stepping in $x$ means changing the column index (axis 1: `Z[1:-1, 2:] - Z[1:-1, :-2]`).",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Slice axis 1 for $dx$: `(Z[1:-1, 2:] - Z[1:-1, :-2]) / (2*dx)` and axis 0 for $dy$: `(Z[2:, 1:-1] - Z[:-2, 1:-1]) / (2*dy)`.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2922,7 +2922,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "higher-order-derivatives-concavity",
+    "id": "t1-22",
     "title": "Partial Derivatives & Axis-Aligned Slices",
     "titleAr": "المشتقات الجزئية وشرائح المحاور المعيارية",
     "trackId": "math",
@@ -2932,7 +2932,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك تقف على سفح جبل صخري وعر تعصف به الرياح. إذا اقترب منك متسلق آخر وسألك: \"ما هو ميل الجبل عند النقطة التي تقف عليها قدمك تماماً؟\"،..."
     },
     "prerequisites": [
-      "differentiation-rules-chain"
+      "t1-18"
     ],
     "x": 195,
     "y": 2075,
@@ -2951,8 +2951,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\frac{\\partial f}{\\partial x_i}(\\mathbf{x}) \\coloneqq \\lim_{h \\to 0} \\frac{f(\\mathbf{x} + h \\mathbf{e}_i) - f(\\mathbf{x})}{h} = \\left. \\frac{d}{dh} f(\\mathbf{x} + h \\mathbf{e}_i) \\right|_{h=0}",
         "formulaNote": {
-          "en": "Core invariant for Partial Derivatives & Axis-Aligned Slices.",
-          "ar": "الخاصية الرياضية الجوهرية لـ المشتقات الجزئية وشرائح المحاور المعيارية."
+          "en": "Mathematical anchor for Partial Derivatives & Axis-Aligned Slices.",
+          "ar": "المرساة الرياضية لـ المشتقات الجزئية وشرائح المحاور المعيارية."
         },
         "narrative": {
           "en": "$$\n\\nabla f(\\mathbf{x}) = \\begin{bmatrix} \\frac{\\partial f}{\\partial x_1}(\\mathbf{x}) \\\\ \\vdots \\\\ \\frac{\\partial f}{\\partial x_D}(\\mathbf{x}) \\end{bmatrix} \\in \\mathbb{R}^D\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $\\mathbf{x}$ | $\\mathbb{R}^D$ | Base operating coordinate vector in domain space | The exact multi-dimensional state where sensitivity is probed |\n| $\\mathbf{e}_i$ | $\\mathbb{R}^D$ | $i$-th canonical unit basis vector $[0,\\dots,1,\\dots,0]^T$ | Enforces displacement strictly along coordinate axis $i$ |\n| $h$ | $\\mathbb{R} \\setminus \\{0\\}$ | Infinitesimal probe step size | Testing displacement along the chosen single coordinate axis |\n| $\\frac{\\partial f}{\\partial x_i}$ | $\\mathbb{R}$ (Scalar) | Slope of the 1D planar slice parallel to axis $i$ | Quantifies isolated marginal sensitivity to input variable $x_i$ |\n| $\\partial$ (Del / Jacobi) | Symbol | Curved d notation distinguishing partials from total derivatives | Signals to the reader that all other $D-1$ variables are held strictly constant |\n\n#### Intuitive Rationale for the Notation $\\partial$\nWhy do mathematicians write $\\frac{\\partial f}{\\partial x}$ with a curved $\\partial$ instead of an ordinary straight $\\frac{df}{dx}$? \nThe straight $d$ denotes a *total derivative*: if moving $x$ also naturally drags $y$ along with it (for example, if $y = x^2$), the total derivative accounts for both direct and indirect changes. The curved $\\partial$ is an explicit warning sign: it means *\"Hold everything else rigidly still! Do not let any other variable budge even an angstrom while we isolate this single coordinate.\"*",
@@ -2963,7 +2963,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-higher-order-derivatives-concavity",
+          "id": "py-t1-22",
           "starterCode": "def numerical_gradient_vector(f: Callable[[np.ndarray], float], x0: np.ndarray, eps: float = 1e-5) -> np.ndarray:\n    \"\"\"\n    Compute numerical partial derivatives vector using central difference perturbations.\n    Constructs axis perturbation matrix E = eps * I without Python coordinate loops.\n    \n    Parameters\n    ----------\n    f : Callable\n        Function mapping 1D numpy array of shape (D,) to a scalar.\n    x0 : np.ndarray\n        Evaluation coordinate vector of shape (D,).\n    eps : float\n        Central difference perturbation step size (default 1e-5).\n        \n    Returns\n    -------\n    np.ndarray\n        Gradient vector containing all D partial derivatives, shape (D,).\n    \"\"\"\n    # Step 1: Construct perturbation matrix E = eps * I_d\n    # Step 2: Perturb along positive and negative directions for each axis\n    # Step 3: Evaluate function responses along each axis displacement\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -2986,16 +2986,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Gradient vector contains all identical values or incorrect magnitude.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Adding a scalar `x0 + eps` perturbs all coordinates at once along the diagonal rather than isolating one coordinate axis at a time.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Multiply `eps` by the identity matrix `E = np.eye(d) * eps` so row $i$ perturbs exclusively coordinate $i$.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3066,7 +3066,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "taylor-series-polynomial",
+    "id": "t1-23",
     "title": "The Gradient Vector & Directional Derivatives",
     "titleAr": "متجه التدرج والمشتقات الاتجاهية",
     "trackId": "math",
@@ -3076,8 +3076,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "في الدرس السابق، قمنا بقياس انحدار الجبل على طول المحاور الشبكية الصارمة للخريطة: شرقاً وغرباً ($\\frac{\\partial f}{\\partial x}$) وشمالاً..."
     },
     "prerequisites": [
-      "differentiation-rules-chain",
-      "higher-order-derivatives-concavity"
+      "t1-18",
+      "t1-19"
     ],
     "x": 210,
     "y": 2170,
@@ -3096,8 +3096,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\nabla f(\\mathbf{x}) \\coloneqq \\begin{bmatrix} \\frac{\\partial f}{\\partial x_1}(\\mathbf{x}) \\\\ \\vdots \\\\ \\frac{\\partial f}{\\partial x_D}(\\mathbf{x}) \\end{bmatrix} \\in \\mathbb{R}^D, \\quad D_{\\hat{\\mathbf{u}}} f(\\mathbf{x}) = \\nabla f(\\mathbf{x})^T \\hat{\\mathbf{u}} = \\|\\nabla f(\\mathbf{x})\\|_2 \\cos(\\theta)",
         "formulaNote": {
-          "en": "Core invariant for The Gradient Vector & Directional Derivatives.",
-          "ar": "الخاصية الرياضية الجوهرية لـ متجه التدرج والمشتقات الاتجاهية."
+          "en": "Mathematical anchor for The Gradient Vector & Directional Derivatives.",
+          "ar": "المرساة الرياضية لـ متجه التدرج والمشتقات الاتجاهية."
         },
         "narrative": {
           "en": "$$\n\\max_{\\|\\hat{\\mathbf{u}}\\|=1} D_{\\hat{\\mathbf{u}}} f(\\mathbf{x}) = \\|\\nabla f(\\mathbf{x})\\|_2 \\iff \\hat{\\mathbf{u}} = \\frac{\\nabla f(\\mathbf{x})}{\\|\\nabla f(\\mathbf{x})\\|_2} \\quad (\\theta = 0)\n$$\n$$\n\\nabla f(\\mathbf{x}_0) \\perp \\text{Tangent space to the level contour } \\mathcal{L}_{f(\\mathbf{x}_0)}(f) \\quad (\\theta = \\pi/2)\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $\\nabla f(\\mathbf{x})$ | $\\mathbb{R}^D$ (Vector) | Vector pointing in the direction of steepest uphill ascent | Compiles all first-order spatial sensitivities into a single directional probe |\n| $\\hat{\\mathbf{u}}$ | $\\mathbb{R}^D, \\|\\hat{\\mathbf{u}}\\|=1$ | Unit vector specifying travel direction | The compass heading along which the slope is queried |\n| $D_{\\hat{\\mathbf{u}}} f(\\mathbf{x})$ | $\\mathbb{R}$ (Scalar) | Directional derivative / instantaneous climb rate along $\\hat{\\mathbf{u}}$ | Measures the slope felt underfoot when hiking along direction $\\hat{\\mathbf{u}}$ |\n| $\\|\\nabla f(\\mathbf{x})\\|_2$ | $\\mathbb{R}_{\\ge 0}$ | Euclidean magnitude of the gradient vector | Upper theoretical limit of how steep any directional slope can possibly be |\n| $\\theta$ | $[0, \\pi]$ | Angle between the gradient vector and step direction $\\hat{\\mathbf{u}}$ | Geometric factor controlling sensitivity through the projection $\\cos(\\theta)$ |\n\n#### Intuitive Rationale via Cauchy-Schwarz\nWhy does the directional derivative equal the dot product $\\nabla f \\cdot \\hat{\\mathbf{u}} = \\|\\nabla f\\| \\cos(\\theta)$?\nThe dot product measures geometric alignment.\n- **Maximum Ascent ($\\theta = 0^\\circ$):** When your walking direction $\\hat{\\mathbf{u}}$ aligns parallel to $\\nabla f$, $\\cos(0) = 1$, achieving the absolute maximum climb rate $+\\|\\nabla f\\|$.\n- **Maximum Descent ($\\theta = 180^\\circ$):** When you turn around and walk directly opposite to $\\nabla f$, $\\cos(\\pi) = -1$, plunging down the fastest possible slope $-\\|\\nabla f\\|$.\n- **Zero Climb ($\\theta = 90^\\circ$):** When you step sideways perpendicular to $\\nabla f$, $\\cos(\\pi/2) = 0$. You are walking tangentially along a level contour curve without gaining or losing a single millimeter of altitude.",
@@ -3108,7 +3108,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-taylor-series-polynomial",
+          "id": "py-t1-23",
           "starterCode": "def directional_derivatives(grad: np.ndarray, directions: np.ndarray) -> tuple[np.ndarray, int]:\n    \"\"\"\n    Compute batch directional derivatives along candidate directions and locate steepest ascent.\n    Normalizes candidate directions to unit vectors before evaluating inner products.\n    \n    Parameters\n    ----------\n    grad : np.ndarray\n        Gradient vector of shape (D,).\n    directions : np.ndarray\n        Array of candidate direction vectors of shape (B, D).\n        \n    Returns\n    -------\n    tuple[np.ndarray, int]\n        d_vals : Directional derivative values along unit directions, shape (B,).\n        best_idx : Index of the candidate direction maximizing ascent.\n    \"\"\"\n    # Step 1: Normalize direction vectors to unit norm along last axis\n    # Step 2: Compute directional derivatives via matrix-vector multiplication (B, D) @ (D,) -> (B,)\n    # Step 3: Identify index of maximum directional ascent\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -3131,16 +3131,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Directional derivative values scale with vector length instead of representing pure slopes.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Omitting normalization causes longer vectors to report artificially massive directional derivatives.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Normalize using `keepdims=True`: `directions / np.linalg.norm(directions, axis=-1, keepdims=True)`.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3211,7 +3211,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "multivariable-scalar-fields",
+    "id": "t1-24",
     "title": "The Hessian Matrix, Curvature & Quadratic Approximations",
     "titleAr": "مصفوفة هيسي، الانحناء، والتقريبات التربيعية",
     "trackId": "math",
@@ -3221,8 +3221,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "يمثل متجه التدرج بوصلتك الموثوقة: فهو يخبرك بميل التضاريس واتجاهها تحت باطن حذائك مباشرة."
     },
     "prerequisites": [
-      "derivative-tangent-slope",
-      "cartesian-coordinate-metric"
+      "t1-17",
+      "t1-01"
     ],
     "x": 195,
     "y": 2265,
@@ -3241,8 +3241,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbf{H}_{i, j} = \\frac{\\partial^2 f}{\\partial x_i \\partial x_j}, \\quad \\mathbf{H}(\\mathbf{x}) = \\nabla^2 f(\\mathbf{x}) \\in \\mathbb{R}^{D \\times D}",
         "formulaNote": {
-          "en": "Core invariant for The Hessian Matrix, Curvature & Quadratic Approximations.",
-          "ar": "الخاصية الرياضية الجوهرية لـ مصفوفة هيسي، الانحناء، والتقريبات التربيعية."
+          "en": "Mathematical anchor for The Hessian Matrix, Curvature & Quadratic Approximations.",
+          "ar": "المرساة الرياضية لـ مصفوفة هيسي، الانحناء، والتقريبات التربيعية."
         },
         "narrative": {
           "en": "$$\nf(\\mathbf{x}_0 + \\Delta \\mathbf{x}) \\approx f(\\mathbf{x}_0) + \\nabla f(\\mathbf{x}_0)^T \\Delta \\mathbf{x} + \\frac{1}{2} \\Delta \\mathbf{x}^T \\mathbf{H}(\\mathbf{x}_0) \\Delta \\mathbf{x}\n$$\n$$\n\\text{At } \\nabla f(\\mathbf{x}^*) = \\mathbf{0}: \\quad \\begin{cases} \\mathbf{H} \\succ 0 \\; (\\forall \\lambda_i > 0) \\implies \\text{Strict Local Minimum} \\\\ \\mathbf{H} \\prec 0 \\; (\\forall \\lambda_i < 0) \\implies \\text{Strict Local Maximum} \\\\ \\exists \\lambda_i > 0, \\lambda_j < 0 \\implies \\text{Saddle Point} \\end{cases}\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $\\mathbf{H} = \\nabla^2 f$ | $\\mathbb{R}^{D \\times D}$ (Symmetric) | Matrix of all second-order partial derivatives | Quadratic curvature operator governing local bowl geometry |\n| $\\frac{\\partial^2 f}{\\partial x_i \\partial x_j}$ | $\\mathbb{R}$ | Rate of change of slope along axis $i$ as you move along axis $j$ | Mixed partial derivative (symmetric: $H_{ij} = H_{ji}$ by Clairaut's theorem) |\n| $\\frac{1}{2} \\Delta \\mathbf{x}^T \\mathbf{H} \\Delta \\mathbf{x}$ | $\\mathbb{R}$ (Scalar) | Directional quadratic curvature form | Governs whether energy rises or falls along displacement step $\\Delta \\mathbf{x}$ |\n| $\\lambda_i$ | $\\mathbb{R}$ | Eigenvalues of the Hessian matrix | Principal curvatures along orthogonal eigen-axes |\n| Saddle Point | Geometry | Mixed positive and negative curvatures | Hyperbolic geometry trapping naive optimization algorithms |\n\n#### Intuitive Rationale for Hessian Symmetry\nWhy is the Hessian matrix always symmetric ($H_{ij} = H_{ji}$) for smooth functions?\nAccording to Clairaut's (Schwarz's) Theorem, if the second derivatives are continuous, the order of differentiation does not matter: $\\frac{\\partial}{\\partial x}\\left(\\frac{\\partial f}{\\partial y}\\right) = \\frac{\\partial}{\\partial y}\\left(\\frac{\\partial f}{\\partial x}\\right)$. Slicing East then stepping North reaches the exact same altitude change as slicing North then stepping East. By the Spectral Theorem, every symmetric matrix possesses strictly real eigenvalues and an orthonormal set of eigenvectors, which define the principal curvature axes of the quadratic bowl.",
@@ -3253,7 +3253,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-multivariable-scalar-fields",
+          "id": "py-t1-24",
           "starterCode": "def quadratic_form_curvature(H: np.ndarray, directions: np.ndarray) -> tuple[np.ndarray, str]:\n    \"\"\"\n    Compute directional quadratic form curvatures and classify surface topology.\n    Uses Einstein summation einsum('bd,de,be->b') to eliminate batch matrix loops.\n    \n    Parameters\n    ----------\n    H : np.ndarray\n        Symmetric Hessian matrix of shape (D, D).\n    directions : np.ndarray\n        Batch of candidate direction vectors of shape (B, D).\n        \n    Returns\n    -------\n    tuple[np.ndarray, str]\n        curvatures : Directional quadratic forms v^T H v, shape (B,).\n        topology : Classification: 'strictly_convex', 'strictly_concave', or 'saddle'.\n    \"\"\"\n    # Step 1: Normalize direction vectors to unit norm along last axis\n    # Step 2: Compute batch quadratic forms v^T H v via einsum\n    # Step 3: Compute eigenvalues of symmetric Hessian matrix\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -3276,16 +3276,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Slow Python loop computing $\\mathbf{v}_i^T H \\mathbf{v}_i$ or shape mismatch.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Multiplying `directions @ H @ directions.T` produces a full $B \\times B$ matrix where only the diagonal elements are needed.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Use `np.einsum('bd,de,be->b', unit_v, H, unit_v)` to directly evaluate the $B$ quadratic forms without allocating the cross-product matrix.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3356,7 +3356,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "partial-derivatives-tangents",
+    "id": "t1-25",
     "title": "The Jacobian Matrix & Vector-Valued Deformation",
     "titleAr": "مصفوفة جاكوبي والتشويه المكاني للدوال المتجهية",
     "trackId": "math",
@@ -3366,7 +3366,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "في استكشافاتنا السابقة لعلم الحسبان، كانت دوالنا عبارة عن حقول عددية: تستقبل نقطة متعددة الأبعاد وتُخرج رقماً قياسياً وحيداً—مثل إدخال..."
     },
     "prerequisites": [
-      "multivariable-scalar-fields"
+      "t1-21"
     ],
     "x": 210,
     "y": 2360,
@@ -3385,8 +3385,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbf{F}: \\mathbb{R}^N \\to \\mathbb{R}^M, \\quad \\mathbf{J} = \\frac{\\partial \\mathbf{F}}{\\partial \\mathbf{x}} \\coloneqq \\begin{bmatrix} \\frac{\\partial F_1}{\\partial x_1} & \\cdots & \\frac{\\partial F_1}{\\partial x_N} \\\\ \\vdots & \\ddots & \\vdots \\\\ \\frac{\\partial F_M}{\\partial x_1} & \\cdots & \\frac{\\partial F_M}{\\partial x_N} \\end{bmatrix} = \\begin{bmatrix} \\nabla F_1^T \\\\ \\vdots \\\\ \\nabla F_M^T \\end{bmatrix} \\in \\mathbb{R}^{M \\times N}",
         "formulaNote": {
-          "en": "Core invariant for The Jacobian Matrix & Vector-Valued Deformation.",
-          "ar": "الخاصية الرياضية الجوهرية لـ مصفوفة جاكوبي والتشويه المكاني للدوال المتجهية."
+          "en": "Mathematical anchor for The Jacobian Matrix & Vector-Valued Deformation.",
+          "ar": "المرساة الرياضية لـ مصفوفة جاكوبي والتشويه المكاني للدوال المتجهية."
         },
         "narrative": {
           "en": "$$\n\\mathbf{F}(\\mathbf{x} + \\Delta \\mathbf{x}) \\approx \\mathbf{F}(\\mathbf{x}) + \\mathbf{J}(\\mathbf{x}) \\Delta \\mathbf{x}\n$$\n$$\ndV_{\\mathbf{y}} = |\\det(\\mathbf{J})| \\, dV_{\\mathbf{x}} \\quad (\\text{Multivariate Volume Scaling for } M = N)\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $\\mathbf{F}$ | $\\mathbb{R}^N \\to \\mathbb{R}^M$ | Non-linear vector mapping from $N$-dim domain to $M$-dim codomain | Forward transformation modeling physical kinematics or neural flow |\n| $\\mathbf{J}$ | $\\mathbb{R}^{M \\times N}$ | Matrix of all first-order partial derivatives | Optimal local linear transformation approximating the nonlinear map $\\mathbf{F}$ |\n| $\\nabla F_i^T$ | $1 \\times N$ (Row vector) | Gradient of the $i$-th scalar output component | $i$-th row of the Jacobian matrix encoding sensitivity of output $i$ |\n| $\\Delta \\mathbf{x}$ | $\\mathbb{R}^N$ | Small spatial displacement vector in input domain | Input nudge transformed into output displacement $\\Delta \\mathbf{y} \\approx \\mathbf{J} \\Delta \\mathbf{x}$ |\n| $|\\det(\\mathbf{J})|$ | $\\mathbb{R}_{\\ge 0}$ (for $M=N$) | Local volume magnification / expansion factor | The scaling factor when transforming probability densities and multidimensional integrals |\n\n#### Intuitive Rationale for $|\\det(\\mathbf{J})|$\nWhy does the absolute determinant $|\\det(\\mathbf{J})|$ represent volume scaling?\nIn linear algebra, the determinant of a matrix represents the volume of the parallelotope formed by its column vectors. Because the Jacobian $\\mathbf{J}$ is the best linear approximation of $\\mathbf{F}$ around a point $\\mathbf{x}$, an infinitesimal cube of volume $dV_{\\mathbf{x}} = dx_1 dx_2 \\dots dx_N$ is mapped into an infinitesimal parallelotope in the output space. The volume of this new parallelotope is precisely scaled by $|\\det(\\mathbf{J})|$. If $|\\det(\\mathbf{J})| = 3.0$, the function locally expands volumes by a factor of 3. If $|\\det(\\mathbf{J})| = 0$, the function collapses a dimension, flattening volumes into pancakes.",
@@ -3397,7 +3397,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-partial-derivatives-tangents",
+          "id": "py-t1-25",
           "starterCode": "def numerical_jacobian(F: Callable[[np.ndarray], np.ndarray], x0: np.ndarray, eps: float = 1e-5) -> np.ndarray:\n    \"\"\"\n    Compute numerical Jacobian matrix of vector function F: R^N -> R^M at x0.\n    Evaluates central difference perturbations along each input basis direction.\n    \n    Parameters\n    ----------\n    F : Callable\n        Vector-valued function mapping array of shape (N,) to array of shape (M,).\n    x0 : np.ndarray\n        Evaluation coordinate vector of shape (N,).\n    eps : float\n        Finite difference perturbation step size (default 1e-5).\n        \n    Returns\n    -------\n    np.ndarray\n        Jacobian matrix of shape (M, N).\n    \"\"\"\n    # Step 1: Construct coordinate perturbation matrix E = eps * I_n\n    # Step 2: Perturb each coordinate j via central differences to obtain column j of the Jacobian\n    # Step 3: Stack column derivative vectors horizontally to form (M, N) matrix\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -3420,16 +3420,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Jacobian matrix is transposed `(N, M)` instead of `(M, N)`.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Perturbing coordinate $x_j$ produces the $j$-th *column* of partial derivatives $\\frac{\\partial \\mathbf{F}}{\\partial x_j}$, not the $j$-th row.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Stack column-wise using `np.column_stack(cols)` or transpose row-stacked results.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3500,7 +3500,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "gradient-vector",
+    "id": "t1-26",
     "title": "Convexity, Epigraphs & Global Minimizers",
     "titleAr": "التحدب، المخططات الفوقية، ونقاط النهاية الصغرى الشاملة",
     "trackId": "math",
@@ -3510,8 +3510,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل إناء حساء خزفياً أملس ومستديراً موضوعاً على طاولة طعام. لنفترض أنك اخترت أي نقطتين عشوائيتين في أي مكان داخل الحساء أو على حافة الإناء..."
     },
     "prerequisites": [
-      "partial-derivatives-tangents",
-      "linear-algebra-vectors"
+      "t1-22",
+      "t1-03"
     ],
     "x": 195,
     "y": 2455,
@@ -3530,8 +3530,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "f(\\alpha \\mathbf{x} + (1 - \\alpha)\\mathbf{y}) \\le \\alpha f(\\mathbf{x}) + (1 - \\alpha) f(\\mathbf{y}) \\quad \\forall \\mathbf{x}, \\mathbf{y} \\in \\operatorname{dom}(f), \\; \\alpha \\in [0, 1]",
         "formulaNote": {
-          "en": "Core invariant for Convexity, Epigraphs & Global Minimizers.",
-          "ar": "الخاصية الرياضية الجوهرية لـ التحدب، المخططات الفوقية، ونقاط النهاية الصغرى الشاملة."
+          "en": "Mathematical anchor for Convexity, Epigraphs & Global Minimizers.",
+          "ar": "المرساة الرياضية لـ التحدب، المخططات الفوقية، ونقاط النهاية الصغرى الشاملة."
         },
         "narrative": {
           "en": "$$\n\\operatorname{epi}(f) \\coloneqq \\left\\{ (\\mathbf{x}, t) \\in \\mathbb{R}^{D+1} \\;\\middle|\\; \\mathbf{x} \\in \\operatorname{dom}(f), \\; t \\ge f(\\mathbf{x}) \\right\\} \\quad (\\text{Epigraph Set is Convex})\n$$\n$$\nf(\\mathbb{E}[\\mathbf{X}]) \\le \\mathbb{E}[f(\\mathbf{X})] \\implies \\Delta_{\\text{Jensen}} = \\mathbb{E}[f(\\mathbf{X})] - f(\\mathbb{E}[\\mathbf{X}]) \\ge 0\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $\\mathbf{x}, \\mathbf{y}$ | $\\mathbb{R}^D$ | Arbitrary pair of coordinates in function domain | Endpoints of the geometric test chord |\n| $\\alpha \\in [0, 1]$ | Scalar | Linear blending / interpolation weight | Sweeps position along the straight chord connecting $\\mathbf{x}$ and $\\mathbf{y}$ |\n| $\\operatorname{epi}(f)$ | Subset of $\\mathbb{R}^{D+1}$ | The epigraph: region of space lying on and above the graph | Set-theoretic definition establishing functional convexity |\n| $\\mathbb{E}[\\mathbf{X}]$ | $\\mathbb{R}^D$ | Expected value / balance point of probability mass | Center of gravity of input random variable |\n| $\\Delta_{\\text{Jensen}}$ | $\\mathbb{R}_{\\ge 0}$ | Non-negative Jensen gap | The non-negative divergence gap underpinning variational inference |\n\n#### Intuitive Rationale: The First-Order Tangent Plane Condition\nFor a differentiable function, convexity can be restated in a beautifully tactile way: **the tangent plane always lies below the function**.\n$$\nf(\\mathbf{y}) \\ge f(\\mathbf{x}) + \\nabla f(\\mathbf{x})^T (\\mathbf{y} - \\mathbf{x}) \\quad \\forall \\mathbf{x}, \\mathbf{y}\n$$\nImagine holding a flat wooden board tangent to the bottom of our ceramic bowl. Does the board slice through the bowl? Never! The flat tangent board supports the bowl from underneath, acting as a global lower bound. This is why any point where the tangent is horizontal ($\\nabla f = \\mathbf{0}$) immediately proves $f(\\mathbf{y}) \\ge f(\\mathbf{x}) + 0 = f(\\mathbf{x})$, certifying $\\mathbf{x}$ as a global minimum.",
@@ -3542,7 +3542,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-gradient-vector",
+          "id": "py-t1-26",
           "starterCode": "def verify_jensen_gap(f: Callable[[np.ndarray], float], points: np.ndarray, weights: np.ndarray) -> tuple[float, float, float]:\n    \"\"\"\n    Compute expectation E[X], function of expectation f(E[X]), and empirical Jensen gap.\n    \n    Parameters\n    ----------\n    f : Callable\n        Convex scalar objective function.\n    points : np.ndarray\n        Sample coordinate array of shape (N, D).\n    weights : np.ndarray\n        Probability weight array of shape (N,).\n        \n    Returns\n    -------\n    tuple[float, float, float]\n        sum_ex : Sum of components of expectation vector E[X].\n        f_ex : Function value evaluated at expectation f(E[X]).\n        gap : Jensen gap E[f(X)] - f(E[X]) >= 0.\n    \"\"\"\n    # Step 1: Normalize weights to sum strictly to 1.0\n    # Step 2: Compute expectation vector E[X] = sum(w_i * x_i) using broadcasting\n    # Step 3: Evaluate function at expectation: f(E[X])\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -3565,16 +3565,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Negative Jensen gap or incorrect expectation values.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "If input weights do not sum to 1.0, $\\mathbb{E}[X]$ and $\\mathbb{E}[f(X)]$ are not valid convex combinations.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Normalize weights unconditionally: `norm_weights = weights / np.sum(weights)`.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3645,7 +3645,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "hessian-matrix-extrema",
+    "id": "t1-27",
     "title": "Gradient Descent, Learning Rates & Landscape Navigation",
     "titleAr": "الانحدار التدريجي، معدلات التعلم، والملاحة في التضاريس",
     "trackId": "math",
@@ -3655,8 +3655,8 @@ export const mathModules: CurriculumModule[] = [
       "ar": "تخيل أنك معصوب العينين وتقف على سفح جبل صخري وعر يلفه ضباب كثيف لا ترى فيه يدك. لا يمكنك رؤية أي معالم حولك، ولا يمكنك تحديد موقع المخيم..."
     },
     "prerequisites": [
-      "gradient-vector",
-      "higher-order-derivatives-concavity"
+      "t1-23",
+      "t1-19"
     ],
     "x": 210,
     "y": 2550,
@@ -3675,8 +3675,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbf{x}_{t+1} = \\mathbf{x}_t - \\eta \\nabla f(\\mathbf{x}_t) \\quad (\\text{Standard Gradient Descent})",
         "formulaNote": {
-          "en": "Core invariant for Gradient Descent, Learning Rates & Landscape Navigation.",
-          "ar": "الخاصية الرياضية الجوهرية لـ الانحدار التدريجي، معدلات التعلم، والملاحة في التضاريس."
+          "en": "Mathematical anchor for Gradient Descent, Learning Rates & Landscape Navigation.",
+          "ar": "المرساة الرياضية لـ الانحدار التدريجي، معدلات التعلم، والملاحة في التضاريس."
         },
         "narrative": {
           "en": "$$\n\\mathbf{v}_{t+1} = \\beta \\mathbf{v}_t + \\eta \\nabla f(\\mathbf{x}_t), \\quad \\mathbf{x}_{t+1} = \\mathbf{x}_t - \\mathbf{v}_{t+1} \\quad (\\text{Polyak Heavy-Ball Momentum})\n$$\n$$\nf(\\mathbf{x}_{t+1}) \\le f(\\mathbf{x}_t) - \\eta \\left(1 - \\frac{L\\eta}{2}\\right) \\|\\nabla f(\\mathbf{x}_t)\\|_2^2 \\quad (\\text{Descent Lemma for } L\\text{-smooth } f)\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $\\mathbf{x}_t$ | $\\mathbb{R}^D$ | Current parameter coordinates at step $t$ | Vector of model weights being optimized |\n| $\\nabla f(\\mathbf{x}_t)$ | $\\mathbb{R}^D$ | Instantaneous direction of steepest ascent | Steers step in the downhill direction via the minus sign |\n| $\\eta$ (Eta) | $\\mathbb{R}_{> 0}$ | Learning rate / step length multiplier | Hyperparameter scaling how far the model steps along the gradient |\n| $\\mathbf{v}_t$ | $\\mathbb{R}^D$ | Accumulated velocity buffer vector | Encodes historical momentum and kinetic memory across iterations |\n| $\\beta \\in [0, 1)$ | Scalar | Momentum friction damping coefficient | Controls the exponential retention rate of past velocity |\n| $L$ | $\\mathbb{R}_{> 0}$ | Lipschitz smoothness constant ($\\|\\nabla f(\\mathbf{x}) - \\nabla f(\\mathbf{y})\\| \\le L\\|\\mathbf{x} - \\mathbf{y}\\|$) | Imposes strict mathematical upper limit on step size: $\\eta < \\frac{2}{L}$ |\n\n#### Intuitive Rationale for the Descent Lemma\nWhy does the Descent Lemma guarantee progress only when $\\eta < 2/L$?\nLook at the contraction factor in the lemma: $\\eta \\left(1 - \\frac{L\\eta}{2}\\right)$.\n- When $\\eta$ is chosen small enough such that $\\frac{L\\eta}{2} < 1$ (i.e., $\\eta < 2/L$), the term $\\left(1 - \\frac{L\\eta}{2}\\right)$ is strictly positive! This mathematically guarantees that $f(\\mathbf{x}_{t+1}) < f(\\mathbf{x}_t)$ whenever the gradient is non-zero: **the loss is guaranteed to decrease on every single step**.\n- The optimal step size maximizing decrease is $\\eta^* = 1/L$.\n- If you push $\\eta > 2/L$, the term becomes negative, meaning the update oversteps the valley and the loss explodes!",
@@ -3687,7 +3687,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-hessian-matrix-extrema",
+          "id": "py-t1-27",
           "starterCode": "def momentum_gradient_descent_step(\n    x: np.ndarray,\n    grad: np.ndarray,\n    v: np.ndarray,\n    lr: float,\n    beta: float\n) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Execute a single iteration update of classical Polyak heavy-ball momentum.\n    \n    Parameters\n    ----------\n    x : np.ndarray\n        Current parameter vector of shape (D,).\n    grad : np.ndarray\n        Current loss gradient vector nabla f(x) of shape (D,).\n    v : np.ndarray\n        Velocity buffer vector of shape (D,).\n    lr : float\n        Learning rate alpha > 0.\n    beta : float\n        Momentum damping coefficient beta in [0, 1).\n        \n    Returns\n    -------\n    tuple[np.ndarray, np.ndarray]\n        x_next : Updated parameter vector, shape (D,).\n        v_next : Updated velocity buffer vector, shape (D,).\n    \"\"\"\n    # Step 1: Accumulate momentum velocity v_{t+1} = beta * v_t + lr * grad\n    # Step 2: Update coordinates opposite to velocity x_{t+1} = x_t - v_next\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -3710,16 +3710,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Gradient ascent occurring (loss increases) or velocity subtracted in wrong direction.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Since $v$ accumulates positive gradient steps $\\alpha \\nabla f$, the parameter update must subtract $v$ to minimize the loss.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Compute `v_next = beta * v + lr * grad` then `x_next = x - v_next`.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3790,7 +3790,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "bayes-theorem",
+    "id": "t1-28",
     "title": "Constrained Optimization & Lagrange Multipliers",
     "titleAr": "التحسين المقيد ومضروبات لاغرانج",
     "trackId": "math",
@@ -3800,7 +3800,7 @@ export const mathModules: CurriculumModule[] = [
       "ar": "لنفترض أنك تتجول في محمية طبيعية محمية وترغب في الوصول إلى أعلى منسوب ممكن على تضاريس جبل شاهق $f(x, y)$."
     },
     "prerequisites": [
-      "cartesian-coordinate-metric"
+      "t1-01"
     ],
     "x": 220,
     "y": 2645,
@@ -3819,8 +3819,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\min_{\\mathbf{x} \\in \\mathbb{R}^N} f(\\mathbf{x}) \\quad \\text{subject to} \\quad g_j(\\mathbf{x}) = 0, \\; j = 1, \\dots, M",
         "formulaNote": {
-          "en": "Core invariant for Constrained Optimization & Lagrange Multipliers.",
-          "ar": "الخاصية الرياضية الجوهرية لـ التحسين المقيد ومضروبات لاغرانج."
+          "en": "Mathematical anchor for Constrained Optimization & Lagrange Multipliers.",
+          "ar": "المرساة الرياضية لـ التحسين المقيد ومضروبات لاغرانج."
         },
         "narrative": {
           "en": "$$\n\\mathcal{L}(\\mathbf{x}, \\boldsymbol{\\lambda}) \\coloneqq f(\\mathbf{x}) + \\sum_{j=1}^M \\lambda_j g_j(\\mathbf{x}) = f(\\mathbf{x}) + \\boldsymbol{\\lambda}^T \\mathbf{g}(\\mathbf{x})\n$$\n$$\n\\begin{bmatrix} \\mathbf{Q} & \\mathbf{A}^T \\\\ \\mathbf{A} & \\mathbf{0} \\end{bmatrix} \\begin{bmatrix} \\mathbf{x}^* \\\\ \\boldsymbol{\\lambda}^* \\end{bmatrix} = \\begin{bmatrix} -\\mathbf{c} \\\\ \\mathbf{b} \\end{bmatrix} \\quad (\\text{Karush-Kuhn-Tucker Block System})\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $f(\\mathbf{x})$ | $\\mathbb{R}^N \\to \\mathbb{R}$ | Unconstrained scalar objective landscape | The target function we desire to minimize or maximize |\n| $g_j(\\mathbf{x}) = 0$ | Manifold of dim $N-1$ | Constraint hypersurface boundary | The rigid fence restricting where solutions are legally permitted to exist |\n| $\\mathcal{L}(\\mathbf{x}, \\boldsymbol{\\lambda})$ | $\\mathbb{R}^{N+M} \\to \\mathbb{R}$ | Lagrangian auxiliary energy function | Unifies objective and constraints into a single saddle-point surface |\n| $\\lambda_j$ | $\\mathbb{R}$ | Proportionality scale factor between gradients | Lagrange multiplier measuring marginal constraint shadow price |\n| $\\mathbf{x}^*$ | $\\mathbb{R}^N$ | Optimal primal decision coordinates | The best feasible point satisfying all constraints |\n| $\\boldsymbol{\\lambda}^*$ | $\\mathbb{R}^M$ | Optimal dual coordinates | The forces required from the constraint barriers to hold $\\mathbf{x}^*$ in place |\n\n#### Intuitive Rationale for the Saddle-Point Formulation\nSetting the derivatives of $\\mathcal{L}(\\mathbf{x}, \\boldsymbol{\\lambda})$ to zero produces the famous Karush-Kuhn-Tucker (KKT) conditions:\n1. $\\nabla_{\\mathbf{x}} \\mathcal{L} = \\nabla f(\\mathbf{x}) + \\mathbf{A}^T \\boldsymbol{\\lambda} = \\mathbf{0}$ enforces gradient balance between objective and constraints.\n2. $\\nabla_{\\boldsymbol{\\lambda}} \\mathcal{L} = \\mathbf{A}\\mathbf{x} - \\mathbf{b} = \\mathbf{0}$ recovers the exact constraint equation!\nNotice that the optimal pair $(\\mathbf{x}^*, \\boldsymbol{\\lambda}^*)$ is **not a local minimum of $\\mathcal{L}$**, but a **saddle point**! It minimizes $\\mathcal{L}$ with respect to the primal decisions $\\mathbf{x}$, while maximizing $\\mathcal{L}$ with respect to the dual penalties $\\boldsymbol{\\lambda}$.",
@@ -3831,7 +3831,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-bayes-theorem",
+          "id": "py-t1-28",
           "starterCode": "def solve_constrained_quadratic_kkt(\n    Q: np.ndarray,\n    c: np.ndarray,\n    A: np.ndarray,\n    b: np.ndarray\n) -> tuple[np.ndarray, np.ndarray]:\n    \"\"\"\n    Solve equality-constrained quadratic program:\n        min  0.5 * x^T Q x + c^T x\n        s.t. A x = b\n    via the Karush-Kuhn-Tucker (KKT) block linear matrix system.\n    \n    Parameters\n    ----------\n    Q : np.ndarray\n        Symmetric positive-definite Hessian matrix of shape (N, N).\n    c : np.ndarray\n        Linear cost vector of shape (N,).\n    A : np.ndarray\n        Linear constraint matrix of shape (M, N) with M < N.\n    b : np.ndarray\n        Constraint target vector of shape (M,).\n        \n    Returns\n    -------\n    tuple[np.ndarray, np.ndarray]\n        x_star : Optimal primal solution vector of shape (N,).\n        lambda_star : Optimal dual Lagrange multiplier vector of shape (M,).\n    \"\"\"\n    # Step 1: Assemble KKT block coefficient matrix [[Q, A^T], [A, 0]]\n    # Step 2: Assemble right-hand side vector [-c, b]\n    # Step 3: Solve linear system KKT @ [x*, lambda*] = rhs\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -3854,16 +3854,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Primal stationarity condition violated ($Q\\mathbf{x}^* + \\mathbf{c} + A^T\\boldsymbol{\\lambda} \\ne \\mathbf{0}$) or sign error in $\\boldsymbol{\\lambda}^*$.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Stationarity requires $Q\\mathbf{x} + A^T\\boldsymbol{\\lambda} = -\\mathbf{c}$. Using `c` instead of `-c` flips the sign of the primal gradient balance.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Negate $c$ in the RHS vector: `np.concatenate([-c, b])`.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3934,7 +3934,7 @@ export const mathModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "central-limit-theorem",
+    "id": "t1-29",
     "title": "The Central Limit Theorem & Geometric Convergence of Noise",
     "titleAr": "مبرهنة النهاية المركزية والتقارب الهندسي للضوضاء",
     "trackId": "math",
@@ -3945,7 +3945,7 @@ export const mathModules: CurriculumModule[] = [
     },
     "prerequisites": [
       "bayes-theorem",
-      "differentiation-rules-chain"
+      "t1-18"
     ],
     "x": 220,
     "y": 2740,
@@ -3964,8 +3964,8 @@ export const mathModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\bar{X}_N \\coloneqq \\frac{1}{N} \\sum_{i=1}^N X_i, \\quad X_i \\overset{\\text{i.i.d.}}{\\sim} \\mathcal{D}(\\mu, \\sigma^2 < \\infty)",
         "formulaNote": {
-          "en": "Core invariant for The Central Limit Theorem & Geometric Convergence of Noise.",
-          "ar": "الخاصية الرياضية الجوهرية لـ مبرهنة النهاية المركزية والتقارب الهندسي للضوضاء."
+          "en": "Mathematical anchor for The Central Limit Theorem & Geometric Convergence of Noise.",
+          "ar": "المرساة الرياضية لـ مبرهنة النهاية المركزية والتقارب الهندسي للضوضاء."
         },
         "narrative": {
           "en": "$$\nZ_N \\coloneqq \\frac{\\bar{X}_N - \\mu}{\\sigma / \\sqrt{N}} = \\frac{\\sum_{i=1}^N X_i - N\\mu}{\\sigma \\sqrt{N}} \\xrightarrow{d} \\mathcal{N}(0, 1) \\quad \\text{as } N \\to \\infty\n$$\n$$\n\\lim_{N \\to \\infty} P(Z_N \\le z) = \\Phi(z) \\coloneqq \\frac{1}{\\sqrt{2\\pi}} \\int_{-\\infty}^z e^{-\\frac{t^2}{2}} \\, dt\n$$\n\n### Demystifying the Equation\n\n| Symbol | Dimensional Type | Geometric Meaning | Operational Role |\n| :--- | :--- | :--- | :--- |\n| $X_i$ | Random Variable | Independent sample draw from arbitrary distribution $\\mathcal{D}$ | Elementary source of microscopic random variation |\n| $\\mu = \\mathbb{E}[X_i]$ | $\\mathbb{R}$ | Center of mass / true population mean | Translation centering anchor parameter |\n| $\\sigma = \\sqrt{\\operatorname{Var}(X_i)}$ | $\\mathbb{R}_{> 0}$ | Population standard deviation | Intrinsic scale parameter governing dispersion |\n| $\\bar{X}_N$ | Random Variable | Sample mean over $N$ observations | Estimator whose variance shrinks at rate $1/N$ |\n| $\\sigma / \\sqrt{N}$ | $\\mathbb{R}_{> 0}$ | Standard error of the mean | Scaling denominator preventing variance collapse |\n| $Z_N$ | Standardized Variable | Normalized Z-score with mean 0 and variance 1 | Universal canonical variable exhibiting asymptotic normality |\n| $\\xrightarrow{d}$ | Convergence in distribution | Cumulative probabilities converge pointwise | Weak convergence of push-forward probability measures |\n| $\\Phi(z)$ | $\\mathbb{R} \\to [0, 1]$ | Cumulative distribution function of standard normal | Universal limiting measure attractor |\n\n#### Intuitive Rationale for the Formulation\n1. **Why divide by $\\sqrt{N}$ instead of $N$?**\n   When adding $N$ independent random variables, their variances add directly: $\\operatorname{Var}(\\sum_{i=1}^N X_i) = N\\sigma^2$. The standard deviation of the raw sum is therefore $\\sqrt{N\\sigma^2} = \\sigma \\sqrt{N}$. When computing the sample mean $\\bar{X}_N = \\frac{1}{N}\\sum X_i$, the variance scales down by $(1/N)^2$, yielding $\\operatorname{Var}(\\bar{X}_N) = \\frac{\\sigma^2}{N}$, meaning its standard deviation shrinks as $\\frac{\\sigma}{\\sqrt{N}}$. To stabilize the spread so it neither collapses to a singular point spike nor explodes to infinity as $N \\to \\infty$, we must rescale the fluctuation by exactly $\\sigma / \\sqrt{N}$.\n2. **Why does individual skewness vanish?**\n   The third central moment (skewness) of the sum grows only linearly as $N$, but the denominator scaling factor $(\\sigma \\sqrt{N})^3$ grows much faster as $N^{3/2}$. Thus, the standardized skewness decays as $\\frac{N}{N^{3/2}} = \\frac{1}{\\sqrt{N}} \\to 0$. As $N$ expands, all asymmetry and idiosyncrasies of the original distribution are completely obliterated.\n3. **Crucial distinction: Raw Population Data vs. Sample Mean Estimator:**\n   The raw underlying population distribution $X$ does *not* transform into a bell curve as you collect more data. A die roll distribution will remain stubbornly flat even after a billion rolls. What converges to a normal distribution is the distribution of the **sample mean estimator** $\\bar{X}_N$ across repeated trials!",
@@ -3976,7 +3976,7 @@ export const mathModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-central-limit-theorem",
+          "id": "py-t1-29",
           "starterCode": "def standardized_sample_means(samples: np.ndarray, true_mean: float, true_std: float) -> np.ndarray:\n    \"\"\"\n    Compute standardized sample mean Z-scores across M independent experiments.\n    \n    Parameters\n    ----------\n    samples : np.ndarray\n        2D array of shape (M, N) containing M experiments of N observations each.\n    true_mean : float\n        True population mean mu.\n    true_std : float\n        True population standard deviation sigma > 0.\n        \n    Returns\n    -------\n    np.ndarray\n        Standardized Z-scores across all M experiments, shape (M,).\n    \"\"\"\n    # Step 1: Compute sample means along observation axis (axis 1) -> shape (M,)\n    # Step 2: Determine sample size N per experiment\n    # Step 3: Compute theoretical standard error of the mean: sigma / sqrt(N)\n    # TODO: Complete the vectorized implementation\n    pass",
           "testCases": [
             {
@@ -3999,16 +3999,16 @@ export const mathModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Output variance is off by factor of $N$ or shape mismatch `(N,)`.",
-            "ar": "حلل الشروط الرياضية الثابتة وتأكد من توافق أبعاد المصفوفات."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Standardizing sample means requires dividing by the *standard error of the mean* $\\sigma_{\\bar{X}} = \\sigma / \\sqrt{N}$, not the raw population standard deviation $\\sigma$.",
-            "ar": "استخدم العمليات الموجهة بدلاً من الحلقات التكرارية لتفادي تجاوز وقت التنفيذ."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Divide by `true_std / np.sqrt(samples.shape[1])`.",
-            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية مقارنة باختبارات الوحدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {

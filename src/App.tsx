@@ -9,8 +9,12 @@ import { OkvirWorkbench } from '@/components/workbench/OkvirWorkbench';
 import { DailyCalibration } from '@/components/review/DailyCalibration';
 import { Sandbox } from '@/components/sandbox/Sandbox';
 import { SettingsView } from '@/components/settings/SettingsView';
+import { useNotificationScheduler } from '@/lib/useNotificationScheduler';
+import { InAppNotificationToast } from '@/components/notifications/InAppNotificationToast';
 
 function App() {
+  useNotificationScheduler();
+
   const {
     theme,
     language,
@@ -31,12 +35,23 @@ function App() {
     useOkvirStore.getState().syncWithTauriProfile?.();
   }, [theme, language, config?.arabicFont]);
 
-  // Global keyboard shortcuts
+  // Global desktop keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // Command Palette (Ctrl+K or Cmd+K)
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setCommandPaletteOpen(!isCommandPaletteOpen);
+      }
+
+      // Fullscreen toggle (F11)
+      if (e.key === 'F11') {
+        e.preventDefault();
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
       }
     };
     window.addEventListener('keydown', handler);
@@ -46,6 +61,7 @@ function App() {
   return (
     <div className="h-screen flex flex-col bg-[var(--bg-app)] text-[var(--text-primary)] overflow-hidden">
       <DesktopTitlebar />
+      <InAppNotificationToast />
 
       {/* Activity sidebar + main content */}
       <div className="flex flex-1 overflow-hidden">

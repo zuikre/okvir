@@ -12,14 +12,15 @@
   "app": {
     "windows": [
       {
-        "title": "OKVIR — The Frame for AI",
+        "label": "main",
+        "title": "OKVIR",
         "width": 1280,
         "height": 840,
         "minWidth": 960,
         "minHeight": 640,
         "resizable": true,
         "fullscreen": false,
-        "decorations": true,
+        "decorations": false,
         "transparent": false
       }
     ],

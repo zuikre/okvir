@@ -9,7 +9,7 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "To truly master Python, you must first dismantle a pervasive beginner myth: that a variable is a \"labeled cardboard box\" holding a value...",
-      "ar": "لإتقان بايثون حقاً، يجب التخلص تماماً من وهم المبتدئين الشائع بأن المتغير عبارة عن 'صندوق كرتوني' يحمل اسماً ونضع في داخله القيمة."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [],
     "x": 460,
@@ -21,7 +21,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "EnvironmentFrameCanvas",
         "narrative": {
           "en": "To truly master Python, you must first dismantle a pervasive beginner myth: that a variable is a \"labeled cardboard box\" holding a value inside it. In low-level languages like C, a variable declaration like `int x = 5;` sets aside 4 physical bytes of stack memory at a fixed address and writes the bit pattern directly into that slot. But Python does not work this way. In Python, **variables are sticky name tags**, and values are independent living entities residing in a vast memory landscape called the **Heap**.\n\nWhen you write `x = [1, 2, 3]`, Python's runtime takes two distinct actions. First, it constructs a new list object on the heap at a specific physical address—think of it as building a house with a unique street number, which you can inspect using `id(x)`. Second, it attaches the name tag `x` to that house's front door. The variable does not \"contain\" the list; it merely *points* to it.\n\nThe real magic—and the source of frequent bugs—emerges when you introduce an alias: `y = x`. A beginner expects Python to duplicate the list, creating a second independent house. Instead, Python does nothing of the sort: it simply pastes a second sticky name tag `y` onto the *exact same front door*. Both `x` and `y` now point to the identical address (`id(x) == id(y)`). If someone walks into the house through tag `x` and changes the furniture (`x.append(4)`), anyone looking through the door marked `y` immediately sees `[1, 2, 3, 4]`. This is called **pointer aliasing** and **in-place mutation**.\n\nThis brings us to the critical distinction between **mutable** and **immutable** objects. In Python, objects like integers, floats, strings, and tuples are completely immutable—their internal values are carved in stone. When you write `count = 5` followed by `count = count + 1`, Python does not alter the number 5; it constructs a brand-new integer object 6 elsewhere in memory, peels the name tag `count` off the number 5, and sticks it onto 6. In contrast, mutable containers like lists, dictionaries, and sets allow their internal contents to be modified in place without changing their memory address.\n\nFinally, what governs the lifespan of these objects? Every Python object carries a built-in reference counter (`ob_refcnt`). Each time a new name tag or data structure references the object, its counter increments; whenever a tag falls out of scope or is explicitly removed with `del`, the counter decrements. The statement `del x` does **not** delete the underlying object—it merely peels off the tag `x`. The moment an object's reference counter hits absolute zero, it becomes orphaned. CPython's memory manager immediately reclaims its memory through automatic garbage collection.",
-          "ar": "لإتقان بايثون حقاً، يجب التخلص تماماً من وهم المبتدئين الشائع بأن المتغير عبارة عن 'صندوق كرتوني' يحمل اسماً ونضع في داخله القيمة. في لغات مثل C، المتغير هو بالفعل مساحة ذاكرة محددة مسبقاً تُكتب فيها البايتات. لكن في بايثون، **المتغيرات هي بطاقات اسمية لاصقة** (Name Tags)، والقيم هي كائنات حية مستقلة تسكن في **ذاكرة الكومة** (Heap).\n\nعندما تكتب `x = [1, 2, 3]`، ينشئ بايثون كائناً جديداً في عنوان ذاكرة فريد يشبه رقم المنزل في الشارع (`id(x)`). ثم يعلق البطاقة `x` على باب ذلك المنزل. فإذا كتبت بعد ذلك `y = x`، فإن بايثون **لا يبني منزلاً جديداً ولا ينسخ محتوياته**، بل يضع ببساطة بطاقة اسمية ثانية `y` على نفس الباب تماماً! وإذا عدّلت محتويات القائمة عبر `x.append(4)`، فإن النظر من خلال البطاقة `y` سيكشف التعديل `[1, 2, 3, 4]` فوراً لأن البطاقتين تشيران إلى ذات الكائن. وحين تُنزع كافة البطاقات، يهبط عداد المراجع (`ob_refcnt`) إلى الصفر ويتم تحرير الذاكرة."
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -29,8 +29,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\sigma: \\text{Var} \\to \\text{Loc}, \\quad \\mu: \\text{Loc} \\to \\text{PyObject}, \\quad \\text{PyObject} = \\langle \\text{ob\\_refcnt}, \\text{ob\\_type}, \\text{payload} \\rangle",
         "formulaNote": {
-          "en": "CPython separates symbolic variable names from heap memory locations via environment frames and reference-counted PyObject headers.",
-          "ar": "يفصل CPython بين الأسماء الرمزية وعناوين الذاكرة في الكومة عبر أطر البيئة وترويسة PyObject المحكومة بعداد المراجع."
+          "en": "Mathematical anchor for Name-Binding, Environment Frames & Variable Lifetime.",
+          "ar": "المرساة الرياضية لـ ربط الأسماء، أطر البيئة، ودورة حياة المتغيرات."
         },
         "narrative": {
           "en": "```text\nStack Frame (Local Scope)                 Heap Memory (CPython Objects)\n+-----------------------+                 +--------------------------------------+\n| Name Tag: x           | ------------->  | Loc: 0x7f9a12c8                      |\n+-----------------------+          /      | ob_refcnt: 2                         |\n| Name Tag: y           | --------+       | ob_type: <class 'list'>              |\n+-----------------------+                 | payload: [*ptr0, *ptr1, *ptr2]       |\n                                          +--------------------------------------+\n```\n\n#### Architectural Breakdown & Mathematical Mapping:\n- **Environment Mapping ($\\sigma: \\text{Var} \\to \\text{Loc}$)**: The symbol table mapping string variable names in the active stack frame to raw memory locations.\n- **Store Mapping ($\\mu: \\text{Loc} \\to \\text{PyObject}$)**: The physical heap mapping memory addresses to actual CPython object structures.\n- **Standard Object Header (`PyObject`)**: Every CPython object starts with a 16-byte header:\n  - `ob_refcnt` (8 bytes): 64-bit integer tracking active references.\n  - `ob_type` (8 bytes): Pointer to the type descriptor struct (`PyTypeObject*`).\n- **In-place Mutation vs Rebinding**: In-place mutation updates the memory payload $\\mu(\\text{loc})$ while preserving $\\text{loc}$. Rebinding creates a new location $\\text{loc}'$ and redirects $\\sigma(x) = \\text{loc}'$.",
@@ -68,16 +68,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Calling `items.append()` mutates the list object in-place, keeping its memory address `id(items)` identical.",
-            "ar": "استدعاء `items.append()` يعدل الكائن في مكانه، فيبقى عنوانه `id(items)` مطابقاً للأصل."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Binary concatenation `items + [100]` constructs an entirely new list object in the heap.",
-            "ar": "عملية الدمج `items + [100]` تنشئ كائناً جديداً تماماً في الكومة بعنوان مختلف."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Verify that `rebound_id != orig_id` holds true to confirm `is_new_object`.",
-            "ar": "تأكد من أن `rebound_id != orig_id` لتعيين `is_new_object` كـ True."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -144,10 +144,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "At the hardware level, your computer's Central Processing Unit (CPU) is an relentless clockwork machine.",
-      "ar": "ينفذ المعالج التعليمات كقطار على مسار مستقيم، وتعتبر جمل التفريع الشرطي (if/else) بمثابة تحويلات السكة التي توجه القطار نحو مسارات بديلة..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "name-binding-lifetime"
+      "cs-01"
     ],
     "x": 445,
     "y": 175,
@@ -158,7 +158,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "ControlFlowGraphLab",
         "narrative": {
           "en": "At the hardware level, your computer's Central Processing Unit (CPU) is an relentless clockwork machine. By default, it reads instructions sequentially from memory, incrementing its Instruction Pointer (Program Counter) step by step, like a locomotive hurtling down a single, unbending stretch of railroad track. If programs could only execute sequentially, computers would be little more than glorified calculators playing back fixed tapes.\n\nConditional branching (`if`, `elif`, `else`) introduces **railroad switches** onto the tracks. When execution reaches a junction, the CPU evaluates a condition expression and flips the switch, steering the instruction pointer onto an alternate branch of bytecode while skipping the other entirely.\n\nHowever, Python's boolean operators (`and`, `or`) conceal one of the language's most elegant—and frequently misunderstood—architectural features: **short-circuit evaluation**. Like an automated home electrical circuit breaker that trips the microsecond an overload occurs, Python halts evaluation of compound expressions the instant the final logical outcome is guaranteed. In `A or B`, if `A` is already truthy, evaluating `B` is a waste of CPU cycles; Python immediately stops. In `A and B`, if `A` is already falsy, the entire expression can never be true, so Python drops `B` completely.\n\nHere is the stunning realization that surprises even intermediate programmers: **Python's `and` and `or` operators do not return boolean `True` or `False`!** Instead, they return the **actual operand object** that decided the outcome! For `A or B`: if `A` is truthy, Python returns the object `A`; otherwise, it evaluates and returns `B`. For `A and B`: if `A` is falsy, it returns `A`; otherwise, it returns `B`. This allows expressive defensive idioms like `user and user.get_profile()`, where the second method is never even touched if `user` is `None`, preventing devastating `AttributeError` crashes.\n\nHow does Python decide whether an arbitrary object is truthy or falsy? This is governed by Python's **Truthiness Protocol**. Under the hood, Python calls `bool(x)`, which first consults the object's `__bool__()` method. If that is undefined, it checks `__len__()` (where a length of zero is falsy). Only a tiny handful of built-in values are inherently falsy: constants `None` and `False`, numeric zeros (`0`, `0.0`, `0j`), and empty collections (`\"\"`, `()`, `[]`, `{}`, `set()`). Every other object in Python—including custom class instances by default—evaluates to truthy!",
-          "ar": "ينفذ المعالج التعليمات كقطار على مسار مستقيم، وتعتبر جمل التفريع الشرطي (`if`/`else`) بمثابة تحويلات السكة التي توجه القطار نحو مسارات بديلة بناءً على صدق التعبير أو كذبه.\n\nلكن الميزة الجوهرية لمعاملات بايثون المنطقية (`and`, `or`) هي **التقييم ذو الدارة القصيرة** (Short-Circuit Evaluation). تماماً كقاطع الكهرباء الذي يفصل فوراً لحماية المنظومة، يتوقف بايثون عن تقييم الشروط المركبة في اللحظة التي يُحسم فيها الحكم منطقياً. والأمر الأكثر إثارة: معاملات `and` و `or` في بايثون **لا تعيد قيماً منطقية مجردة** (`True`/`False`)، بل تعيد **الكائن الحقيقي** الذي حسم القرار! ففي التعبير `A or B`: إذا كان `A` صادقاً (Truthy)، يعيد بايثون `A` فوراً دون أن يفحص `B`. وفي التعبير `A and B`: إذا كان `A` زائفاً (Falsy كـ `None` أو `0`)، يعيد بايثون `A` فوراً، مما يمنع حدوث أخطاء الانهيار مثل `user and user.name`."
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -166,8 +166,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathcal{E}\\llbracket e_1 \\land e_2 \\rrbracket = \\begin{cases} e_1 & \\text{if } \\text{bool}(e_1) = \\mathbf{False} \\\\ e_2 & \\text{if } \\text{bool}(e_1) = \\mathbf{True} \\end{cases}, \\quad \\mathcal{E}\\llbracket e_1 \\lor e_2 \\rrbracket = \\begin{cases} e_1 & \\text{if } \\text{bool}(e_1) = \\mathbf{True} \\\\ e_2 & \\text{if } \\text{bool}(e_1) = \\mathbf{False} \\end{cases}",
         "formulaNote": {
-          "en": "Python boolean operators return the evaluated operand object itself rather than a boolean primitive, short-circuiting as soon as the outcome is deterministic.",
-          "ar": "تعيد المعاملات المنطقية في بايثون الكائن المحسوب ذاته بدلاً من قيمة منطقية مجردة، مع قصر الدارة فور حسم النتيجة."
+          "en": "Mathematical anchor for Control Flow, Short-Circuit Boolean Logic & Branching Trees.",
+          "ar": "المرساة الرياضية لـ تدفق التحكم، المنطق البولياني ذو الدارة القصيرة، وشجيرات التفريع."
         },
         "narrative": {
           "en": "```text\nShort-Circuit Execution Graph: expr1 and expr2\n         [ Evaluate expr1 ]\n                 |\n          bool(expr1) is True?\n             /       \\\n          (No)       (Yes)\n           /           \\\n     Return expr1    [ Evaluate expr2 ]\n  (Short-circuit!)          |\n                       Return expr2\n```\n\n#### Architectural Breakdown & Opcode Mechanics:\n- **`POP_JUMP_IF_FALSE` / `POP_JUMP_IF_TRUE`**: Standard conditional jump instructions that pop the top-of-stack (TOS) and conditionally branch the instruction pointer.\n- **`JUMP_IF_FALSE_OR_POP`**: The dedicated opcode for `and`. Inspects TOS: if falsy, it leaves the value on the stack and jumps past the right-hand operand; if truthy, it pops TOS and continues execution into the right operand.\n- **`JUMP_IF_TRUE_OR_POP`**: The dedicated opcode for `or`. Inspects TOS: if truthy, it preserves the value on the stack and jumps past the right-hand operand; if falsy, it pops TOS and continues.\n- **Truthiness Resolution**: `type(x)->tp_as_number->nb_bool` followed by `type(x)->tp_as_sequence->sq_length`.",
@@ -205,16 +205,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Do not write `user_override.get(key) or defaults.get(key)` because this overrides `0` and `False` with defaults!",
-            "ar": "لا تستخدم `get(key) or defaults.get(key)` لأن ذلك سيتجاهل القيم الصريحة كـ `0` و `False` ويستبدلها بالافتراضية!"
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Use explicit membership testing (`key in user_override`) guarded by `user_override is not None`.",
-            "ar": "استخدم فحص الانتماء الصريح (`key in user_override`) محصناً بشرط `user_override is not None`."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Return `user_override[key]` immediately once found to short-circuit lower priority layers.",
-            "ar": "أعد `user_override[key]` فور العثور عليه لتخطي الطبقات الأقل أولوية."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -281,10 +281,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "When newcomers write a loop like for item in collection:, they usually picture Python quietly maintaining a C-style integer index behind...",
-      "ar": "عندما تكتب for item in collection:، يظن المبتدئ أن بايثون يعد المؤشرات مثل حلقة C التقليدية (i = 0; i < len; i++)."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "control-flow-branching"
+      "cs-02"
     ],
     "x": 460,
     "y": 270,
@@ -295,7 +295,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "ScopeChainInspector",
         "narrative": {
           "en": "When newcomers write a loop like `for item in collection:`, they usually picture Python quietly maintaining a C-style integer index behind the curtain—something like `i = 0; while i < len(collection): item = collection[i]; i += 1`. While this mental model works passably well for indexed arrays, it fails to explain how Python can effortlessly loop over dictionaries, database streams, generator expressions, open files, or infinite mathematical series that have no indices or measurable length whatsoever!\n\nUnder the hood, Python achieves this through a universal contract known as the **Iterator Protocol**. Instead of relying on numeric indices, Python cleanly decouples the collection holding the data from the process of walking through that data.\n\nThink of an iterable collection as a **vending machine warehouse**. The warehouse holds the physical merchandise, but it cannot dispense items itself. When you pass the collection to `iter(collection)`, Python hires a specialized **conveyor belt clerk**—an *iterator object*. This clerk is stationed at the warehouse entrance, armed with an internal bookmark pointing to the very beginning.\n\nEach time the loop body demands the next piece of data, it presses the dispensing lever: `next(iterator)`. The clerk reaches into the warehouse, hands you the next item in sequence, and advances its internal bookmark exactly one step forward. The clerk is strictly a one-way, disposable traveler: it has no memory of what came before, and it cannot rewind.\n\nWhat happens when the warehouse shelves are completely empty? Instead of returning a sentinel value like `None` or `-1` (which might be legitimate data items!), the clerk raises a `StopIteration` exception. The `for` loop catches this signal behind the scenes and terminates cleanly. The caller never sees the exception; the loop simply finishes and control flows onward. Any custom Python object that implements `__iter__()` and `__next__()` can participate in this protocol!",
-          "ar": "عندما تكتب `for item in collection:`، يظن المبتدئ أن بايثون يعد المؤشرات مثل حلقة C التقليدية (`i = 0; i < len; i++`). لكن ما يحدث فعلياً أعمق وأجمل بكثير: **بروتوكول التكرار** (Iterator Protocol).\n\nتخيل الكائن القابل للتكرار كـ **مستودع آلة بيع ذاتية**. استدعاء `iter(collection)` ينشئ **موظف شريط ناقل** (كائن مكرر Iterator). في كل دورة حلقة، نضغط زر الصرف `next(iterator)`، فيسلمنا الموظف العنصر التالي ويخطو خطوة للأمام. يحتفظ الموظف بحالته الداخلية ولا يتحرك إلا للأمام. وعند نفاد البضاعة، يرفع الموظف استثناء `StopIteration`. تلتقط حلقة `for` هذا الاستثناء تلقائياً وتنهي التكرار بسلاسة دون انهيار! أي كائن ينفذ `__iter__()` و `__next__()` ينضم تلقائياً لهذه المنظومة."
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -303,8 +303,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\text{Iterable} \\xrightarrow{\\text{iter()}} \\text{Iterator} \\xrightarrow{\\text{next()}} (x_k, s_{k+1}) \\quad \\text{until } \\text{StopIteration}, \\quad \\text{acc}_k = \\bigoplus_{i=1}^k x_i",
         "formulaNote": {
-          "en": "Iteration in Python is governed by the two-phase iterator protocol (iter() and next()), advancing a stateful stream until StopIteration.",
-          "ar": "يخضع التكرار في بايثون لبروتوكول ثنائي الطور (iter و next)، يقدّم مجرى ذا حالة حتى إطلاق استثناء StopIteration."
+          "en": "Mathematical anchor for Iteration Protocols, Loop Invariants & State Accumulators.",
+          "ar": "المرساة الرياضية لـ بروتوكول التكرار الحلقي، اللامتغيرات، وتراكم الحالة."
         },
         "narrative": {
           "en": "```text\nThe Two-Phase Iterator Protocol:\n+------------------------+\n|  Iterable Collection   |  (Implements __iter__() -> returns Iterator)\n+------------------------+\n            | iter(collection)\n            v\n+------------------------+\n|    Iterator Object     |  (Maintains internal cursor state s_k)\n+------------------------+\n      |            ^\nnext()|            | advances cursor\n      v            |\n  [ Yield x_k ] ---+    --->  When depleted: raises StopIteration (caught by loop)\n```\n\n#### Architectural Breakdown & State Accumulation:\n- **Loop Invariant ($\\mathcal{I}(k)$)**: A formal mathematical property that is true before loop entry, preserved across every transition step $\\text{acc}_k = \\text{acc}_{k-1} \\oplus x_k$, and guaranteed to hold true upon termination.\n- **`GET_ITER` Bytecode**: Pushes a new iterator onto the virtual evaluation stack by calling the object's `tp_iter` slot in C.\n- **`FOR_ITER <target>`**: Calls the C-level `tp_iternext` function pointer. If an item is produced, it is pushed onto the stack. If `StopIteration` is raised, it clears the exception and jumps directly to `target`, exiting the loop in zero Python overhead.",
@@ -342,16 +342,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Call `it = iter(iterable)` to obtain the iterator before consuming items.",
-            "ar": "استدعِ `it = iter(iterable)` للحصول على كائن المكرر قبل البدء بسحب العناصر."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "If `initial` is not supplied, use `next(it)` to prime the accumulator with the very first item.",
-            "ar": "إذا لم يُمرر `initial`، استدعِ `next(it)` لتهيئة المجمع بأول عنصر في المجرى."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Catch `StopIteration` inside a `while True:` loop to detect natural exhaustion of the stream.",
-            "ar": "التقط `StopIteration` داخل حلقة `while True:` لمعرفة لحظة استنفاد المجرى."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -418,10 +418,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "Whenever your Python program invokes a function, how does the CPU remember where it came from, where to return the result, and what local...",
-      "ar": "مكدس الاستدعاء (Call Stack) يشبه كومة من صواني المطعم الجامعي. في كل مرة يستدعي فيها البرنامج دالة، يتم وضع صينية جديدة (إطار مكدس Stack..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "iteration-state-accumulation"
+      "cs-03"
     ],
     "x": 445,
     "y": 365,
@@ -432,7 +432,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "ReferentialTransparencyLab",
         "narrative": {
           "en": "Whenever your Python program invokes a function, how does the CPU remember where it came from, where to return the result, and what local variables belong to this specific invocation? It relies on a fundamental computer science data structure: the **Call Stack**.\n\nPicture the call stack as a spring-loaded **stack of cafeteria trays**. When your program starts, the main module sits as the very bottom tray. When a function `f()` is called, the CPU stamps out a brand-new tray—called a **Stack Frame**—containing that function's arguments, local name tags, and return address, and drops it onto the top of the pile (`push`). The CPU works exclusively on whatever tray is currently resting at the very top. When `f()` finishes executing and returns a value, its tray is popped off the stack (`pop`) and instantly destroyed, safely exposing the caller's tray below.\n\nIn **recursion**, a function solves a problem by calling itself with smaller sub-problems. Each recursive invocation stamps out and stacks another tray on top of the pile. But here is the critical danger: if you forget to establish a **base case**—the solid table surface that halts the recursion—the function will keep stacking trays higher and higher. Eventually, the pile crashes into the memory ceiling, and CPython aborts with a famous panic: `RecursionError: maximum recursion depth exceeded`.\n\nThis brings us to the profound software engineering principle of **Pure Functions**. A pure function is like an honest, deterministic vending machine: whenever you insert the exact same inputs, you receive the exact same output, every single time. It reads no global state, mutates no hidden variables in outer scopes, and produces zero covert side effects on heap memory.\n\nBecause a pure function depends strictly on its arguments and nothing else, it achieves **Referential Transparency**. This means that any call to `square(4)` can be swapped with its computed value `16` at compile time or runtime without altering program behavior in the slightest! This property makes pure code trivial to test, embarrassingly easy to parallelize across CPU cores, and immune to nasty concurrency bugs.",
-          "ar": "مكدس الاستدعاء (Call Stack) يشبه **كومة من صواني المطعم الجامعي**. في كل مرة يستدعي فيها البرنامج دالة، يتم وضع صينية جديدة (إطار مكدس Stack Frame) في أعلى الكومة تحوي المتغيرات المحلية. يعمل المعالج حصرياً على الصينية الموجودة في القمة. وعندما تنتهي الدالة وتُرجع قيمتها، تُرفع الصينية وتُحذف (`pop`) لتعود الصينية السابقة للظهور.\n\nفي الاستدعاء الذاتي (Recursion)، تكدس الدالة صينية فوق صينية؛ فإن نسيت شرط التوقف (Base Case)، ارتفعت الكومة حتى تصطدم بسقف الذاكرة (`RecursionError`). الدالة النقية (Pure Function) كآلة بيع رياضية: المدخل ذاته ينتج دائماً المخرج ذاته دون إحداث أي أثر جانبي خفي (الشفافية الإسنادية Referential Transparency). يمكن استبدال استدعاء الدالة النقية `f(x)` بنتيجتها المحسوبة دون أي تغيير في سلوك البرنامج."
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -440,8 +440,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "f: \\mathcal{X} \\to \\mathcal{Y} \\text{ pure} \\iff \\forall x \\in \\mathcal{X}, f(x) = y \\land \\Delta \\Sigma_{\\text{heap}} = \\emptyset, \\quad d(n) \\le \\text{sys.getrecursionlimit}()",
         "formulaNote": {
-          "en": "Pure functions satisfy referential transparency without mutating external memory, while recursion allocates a fresh stack frame per invocation.",
-          "ar": "تحقق الدوال النقية الشفافية الإسنادية دون تعديل الذاكرة الخارجية، بينما يخصص الاستدعاء الذاتي إطار مكدس جديد لكل استدعاء."
+          "en": "Mathematical anchor for Pure Functions, Referential Transparency & Stack Frames.",
+          "ar": "المرساة الرياضية لـ الدوال النقية، الشفافية الإسنادية، وأطر مكدس الاستدعاء."
         },
         "narrative": {
           "en": "```text\nVisualizing the Call Stack (Cafeteria Trays):\n+------------------------------------------+  <-- Active Execution (TOS)\n| Frame: pure_flatten([3, 4])              |      Locals: nested=[3, 4], result=[]\n+------------------------------------------+\n| Frame: pure_flatten([2, [3, 4]])         |      Paused at recursive call\n+------------------------------------------+\n| Frame: pure_flatten([1, [2, [3, 4]]])    |      Paused at recursive call\n+------------------------------------------+\n| Frame: __main__                          |      Caller Scope\n+------------------------------------------+\n```\n\n#### Architectural Breakdown & Recursion Limits:\n- **`PyFrameObject` Overhead**: In CPython, each stack frame is a heap-allocated C struct consuming roughly 300 to 400 bytes, containing local variable pointers, evaluation stack, and bytecode instruction pointers.\n- **Absence of Tail Call Optimization (TCO)**: Functional languages reuse the existing frame for tail calls ($O(1)$ stack space). CPython deliberately avoids TCO to preserve full, unaltered stack tracebacks for debugging.\n- **Recursion Guard**: Regulated by `sys.getrecursionlimit()` (defaults to 1000). If recursive depth exceeds this limit, CPython raises `RecursionError` to prevent a hard C-stack segment fault.",
@@ -479,16 +479,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Check if an element is a list using `isinstance(item, list)`.",
-            "ar": "تحقق مما إذا كان العنصر قائمة باستخدام `isinstance(item, list)`."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "For leaf elements, append directly; for sublists, call `pure_flatten(item)` and extend.",
-            "ar": "للعناصر الفردية أضفها مباشرة، وللقوائم الفرعية استدعِ `pure_flatten(item)` واستخدم `extend`."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Always build and return a fresh new list so the original inputs remain completely untouched.",
-            "ar": "ابنِ قائمة جديدة دائماً لضمان بقاء المدخلات الأصلية نقية وغير ملموسة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -555,10 +555,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "In many legacy programming languages, functions are treated as rigid, second-class subroutines—code carved into read-only program memory...",
-      "ar": "في بايثون، الدوال ليست مجرد إجراءات ثانوية جامدة، بل هي كائنات من الرتبة الأولى (First-Class Objects) شأنها شأن الأرقام والنصوص."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "pure-functions-recursion"
+      "cs-04"
     ],
     "x": 460,
     "y": 460,
@@ -569,7 +569,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "HigherOrderPipelineCanvas",
         "narrative": {
           "en": "In many legacy programming languages, functions are treated as rigid, second-class subroutines—code carved into read-only program memory that can only be invoked by name. In Python, functions are elevated to **first-class citizens**. This means a function is an ordinary object on the heap, possessing the exact same privileges as an integer, string, or dictionary: you can assign it to a variable, pass it as an argument into another function, store it inside a list, or return it as the result of a function call.\n\nThis capability unlocks one of the most powerful programming paradigms in modern computing: the **Lexical Closure**. But to truly grasp closures, you must confront a startling architectural mystery.\n\nNormally, when an outer function executes and finishes, its local stack frame is destroyed (`popped`) from memory, and all its local variables vanish. If that outer function defined an *inner function* that referenced those outer local variables and returned it, what happens when you invoke that inner function seconds, minutes, or hours later? How can the inner function read variables whose stack frame no longer exists?\n\nThe answer is the **traveling backpack analogy**. When Python compiles an inner function that references variables from its enclosing outer scope (known as *free variables*), it does not store those variables on the transient call stack! Instead, CPython allocates a special heap object called a `cell` (`PyCellObject`). It equips the inner function with a permanent traveling backpack: the `__closure__` attribute.\n\nEven after the outer function's execution terminates and its stack frame is completely dismantled, the inner function carries its backpack wherever it journeys across your program. Whenever the inner function needs to read or update the captured variable, it reaches into its backpack and accesses the cell directly. Closures thus enable lightweight state encapsulation, function factories, and elegant decorators without requiring full-blown class definitions.",
-          "ar": "في بايثون، الدوال ليست مجرد إجراءات ثانوية جامدة، بل هي **كائنات من الرتبة الأولى** (First-Class Objects) شأنها شأن الأرقام والنصوص. يمكنك تخزين الدالة في متغير، أو تمريرها كوسيط، أو إعادتها كقيمة من دالة أخرى، أو حفظها في قاموس.\n\nأما **الغلاف المعجمي (Closure)** فهو دالة ترتدي **حقيبة ظهر سحرية**: عندما تشير دالة داخلية إلى متغير معرّف في نطاق خارجي وتُعاد كقيمة، فإنها تحزم ذلك المتغير في خلايا خاصة ملحقة بالخاصية `__closure__`. وحتى بعد أن تنتهي الدالة الخارجية تماماً ويتحلل إطارها من مكدس الذاكرة، تظل الدالة الداخلية تحمل حقيبة ظهرها معها أينما ذهبت متذكرةً القيم التي نشأت في كنفها!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -577,8 +577,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\text{Closure} = \\langle \\text{CodeObject}, (\\text{cell}_1, \\dots, \\text{cell}_k) \\rangle, \\quad \\text{cell.cell\\_contents} = v \\in \\mathcal{E}_{\\text{outer}}",
         "formulaNote": {
-          "en": "A closure binds executable bytecode with cell objects referencing lexical variables in an enclosing scope that has already terminated.",
-          "ar": "يربط الغلاف المعجمي شفرة البايت بخلايا ذاكرية تشير إلى متغيرات معجمية في نطاق خارجي انتهى تنفيذه بالفعل."
+          "en": "Mathematical anchor for First-Class Functions & Lexical Closures.",
+          "ar": "المرساة الرياضية لـ دوال الرتبة الأولى والأغلفة المعجمية (Closures)."
         },
         "narrative": {
           "en": "```text\nHeap Layout of a Lexical Closure:\nFunction Object (rate_limiter)\n+------------------------------------+\n| __name__: \"rate_limiter\"           |\n| __code__: <code object>            |\n| __closure__: ( <cell_0>, )         |\n+-------------------|----------------+\n                    | (Pointer to captured cell)\n                    v\n            +---------------------------------+\n            | PyCellObject (Heap)             |\n            | ob_refcnt: 2                    |\n            | cell_contents: ---------> [ 0 ] | (Integer payload)\n            +---------------------------------+\n```\n\n#### Architectural Breakdown & Cell Mechanics:\n- **Free Variables ($\\text{FreeVars}(\\text{code})$)**: Identifiers referenced in a function body that are neither local parameters nor assigned locally, resolved from enclosing lexical environments.\n- **`PyCellObject`**: A 24-byte CPython container with a single pointer `ob_ref` pointing to the shared object in the heap.\n- **`LOAD_DEREF` / `STORE_DEREF`**: Specialized CPython opcodes used inside closures. Instead of indexing local variables with `LOAD_FAST`, the VM dereferences the cell pointer directly.\n- **The `nonlocal` Keyword**: Informs the compiler that an assignment should update the captured cell in the outer scope rather than creating a new shadowing local variable.",
@@ -616,16 +616,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Use the `nonlocal` keyword inside `rate_limiter` so you can rebind `calls_made` in the enclosing scope.",
-            "ar": "استخدم الكلمة المفتاحية `nonlocal` داخل الدالة الداخلية لتعديل المتغير `calls_made` في النطاق الخارجي."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Check `calls_made < max_calls` before incrementing and returning `True`.",
-            "ar": "تحقق من الشرط `calls_made < max_calls` قبل زيادة العداد وإرجاع `True`."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Each call to `make_rate_limiter` produces a distinct closure with an isolated `calls_made` cell.",
-            "ar": "كل استدعاء للدالة الأم ينتج غلافاً مستقلاً تماماً يمتلك خلية عداد خاصة به."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -692,10 +692,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "When Python executes a statement like print(total), how does the interpreter know which object total actually refers to? In a large...",
-      "ar": "عندما يصادف بايثون اسماً برمجياً مثل total، كيف يحدد الكائن المعني؟ يبحث المعالج عبر دوائر متحدة المركز تحكمها قاعدة LEGB: 1."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "first-class-closures"
+      "cs-05"
     ],
     "x": 445,
     "y": 555,
@@ -706,7 +706,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "ClosureScopeInspector",
         "narrative": {
           "en": "When Python executes a statement like `print(total)`, how does the interpreter know which object `total` actually refers to? In a large application, there might be dozens of variables named `total` across different functions, modules, and imported packages. Python resolves this ambiguity by searching outward through concentric rings of visibility governed by the **LEGB Rule**.\n\nPicture scope resolution as looking outward through an **apartment complex**:\n1. **L — Local**: First, Python looks around the private room you are currently sitting in (the local execution frame of the active function).\n2. **E — Enclosing**: If not found, it steps out into the private hallway of any parent function wrapped around you (from innermost nesting scope out to outermost enclosing function).\n3. **G — Global**: If still not found, it steps down to the lobby of the entire building (the top-level namespace of the current `.py` module file).\n4. **B — Built-in**: Finally, if nowhere in the building, it checks the city's municipal library across the street—Python's built-in namespace containing universal primitives like `len`, `range`, `dict`, and `print`. If the name tag is absent from all four scopes, Python raises a `NameError`.\n\nHowever, beneath this intuitive hierarchy lurks the single most infamous trap in the Python language: **locality is determined statically at compile time, not dynamically at runtime!**\n\nWhen Python compiles a function into bytecode before executing a single line, it inspects every statement. If an assignment operator (`x = ...`, `x += ...`, `for x in ...`, or `import x`) appears *anywhere* inside the function body, the compiler stamps `x` as **strictly Local** across the entire function! It does not matter if the assignment occurs on line 100 and you try to read `x` on line 2. The moment Python sees `x` on line 2, it looks exclusively in the local frame. Finding that local `x` has not yet received a value, it does **not** fall back to outer scopes; it throws `UnboundLocalError: local variable referenced before assignment`!\n\nTo override this compile-time behavior, Python provides two explicit keywords: `global` and `nonlocal`. Declaring `global x` instructs the compiler to bypass local creation and bind the tag directly to the module-level dictionary (`LOAD_GLOBAL`). Declaring `nonlocal x` tells the compiler to reach into the enclosing parent function's closure cell (`LOAD_DEREF`). Understanding these mechanics demystifies scope resolution and prevents subtle state corruption bugs.",
-          "ar": "عندما يصادف بايثون اسماً برمجياً مثل `total`، كيف يحدد الكائن المعني؟ يبحث المعالج عبر دوائر متحدة المركز تحكمها **قاعدة LEGB**:\n\n1. **L**ocal (المحلي): داخل غرفة الدالة الحالية التي يجري تنفيذها.\n2. **E**nclosing (المحيط): داخل شقة الدوال الحاضنة (من الأقرب للأبعد).\n3. **G**lobal (العام): في كامل مبنى الملف الحالي (الموديول).\n4. **B**uilt-in (المدمج): في مكتبة المدينة العامة لبايثون (`len`, `range`, `print`).\n\nالفخ الأكثر شهرة وصدمة للمبتدئين هو أن **صفة المحلية تُحدد أثناء الترجمة** (Compile Time)! إن كان هناك سطر تعيين (`x = ...`) في أي مكان داخل الدالة، يُصنف `x` محلياً في كافة أرجائها؛ فإذا حاولت قراءته قبل سطر التعيين، لن يبحث بايثون في النطاقات الخارجية بل يفاجئك بخطأ `UnboundLocalError`!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -714,8 +714,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\text{Lookup}(v) = \\text{head}\\left([ \\mathcal{S}_L(v), \\mathcal{S}_E(v), \\mathcal{S}_G(v), \\mathcal{S}_B(v) ] \\setminus \\{\\bot\\}\\right)",
         "formulaNote": {
-          "en": "Variable lookup traverses four lexical concentric scopes in order: Local -> Enclosing -> Global -> Built-in, short-circuiting at the first match.",
-          "ar": "يمر البحث عن المتغير عبر أربعة نطاقات معجمية متحدة المركز: المحلي -> المحيط -> العام -> المدمج، متوقفاً عند أول تطابق."
+          "en": "Mathematical anchor for Scope Resolution & The LEGB Rule.",
+          "ar": "المرساة الرياضية لـ استبانة النطاق وقاعدة LEGB (Local, Enclosing, Global, Built-in)."
         },
         "narrative": {
           "en": "```text\nThe Concentric LEGB Search Hierarchy:\n+-----------------------------------------------------------+\n| [B] Built-in Scope (sys.modules['builtins'].__dict__)     |\n|   +-----------------------------------------------------+ |\n|   | [G] Global Module Scope (globals() dictionary)      | |\n|   |   +-----------------------------------------------+ | |\n|   |   | [E] Enclosing Closures (cell pointers)        | | |\n|   |   |   +-----------------------------------------+ | | |\n|   |   |   | [L] Local Frame (fastlocals C array)    | | | |\n|   |   |   |     LOOKUP STARTS HERE ---> [x]         | | | |\n|   |   |   +-----------------------------------------+ | | |\n|   |   +-----------------------------------------------+ | |\n|   +-----------------------------------------------------+ |\n+-----------------------------------------------------------+\n```\n\n#### Architectural Breakdown & Opcode Speed:\n- **`LOAD_FAST`**: When an identifier is local, CPython statically indexes the `fastlocals` array inside the C-level `PyFrameObject`. This avoids dictionary lookups entirely and executes in pure pointer arithmetic (~5-10 ns).\n- **`LOAD_DEREF`**: Emitted for enclosing closure variables, following the `PyCellObject` pointer stored in `f_blockstack`.\n- **`LOAD_GLOBAL`**: Emitted for module-level globals and built-ins. Performs a hash table lookup in `f->f_globals`, falling back to `f->f_builtins`.\n- **Compilation Pass**: Python compilers scan for `STORE_*` instructions in the AST. Any symbol targeted by a store operation is marked local unless declared `global` or `nonlocal`.",
@@ -753,16 +753,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Declare `nonlocal current_total` inside `add_amount` before performing `current_total += amount`.",
-            "ar": "صرّح بـ `nonlocal current_total` داخل الدالة قبل تنفيذ عملية الإضافة."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Without `nonlocal`, the assignment `current_total += amount` marks the variable local, causing an UnboundLocalError.",
-            "ar": "دون `nonlocal`، تجعل عملية التعيين المتغير محلياً وتتسبب في خطأ UnboundLocalError."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "`get_current_total` only reads `current_total` and does not assign to it, so it naturally resolves via Enclosing scope.",
-            "ar": "دالة القراءة تقرأ المتغير فقط دون تعيين، لذا تستبينه طبيعياً من النطاق المحيط."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -829,10 +829,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "A common misconception among beginner programmers is that a Python list is implemented as a classical linked list—a chain of separate nodes...",
-      "ar": "قائمة بايثون (list) ليست سلسلة مرتبطة، بل هي مصفوفة ديناميكية من المؤشرات (Pointers). تخيل صفاً من مواقف السيارات المرقمة؛ كل موقف يحمل..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "scope-resolution-legb"
+      "cs-06"
     ],
     "x": 460,
     "y": 650,
@@ -843,7 +843,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "PointerAliasingLab",
         "narrative": {
           "en": "A common misconception among beginner programmers is that a Python `list` is implemented as a classical linked list—a chain of separate nodes where each link holds a pointer to the next. In reality, a Python list is a **dynamically resizing array of contiguous pointers**.\n\nPicture a list as a dedicated **strip of numbered parking spaces**. The parking spaces themselves are glued together in a continuous, unbroken line of physical RAM. However, the cars (the actual Python objects—strings, integers, custom instances) are not parked directly in those spaces! Instead, each parking spot holds a tiny laminated card containing the exact memory address (a 64-bit pointer) of where the vehicle actually lives elsewhere in the vast heap.\n\nBecause the pointer slots sit adjacent to each other in contiguous memory, indexing `lst[i]` is instantaneous: the CPU takes the starting memory address of slot 0, adds `i * 8` bytes, and lands on the desired pointer in a single CPU cycle ($O(1)$ random access).\n\nNow comes the critical engineering question: what happens when your parking strip is completely full and you call `lst.append(x)`? If CPython merely requested space for *one single extra slot* from the operating system, disaster would strike. When the operating system cannot expand the existing block in place, Python would have to allocate a new buffer, copy all $N$ existing pointers over, and free the old buffer. Doing this on every single append would turn $N$ successive appends into an excruciating $O(N^2)$ operation!\n\nTo prevent this, CPython implements an ingenious **amortized growth strategy**. When the array fills up, CPython intentionally over-allocates extra headroom according to a proportional geometric formula: $\\text{newsize} + (\\text{newsize} \\gg 3) + \\text{bias}$. It moves the existing pointers over to this much larger parking lot, leaving empty parking spots waiting ahead. The next several appends simply drop their address cards into the pre-allocated empty slots in pure $O(1)$ time without touching the system memory allocator. Averaged across millions of appends, the cost of the rare resizing spikes washes out, granting an **amortized $O(1)$ time complexity**!",
-          "ar": "قائمة بايثون (`list`) ليست سلسلة مرتبطة، بل هي **مصفوفة ديناميكية من المؤشرات** (Pointers). تخيل صفاً من مواقف السيارات المرقمة؛ كل موقف يحمل بطاقة برقم عنوان (مؤشر 64 بت) لكائن يقيم في الذاكرة الحرة.\n\nعندما تستدعي `lst.append()` وتمتلئ المواقف، لا يضيف بايثون موقفاً واحداً إضافياً فقط (لأن ذلك سيتطلب نسخ كل شيء في كل عملية إضافة، مما يجعل إضافة $N$ عنصراً تستغرق زمناً كارثياً $O(N^2)$). بل يحجز بايثون موقفاً جديداً أكبر بنسبة هندسية محددة وفق صيغة نمو مسبقة، وينقل المؤشرات ويترك مساحات شاغرة للمستقبل. ولهذا السبب تتميز عملية الإضافة بتكلفة زمنية مجمعة (Amortized Time) ثابتة **$O(1)$**!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -851,8 +851,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\text{new\\_allocated} = \\text{newsize} + (\\text{newsize} \\gg 3) + (\\text{newsize} < 9 \\mathrel{?} 3 : 6), \\quad T_{\\text{amortized}}(\\text{append}) = \\mathcal{O}(1)",
         "formulaNote": {
-          "en": "CPython lists over-allocate contiguous pointer memory using a geometric formula, amortizing reallocation costs to O(1) per append.",
-          "ar": "تفرط قوائم CPython في حجز مصفوفات المؤشرات المتجاورة هندسياً، مما يجعل التكلفة المجمعة للإضافة ثنائية ثابتة O(1)."
+          "en": "Mathematical anchor for Python Lists & Dynamic Array Memory Growth.",
+          "ar": "المرساة الرياضية لـ قوائم بايثون والنمو الذاكري للمصفوفات الديناميكية."
         },
         "narrative": {
           "en": "```text\nCPython PyListObject Memory Layout (64-bit architecture):\n+-------------------------------------------------------------+\n| PyListObject Header (56 bytes)                              |\n|   ob_refcnt: 1                                              |\n|   ob_type: &PyList_Type                                     |\n|   ob_size: 4 (active elements)                              |\n|   allocated: 8 (total capacity)                             |\n|   ob_item: -------------------------------+                 |\n+-------------------------------------------|-----------------+\n                                            v\nContiguous Array of Pointers (ob_item):\n[ Slot 0: *ptrA ] -> Heap: \"alpha\"\n[ Slot 1: *ptrB ] -> Heap: 42\n[ Slot 2: *ptrC ] -> Heap: [True, False]\n[ Slot 3: *ptrD ] -> Heap: 3.1415\n[ Slot 4: NULL  ] (Pre-allocated headroom)\n[ Slot 5: NULL  ] (Pre-allocated headroom)\n[ Slot 6: NULL  ] (Pre-allocated headroom)\n[ Slot 7: NULL  ] (Pre-allocated headroom)\n```\n\n#### Architectural Breakdown & Reallocation Mechanics:\n- **`PyListObject` Structure**: Defined in CPython's `listobject.c`. It contains `ob_size` (the logical length seen by `len(lst)`) and `allocated` (the physical number of 8-byte pointer slots currently reserved in memory).\n- **Geometric Growth Progression**: Starting from empty, the allocated slot capacity sequence follows: 0 -> 4 -> 8 -> 16 -> 24 -> 32 -> 40 -> 52 -> 64 -> 76...\n- **`append(x)` vs `insert(0, x)`**: While `append()` merely drops a pointer into the next available pre-allocated slot ($O(1)$ amortized), `insert(0, x)` must invoke the C standard library's `memmove()` to physically shift all $N$ 64-bit pointers to the right by one position, making it strictly $O(N)$ linear time.",
@@ -890,16 +890,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Use bitwise shift `target_size >> 3` which represents dividing by 8.",
-            "ar": "استخدم الإزاحة الثنائية `target_size >> 3` التي تعادل القسمة الصحيحة على 8."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Add a bias of 3 if target_size < 9, otherwise add 6.",
-            "ar": "أضف إزاحة 3 إذا كان الحجم أقل من 9، وإلا أضف 6."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "On `size = 1`, the allocated capacity expands immediately to 4 slots.",
-            "ar": "عند `size = 1`، تتوسع السعة المحجوزة فوراً إلى 4 خانات."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -966,10 +966,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "How can Python retrieve a specific value among 10,000,000 keys in under a microsecond? If Python had to scan through pairs sequentially...",
-      "ar": "كيف يعثر بايثون على مفتاح ضمن مليون عنصر في أقل من ميكروثانية؟ تخيل مكتبة عملاقة، بدلاً من فحص الرفوف سطراً بعد سطر، تُدخل عنوان الكتاب في..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "python-lists-memory-growth"
+      "cs-07"
     ],
     "x": 445,
     "y": 745,
@@ -980,7 +980,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "DynamicArrayGrowthLab",
         "narrative": {
           "en": "How can Python retrieve a specific value among 10,000,000 keys in under a microsecond? If Python had to scan through pairs sequentially like a list, checking whether `key == target_key`, lookup time would grow linearly ($O(N)$), crawling to a complete standstill on modern big data workloads. Instead, Python's core data structure—the dictionary (`dict`)—achieves breathtaking **average-case $O(1)$ constant time lookup**.\n\nThe secret lies in the **post office mailbox analogy**. Imagine a post office with thousands of private mailboxes numbered from $0$ to $M-1$. When a letter arrives addressed to a person's name (the dictionary key), the postmaster does not search through every resident in the city. Instead, they drop the name into a deterministic mathematical blender: the **Hash Function** `hash(key)`. The blender scrambles the letters and instantly produces a single integer. The postmaster computes `hash(key) % M` to find the exact mailbox number and walks straight to that box in a single step!\n\nWhat happens when two completely different keys produce the exact same mailbox number? This inevitable event is called a **Hash Collision**. Unlike other languages that chain colliding items into linked lists (separate chaining), CPython uses **open addressing with pseudo-random perturbation**. If mailbox $i$ is already occupied by a different key, Python does not check the neighbor $i+1$ (which causes catastrophic clustering). Instead, it applies a bitwise perturbation recurrence: $i_{t+1} = (5 \\cdot i_t + \\text{perturb} + 1) \\pmod M$, scrambling the bits of the original hash to hop across the table until it lands on an empty slot or finds the matching key.\n\nBefore Python 3.6, dictionaries were notoriously memory-hungry: they stored large 24-byte structs `(hash, key_ptr, val_ptr)` directly inside a sparse table where up to two-thirds of the slots were empty `NULL` space. Starting in Python 3.6 (designed by Raymond Hettinger), CPython overhauled dictionaries into a **compact, insertion-ordered architecture**. The dictionary was split into two separate structures: a tiny sparse array of 1-byte indices, and a densely packed array of `entries` in the exact order they were inserted! This revolutionary redesign slashed dictionary memory consumption by 30% to 40% and guaranteed that dictionaries preserve insertion order by default.\n\nTo preserve $O(1)$ performance, the dictionary must never become overly crowded. CPython enforces a strict **Load Factor threshold**: $\\alpha = N / M \\le 2/3$. The instant the sparse table becomes more than two-thirds full, CPython allocates a table that is 2x or 4x larger, re-indexes the entries, and preserves the lightning-fast lookup speed that powers the entire Python runtime.",
-          "ar": "كيف يعثر بايثون على مفتاح ضمن مليون عنصر في أقل من ميكروثانية؟ تخيل مكتبة عملاقة، بدلاً من فحص الرفوف سطراً بعد سطر، تُدخل عنوان الكتاب في خلاط رياضي عجيب: **دالة التجزئة** `hash(key)`. يُنتج الخلاط رقماً حتمياً يوجهك مباشرة إلى الرف المنشود!\n\nمنذ إصدار بايثون 3.6، أصبحت القواميس **مضغوطة وتحافظ على ترتيب الإدخال**. كانت الإصدارات القديمة تهدر مساحات شاسعة من الذاكرة بجدول متناثر ضخم. أما اليوم، فيفصل بايثون القاموس إلى جدولين: مصفوفة فهارس صغيرة متناثرة (`indices`) تشير إلى مصفوفة مدخلات مرصوصة بإحكام (`entries`) تحوي `[hash, key, value]`. وعند حدوث تصادم (تطابق الفهرس لمفتاحين مختلفين)، يحل بايثون النزاع عبر خوارزمية العنونة المفتوحة والاضطراب التكراري: $i = (5i + \\text{perturb} + 1) \\pmod M$."
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -988,8 +988,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "i_0 = \\text{hash}(\\text{key}) \\pmod M, \\quad i_{t+1} = (5 \\cdot i_t + \\text{perturb} + 1) \\pmod M, \\quad \\text{Load Factor } \\alpha \\le \\frac{2}{3}",
         "formulaNote": {
-          "en": "CPython compact dictionaries decouple a sparse indices hash table from a dense entries array, resolving collisions via open-addressing perturbation.",
-          "ar": "تفصل قواميس CPython المضغوطة جدول الفهارس المتناثر عن مصفوفة المدخلات المرصوصة، وتعالج التصادم بالعنونة المفتوحة والاضطراب التكراري."
+          "en": "Mathematical anchor for Hash Tables & CPython Dictionary Internals.",
+          "ar": "المرساة الرياضية لـ جداول التجزئة والمعمارية الداخلية لقواميس CPython."
         },
         "narrative": {
           "en": "```text\nCompact Dict Architecture (Python 3.6+):\nSparse Hash Indices Table (Size M = 8):\n  [ 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 ]\n  [-1 | 0 |-1 | 1 |-1 |-1 | 2 |-1 ]  <-- Only 1 byte per slot (int8)\n        |       |           |\n        v       v           v\nDense Entries Array (Insertion Ordered):\n  Row 0: hash=0x3a1f, key=\"alpha\", val=100\n  Row 1: hash=0x9b4c, key=\"beta\",  val=200\n  Row 2: hash=0x110e, key=\"gamma\", val=300\n```\n\n#### Architectural Breakdown & Hash Invariants:\n- **Hash Table Invariant**: If $a == b$, then $\\text{hash}(a)$ MUST equal $\\text{hash}(b)$. Any custom class defining `__eq__` must implement `__hash__` to satisfy this contract.\n- **Why Mutable Objects are Unhashable**: A list's contents can change over time. If a list were permitted as a key, mutating it would alter its hash code, leaving the entry permanently lost in the wrong hash bucket! Python prevents this by setting `__hash__ = None` on mutable types.\n- **Perturbation Formula Dynamics**: Shifting `perturb >>= 5` on every probe step incorporates the high-order bits of the 64-bit hash into the probe sequence, guaranteeing that all slots in the power-of-two table will eventually be visited without infinite loops.",
@@ -1027,16 +1027,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Initial index is `hash_value % table_size`.",
-            "ar": "الفهرس الابتدائي هو `hash_value % table_size`."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "In each step, update `idx = (5 * idx + perturb + 1) % table_size` and shift `perturb >>= 5`.",
-            "ar": "في كل خطوة، حدّث الفهرس بصيغة الاضطراب ثم أزح `perturb >>= 5`."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "The sequence guarantees full permutation coverage of all table slots.",
-            "ar": "تضمن هذه الصيغة تغطية كافة خانات الجدول وتشتيت التصادمات بانتظام."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1103,10 +1103,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "When novice developers encounter Python's tuple type, they almost invariably dismiss it as nothing more than a \"read-only list.",
-      "ar": "يعتقد المبتدئون أن الصف (Tuple) مجرد 'قائمة للقراءة فقط'، لكن غرضهما المعماري مختلف جوهرياً. القائمة مصفوفة ديناميكية صُممت لتنمو وتنكمش."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "hash-tables-dict-internals"
+      "cs-08"
     ],
     "x": 460,
     "y": 840,
@@ -1117,7 +1117,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "RecursionTreeExplorer",
         "narrative": {
           "en": "When novice developers encounter Python's `tuple` type, they almost invariably dismiss it as nothing more than a \"read-only list.\" After all, both store ordered collections, both support indexing `seq[0]`, both allow slicing `seq[1:3]`, and both can be looped over. But in software architecture and memory design, lists and tuples serve two radically different purposes.\n\nA list is a **dynamic shopping cart**. It is designed for homogeneous sequences of varying length that are meant to expand, shrink, and reorder as items are acquired. In contrast, a tuple is a **sealed, welded cargo crate**. It represents a fixed-dimension heterogeneous record—analogous to a single row in an SQL database or a `struct` in C (for example: `(\"Alice\", 30, \"Staff Engineer\", True)`).\n\nBecause a tuple's length is permanently frozen upon creation, CPython optimizes it aggressively. Unlike a list, a tuple never over-allocates spare memory headroom. An empty tuple consumes just 40 bytes on 64-bit CPython, compared to 56 bytes for an empty list. Furthermore, CPython maintains internal **freelists** for small tuples: when a small tuple is destroyed, its memory is not returned to the operating system; it is recycled instantly for the next tuple allocation, dramatically cutting memory fragmentation.\n\nHowever, programmers must beware of Python's most notorious trap: **immutability in Python is strictly shallow!** A tuple's immutability means only that the sequence of memory addresses (pointers) it holds is permanently locked. But if one of those pointers happens to point to a *mutable* object—such as a list—the contents of that list can still be modified in place! The crate itself cannot change which rooms it connects to, but someone inside one of those rooms can still rearrange the furniture! Consequently, a tuple is only hashable (and eligible as a dictionary key or set member) if *all* of its constituent elements are recursively immutable.\n\nMeanwhile, a **set** is an ultra-fast collection modeled on mathematical set theory. Under the hood, a set is implemented as a modified hash table that stores only keys without values. This grants $O(1)$ constant-time membership testing (`item in my_set`) and empowers developers with instantaneous mathematical operations like unions (`|`), intersections (`&`), and symmetric differences (`^`).",
-          "ar": "يعتقد المبتدئون أن الصف (Tuple) مجرد 'قائمة للقراءة فقط'، لكن غرضهما المعماري مختلف جوهرياً. القائمة مصفوفة ديناميكية صُممت لتنمو وتنكمش. بينما **الصف** هو سجل بيانات بنيوي ثابت الحجم (مثل صف في قاعدة بيانات: `('Alice', 30, 'Engineer')`).\n\nولأن حجم الصف مجمد عند إنشائه، يستمثله CPython بكفاءة عالية: لا مساحات محجوزة فائضة، واستهلاك أقل للذاكرة، وإعادة تدوير الصفوف الصغيرة في الذاكرة. ولكن احذر: **اللاقابلية للتعديل في بايثون سطحية** (Shallow Immutability)! لا يمكن للصف أن يغير مؤشرات الذاكرة التي يحملها؛ لكن إذا كان أحد تلك المؤشرات يشير إلى قائمة قابلة للتعديل، فإن محتويات القائمة الداخلية يمكن أن تتغير! أما **المجموعة** (`set`) فهي جدول تجزئة فائق السرعة يحوي مفاتيح فقط دون قيم، مما يمنح فحص الانتماء الرياضي بزمن ثابت $O(1)$."
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -1125,8 +1125,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\text{sizeof}(\\text{tuple}_n) = 40 + 8n \\text{ bytes}, \\quad \\text{sizeof}(\\text{list}_n) = 56 + 8 \\cdot \\text{allocated}, \\quad \\text{Shallow Immutability}",
         "formulaNote": {
-          "en": "Tuples guarantee shallow immutability and exact memory allocation without over-allocation headroom, while sets leverage hash table direct addressing.",
-          "ar": "تضمن الصفوف اللاقابلية السطحية للتعديل وتخصيصاً دقيقاً للذاكرة دون مساحات فائضة، بينما تعتمد المجموعات على عنونة جداول التجزئة."
+          "en": "Mathematical anchor for Tuples, Immutability & Set Theory Mechanics.",
+          "ar": "المرساة الرياضية لـ الصفوف (Tuples)، اللاقابلية للتغيير، وميكانيكا المجموعات (Sets)."
         },
         "narrative": {
           "en": "```text\nMemory Comparison: List vs Tuple vs Shallow Immutability:\nPyTupleObject (Frozen 2-element record):\n+------------------------------------+\n| ob_refcnt: 1                       |\n| ob_type: &PyTuple_Type             |\n| ob_size: 2                         |\n| ob_item[0]: ---------> Heap: 42    |  (Immutable Integer)\n| ob_item[1]: ---------> Heap: [*]   |  (Mutable List!)\n+-------------------------|----------+\n                          v\n               +----------------------+\n               | PyListObject         |\n               | contents: [1, 2]     |  <-- Can mutate via t[1].append(3)!\n               +----------------------+\n```\n\n#### Architectural Breakdown & Freelist Recycling:\n- **`PyTupleObject`**: Immutable variable-length object struct with no `allocated` field; `sizeof(tuple) = sizeof(PyVarObject) + sizeof(PyObject*) * ob_size`.\n- **Tuple Freelists**: CPython maintains an array of single-linked freelists for tuples of size $1 \\le n < 20$, avoiding system heap allocations during hot loops.\n- **Set Invariants**: Sets maintain an 8-slot hash table initially, requiring items to be fully hashable. Set lookups bypass value fetching, matching keys directly via pointer identity followed by `__eq__`.",
@@ -1164,16 +1164,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Convert lists using `tuple(deep_freeze(x) for x in obj)`.",
-            "ar": "حوّل القوائم باستخدام `tuple(deep_freeze(x) for x in obj)`."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Convert dicts into `frozenset` containing frozen key-value tuples.",
-            "ar": "حوّل القواميس إلى `frozenset` يحتوي على أزواج (مفتاح، قيمة مجمدة)."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Primitive immutables (int, str, float) should be returned unchanged.",
-            "ar": "أعد القيم الثابتة البسيطة (int, str) كما هي دون تعديل."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1240,10 +1240,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "In many object-oriented languages like Java or C++, polymorphism is enforced through rigid, bureaucratic class hierarchies and formal...",
-      "ar": "باثيون لغة تعتمد على البروتوكولات (Protocols) أكثر من اعتمادها على الوراثة الجامدة. فكل بناء لغوي في بايثون هو قناع ناعم لدالة خاصة محاطة..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "tuples-immutability-sets"
+      "cs-09"
     ],
     "x": 445,
     "y": 935,
@@ -1254,7 +1254,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "HashTableBucketLab",
         "narrative": {
           "en": "In many object-oriented languages like Java or C++, polymorphism is enforced through rigid, bureaucratic class hierarchies and formal interface contracts (`implements Comparable<T>`, `implements Serializable`). If a class fails to formally declare that it implements an interface, the compiler rejects it—even if the class contains the exact methods needed. Python approaches object-orientation with a radically different philosophy: **Duck Typing and Protocol Orientation**.\n\nThe core premise of duck typing is simple and pragmatic: *\"If it walks like a duck and quacks like a duck, it is a duck.\"* Python's runtime rarely asks for an object's pedigree (`isinstance(x, SomeInterface)`). Instead, it asks whether the object knows how to respond to specific, standardized **secret handshakes**. In Python, these secret handshakes are known as **dunder methods** (double-underscore methods like `__len__`, `__getitem__`, and `__add__`).\n\nConsider what happens when you write `len(my_object)`. Python does not look for a hardcoded property on a base class. Instead, the built-in function translates directly to `type(my_object).__len__(my_object)`. When you write `a + b`, Python translates it to `type(a).__add__(a, b)`. When you access an element with square brackets `obj[3]`, Python calls `type(obj).__getitem__(obj, 3)`. When you iterate over an object in a `for` loop, Python calls `__iter__()`. The entire Python syntax is, in essence, an expressive layer of syntactic sugar draped over dunder protocols!\n\nBy implementing standard dunder protocols on your custom classes, you make them feel like native Python primitives. Your geometric `Vector` objects can be added with `+`, multiplied with `*`, formatted with f-strings via `__repr__`, compared for value equality with `==` via `__eq__`, and stored as keys in dictionaries via `__hash__`. They blend seamlessly into the language ecosystem without requiring the caller to learn bespoke method names like `.plus()` or `.getLength()`.\n\nFinally, when building complex object hierarchies with multiple inheritance, Python prevents ambiguity using the **C3 Linearization Algorithm** to construct the **Method Resolution Order (MRO)**. The MRO deterministically flattens a complex directed acyclic graph (DAG) of base classes into a clean linear chain, guaranteeing that a parent class is never checked before any of its children, and that `super()` calls traverse cooperative inheritance without infinite recursion.",
-          "ar": "باثيون لغة تعتمد على **البروتوكولات** (Protocols) أكثر من اعتمادها على الوراثة الجامدة. فكل بناء لغوي في بايثون هو قناع ناعم لدالة خاصة محاطة بشرطتين سفليتين (Dunder Method). عندما تكتب `len(x)`، يستدعي بايثون `type(x).__len__(x)`. وعندما تكتب `a + b`، يُترجم إلى `type(a).__add__(a, b)`. وعندما تكتب `x in c`، يُستدعى `__contains__`.\n\nوعندما تطبق هذه البروتوكولات على أصنافك المخصصة، تصبح كائناتك مدمجة بسلاسة في لغة بايثون: يمكن تقطيعها بالأقواس `obj[1:3]`، وطباعتها بأناقة عبر `__repr__`، ومقارنتها وترتيبها في الخوارزميات، واستخدامها كمفاتيح في القواميس عبر `__hash__` و `__eq__`."
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -1262,8 +1262,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "x[k] \\iff \\text{type}(x).\\_\\_\\text{getitem}\\_\\_(x, k), \\quad a + b \\iff \\text{type}(a).\\_\\_\\text{add}\\_\\_(a, b), \\quad a == b \\implies \\text{hash}(a) == \\text{hash}(b)",
         "formulaNote": {
-          "en": "Python data model binds high-level language operators and syntactic constructs to double-underscore ('dunder') method protocols on the type object.",
-          "ar": "يربط نموذج بيانات بايثون المعاملات اللغوية والتراكيب النحوية ببروتوكولات الدوال المزدوجة (Dunder) المعرفة في صنف الكائن."
+          "en": "Mathematical anchor for Object-Oriented Protocols & Dunder Methods.",
+          "ar": "المرساة الرياضية لـ البروتوكولات كائنية التوجه ودوال بايثون السحرية (Dunder Methods)."
         },
         "narrative": {
           "en": "```text\nCPython Protocol Slot Dispatch Architecture:\nPython Syntax: len(v)                     Python Syntax: a + b\n       |                                         |\n       v                                         v\nPyObject_Size(v)                         PyNumber_Add(a, b)\n       |                                         |\n       v                                         v\nv->ob_type->tp_as_sequence->sq_length    a->ob_type->tp_as_number->nb_add\n       |                                         |\n       v                                         v\nDirect C Function Pointer Call           Direct C Function Pointer Call\n(Zero Python dictionary lookup!)         (Zero Python dictionary lookup!)\n```\n\n#### Architectural Breakdown & C-Level Slots:\n- **Type Slots (`tp_as_number`, `tp_as_sequence`, `tp_as_mapping`)**: In CPython's C source code, dunder methods are mirrored by fast C function pointer slots on the `PyTypeObject`. Built-in operations like `len()` execute at raw C speed without dictionary lookups.\n- **`__repr__` vs `__str__`**: `__repr__` should be unambiguous, aiming for `eval(repr(x)) == x` (primarily for developers and debugging); `__str__` should be human-readable and user-friendly.\n- **The Hash Contract Invariant**: If two objects compare equal via `__eq__`, their `__hash__` values must match. If you override `__eq__` without defining `__hash__`, CPython automatically sets `__hash__ = None` to prevent corrupting hash tables.",
@@ -1301,16 +1301,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Implement `__add__` by creating a new `Vector2D(self.x + other.x, self.y + other.y)`.",
-            "ar": "نفذ `__add__` بإنشاء كائن جديد `Vector2D(self.x + other.x, self.y + other.y)`."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Implement `__hash__` by returning the hash of the tuple `(self.x, self.y)`.",
-            "ar": "نفذ `__hash__` بإرجاع تجزئة الصف `(self.x, self.y)`."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Return `NotImplemented` from `__add__` if `other` is not an instance of Vector2D.",
-            "ar": "أعد `NotImplemented` من `__add__` إذا لم يكن الكائن الآخر من نفس النوع."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1377,10 +1377,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "Imagine you are tasked with processing a 100-gigabyte web server log file on a workstation that has only 8 gigabytes of physical RAM.",
-      "ar": "تخيل أنك بحاجة لمعالجة ملف سجلات ضخم بحجم 100 غيغابايت على جهاز يمتلك 8 غيغابايت فقط من الذاكرة العشوائية."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "object-oriented-dunder"
+      "cs-10"
     ],
     "x": 460,
     "y": 1030,
@@ -1391,7 +1391,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "CompactDictLayoutLab",
         "narrative": {
           "en": "Imagine you are tasked with processing a 100-gigabyte web server log file on a workstation that has only 8 gigabytes of physical RAM. If your instinct is to write a standard list comprehension or call `file.readlines()`, your computer will abruptly freeze and crash with an unceremonious `MemoryError`! Why does this happen? A Python `list` is inherently **eager**: it demands that all 100 gigabytes of data be allocated, constructed as individual Python objects, and held in memory simultaneously before you can inspect even the very first line.\n\nA **Generator** completely overturns this paradigm through **lazy evaluation**. Instead of a giant warehouse filled with thousands of pre-manufactured crates, imagine a **conveyor belt that pauses and freezes in time**. A generator does not compute its values upfront; it produces each item on-demand, strictly one by one, at the exact millisecond the caller asks for it. At any given moment, only a single element resides in memory, reducing space consumption from gigabytes down to a tiny, constant handful of bytes ($O(1)$ auxiliary space).\n\nTo appreciate how revolutionary this is, think about ordinary functions. An ordinary function is like a vending machine drop: you invoke it with arguments, it runs to completion, hits a `return` statement, drops its result, and its entire stack frame—all its local variables, memory allocations, and execution state—is instantly obliterated (popped off the call stack). If you call that function again, it must start from total scratch with zero memory of its previous execution.\n\nThe `yield` keyword rewires this contract completely. When a Python function contains the `yield` statement, calling it does not execute the function body; instead, it returns a special **generator object** (`PyGenObject`). When you call `next()` on this generator, the function executes normally until it hits `yield`. At that exact microsecond, Python **freezes the function's stack frame in place on the heap**. Its local variables, execution position, and temporary values are preserved in suspended animation, and the yielded value is handed to the caller.\n\nWhen the caller subsequently asks for the next item, Python does not restart the function; it simply **thaws out** the frozen frame on the heap! Execution resumes at the exact instruction immediately following the `yield`, advances until the next `yield` or until the function returns (which raises `StopIteration`), and freezes again. This enables you to construct infinite data streams—such as live sensor telemetry, Fibonacci sequences, or streaming real-time event logs—flowing through modular, memory-efficient pipeline stages without ever running out of RAM.",
-          "ar": "تخيل أنك بحاجة لمعالجة ملف سجلات ضخم بحجم 100 غيغابايت على جهاز يمتلك 8 غيغابايت فقط من الذاكرة العشوائية. إن استخدمت قائمة عادية، سينهار نظامك فوراً بنفاد الذاكرة! والسبب أن القوائم 'شرهة' (Eager) تتطلب بناء كافة العناصر في الذاكرة دفعة واحدة.\n\nأما **المولد (Generator)** فهو كسول وذكي: إنه **شريط ناقل يتجمد في الزمن**. الكلمة المفتاحية `yield` توقف تنفيذ الدالة مؤقتاً، وتجمد إطارها الذاكري في الكومة وتسلم عنصراً واحداً فقط للمستدعي. لا يشغل البرنامج في أي لحظة سوى ذاكرة عنصر وحيد؛ وحين يطلب المستدعي العنصر التالي (`next(gen)`)، تستيقظ الدالة من مكان توقفها تماماً، وتخطو خطوة واحدة، ثم تعود للتجمد!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -1399,8 +1399,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\text{GeneratorState} \\in \\{\\text{GEN\\_CREATED}, \\text{GEN\\_SUSPENDED}, \\text{GEN\\_RUNNING}, \\text{GEN\\_CLOSED}\\}",
         "formulaNote": {
-          "en": "Generators suspend and resume stack frames lazily on the heap via yield, achieving O(1) auxiliary memory consumption across infinite streams.",
-          "ar": "تعلق المولدات أطر التنفيذ وتستأنفها في الكومة عند الطلب عبر yield، محققة استهلاكاً ذاكرياً ثابتاً O(1) عبر تدفقات غير محدودة."
+          "en": "Mathematical anchor for Iterators, Generators & Lazy Streams.",
+          "ar": "المرساة الرياضية لـ المكررات، المولدات الكسولة، وتدفق البيانات غير المحدود."
         },
         "narrative": {
           "en": "$$\n\\text{Stream Processing}: \\mathcal{S}_0 \\xrightarrow{\\text{next()}} (x_0, \\mathcal{S}_1) \\xrightarrow{\\text{next()}} (x_1, \\mathcal{S}_2) \\dots \\implies \\text{Space: } \\mathcal{O}(1) \\ll \\mathcal{O}(N)\n$$\n\n```text\nCPython Generator Frame Suspension Architecture:\n\nOrdinary Function (Stack Unwinding):\n[ Caller Frame ] ---> [ Callee Frame ] (Hits return) ---> [ Callee Frame Destroyed ]\n\nGenerator Function (Heap-Allocated Frame Suspension):\nCall Stack (Evaluator)                   Heap Memory (Persistent State)\n+-----------------------+                +---------------------------------------+\n| Active Loop / Caller  |                | PyGenObject (0x7f8a3c00)              |\n| next(gen)             | -------------> |   gi_frame -> PyFrameObject           |\n+-----------------------+                |     f_lasti: 42 (Offset of YIELD_VAL) |\n      ^                                  |     f_localsplus: [x=10, chunk=[...]] |\n      | yields value x_k                 |     f_valuestack: [...]               |\n      +--------------------------------- |   gi_running: 0 (Suspended)           |\n                                         +---------------------------------------+\n```\n\n#### Architectural Breakdown & Mathematical Mapping:\n- **Generator States ($\\text{GeneratorState}$)**: A generator progresses through four explicit lifecycle states: `GEN_CREATED` (instantiated but not yet started), `GEN_RUNNING` (currently executing on the CPU), `GEN_SUSPENDED` (paused at a `yield` statement with its frame frozen on the heap), and `GEN_CLOSED` (execution finished or aborted).\n- **CPython Frame Suspension (`PyGenObject` -> `PyFrameObject`)**: Unlike standard C functions whose stack frames are popped from the OS thread stack upon returning, a Python generator's frame lives on the heap.\n- **Instruction Pointer Preservation (`f_lasti`)**: CPython bytecode stores the index of the last executed instruction. When pausing on `YIELD_VALUE`, `f_lasti` records the offset, allowing the Virtual Machine loop to resume execution seamlessly at `f_lasti + 1`.\n- **Constant Space Guarantee ($\\mathcal{O}(1)$ Memory)**: Pipeline chaining of generators (`f(g(h(stream)))`) composes operations into pull-based streams where values flow one-by-one without intermediate list allocations.",
@@ -1438,16 +1438,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Accumulate incoming stream items into a `chunk` list.",
-            "ar": "اجمع عناصر المجرى الواردة في قائمة `chunk` مؤقتة."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "When `len(chunk) == chunk_size`, `yield chunk` and reset `chunk = []`.",
-            "ar": "عندما يصل طول القائمة للحد المطلوب، أطلق `yield chunk` ثم صفّر القائمة."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Do not forget to yield any remaining non-empty chunk after the loop finishes.",
-            "ar": "لا تنس إطلاق القائمة الجزئية المتبقية بعد نهاية الحلقة إن كانت تحوي عناصر."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1514,10 +1514,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "In production software systems, resources like file descriptors, network socket connections, database connection pools, thread locks, and...",
-      "ar": "في الأنظمة الإنتاجية، تكون موارد النظام كالملفات، ومقابس الشبكة، واتصالات قواعد البيانات، وأقفال العتاد محدودة للغاية."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "iterators-generators-streams"
+      "cs-11"
     ],
     "x": 445,
     "y": 1125,
@@ -1528,7 +1528,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "BigOComplexityRacer",
         "narrative": {
           "en": "In production software systems, resources like file descriptors, network socket connections, database connection pools, thread locks, and GPU memory are strictly finite operating system artifacts. When your program asks the operating system for a file via `open()`, the OS kernel allocates a dedicated slot in its internal process descriptor table and hands back an integer file handle. If your program fails to close that file when it finishes, that kernel slot remains locked open.\n\nConsider the naive beginner pattern: a developer opens a file, reads data, performs extensive mathematical parsing, and then calls `file.close()` on the final line. This code is a dormant ticking time-bomb! If a single line during the parsing phase throws an unexpected `ValueError`, `ZeroDivisionError`, or encounters an early `return` statement, the execution flow abruptly aborts. The final line `file.close()` is never reached. In high-throughput backend services, these leaked file descriptors accumulate relentlessly until the OS kernel refuses to open any further files, crashing the entire service with `OSError: [Errno 24] Too many open files`.\n\nA **Context Manager** (`with open(...) as f:`) completely eradicates this failure mode through the principle of **deterministic resource management** (akin to RAII—Resource Acquisition Is Initialization). Think of a context manager as an **automatic safety airlock chamber** or a **hotel room keycard switch**. When you enter the room, inserting the keycard automatically switches on the power, arms the circuits, and locks the perimeter (`__enter__`).\n\nThe true genius of the airlock reveals itself when things go wrong inside. Even if a catastrophic failure detonates within the room—an unexpected exception, an uncaught error, or a sudden jump statement like `break` or `return`—the physical airlock mechanism deterministically triggers upon departure (`__exit__`). It guarantees that power is cut, buffers are flushed to disk, and the kernel handle is returned safely to the operating system before the caller can proceed. You no longer have to manually litter your code with verbose, error-prone `try ... finally` blocks.\n\nUnder the hood, Python elevates this safety protocol through two special dunder methods: `__enter__()` and `__exit__()`. When entering the `with` statement, `__enter__()` acquires the resource and returns the object bound to the `as` variable. When leaving the block, `__exit__()` receives three diagnostic arguments: the exception type (`exc_type`), the exception value (`exc_val`), and the traceback object (`exc_tb`). If no error occurred, all three are `None`. But if an error occurred, `__exit__` has the extraordinary ability to inspect the failure and choose whether to **suppress** it (by returning a truthy `True`) or let it propagate up the call stack (by returning `False` or `None`).",
-          "ar": "في الأنظمة الإنتاجية، تكون موارد النظام كالملفات، ومقابس الشبكة، واتصالات قواعد البيانات، وأقفال العتاد محدودة للغاية. فإذا فتح برنامجك ملفاً وتعطل قبل الوصول لسطر `file.close()`، يتسرب مورد النظام في الذاكرة (Resource Leak)!\n\n**مدير السياق** (`with open(...) as f:`) يشبه **غرفة عزل هوائية أوتوماتيكية**. عند دخولك، تؤمن البوابة المورد وتهيئه (`__enter__`). ومهما حدث داخل الغرفة—سواء انفجر استثناء مدمر، أو حدث خطأ غير متوقع، أو تم تنفيذ `return` مبكر—تضمن المنظومة حتمياً إغلاق المورد وتنظيف الذاكرة وتحريره لنظام التشغيل (`__exit__`)."
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -1536,8 +1536,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathbf{with} \\; \\mathcal{M} \\; \\mathbf{as} \\; v \\iff v = \\mathcal{M}.\\_\\_\\text{enter}\\_\\_(); \\quad \\mathbf{try} \\; \\{ \\text{body}(v) \\} \\; \\mathbf{finally} \\; \\{ \\mathcal{M}.\\_\\_\\text{exit}\\_\\_(\\tau, \\nu, \\beta) \\}",
         "formulaNote": {
-          "en": "Context managers enforce deterministic acquisition and release of system resources, guaranteeing cleanup via the __enter__ and __exit__ protocol.",
-          "ar": "يضمن مديرو السياق حتمية حجز وتحرير موارد النظام، مع ضمان التنظيف التام عبر بروتوكول __enter__ و __exit__."
+          "en": "Mathematical anchor for Context Managers & Deterministic Resource Cleanup.",
+          "ar": "المرساة الرياضية لـ مديرو السياق (Context Managers) والإدارة الحتمية للموارد."
         },
         "narrative": {
           "en": "$$\n\\text{Suppression Logic}: \\quad \\text{propagate}(\\tau, \\nu, \\beta) \\iff \\mathbf{bool}(\\mathcal{M}.\\_\\_\\text{exit}\\_\\_(\\tau, \\nu, \\beta)) = \\mathbf{False}\n$$\n\n```text\nCPython Context Manager Execution Flow & Bytecode Dispatch:\n\n[ Enter with M as v ]\n                 |\n        v = M.__enter__()\n                 |\n       +---------+---------+\n       |   Execute Block   |\n       +---------+---------+\n         /               \\\n   (Success)         (Exception Raised: tau, nu, beta)\n       |                            |\nM.__exit__(None, None, None)   M.__exit__(tau, nu, beta)\n       |                            |\n  [ Continue ]               Is return value truthy?\n                                   /       \\\n                              (Yes)         (No)\n                               /               \\\n                       [ Suppress Error ]   [ Re-raise Exception ]\n                       (Resume execution)   (Unwind Call Stack)\n```\n\n#### Architectural Breakdown & Mathematical Mapping:\n- **Formal Expansion ($\\mathbf{with} \\; \\mathcal{M} \\; \\mathbf{as} \\; v$)**: The Python compiler lowers the `with` statement into an explicit `try ... finally` bytecode sequence (`BEFORE_WITH` / `SETUP_WITH` instructions). The exit handler is guaranteed to execute even during unhandled exceptions or thread interruptions.\n- **The Dunder Protocol Contract**:\n  - `__enter__(self) -> Resource`: Allocates the underlying resource, sets up invariants, and returns the target reference bound to the `as` alias.\n  - `__exit__(self, exc_type, exc_val, exc_tb) -> bool`: Executes deterministic teardown. If `exc_type is not None`, an active exception is in flight.\n- **Exception Suppression Mechanism**: Returning a boolean `True` from `__exit__` informs the CPython runtime that the exception has been safely quarantined and resolved. CPython clears the exception state from the current thread frame and resumes linear execution.\n- **Rollback & Transactional Safety**: Context managers enable transactional consistency: mutations can be applied to an active state, and if any step fails, `__exit__` intercepts the failure to restore the pre-transaction snapshot before allowing the system to continue.",
@@ -1575,16 +1575,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "In `__enter__`, record `self._snapshot = self.target_dict.copy()`.",
-            "ar": "في `__enter__`، احفظ لقطة من القاموس `self._snapshot = self.target_dict.copy()`."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "In `__exit__`, check if `exc_type is not None` to detect errors and roll back.",
-            "ar": "في `__exit__`، تحقق مما إذا كان `exc_type is not None` لاكتشاف الخطأ والتراجع عنه."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Returning `True` from `__exit__` suppresses the exception so execution can continue.",
-            "ar": "إرجاع `True` من `__exit__` يكتم الخطأ ويسمح للبرنامج بمتابعة عمله."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1651,10 +1651,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "Benchmarking code using a wall-clock stopwatch (time.time()) is one of the most dangerous traps in computer science.",
-      "ar": "قياس كفاءة الكود بساعة إيقاف الجدار أمر مضلل: فحاسوب خارق سينفذ كوداً رديئاً بسرعة على 100 سطر، لكن نفس الخوارزمية ستتجمد حين تُغذى بـ 10..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "context-managers-resources"
+      "cs-12"
     ],
     "x": 460,
     "y": 1220,
@@ -1665,7 +1665,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "DunderProtocolDispatchLab",
         "narrative": {
           "en": "Benchmarking code using a wall-clock stopwatch (`time.time()`) is one of the most dangerous traps in computer science. If you test a naive algorithm on a liquid-cooled modern laptop with 100 rows of data, the CPU will execute it in 0.001 seconds, lulling you into false confidence. But feed that exact same algorithm 1,000,000 rows in production, and your application will grind to an agonizing halt for hours or days! Physical seconds measure hardware clock speed, thermal throttling, and operating system background tasks; **Big-O notation measures how an algorithm's operation count scales as the input size $n$ explodes toward infinity**.\n\nTo develop an intuitive instinct for algorithmic scaling, consider physical analogies from daily life:\n- **$\\mathcal{O}(1)$ Constant Time**: Flicking on a wall light switch. It takes the exact same split-second whether you are illuminating a tiny closet or an 80,000-seat sports stadium. The workload is strictly independent of the size of the room.\n- **$\\mathcal{O}(\\log n)$ Logarithmic Time**: Looking up a person's name in a 1,000-page physical telephone directory using binary search. You flip open to page 500; seeing that the target name is alphabetically earlier, you instantly discard the entire second half (500 pages) in one motion. If the phone book doubles to 2,000 pages, you only need **one single additional page flip**!\n- **$\\mathcal{O}(n)$ Linear Time**: Reading every single book title along a library aisle one by one. If there are 10 books, it takes 10 seconds; if there are 1,000,000 books, it takes 1,000,000 seconds. Time scales in direct, lockstep proportion to input size.\n- **$\\mathcal{O}(n^2)$ Quadratic Time**: Every single guest at a 1,000-person wedding ceremony insisting on personally shaking hands with every other guest ($1,000 \\times 1,000 = 1,000,000$ handshakes). If attendance doubles to 2,000 guests, the handshake count does not double—it quadruples to 4,000,000!\n\nThe practical divergence between complexity classes is staggering. When $n = 1,000,000$, a linear $\\mathcal{O}(n)$ algorithm executing at 100 million operations per second finishes in **0.01 seconds**. An $\\mathcal{O}(n^2)$ quadratic algorithm on that same data demands $10^{12}$ operations—requiring nearly **3 uninterrupted hours**. And an exponential $\\mathcal{O}(2^n)$ algorithm exceeds the number of atoms in the observable universe!\n\nCrucially, in Python, your choice of primitive data structures directly governs the asymptotic class of your code. For instance, testing membership via `item in my_list` forces CPython to perform an $\\mathcal{O}(n)$ linear scan through the underlying pointer array. Replacing that list with a hash set (`item in my_set`) transforms the operation into an $\\mathcal{O}(1)$ average-time hash lookup. A single data structure substitution can transmute an unrunnable $\\mathcal{O}(n^2)$ bottleneck into an instantaneous $\\mathcal{O}(n)$ pipeline!",
-          "ar": "قياس كفاءة الكود بساعة إيقاف الجدار أمر مضلل: فحاسوب خارق سينفذ كوداً رديئاً بسرعة على 100 سطر، لكن نفس الخوارزمية ستتجمد حين تُغذى بـ 10 ملايين سطر. **ترميز Big-O** لا يقيس الثواني، بل يقيس **معدل تضاعف عدد العمليات الحسابية مع انفجار حجم المدخلات $n$ نحو اللانهاية**.\n\n$O(1)$ كضغط مفتاح المصباح: يستغرق نفس اللحظة سواء كانت الغرفة استوديو صغيراً أو ملعباً ضخماً. $O(n)$ هو قراءة كل كتاب في الرف كتاباً بعد كتاب. $O(n^2)$ هو مصافحة كل ضيف في حفل لجميع الضيوف الآخرين واحداً تلو الآخر. عندما يكون $n = 1,000,000$، تنهي خوارزمية $O(n)$ عملها في رمشة عين، بينما تحتاج خوارزمية $O(n^2)$ إلى 31.7 سنة من الحوسبة المتواصلة!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -1673,8 +1673,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "f(n) \\in \\mathcal{O}(g(n)) \\iff \\exists \\, c > 0, n_0 \\in \\mathbb{N} \\quad \\text{such that} \\quad \\forall n \\ge n_0, \\; 0 \\le f(n) \\le c \\cdot g(n)",
         "formulaNote": {
-          "en": "Big-O notation establishes an asymptotic upper bound on computational resource scaling as input dimension n approaches infinity.",
-          "ar": "يحدد ترميز Big-O سقفاً مقارباً لمعدل نمو استهلاك الموارد الحسابية عندما يقترب بعد المدخلات n من اللانهاية."
+          "en": "Mathematical anchor for Algorithmic Complexity, Big-O Notation & Asymptotics.",
+          "ar": "المرساة الرياضية لـ التعقيد الخوارزمي، ترميز Big-O والتحليل المقارب."
         },
         "narrative": {
           "en": "$$\n\\text{Asymptotic Hierarchy}: \\quad \\mathcal{O}(1) \\subset \\mathcal{O}(\\log n) \\subset \\mathcal{O}(n) \\subset \\mathcal{O}(n \\log n) \\subset \\mathcal{O}(n^2) \\subset \\mathcal{O}(2^n) \\subset \\mathcal{O}(n!)\n$$\n\n```text\nAsymptotic Growth Landscape & Scaling Divergence:\n\nOperations f(n)\n  ^\n  |                                                  / O(2^n) [Exponential: Catastrophic]\n  |                                                 /\n  |                                         :      /\n  |                                         :     /  O(n^2) [Quadratic: Dangerous]\n  |                                         :    /\n  |                                         :   /\n  |                                         :  /    O(n log n) [Log-linear: Optimal Sort]\n  |                                         : /\n  |                                         :/      O(n) [Linear: Streaming]\n  |........................................./\n  |                                        /        O(log n) [Logarithmic: Divide & Conquer]\n  |---------------------------------------+------>  O(1) [Constant: Direct Hash/Array Index]\n  0                                        n_0      Input Size (n) ---> infinity\n```\n\n#### Architectural Breakdown & Mathematical Mapping:\n- **Upper Bound Formal Definition ($\\mathcal{O}$)**: $f(n) \\le c \\cdot g(n)$ for all $n \\ge n_0$. Big-O characterizes the asymptotic upper bound, ignoring machine-specific hardware constants $c$ and low-order terms.\n- **Lower Bound ($\\Omega$) and Tight Bound ($\\Theta$)**: $\\Omega(g(n))$ establishes the theoretical minimum operations required by any algorithm solving the problem. $\\Theta(g(n))$ indicates that an algorithm's upper and lower bounds match asymptotically.\n- **Logarithmic Reduction ($\\log_2 n$)**: Algorithms that halve the problem domain at each step (binary search, divide-and-conquer) scale logarithmically: $\\log_2(10^6) \\approx 20$, and $\\log_2(10^9) \\approx 30$.\n- **Amortized Analysis**: An individual operation may occasionally take $\\mathcal{O}(n)$ (e.g. dynamic array overallocation resize), but when averaged across $n$ operations, the amortized cost per operation is strictly $\\mathcal{O}(1)$.",
@@ -1712,16 +1712,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Compute the complement `target - num` at each iteration.",
-            "ar": "احسب المتمم `target - num` في كل دورة."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Check if `complement in seen` in O(1) time using a dictionary.",
-            "ar": "تحقق من وجود المتمم في القاموس `complement in seen` بزمن O(1)."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Record `seen[num] = i` so future elements can find this index.",
-            "ar": "سجل `seen[num] = i` لكي تتمكن العناصر اللاحقة من إيجاد هذا الفهرس."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1788,10 +1788,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "Imagine you are handed a thoroughly shuffled deck of 1,000 index cards, each bearing a transaction record, and asked to arrange them in...",
-      "ar": "ترتيب كومة من 1000 ورقة بمقارنة كل ورقة بجميع الأوراق الأخرى يتطلب ما يقارب مليون مقارنة ($O(n^2)$)! مبدأ فرّق تسُد (Divide and Conquer) هو..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "algorithmic-complexity-big-o"
+      "cs-13"
     ],
     "x": 445,
     "y": 1315,
@@ -1802,7 +1802,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "IteratorStateMachineCanvas",
         "narrative": {
           "en": "Imagine you are handed a thoroughly shuffled deck of 1,000 index cards, each bearing a transaction record, and asked to arrange them in strict numerical order. If you adopt the naive beginner strategy—comparing every card against every other card (the basis of Bubble Sort or Selection Sort)—you will perform roughly $\\frac{n(n-1)}{2} \\approx 500,000$ individual comparisons. For a production dataset of 1,000,000 records, naive comparison sorting explodes to half a trillion operations ($\\approx 5 \\times 10^{11}$), completely choking the CPU for hours!\n\n**Divide and Conquer** is the computer scientist's ultimate scaling lever: whenever an obstacle appears too gigantic to conquer directly, recursively shatter it into microscopic halves! Instead of grappling with 1,000 cards in a single monolithic struggle, we split the deck into two piles of 500, then four piles of 250, eight of 125, and so on, until we reach piles containing **exactly one single card**.\n\nWhy stop at single-card piles? Because a pile of one card is trivially, instantaneously sorted by definition! No comparisons or CPU cycles are required. This serves as our immutable **base case**. The genuine genius of Merge Sort unfolds in reverse: once the entire dataset has been atomized into single-element piles, we begin the **Merge phase**.\n\nPicture the teeth of a **jacket zipper meshing together in harmony**. You place two sorted piles side by side on the table. You never examine the hidden cards underneath; you only inspect the two exposed cards sitting at the very top of each pile. You pick the smaller card, slide it into the newly merged output array, and advance that pile's pointer forward. Because every single card is evaluated and placed in constant time, merging two sorted lists of total size $k$ takes strictly linear time $\\mathcal{O}(k)$. Multiplying this $\\mathcal{O}(n)$ linear merge across the $\\log_2 n$ levels of the recursion tree cuts total work down to the mathematically optimal $\\mathcal{O}(n \\log n)$!\n\nReal-world production data, however, is rarely purely randomized noise—it naturally contains pre-existing ascending or descending runs (such as chronologically logged event streams). Python's default sorting engine, **Timsort** (engineered by Tim Peters), exploits this reality. Timsort adaptively scans the list to identify existing sorted chunks, uses high-speed Insertion Sort on microscopic slices, and merges the resulting runs using an adaptive merge stack. Furthermore, Timsort is strictly **stable**: records possessing identical keys are mathematically guaranteed to retain their original relative order.",
-          "ar": "ترتيب كومة من 1000 ورقة بمقارنة كل ورقة بجميع الأوراق الأخرى يتطلب ما يقارب مليون مقارنة ($O(n^2)$)! مبدأ **فرّق تسُد (Divide and Conquer)** هو السلاح الأقوى في علوم الحاسوب: إن كانت المسألة شاقة وكبيرة، اقسمها إلى نصفين!\n\nترتيب كومة من ورقة واحدة أمر بديهي منجز تلقائياً! لذا نقسم القائمة إلى نصفين بالتكرار الذاتي حتى نصل لأكوام من ورقة واحدة، ثم ندمجها (Merge): نقارن فقط الورقتين الظاهرتين في قمة كل كومة، وندمجهما معاً كأسنَان سحاب السترة في زمن خطي $O(n)$! هذا يقلص التعقيد الإجمالي إلى $O(n \\log n)$. محرك الترتيب الفعلي في بايثون، **Timsort**، يدمج خوارزمية الدمج مع الإدراج ليستغل المقاطع المرتبة مسبقاً في البيانات الحقيقية بسرعة خارقة."
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -1810,8 +1810,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "T(n) = 2 T\\left(\\frac{n}{2}\\right) + \\mathcal{O}(n) \\implies T(n) = \\Theta(n \\log_2 n)",
         "formulaNote": {
-          "en": "Divide-and-conquer recurrence reaches the information-theoretic lower bound of comparison-based sorting Omega(n log n).",
-          "ar": "تحقق علاقة التكرار لمبدأ فرّق تسُد الحد الأدنى النظري لخوارزميات الترتيب القائمة على المقارنة Omega(n log n)."
+          "en": "Mathematical anchor for Sorting Algorithms & Divide-and-Conquer Recurrences.",
+          "ar": "المرساة الرياضية لـ خوارزميات الترتيب، فرّق تسُد (Divide and Conquer)، ومبرهنة التكرار."
         },
         "narrative": {
           "en": "$$\n\\text{Information-Theoretic Lower Bound}: \\quad h \\ge \\log_2(n!) \\ge n \\log_2 n - n \\log_2 e = \\Omega(n \\log n)\n$$\n\n```text\nDivide-and-Conquer Merge Sort Binary Tree Architecture:\n\nLevel 0 (Root):                [ 38, 27, 43, 3, 9, 82, 10 ]        ---> Cost: c*n\n                                       /              \\\nLevel 1:                       [ 38, 27, 43 ]     [ 3, 9, 82, 10 ] ---> Cost: c*n\n                                /         \\          /        \\\nLevel 2:                   [ 38 ]      [ 27, 43 ] [ 3, 9 ]  [ 82, 10 ]  Cost: c*n\n                             |           /    \\     /   \\     /    \\\nLevel 3 (Leaves: n piles): [ 38 ]     [ 27 ] [ 43 ][ 3 ] [ 9 ][ 82 ] [ 10 ]\n---------------------------------------------------------------------------------\nMerge Phases (Upward):           Combine sorted sublists like zipper teeth:\nLevel 2:                   [ 38 ]      [ 27, 43 ] [ 3, 9 ]  [ 10, 82 ]\nLevel 1:                       [ 27, 38, 43 ]     [ 3, 9, 10, 82 ]\nLevel 0 (Sorted Output):       [ 3, 9, 10, 27, 38, 43, 82 ]\nTotal Height = log2(n) levels  ===> Total Time Complexity: Theta(n * log2(n))\n```\n\n#### Architectural Breakdown & Mathematical Mapping:\n- **Recurrence Relation ($T(n) = 2T(n/2) + \\mathcal{O}(n)$)**: Halving the array into two subproblems of size $n/2$ takes $\\mathcal{O}(1)$ time. Solving them takes $2T(n/2)$. Merging the sorted halves requires linear scan $\\mathcal{O}(n)$. By the Master Theorem (Case 2), this strictly evaluates to $\\Theta(n \\log_2 n)$.\n- **Decision Tree Lower Bound ($\\Omega(n \\log n)$)**: Any comparison-based sorting algorithm can be modeled as a binary decision tree with $n!$ leaves (representing every possible permutation). The minimum tree height $h \\ge \\log_2(n!) \\approx n \\log_2 n - 1.44n = \\Omega(n \\log n)$. No comparison sort can ever run asymptotically faster than $\\mathcal{O}(n \\log n)$ in the worst case.\n- **Sorting Stability**: A sort is stable if for any two elements $A$ and $B$ where $\\text{key}(A) == \\text{key}(B)$ and $A$ appeared before $B$ in the input, $A$ strictly precedes $B$ in the output. This is vital for database pipelines (e.g. `df.sort_values(['dept', 'salary'])`).\n- **Memory Overhead of Merge Sort**: Standard recursive Merge Sort requires $\\mathcal{O}(n)$ auxiliary memory space to store the merged sublists during the upward pass.",
@@ -1849,16 +1849,16 @@ export const programmingModules: CurriculumModule[] = [
         },
         "hints": {
           "tier1": {
-            "en": "Base case: if `len(arr) <= 1`, return `arr[:]` immediately.",
-            "ar": "شرط التوقف: إذا كان طول المصفوفة 1 أو أقل أعد نسخة منها فوراً."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Split at `mid = len(arr) // 2` and recursively sort left and right halves.",
-            "ar": "اقسم عند المنتصف واستدعِ الفرز ذاتياً للنصفين الأيمن والأيسر."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Zip the two sorted halves together using two pointers in the `merge()` helper.",
-            "ar": "ادمج النصفين المرتبين معاً باستخدام مؤشرين في دالة `merge` المساعدة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -1925,10 +1925,10 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "In high-level Python development, memory feels transparent, lightweight, and boundless.",
-      "ar": "في بايثون، تبدو الذاكرة مجرد فضاء شفاف لا نهائي. لكن خلف الكواليس، الرقم الصحيح ليس مجرد 8 بايتات، بل هو كائن PyLongObject كامل يزن 28..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "sorting-divide-and-conquer"
+      "cs-14"
     ],
     "x": 460,
     "y": 1410,
@@ -1939,7 +1939,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "GeneratorSuspensionLab",
         "narrative": {
           "en": "In high-level Python development, memory feels transparent, lightweight, and boundless. You write `x = 42`, and it feels like a weightless integer. But under the hood of CPython, that integer is not a naked 8-byte CPU number: it is a heavyweight, fully boxed `PyLongObject` struct weighing a whopping **28 bytes**! Every single integer in Python requires an 8-byte reference count (`ob_refcnt`), an 8-byte pointer to its type descriptor (`ob_type`), an 8-byte size descriptor (`ob_size`), and a 4-byte digit payload. A standard Python list containing 1,000,000 integers does not consume 8 megabytes—it devours over **36 megabytes of physical RAM**!\n\nTo keep this massive object overhead from grinding operating system allocators (`malloc`) to a halt, CPython implements a specialized 3-tier memory engine called **`pymalloc`**. When Python requests memory for objects smaller than or equal to 512 bytes, it completely bypasses the OS kernel allocator:\n1. **Arenas (256 KB)**: Large contiguous memory chunks obtained directly from the operating system via `malloc` or `mmap`.\n2. **Pools (4 KB)**: Each Arena is divided into 64 Pools matching standard OS virtual memory page sizes. Each pool is strictly dedicated to a single fixed size class (e.g. 16-byte blocks, 32-byte blocks, 48-byte blocks).\n3. **Blocks**: The microscopic byte slots within a Pool where actual `PyObject` payloads are instantiated. When an object is freed, its block is returned to the pool's singly linked free-list in nanoseconds, eliminating heap fragmentation.\n\nWhile reference counting reclaims memory the very microsecond an object's reference counter hits zero, it possesses a fatal architectural blind spot: **reference cycles**. If object $A$ holds a reference to object $B$, and object $B$ points back to object $A$, their reference counts remain stuck at 1 forever—even if both variables are deleted from local scope (`del a, b`)! To recover from these silent memory leaks, CPython runs a cyclic **Generational Garbage Collector** (Gen 0, Gen 1, Gen 2). Operating under the empirical heuristic that *\"most objects die young\"*, young objects start in Gen 0. If they survive a GC collection pass, they are promoted to Gen 1 and eventually Gen 2, which are inspected with exponentially decreasing frequency.\n\nFinally, we arrive at the physical hardware boundary: **Cache Locality**. Modern CPU registers operate at gigahertz speeds, executing arithmetic in fractions of a nanosecond, whereas pulling data from main system DRAM takes an agonizing 80 to 100 nanoseconds—a staggering 100x speed penalty known as the Memory Wall! To mitigate this, CPUs pull contiguous 64-byte chunks called **Cache Lines** into ultra-fast L1, L2, and L3 on-die SRAM caches.\n\nBecause a Python `list` is merely a dynamic array of 64-bit pointers pointing to disjointed `PyObject` addresses scattered arbitrarily across the heap, looping through a Python list forces the CPU into **pointer chasing**. At every step, the CPU must dereference a new pointer, jumping across RAM and suffering catastrophic L1 cache misses that stall pipeline execution. In contrast, contiguous C-buffers like NumPy arrays pack raw 8-byte numbers sequentially into memory, allowing a single 64-byte cache line to load 8 numbers simultaneously, unleashing vectorized SIMD (Single Instruction, Multiple Data) processing speeds!",
-          "ar": "في بايثون، تبدو الذاكرة مجرد فضاء شفاف لا نهائي. لكن خلف الكواليس، الرقم الصحيح ليس مجرد 8 بايتات، بل هو كائن `PyLongObject` كامل يزن **28 بايتاً** على الأقل! لأنه يحمل عداد مراجع 8 بايت، ومؤشر نوع 8 بايت، وحجم خانات 8 بايت، ثم بيانات الرقم.\n\nتدير بايثون الذاكرة عبر 3 طبقات متخصصة: مخصص نظام التشغيل، ومخصص الكائنات الصغيرة `pymalloc` (المقسم إلى حلبات Arenas بحجم 256KB، وأحواض Pools بحجم 4KB، وكتل Blocks حتى 512 بايتاً)، وجامع القمامة الدوري (الأجيال 0، 1، 2). المعالجات الحديثة أسرع بـ 100 ضعف من ذاكرة RAM العادية؛ وعندما يقرأ المعالج البيانات، يسحب **خط كاش (Cache Line)** كاملاً بحجم 64 بايتاً إلى ذاكرة L1 الخاطفة. ولأن قوائم بايثون مصفوفات من المؤشرات لكائنات مبعثرة في الكومة، فإن ملاحقة تلك المؤشرات ('Pointer Chasing') تسبب إخفاقات كاش وتوقف المعالج عن العمل في انتظار الذاكرة!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -1947,8 +1947,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\text{Latency Hierarchy}: \\quad \\text{L1 Cache } (\\approx 1\\text{ ns}) \\ll \\text{L2 } (\\approx 4\\text{ ns}) \\ll \\text{L3 } (\\approx 10\\text{ ns}) \\ll \\text{Main DRAM } (\\approx 80\\text{ ns})",
         "formulaNote": {
-          "en": "CPython manages small objects through pymalloc arenas, pools, and blocks, while CPU cache line locality dictates real-world data throughput.",
-          "ar": "يدير CPython الكائنات الصغيرة عبر حلبات وأحواض وكتل pymalloc، بينما يحدد تمركز خطوط الكاش في المعالج سرعة تدفق البيانات الحقيقية."
+          "en": "Mathematical anchor for CPython Memory Architecture & Cache Locality.",
+          "ar": "المرساة الرياضية لـ معمارية ذاكرة CPython، تجميع القمامة، وتمركز الذاكرة المخبأة (Cache Locality)."
         },
         "narrative": {
           "en": "$$\n\\text{Memory Architecture}: \\quad \\text{OS Heap} \\xrightarrow{\\text{malloc/mmap}} \\text{Arena (256 KB)} \\xrightarrow{\\div 64} \\text{Pool (4 KB)} \\xrightarrow{\\text{size class}} \\text{Block } (\\le 512\\text{ B})\n$$\n\n```text\nCPython Memory Architecture & CPU Cache Line Saturation:\n\nCPython Pointer Array (Scattered Heap - Pointer Chasing):\nList Array:      [ *ptr0 | *ptr1 | *ptr2 | *ptr3 ] (Contiguous pointers)\n                     |       |       |       |\nHeap Objects:        v       |       v       |\n               [PyLong: 28B] |  [PyLong: 28B]|\n                (Loc: 0x1A0) v   (Loc: 0x8F0)v\n                        [PyLong: 28B]   [PyLong: 28B]\n                         (Loc: 0x4B0)    (Loc: 0x920)\n===> Result: CPU Cache Line (64B) pulls useless surrounding bytes; \n            dereferencing pointers causes repeated L1 Cache Misses!\n\nNumPy Contiguous Buffer (Direct Cache Line Saturation):\nMemory:        | 8-byte int0 | 8-byte int1 | 8-byte int2 | ... | 8-byte int7 |\n               +-------------------------------------------------------------+\n               <----------------- 64-Byte CPU Cache Line -------------------->\n===> Result: Zero pointer chasing! 8 full 64-bit numbers loaded per clock cycle.\n```\n\n#### Architectural Breakdown & Mathematical Mapping:\n- **PyObject Header Layout**: Every allocated object begins with a mandatory 16-byte prefix: 8 bytes for `ob_refcnt` (reference tracking) and 8 bytes for `ob_type` (pointer to type descriptor). Variable-length objects (`PyVarObject`, e.g. `list`, `str`, `int`) append an 8-byte `ob_size` descriptor.\n- **Pymalloc Fast Allocation**: Objects $\\le 512$ bytes are routed to `pymalloc`. Size classes increment by 8 bytes (16, 24, 32, ..., 512 bytes). Requests are fulfilled from pool free-lists with $\\mathcal{O}(1)$ pointer swaps.\n- **Generational GC Thresholds**: CPython tracks allocation versus deallocation counts. When allocations exceed deallocations by `threshold0` (default 700), a Gen 0 collection pass is triggered. Gen 1 and Gen 2 trigger after 10 collections of the preceding generation.\n- **Cache Line Utilization Efficiency**:\n  $$\\text{Cache Efficiency} = \\frac{\\text{Useful Payload Bytes}}{\\text{Loaded Cache Line (64 Bytes)}} \\times 100\\%$$\n  - NumPy `float64`: $\\frac{8 \\times 8}{64} = 100\\%$ payload saturation.\n  - Python `list[float]`: 8 bytes pointer + pointer chase to 24-byte float object $\\implies < 25\\%$ cache efficiency with multiple DRAM roundtrips.",
@@ -1960,7 +1960,7 @@ export const programmingModules: CurriculumModule[] = [
         "type": "code",
         "code": {
           "id": "py-memory-profiling-cpython",
-          "starterCode": "import gc\nfrom typing import Any\n\ndef detect_and_collect_cycles() -> dict[str, int]:\n    \"\"\"\n    Demonstrates CPython's cyclic garbage collection mechanics by constructing\n    an isolated reference cycle, unbinding local variables, and invoking gc.collect().\n\n    Returns:\n        dict containing:\n          - 'collected_objects': Number of unreachable cyclic objects collected by GC.\n          - 'is_cycle_detected': Binary flag indicating cycle collection succeeded.\n    \"\"\"\n    # Step 1: Temporarily disable automatic garbage collection to inspect deterministic manual collection\n    gc.disable()\n\n    # Step 2: Construct an isolated reference cycle between two container lists\n    node_a: list[Any] = []\n    node_b: list[Any] = []\n    node_a.append(node_b)\n    node_b.append(node_a)\n\n    # Step 3: Delete local stack references; refcount remains 1 for each due to the mutual cycle\n    del node_a\n    del node_b\n\n    # Step 4: Run full generational cyclic garbage collection pass to isolate and break the cycle\n    collected = gc.collect()\n\n    # Step 5: Re-enable automatic garbage collection and return diagnostic mapping\n    gc.enable()\n\n    return {\n        \"collected_objects\": collected,\n        \"is_cycle_detected\": 1 if collected >= 2 else 0,\n    }",
+          "starterCode": "def detect_and_collect_cycles() -> dict[str, int]:\n    \"\"\"\n    Demonstrates CPython's cyclic garbage collection mechanics by constructing\n    an isolated reference cycle, unbinding local variables, and invoking gc.collect().\n\n    Returns:\n        dict containing:\n          - 'collected_objects': Number of unreachable cyclic objects collected by GC.\n          - 'is_cycle_detected': Binary flag indicating cycle collection succeeded.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "detect_and_collect_cycles()['is_cycle_detected']",
@@ -1978,24 +1978,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "1",
           "variants": {
             "python": {
-              "starterCode": "import gc\nfrom typing import Any\n\ndef detect_and_collect_cycles() -> dict[str, int]:\n    \"\"\"\n    Demonstrates CPython's cyclic garbage collection mechanics by constructing\n    an isolated reference cycle, unbinding local variables, and invoking gc.collect().\n\n    Returns:\n        dict containing:\n          - 'collected_objects': Number of unreachable cyclic objects collected by GC.\n          - 'is_cycle_detected': Binary flag indicating cycle collection succeeded.\n    \"\"\"\n    # Step 1: Temporarily disable automatic garbage collection to inspect deterministic manual collection\n    gc.disable()\n\n    # Step 2: Construct an isolated reference cycle between two container lists\n    node_a: list[Any] = []\n    node_b: list[Any] = []\n    node_a.append(node_b)\n    node_b.append(node_a)\n\n    # Step 3: Delete local stack references; refcount remains 1 for each due to the mutual cycle\n    del node_a\n    del node_b\n\n    # Step 4: Run full generational cyclic garbage collection pass to isolate and break the cycle\n    collected = gc.collect()\n\n    # Step 5: Re-enable automatic garbage collection and return diagnostic mapping\n    gc.enable()\n\n    return {\n        \"collected_objects\": collected,\n        \"is_cycle_detected\": 1 if collected >= 2 else 0,\n    }",
+              "starterCode": "def detect_and_collect_cycles() -> dict[str, int]:\n    \"\"\"\n    Demonstrates CPython's cyclic garbage collection mechanics by constructing\n    an isolated reference cycle, unbinding local variables, and invoking gc.collect().\n\n    Returns:\n        dict containing:\n          - 'collected_objects': Number of unreachable cyclic objects collected by GC.\n          - 'is_cycle_detected': Binary flag indicating cycle collection succeeded.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "1"
             }
           },
-          "solution": "import gc\nfrom typing import Any\n\ndef detect_and_collect_cycles() -> dict[str, int]:\n    \"\"\"\n    Demonstrates CPython's cyclic garbage collection mechanics by constructing\n    an isolated reference cycle, unbinding local variables, and invoking gc.collect().\n\n    Returns:\n        dict containing:\n          - 'collected_objects': Number of unreachable cyclic objects collected by GC.\n          - 'unreachable_count': Confirms cyclic collection succeeded (> 0).\n    \"\"\"\n    # Disable automatic GC temporarily to inspect deterministic collection\n    gc.disable()\n\n    # Step 1: Create a reference cycle\n    node_a: list[Any] = []\n    node_b: list[Any] = []\n    node_a.append(node_b)\n    node_b.append(node_a)\n\n    # Step 2: Delete local references; reference count remains 1 due to the cycle\n    del node_a\n    del node_b\n\n    # Step 3: Run full cyclic garbage collection\n    collected = gc.collect()\n\n    # Re-enable automatic garbage collection\n    gc.enable()\n\n    return {\n        \"collected_objects\": collected,\n        \"is_cycle_detected\": 1 if collected >= 2 else 0,\n    }"
+          "solution": "import gc\nfrom typing import Any\n\ndef detect_and_collect_cycles() -> dict[str, int]:\n    \"\"\"\n    Demonstrates CPython's cyclic garbage collection mechanics by constructing\n    an isolated reference cycle, unbinding local variables, and invoking gc.collect().\n\n    Returns:\n        dict containing:\n          - 'collected_objects': Number of unreachable cyclic objects collected by GC.\n          - 'is_cycle_detected': Binary flag indicating cycle collection succeeded.\n    \"\"\"\n    # Step 1: Temporarily disable automatic garbage collection to inspect deterministic manual collection\n    gc.disable()\n\n    # Step 2: Construct an isolated reference cycle between two container lists\n    node_a: list[Any] = []\n    node_b: list[Any] = []\n    node_a.append(node_b)\n    node_b.append(node_a)\n\n    # Step 3: Delete local stack references; refcount remains 1 for each due to the mutual cycle\n    del node_a\n    del node_b\n\n    # Step 4: Run full generational cyclic garbage collection pass to isolate and break the cycle\n    collected = gc.collect()\n\n    # Step 5: Re-enable automatic garbage collection and return diagnostic mapping\n    gc.enable()\n\n    return {\n        \"collected_objects\": collected,\n        \"is_cycle_detected\": 1 if collected >= 2 else 0,\n    }"
         },
         "hints": {
           "tier1": {
-            "en": "Create circular lists `a.append(b)` and `b.append(a)`.",
-            "ar": "أنشئ قائمتين ترجع كل منهما للأخرى `a.append(b)` و `b.append(a)`."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Delete local names using `del node_a; del node_b` so only the internal cycle remains.",
-            "ar": "احذف الأسماء المحلية `del node_a; del node_b` ليبقى المرجع الدائري الداخلي فقط."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Call `gc.collect()` to trigger the generational cyclic garbage collector.",
-            "ar": "استدعِ `gc.collect()` لتشغيل جامع القمامة الدوري واستعادة الذاكرة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2062,11 +2062,11 @@ export const programmingModules: CurriculumModule[] = [
     "estimatedMinutes": 15,
     "description": {
       "en": "Why is pure Python code so notoriously slow for numerical computing and large-scale data engineering compared to NumPy, C, or Rust? If you...",
-      "ar": "لماذا تُعد لغة بايثون النقية شديدة البطء في الحسابات العددية وهندسة البيانات مقارنة بـ NumPy أو C؟ إذا كتبت حلقة for عادية لجمع قائمتين..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "memory-profiling-cpython",
-      "linear-algebra-vectors"
+      "cs-15",
+      "t1-03"
     ],
     "x": 455,
     "y": 1505,
@@ -2077,7 +2077,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "SimdVsLoopBenchmarkLab",
         "narrative": {
           "en": "Why is pure Python code so notoriously slow for numerical computing and large-scale data engineering compared to NumPy, C, or Rust? If you write a standard Python `for` loop to compute the element-wise sum of two arrays containing 10,000,000 numbers, the execution routinely requires 1,200 to 1,500 milliseconds. In NumPy, that identical addition finishes in less than 8 milliseconds—more than 150 times faster!\n\nIs CPython fundamentally lazy? Not at all. The bottleneck lies in the physical memory architecture and the high bureaucratic tax of dynamic object interpretation. In standard Python, a simple floating-point number is not a raw 64-bit value in memory; it is a full-blown `PyFloatObject` allocating 24 to 28 bytes on the heap, accompanied by reference counters, type pointers, and scattered memory addresses. When a Python loop runs, the CPU must traverse a labyrinth of heap pointers, experiencing constant cache misses and repeating dynamic type checks for every single arithmetic addition.\n\nBy packing raw numeric bytes into contiguous memory, NumPy allows the CPU hardware prefetcher to stream sequential 64-byte cache lines directly into L1/L2 caches at memory bus speeds, feeding vector execution units without a single wasted cycle.",
-          "ar": "لماذا تُعد لغة بايثون النقية شديدة البطء في الحسابات العددية وهندسة البيانات مقارنة بـ NumPy أو C؟ إذا كتبت حلقة `for` عادية لجمع قائمتين تحوي كل منهما 1,000,000 رقم، فستستغرق العملية حوالي 100 مللي ثانية. بينما تنجز مكتبة NumPy العملية نفسها في أقل من مللي ثانية واحدة—أي أسرع بأكثر من 100 ضعف!\n\n### تشبيه المطبخ: الطاهي البيروقراطي مقابل خط التجميع الآلي\nتخيل مطعماً مطلوباً منه تتبيل مليون طبق حساء:\n- **بايثون النقية (حلقة `for`)**: يقوم طاهٍ وحيد بإعداد كل طبق على حدة. عند كل طبق، يمشي إلى المستودع (تتبع المؤشرات في الذاكرة Pointer Dereferencing)، ويفحص ملصق العلبة ليتأكد أنها ملح وليست سكراً (فحص الأنواع الديناميكي Dynamic Type-Checking)، ويفتح الغطاء الكرتوني (إلغاء التغليف Unboxing)، ثم يضع ذرة ملح (حساب المعالج ALU)، ثم يغلف الناتج في صندوق كرتوني جديد (Boxing). تتكرر هذه المعاناة البيروقراطية مليون مرة!\n- **التوجيه في NumPy (معمارية SIMD)**: توضع أطباق الحساء المليون على شريط فولاذي ناقل متصل فيزيائياً دون انقطاع في الذاكرة (Contiguous Buffer). وتهبط ذراع آلية صناعية مزودة بـ 4 أو 8 أو 16 ملعقة متوازية (سجلات AVX SIMD - تعليمة واحدة لبيانات متعددة) لتتبيل الدفعة كاملة في نبضة ساعة واحدة للمعالج دون أي قفزات عشوائية في الذاكرة!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -2085,8 +2085,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "T_{\\text{CPython}} = N \\cdot \\left( \\tau_{\\text{dispatch}} + \\tau_{\\text{deref}} + \\tau_{\\text{typecheck}} + \\tau_{\\text{unbox}} + \\tau_{\\text{alu}} + \\tau_{\\text{box}} \\right) \\quad \\gg \\quad T_{\\text{SIMD}} = \\left\\lceil \\frac{N}{W_{\\text{SIMD}}} \\right\\rceil \\cdot \\tau_{\\text{vector\\_alu}} + \\tau_{\\text{load}}",
         "formulaNote": {
-          "en": "Execution latency breakdown comparing scalar bytecode interpretation against vectorized SIMD hardware execution.",
-          "ar": "مقارنة زمن التنفيذ بين حلقة مفسر بايثون التكرارية وتنفيذ عتاد SIMD الموجه."
+          "en": "Mathematical anchor for SIMD Architecture & Contiguous Buffer Vectorization.",
+          "ar": "المرساة الرياضية لـ معمارية SIMD وتوجيه المخازن الذاكرية المتصلة في NumPy."
         },
         "narrative": {
           "en": "### Mathematical Invariants & Symbol Breakdown\n\nIn CPython, calculating an element-wise sum requires executing the full administrative chain $(\\tau_{\\text{dispatch}} + \\tau_{\\text{deref}} + \\dots + \\tau_{\\text{box}})$ for each element independently, totaling over 100 CPU cycles per scalar. In contrast, SIMD vectorization loads an entire 256-bit or 512-bit register line containing $W_{\\text{SIMD}}$ numbers in contiguous memory, executes the arithmetic kernel in a single clock cycle, and streams the result directly into output buffers without intermediate object allocations.\n\n## Beat 3: Interactive Code Challenge",
@@ -2098,7 +2098,7 @@ export const programmingModules: CurriculumModule[] = [
         "type": "code",
         "code": {
           "id": "py-numpy-vectorization",
-          "starterCode": "import numpy as np\n\ndef vectorized_huber_loss(y_true: np.ndarray, y_pred: np.ndarray, delta: float = 1.0) -> float:\n    \"\"\"\n    Computes the mean Huber loss between true and predicted targets using\n    SIMD-vectorized NumPy operations without Python loops.\n\n    Formula:\n        loss = 0.5 * (y_true - y_pred)^2                  if |y_true - y_pred| <= delta\n        loss = delta * (|y_true - y_pred| - 0.5 * delta)  otherwise\n\n    Args:\n        y_true: 1D NumPy array of ground truth targets.\n        y_pred: 1D NumPy array of model predictions.\n        delta: Threshold separating quadratic and linear penalty regimes.\n\n    Returns:\n        Scalar float representing mean Huber loss across all samples.\n    \"\"\"\n    # Step 1: Ensure contiguous float64 NumPy arrays\n    # Step 2: Compute absolute residuals: errors = np.abs(y_true - y_pred)\n    # Step 3: Compute quadratic branch: 0.5 * (errors ** 2)\n    # Step 4: Compute linear branch: delta * (errors - 0.5 * delta)\n    # Step 5: Combine branches branchlessly via np.where, and return mean as float\n    raise NotImplementedError(\"Implement vectorized_huber_loss\")",
+          "starterCode": "def vectorized_huber_loss(y_true: np.ndarray, y_pred: np.ndarray, delta: float = 1.0) -> float:\n    \"\"\"\n    Computes the mean Huber loss between true and predicted targets using\n    SIMD-vectorized NumPy operations without Python loops.\n\n    Formula:\n        loss = 0.5 * (y_true - y_pred)^2                  if |y_true - y_pred| <= delta\n        loss = delta * (|y_true - y_pred| - 0.5 * delta)  otherwise\n\n    Args:\n        y_true: 1D NumPy array of ground truth targets.\n        y_pred: 1D NumPy array of model predictions.\n        delta: Threshold separating quadratic and linear penalty regimes.\n\n    Returns:\n        Scalar float representing mean Huber loss across all samples.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "round(vectorized_huber_loss(np.array([1.0, 2.0]), np.array([1.0, 2.0])), 2)",
@@ -2112,24 +2112,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "0.0",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef vectorized_huber_loss(y_true: np.ndarray, y_pred: np.ndarray, delta: float = 1.0) -> float:\n    \"\"\"\n    Computes the mean Huber loss between true and predicted targets using\n    SIMD-vectorized NumPy operations without Python loops.\n\n    Formula:\n        loss = 0.5 * (y_true - y_pred)^2                  if |y_true - y_pred| <= delta\n        loss = delta * (|y_true - y_pred| - 0.5 * delta)  otherwise\n\n    Args:\n        y_true: 1D NumPy array of ground truth targets.\n        y_pred: 1D NumPy array of model predictions.\n        delta: Threshold separating quadratic and linear penalty regimes.\n\n    Returns:\n        Scalar float representing mean Huber loss across all samples.\n    \"\"\"\n    # Step 1: Ensure contiguous float64 NumPy arrays\n    # Step 2: Compute absolute residuals: errors = np.abs(y_true - y_pred)\n    # Step 3: Compute quadratic branch: 0.5 * (errors ** 2)\n    # Step 4: Compute linear branch: delta * (errors - 0.5 * delta)\n    # Step 5: Combine branches branchlessly via np.where, and return mean as float\n    raise NotImplementedError(\"Implement vectorized_huber_loss\")",
+              "starterCode": "def vectorized_huber_loss(y_true: np.ndarray, y_pred: np.ndarray, delta: float = 1.0) -> float:\n    \"\"\"\n    Computes the mean Huber loss between true and predicted targets using\n    SIMD-vectorized NumPy operations without Python loops.\n\n    Formula:\n        loss = 0.5 * (y_true - y_pred)^2                  if |y_true - y_pred| <= delta\n        loss = delta * (|y_true - y_pred| - 0.5 * delta)  otherwise\n\n    Args:\n        y_true: 1D NumPy array of ground truth targets.\n        y_pred: 1D NumPy array of model predictions.\n        delta: Threshold separating quadratic and linear penalty regimes.\n\n    Returns:\n        Scalar float representing mean Huber loss across all samples.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "0.0"
             }
           },
-          "solution": "import numpy as np\n\ndef vectorized_huber_loss(y_true: np.ndarray, y_pred: np.ndarray, delta: float = 1.0) -> float:\n    # Ensure float64 C-contiguous memory layout\n    y_t = np.asarray(y_true, dtype=np.float64)\n    y_p = np.asarray(y_pred, dtype=np.float64)\n    \n    # Vectorized element-wise residual calculation\n    errors = np.abs(y_t - y_p)\n    \n    # Vectorized branchless condition mapping via SIMD instructions\n    quadratic = 0.5 * (errors ** 2)\n    linear = delta * (errors - 0.5 * delta)\n    losses = np.where(errors <= delta, quadratic, linear)\n    \n    return float(np.mean(losses))"
+          "solution": "import numpy as np\n\ndef vectorized_huber_loss(y_true: np.ndarray, y_pred: np.ndarray, delta: float = 1.0) -> float:\n    \"\"\"\n    Computes the mean Huber loss between true and predicted targets using\n    SIMD-vectorized NumPy operations without Python loops.\n\n    Formula:\n        loss = 0.5 * (y_true - y_pred)^2                  if |y_true - y_pred| <= delta\n        loss = delta * (|y_true - y_pred| - 0.5 * delta)  otherwise\n\n    Args:\n        y_true: 1D NumPy array of ground truth targets.\n        y_pred: 1D NumPy array of model predictions.\n        delta: Threshold separating quadratic and linear penalty regimes.\n\n    Returns:\n        Scalar float representing mean Huber loss across all samples.\n    \"\"\"\n    # Step 1: Ensure contiguous float64 NumPy arrays\n    # Step 2: Compute absolute residuals: errors = np.abs(y_true - y_pred)\n    # Step 3: Compute quadratic branch: 0.5 * (errors ** 2)\n    # Step 4: Compute linear branch: delta * (errors - 0.5 * delta)\n    # Step 5: Combine branches branchlessly via np.where, and return mean as float\n    raise NotImplementedError(\"Implement vectorized_huber_loss\")"
         },
         "hints": {
           "tier1": {
-            "en": "Use `np.abs(y_true - y_pred)` to calculate absolute error residuals without looping.",
-            "ar": "استخدم `np.abs(y_true - y_pred)` لحساب الفروق المطلقة دفعة واحدة دون حلقات تكرار."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Compute both `quadratic` and `linear` loss arrays using vectorized arithmetic, then select with `np.where(errors <= delta, quadratic, linear)`.",
-            "ar": "احسب مصفوفتي الخطأ التربيعي والخطي بعمليات موجهة، ثم ادمجهما بشرط `np.where(errors <= delta, quadratic, linear)`."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Calculate `float(np.mean(losses))` to return the final scalar loss.",
-            "ar": "احسب المتوسط عبر `float(np.mean(losses))` لإرجاع القيمة العددية النهائية."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2200,17 +2200,17 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "numpy-broadcasting-rules",
+    "id": "numpy-strides-zero-copy",
     "title": "Strided Memory Layout & Zero-Copy Slicing",
     "titleAr": "تخطيط الذاكرة ذو الخطوات (Strides) وتجزيء المصفوفات دون نسخ",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "Physical computer memory (RAM) is strictly one-dimensional: it is an unbroken, linear sequence of numbered byte addresses starting from...",
-      "ar": "ذاكرة الحاسوب الفيزيائية (RAM) أحادية البعد تماماً: إنها شريط مستقيم واحد من عناوين البايتات المرقمة بالتسلسل."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "numpy-vectorization"
+      "cs-16"
     ],
     "x": 485,
     "y": 1600,
@@ -2221,7 +2221,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "StrideMemoryGridLab",
         "narrative": {
           "en": "Physical computer memory (RAM) is strictly one-dimensional: it is an unbroken, linear sequence of numbered byte addresses starting from address 0 up to billions. There are no physical 2D grids, 3D cubes, or 4D tensors carved into silicon chips! Every multidimensional tensor ever conceived in data science, computer vision, or deep learning must ultimately be flattened into a single straight line of bytes in RAM.\n\nHow, then, does NumPy create a $(3 \\times 4)$ matrix containing 12 numbers and allow you to index it as `matrix[row, col]`? It stores all 12 numbers sequentially in a single contiguous 1D memory buffer. To make this flat buffer behave like a multidimensional table, NumPy attaches a lightweight 80-byte metadata structure called the **Array Header**. This header contains three critical descriptors:\n1. **Data Pointer**: The 64-bit integer memory address marking the first byte of the array in RAM.\n2. **Shape Tuple**: The logical multidimensional geometry, e.g., `(3, 4)`.\n3. **Strides Tuple**: The exact byte offset required to advance by one index step along each dimension!\n\nThis elegant architectural invariant is known as **Zero-Copy Slicing**. Whether an array holds 10 numbers or 10,000,000,000 numbers, creating a sliced view takes less than 1 microsecond and consumes $O(1)$ additional memory!",
-          "ar": "ذاكرة الحاسوب الفيزيائية (RAM) أحادية البعد تماماً: إنها شريط مستقيم واحد من عناوين البايتات المرقمة بالتسلسل. لا توجد شبكات ثنائية الأبعاد ولا مكعبات ثلاثية داخل رقاقات السيليكون!\n\nفكيف تنشئ مكتبة NumPy مصفوفة ثنائية الأبعاد بحجم `(3, 4)` تحوي 12 رقماً؟ تقوم برصف الأرقام الـ 12 في خط مستقيم واحد متصل في الذاكرة. ولكي تتصرف كمصفوفة، ترفق معها ترويسة بيانات وصفية خفيفة الوزن تحوي ثلاثة عناصر:\n1. **مؤشر الأساس (Base Pointer)**: عنوان أول بايت في الذاكرة.\n2. **الشكل (Shape)**: الأبعاد المنطقية، مثل `(3, 4)`.\n3. **الخطوات (Strides)**: عدد البايتات الدقيق الواجب قفزه للتقدم خطوة واحدة عبر كل بعد!\n\n### تشبيه الدرج: القفز فوق الدرجات\nتخيل أنك تصعد درجا مستقيماً طويلاً، حيث تمثل كل درجة رقماً مخزناً:\n- إذا تقدمت درجة واحدة للأمام، فإن مقدار خطوتك (Stride) هو درجة واحدة (8 بايت لرقم `float64`)، وهذا ينقلك إلى **العمود التالي**.\n- وللانتقال إلى **الصف التالي**، لن تبني سلماً جديداً! بل تقفز ساقك 4 درجات دفعة واحدة (32 بايت).\n- عندما تأخذ شريحة (Slice) أو نافذة متحركة، لا تقوم بايثون بنسخ أي بايت في الذاكرة؛ بل تكتفي بصنع بطاقة وصفية جديدة تحدد خطوات قفز مختلفة! هذا هو سر **التجزيء دون نسخ (Zero-Copy)**."
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -2229,8 +2229,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "s_{n-1} = w, \\quad s_k = s_{k+1} \\cdot d_{k+1} = w \\cdot \\prod_{j=k+1}^{n-1} d_j \\implies \\text{byte\\_offset}(\\mathbf{i}) = \\sum_{k=0}^{n-1} i_k \\cdot s_k",
         "formulaNote": {
-          "en": "C-contiguous stride recurrence formula and physical byte offset projection for coordinate tuple i.",
-          "ar": "صيغة تتابع الخطوات المتصلة وحساب إزاحة البايتات الفيزيائية لمتجه الإحداثيات."
+          "en": "Mathematical anchor for Strided Memory Layout & Zero-Copy Slicing.",
+          "ar": "المرساة الرياضية لـ تخطيط الذاكرة ذو الخطوات (Strides) وتجزيء المصفوفات دون نسخ."
         },
         "narrative": {
           "en": "### Mathematical Invariants & Symbol Breakdown\n\nIn a standard row-major (C-contiguous) layout, elements of the last dimension ($k = n-1$) are placed consecutively in memory. Slicing with a step parameter $p$ modifies the stride $s_k' = p \\cdot s_k$ and shape $d_k' = \\lceil d_k / p \\rceil$ without allocating a single byte of heap memory. Transposing an array simply reverses the stride tuple: $\\text{strides}(A^T) = (s_1, s_0)$ for $\\text{strides}(A) = (s_0, s_1)$.\n\n## Beat 3: Interactive Code Challenge",
@@ -2241,8 +2241,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-numpy-broadcasting-rules",
-          "starterCode": "import numpy as np\nfrom numpy.lib.stride_tricks import as_strided\n\ndef strided_rolling_window(arr: np.ndarray, window_size: int) -> np.ndarray:\n    \"\"\"\n    Creates a 2D rolling window view of a 1D array with zero memory copies\n    using NumPy memory stride manipulation.\n\n    Args:\n        arr: 1D NumPy array of length N.\n        window_size: Window length W (1 <= W <= N).\n\n    Returns:\n        2D NumPy array of shape (N - W + 1, W) sharing the underlying buffer.\n    \"\"\"\n    # Step 1: Validate that arr is 1D and window_size satisfies 1 <= window_size <= len(arr)\n    # Step 2: Ensure contiguous buffer layout: c_arr = np.ascontiguousarray(arr)\n    # Step 3: Extract single element byte stride: elem_stride = c_arr.strides[0]\n    # Step 4: Define new shape: (N - window_size + 1, window_size)\n    # Step 5: Define new strides: (elem_stride, elem_stride)\n    # Step 6: Construct and return zero-copy view via as_strided(c_arr, shape=..., strides=..., writeable=False)\n    raise NotImplementedError(\"Implement strided_rolling_window\")",
+          "id": "py-numpy-strides-zero-copy",
+          "starterCode": "def strided_rolling_window(arr: np.ndarray, window_size: int) -> np.ndarray:\n    \"\"\"\n    Creates a 2D rolling window view of a 1D array with zero memory copies\n    using NumPy memory stride manipulation.\n\n    Args:\n        arr: 1D NumPy array of length N.\n        window_size: Window length W (1 <= W <= N).\n\n    Returns:\n        2D NumPy array of shape (N - W + 1, W) sharing the underlying buffer.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "strided_rolling_window(np.array([10, 20, 30, 40, 50]), 3).shape",
@@ -2256,24 +2256,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "(3, 3)",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\nfrom numpy.lib.stride_tricks import as_strided\n\ndef strided_rolling_window(arr: np.ndarray, window_size: int) -> np.ndarray:\n    \"\"\"\n    Creates a 2D rolling window view of a 1D array with zero memory copies\n    using NumPy memory stride manipulation.\n\n    Args:\n        arr: 1D NumPy array of length N.\n        window_size: Window length W (1 <= W <= N).\n\n    Returns:\n        2D NumPy array of shape (N - W + 1, W) sharing the underlying buffer.\n    \"\"\"\n    # Step 1: Validate that arr is 1D and window_size satisfies 1 <= window_size <= len(arr)\n    # Step 2: Ensure contiguous buffer layout: c_arr = np.ascontiguousarray(arr)\n    # Step 3: Extract single element byte stride: elem_stride = c_arr.strides[0]\n    # Step 4: Define new shape: (N - window_size + 1, window_size)\n    # Step 5: Define new strides: (elem_stride, elem_stride)\n    # Step 6: Construct and return zero-copy view via as_strided(c_arr, shape=..., strides=..., writeable=False)\n    raise NotImplementedError(\"Implement strided_rolling_window\")",
+              "starterCode": "def strided_rolling_window(arr: np.ndarray, window_size: int) -> np.ndarray:\n    \"\"\"\n    Creates a 2D rolling window view of a 1D array with zero memory copies\n    using NumPy memory stride manipulation.\n\n    Args:\n        arr: 1D NumPy array of length N.\n        window_size: Window length W (1 <= W <= N).\n\n    Returns:\n        2D NumPy array of shape (N - W + 1, W) sharing the underlying buffer.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "(3, 3)"
             }
           },
-          "solution": "import numpy as np\nfrom numpy.lib.stride_tricks import as_strided\n\ndef strided_rolling_window(arr: np.ndarray, window_size: int) -> np.ndarray:\n    if arr.ndim != 1:\n        raise ValueError(\"Input array must be 1-dimensional\")\n    n = arr.shape[0]\n    if window_size < 1 or window_size > n:\n        raise ValueError(\"window_size must satisfy 1 <= window_size <= len(arr)\")\n\n    # Ensure contiguous memory layout before inspecting byte strides\n    c_arr = np.ascontiguousarray(arr)\n    elem_stride = c_arr.strides[0]\n\n    num_windows = n - window_size + 1\n    new_shape = (num_windows, window_size)\n    new_strides = (elem_stride, elem_stride)\n\n    # Construct zero-copy strided view\n    return as_strided(c_arr, shape=new_shape, strides=new_strides, writeable=False)"
+          "solution": "import numpy as np\nfrom numpy.lib.stride_tricks import as_strided\n\ndef strided_rolling_window(arr: np.ndarray, window_size: int) -> np.ndarray:\n    \"\"\"\n    Creates a 2D rolling window view of a 1D array with zero memory copies\n    using NumPy memory stride manipulation.\n\n    Args:\n        arr: 1D NumPy array of length N.\n        window_size: Window length W (1 <= W <= N).\n\n    Returns:\n        2D NumPy array of shape (N - W + 1, W) sharing the underlying buffer.\n    \"\"\"\n    # Step 1: Validate that arr is 1D and window_size satisfies 1 <= window_size <= len(arr)\n    # Step 2: Ensure contiguous buffer layout: c_arr = np.ascontiguousarray(arr)\n    # Step 3: Extract single element byte stride: elem_stride = c_arr.strides[0]\n    # Step 4: Define new shape: (N - window_size + 1, window_size)\n    # Step 5: Define new strides: (elem_stride, elem_stride)\n    # Step 6: Construct and return zero-copy view via as_strided(c_arr, shape=..., strides=..., writeable=False)\n    raise NotImplementedError(\"Implement strided_rolling_window\")"
         },
         "hints": {
           "tier1": {
-            "en": "Use `arr.shape[0] - window_size + 1` to compute the number of output rolling window rows.",
-            "ar": "احسب عدد صفوف النوافذ المتحركة باستخدام `arr.shape[0] - window_size + 1`."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "For consecutive rolling windows, advancing 1 row shifts by 1 element, so row stride equals column stride: `(elem_stride, elem_stride)`.",
-            "ar": "لإنشاء نوافذ متداخلة، فإن التقدم صفاً يعني التقدم عنصراً واحداً، لذا خطوة الصف تساوي خطوة العمود: `(elem_stride, elem_stride)`."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Pass `writeable=False` to `as_strided` to prevent dangerous memory aliasing writes on overlapping buffers.",
-            "ar": "مرر `writeable=False` إلى `as_strided` لمنع التعديلات العشوائية الخطرة على المخازن المتداخلة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2344,17 +2344,17 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "numpy-strides-indexing",
+    "id": "numpy-broadcasting-rules",
     "title": "Multi-Dimensional Array Broadcasting Rules",
     "titleAr": "قواعد البث متعدد الأبعاد (Broadcasting Rules) في NumPy",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "In strict classical linear algebra, adding a single scalar number $5$ to a $(1,000 \\times 1,000)$ matrix is mathematically undefined.",
-      "ar": "في الجبر الخطي الصارم، لا يمكن جمع قيمة عددية فردية (Scalar) مع مصفوفة بأبعاد $(1000 \\times 1000)$ لأن جمع المصفوفات لا يُعرّف إلا بين..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "numpy-vectorization"
+      "cs-16"
     ],
     "x": 455,
     "y": 1695,
@@ -2365,7 +2365,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "BroadcastingAlignmentGrid",
         "narrative": {
           "en": "In strict classical linear algebra, adding a single scalar number $5$ to a $(1,000 \\times 1,000)$ matrix is mathematically undefined. Matrix addition is defined exclusively between matrices sharing identical dimensions $(M \\times N) + (M \\times N)$. If the shapes do not match, the operation is invalid.\n\nYet in modern data science and deep learning, you write expressions like `matrix + 5` or `images - channel_means` dozens of times every day. How does NumPy execute these mismatched arithmetic operations without allocating gigabytes of RAM to duplicate the smaller tensor millions of times?",
-          "ar": "في الجبر الخطي الصارم، لا يمكن جمع قيمة عددية فردية (Scalar) مع مصفوفة بأبعاد $(1000 \\times 1000)$ لأن جمع المصفوفات لا يُعرّف إلا بين مصفوفات متطابقة الأبعاد تماماً.\n\nلكنك في علم البيانات تكتب `matrix + 5` كل يوم! فكيف تجري NumPy هذه العملية دون حجز 8 ميجابايت من الذاكرة لتكرار ونسخ الرقم 5 مليون مرة؟\n\n### تشبيه البروجكتور: الأبعاد ذات الخطوة الصفرية\nتخيل جهاز عرض ضوئي (بروجكتور) في قاعة سينما:\n- لعرض صورة على شاشة أمام 1000 متفرج، لن تطبع 1000 صورة ورقية وتلصقها على كل مقعد!\n- بل تسلط شريحة ضوئية **واحدة** ليراها الجميع في وقت واحد.\n- في NumPy، يُنفذ هذا سحرياً عبر ضبط **خطوة الذاكرة (Stride) لذلك البعد على 0 بايت**!\nفعندما ينتقل المعالج من صف إلى صف، تكون قفزة الذاكرة صفر بايت، فيقرأ نفس الرقم 5 مراراً وتكراراً بأقصى سرعة ممكنة وبـ **صفر استهلاك للذاكرة**!\n\n### قاعدتا البث الذهبيتان\nتقارن NumPy أبعاد المصفوفتين بدءاً من **البعد الأخير (في أقصى اليمين)** نحو اليسار:\n1. البعدان متوافقان إذا كانا **متساويين**، أو\n2. أحدهما يساوي **1** (أو مفقوداً فيُعوّض بالرقم 1 في اليسار).\nإذا كان البعد 1، تتمدد أبعاده افتراضياً عبر ضبط خطوته على 0 بايت!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -2373,8 +2373,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\forall k \\in \\{0, \\dots, D-1\\}: \\quad (a_k = b_k) \\;\\lor\\; (a_k = 1) \\;\\lor\\; (b_k = 1) \\implies d_{\\text{out}, k} = \\max(a_k, b_k), \\quad s_{\\text{bc}, k} = \\begin{cases} 0 & \\text{if } d_k = 1 < d_{\\text{out}, k} \\\\ s_k & \\text{otherwise} \\end{cases}",
         "formulaNote": {
-          "en": "Broadcasting compatibility condition, resulting dimension projection, and zero-stride assignment.",
-          "ar": "شرط توافق البث، أبعاد المصفوفة الناتجة، وتعيين الخطوة الصفرية للأبعاد المفردة."
+          "en": "Mathematical anchor for Multi-Dimensional Array Broadcasting Rules.",
+          "ar": "المرساة الرياضية لـ قواعد البث متعدد الأبعاد (Broadcasting Rules) في NumPy."
         },
         "narrative": {
           "en": "### Mathematical Invariants & Symbol Breakdown\n\nBroadcasting guarantees that if an operand has dimension extent $1$, its effective memory stride is clamped to $s_{\\text{bc}, k} = 0$. However, while broadcasting eliminates input memory duplication, the output array must allocate physical storage proportional to $\\prod_{k=0}^{D-1} d_{\\text{out}, k}$.\n\n## Beat 3: Interactive Code Challenge",
@@ -2385,8 +2385,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-numpy-strides-indexing",
-          "starterCode": "import numpy as np\n\ndef pairwise_squared_distance(X: np.ndarray, Y: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Computes the (N x M) pairwise squared Euclidean distance matrix between\n    two sets of feature vectors using NumPy broadcasting without Python loops.\n\n    Formula:\n        dist[i, j] = ||X[i] - Y[j]||^2 = sum_{d=0}^{D-1} (X[i, d] - Y[j, d])^2\n\n    Args:\n        X: (N, D) array of feature vectors.\n        Y: (M, D) array of feature vectors.\n\n    Returns:\n        (N, M) matrix of pairwise squared Euclidean distances.\n    \"\"\"\n    # Step 1: Validate that X and Y are 2D and feature dimensions agree: X.shape[1] == Y.shape[1]\n    # Step 2: Reshape X to (N, 1, D) and Y to (1, M, D) using np.newaxis\n    # Step 3: Broadcast subtract and square: diff = (X[:, np.newaxis, :] - Y[np.newaxis, :, :]) ** 2\n    # Step 4: Sum squared differences along the feature axis (axis=2) to return (N, M) array\n    raise NotImplementedError(\"Implement pairwise_squared_distance\")",
+          "id": "py-numpy-broadcasting-rules",
+          "starterCode": "def pairwise_squared_distance(X: np.ndarray, Y: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Computes the (N x M) pairwise squared Euclidean distance matrix between\n    two sets of feature vectors using NumPy broadcasting without Python loops.\n\n    Formula:\n        dist[i, j] = ||X[i] - Y[j]||^2 = sum_{d=0}^{D-1} (X[i, d] - Y[j, d])^2\n\n    Args:\n        X: (N, D) array of feature vectors.\n        Y: (M, D) array of feature vectors.\n\n    Returns:\n        (N, M) matrix of pairwise squared Euclidean distances.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "pairwise_squared_distance(np.array([[0.0, 0.0]]), np.array([[3.0, 4.0]])).tolist()",
@@ -2400,24 +2400,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "[[25.0]]",
           "variants": {
             "python": {
-              "starterCode": "import numpy as np\n\ndef pairwise_squared_distance(X: np.ndarray, Y: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Computes the (N x M) pairwise squared Euclidean distance matrix between\n    two sets of feature vectors using NumPy broadcasting without Python loops.\n\n    Formula:\n        dist[i, j] = ||X[i] - Y[j]||^2 = sum_{d=0}^{D-1} (X[i, d] - Y[j, d])^2\n\n    Args:\n        X: (N, D) array of feature vectors.\n        Y: (M, D) array of feature vectors.\n\n    Returns:\n        (N, M) matrix of pairwise squared Euclidean distances.\n    \"\"\"\n    # Step 1: Validate that X and Y are 2D and feature dimensions agree: X.shape[1] == Y.shape[1]\n    # Step 2: Reshape X to (N, 1, D) and Y to (1, M, D) using np.newaxis\n    # Step 3: Broadcast subtract and square: diff = (X[:, np.newaxis, :] - Y[np.newaxis, :, :]) ** 2\n    # Step 4: Sum squared differences along the feature axis (axis=2) to return (N, M) array\n    raise NotImplementedError(\"Implement pairwise_squared_distance\")",
+              "starterCode": "def pairwise_squared_distance(X: np.ndarray, Y: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Computes the (N x M) pairwise squared Euclidean distance matrix between\n    two sets of feature vectors using NumPy broadcasting without Python loops.\n\n    Formula:\n        dist[i, j] = ||X[i] - Y[j]||^2 = sum_{d=0}^{D-1} (X[i, d] - Y[j, d])^2\n\n    Args:\n        X: (N, D) array of feature vectors.\n        Y: (M, D) array of feature vectors.\n\n    Returns:\n        (N, M) matrix of pairwise squared Euclidean distances.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "[[25.0]]"
             }
           },
-          "solution": "import numpy as np\n\ndef pairwise_squared_distance(X: np.ndarray, Y: np.ndarray) -> np.ndarray:\n    X_arr = np.asarray(X, dtype=np.float64)\n    Y_arr = np.asarray(Y, dtype=np.float64)\n\n    if X_arr.ndim != 2 or Y_arr.ndim != 2:\n        raise ValueError(\"Inputs must be 2D matrices\")\n    if X_arr.shape[1] != Y_arr.shape[1]:\n        raise ValueError(f\"Feature dimension mismatch: {X_arr.shape[1]} vs {Y_arr.shape[1]}\")\n\n    # Broadcast X of shape (N, 1, D) against Y of shape (1, M, D)\n    diff = X_arr[:, np.newaxis, :] - Y_arr[np.newaxis, :, :]\n    \n    # Sum along feature axis D\n    return np.sum(diff ** 2, axis=2)"
+          "solution": "import numpy as np\n\ndef pairwise_squared_distance(X: np.ndarray, Y: np.ndarray) -> np.ndarray:\n    \"\"\"\n    Computes the (N x M) pairwise squared Euclidean distance matrix between\n    two sets of feature vectors using NumPy broadcasting without Python loops.\n\n    Formula:\n        dist[i, j] = ||X[i] - Y[j]||^2 = sum_{d=0}^{D-1} (X[i, d] - Y[j, d])^2\n\n    Args:\n        X: (N, D) array of feature vectors.\n        Y: (M, D) array of feature vectors.\n\n    Returns:\n        (N, M) matrix of pairwise squared Euclidean distances.\n    \"\"\"\n    # Step 1: Validate that X and Y are 2D and feature dimensions agree: X.shape[1] == Y.shape[1]\n    # Step 2: Reshape X to (N, 1, D) and Y to (1, M, D) using np.newaxis\n    # Step 3: Broadcast subtract and square: diff = (X[:, np.newaxis, :] - Y[np.newaxis, :, :]) ** 2\n    # Step 4: Sum squared differences along the feature axis (axis=2) to return (N, M) array\n    raise NotImplementedError(\"Implement pairwise_squared_distance\")"
         },
         "hints": {
           "tier1": {
-            "en": "Insert singleton dimensions via `X[:, np.newaxis, :]` (shape N, 1, D) and `Y[np.newaxis, :, :]` (shape 1, M, D).",
-            "ar": "أضف أبعاداً أحادية عبر `X[:, np.newaxis, :]` لتصبح بأبعاد (N, 1, D) و `Y[np.newaxis, :, :]` لتصبح (1, M, D)."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Subtracting these two arrays broadcasts them into shape (N, M, D) without allocating duplicate arrays in Python.",
-            "ar": "طرح هاتين المصفوفتين يقوم ببثهما إلى شكل (N, M, D) تلقائياً دون نسخ الذاكرة في بايثون."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Compute `np.sum(diff ** 2, axis=2)` to reduce across the feature dimension and obtain the (N, M) matrix.",
-            "ar": "احسب `np.sum(diff ** 2, axis=2)` لاختزال بعد الخصائص والحصول على مصفوفة المسافات (N, M)."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2488,17 +2488,17 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "pandas-dataframe",
+    "id": "pandas-loc-iloc-indexing",
     "title": "DataFrame Mental Model: Indexing via `loc` vs `iloc`",
     "titleAr": "النموذج الذهني لإطارات البيانات: الفهرسة عبر loc مقابل iloc",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "A Pandas DataFrame is frequently taught to beginners as a \"spreadsheet inside Python\".",
-      "ar": "غالبًا ما يُشرح إطار بيانات Pandas (DataFrame) للمبتدئين بأنه \"جدول إكسل داخل بايثون\"."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "numpy-strides-indexing"
+      "cs-17"
     ],
     "x": 485,
     "y": 1790,
@@ -2509,7 +2509,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "DataFrameBlockManagerLab",
         "narrative": {
           "en": "A Pandas DataFrame is frequently taught to beginners as a \"spreadsheet inside Python\". While friendly, this superficial metaphor is a trap that causes endless performance regressions and subtle production bugs!\n\nWhat actually is a DataFrame under the hood?\nA DataFrame is not a 2D matrix of numbers, nor is it an Excel grid. Internally, a DataFrame is an orchestration of two distinct subsystems:\n1. **The BlockManager**: A collection of 1D and 2D homogeneous NumPy arrays grouped by physical data type (e.g., all 64-bit float columns stored together in one block, all int64 columns in another, and object/string pointers in a third).\n2. **Two Hash-Indexed Labels**: Two robust hash tables mapping human-readable labels to physical integer coordinates:\n   - **Row Index ($\\mathcal{I}_{\\text{row}}$)**: Maps row labels (e.g. `\"AAPL\"`, `\"2024-01-01\"`, `104`) to 0-based integer row offsets.\n   - **Column Index ($\\mathcal{I}_{\\text{col}}$)**: Maps column strings (e.g. `\"revenue\"`, `\"close_price\"`) to column buffer indices.",
-          "ar": "غالبًا ما يُشرح إطار بيانات Pandas (DataFrame) للمبتدئين بأنه \"جدول إكسل داخل بايثون\". هذا التشبيه السطحي يقود إلى أخطاء برمجية لا حصر لها!\n\nفما هو إطار البيانات في الحقيقة تحت الغطاء؟\nإطار البيانات هو مجموعة من مصفوفات NumPy أحادية البعد (الأعمدة) يديرها جدولان تجزئة (Hash Maps):\n1. **فهرس الصفوف (Row Index)**: خريطة تربط التسميات (مثل `\"AAPL\"` أو `\"2024-01-01\"`) بالمواقع الرقمية للصفوف.\n2. **فهرس الأعمدة (Column Index)**: خريطة تربط أسماء الأعمدة بمخازن الأعمدة الداخلية.\n\n### تشبيه قاعة المؤتمر: بطاقات الأسماء مقابل أرقام المقاعد\nتخيل أنك ترشد الضيوف في مأدبة مؤتمر دولي:\n- **الفهرسة بالتسمية (`loc`)**: تبحث عن الضيف بواسطة **بطاقة اسمه** المكتوبة (مثل *\"طاولة د. سارة\"*). لا يهم أي كرسي فيزيائي تجلس عليه، فأنت تتعامل مع هويتها الاسمية.\n- **الفهرسة بالموقع الرقمي (`iloc`)**: تشير مباشرة إلى **رقم المقعد** (مثل *\"المقعد رقم 3 في الصف 0\"*). لا تكترث لمن يجلس هناك، بل تتعامل مع الإحداثي الفيزيائي المجرد.\n\n### المحاذاة التلقائية للفهارس (Index Alignment)\nعندما تطرح سلسلتين: `الأرباح - التكاليف`، لا تطرح Pandas العنصر الأول من الأول عشوائياً كالمصفوفات! بل تستخدم بطاقات الأسماء لمطابقة كل شركة بتكاليفها تلقائياً. وإذا وُجدت شركة في الأرباح وغابت عن التكاليف، تضع Pandas القيمة المفقودة `NaN` لحماية سلامة البيانات العلائقية!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -2517,8 +2517,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathcal{D} = \\langle \\mathcal{I}_{\\text{row}}, \\mathcal{I}_{\\text{col}}, \\mathbf{T}, \\mathbf{M} \\rangle, \\quad \\text{loc}(r, c) = \\mathbf{M}[\\mathcal{I}_{\\text{row}}(r), \\mathcal{I}_{\\text{col}}(c)], \\quad \\text{iloc}(i, j) = \\mathbf{M}[i, j]",
         "formulaNote": {
-          "en": "Formal algebraic tuple definition of DataFrame index mapping and coordinate dereferencing.",
-          "ar": "التعريف الجبري لإطار البيانات عبر دالتي تعيين الفهارس واستخراج القيم."
+          "en": "Mathematical anchor for DataFrame Mental Model: Indexing via `loc` vs `iloc`.",
+          "ar": "المرساة الرياضية لـ النموذج الذهني لإطارات البيانات: الفهرسة عبر loc مقابل iloc."
         },
         "narrative": {
           "en": "### Mathematical Invariants & Symbol Breakdown\n\nWhen an arithmetic operation $\\mathcal{S}_A \\oplus \\mathcal{S}_B$ is evaluated, Pandas constructs the outer union of the label sets: $\\mathcal{L}_{\\text{out}} = \\text{dom}(\\mathcal{S}_A) \\cup \\text{dom}(\\mathcal{S}_B)$. For any label $\\ell$ present in only one operand, the missing value is imputed with $\\bot_{\\text{NaN}}$, ensuring that mathematical alignment is governed by identity rather than accidental positional ordering.\n\n## Beat 3: Interactive Code Challenge",
@@ -2529,8 +2529,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-pandas-dataframe",
-          "starterCode": "def align_and_compute_spread(\n    series_a: dict[str, float], \n    series_b: dict[str, float], \n    fill_value: float = 0.0\n) -> dict[str, float]:\n    \"\"\"\n    Emulates Pandas index alignment by computing the spread (a - b)\n    across the union of label indices, handling missing keys via imputation.\n\n    Args:\n        series_a: Mapping of index label to float value.\n        series_b: Mapping of index label to float value.\n        fill_value: Imputation value when a label is missing in either series.\n\n    Returns:\n        Dictionary mapping each unique label to (val_a - val_b) rounded to 6 decimal places,\n        sorted alphabetically by key.\n    \"\"\"\n    # Step 1: Collect sorted union of all keys across series_a and series_b\n    # Step 2: For each key, extract val_a (with fill_value fallback) and val_b (with fill_value fallback)\n    # Step 3: Compute diff = round(val_a - val_b, 6)\n    # Step 4: Return dictionary mapping key -> diff\n    raise NotImplementedError(\"Implement align_and_compute_spread\")",
+          "id": "py-pandas-loc-iloc-indexing",
+          "starterCode": "def align_and_compute_spread(\n    series_a: dict[str, float], \n    series_b: dict[str, float], \n    fill_value: float = 0.0\n) -> dict[str, float]:\n    \"\"\"\n    Emulates Pandas index alignment by computing the spread (a - b)\n    across the union of label indices, handling missing keys via imputation.\n\n    Args:\n        series_a: Mapping of index label to float value.\n        series_b: Mapping of index label to float value.\n        fill_value: Imputation value when a label is missing in either series.\n\n    Returns:\n        Dictionary mapping each unique label to (val_a - val_b) rounded to 6 decimal places,\n        sorted alphabetically by key.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "align_and_compute_spread({'AAPL': 150.0, 'MSFT': 300.0}, {'AAPL': 140.0, 'GOOG': 2800.0})['AAPL']",
@@ -2544,24 +2544,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "10.0",
           "variants": {
             "python": {
-              "starterCode": "def align_and_compute_spread(\n    series_a: dict[str, float], \n    series_b: dict[str, float], \n    fill_value: float = 0.0\n) -> dict[str, float]:\n    \"\"\"\n    Emulates Pandas index alignment by computing the spread (a - b)\n    across the union of label indices, handling missing keys via imputation.\n\n    Args:\n        series_a: Mapping of index label to float value.\n        series_b: Mapping of index label to float value.\n        fill_value: Imputation value when a label is missing in either series.\n\n    Returns:\n        Dictionary mapping each unique label to (val_a - val_b) rounded to 6 decimal places,\n        sorted alphabetically by key.\n    \"\"\"\n    # Step 1: Collect sorted union of all keys across series_a and series_b\n    # Step 2: For each key, extract val_a (with fill_value fallback) and val_b (with fill_value fallback)\n    # Step 3: Compute diff = round(val_a - val_b, 6)\n    # Step 4: Return dictionary mapping key -> diff\n    raise NotImplementedError(\"Implement align_and_compute_spread\")",
+              "starterCode": "def align_and_compute_spread(\n    series_a: dict[str, float], \n    series_b: dict[str, float], \n    fill_value: float = 0.0\n) -> dict[str, float]:\n    \"\"\"\n    Emulates Pandas index alignment by computing the spread (a - b)\n    across the union of label indices, handling missing keys via imputation.\n\n    Args:\n        series_a: Mapping of index label to float value.\n        series_b: Mapping of index label to float value.\n        fill_value: Imputation value when a label is missing in either series.\n\n    Returns:\n        Dictionary mapping each unique label to (val_a - val_b) rounded to 6 decimal places,\n        sorted alphabetically by key.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "10.0"
             }
           },
-          "solution": "def align_and_compute_spread(\n    series_a: dict[str, float], \n    series_b: dict[str, float], \n    fill_value: float = 0.0\n) -> dict[str, float]:\n    # Union of all label indices\n    all_keys = sorted(set(series_a.keys()) | set(series_b.keys()))\n    \n    result: dict[str, float] = {}\n    for key in all_keys:\n        val_a = series_a.get(key, fill_value)\n        val_b = series_b.get(key, fill_value)\n        result[key] = round(val_a - val_b, 6)\n        \n    return result"
+          "solution": "def align_and_compute_spread(\n    series_a: dict[str, float], \n    series_b: dict[str, float], \n    fill_value: float = 0.0\n) -> dict[str, float]:\n    \"\"\"\n    Emulates Pandas index alignment by computing the spread (a - b)\n    across the union of label indices, handling missing keys via imputation.\n\n    Args:\n        series_a: Mapping of index label to float value.\n        series_b: Mapping of index label to float value.\n        fill_value: Imputation value when a label is missing in either series.\n\n    Returns:\n        Dictionary mapping each unique label to (val_a - val_b) rounded to 6 decimal places,\n        sorted alphabetically by key.\n    \"\"\"\n    # Step 1: Collect sorted union of all keys across series_a and series_b\n    # Step 2: For each key, extract val_a (with fill_value fallback) and val_b (with fill_value fallback)\n    # Step 3: Compute diff = round(val_a - val_b, 6)\n    # Step 4: Return dictionary mapping key -> diff\n    raise NotImplementedError(\"Implement align_and_compute_spread\")"
         },
         "hints": {
           "tier1": {
-            "en": "Use `set(series_a.keys()) | set(series_b.keys())` to construct the full union index.",
-            "ar": "استخدم `set(series_a.keys()) | set(series_b.keys())` لإنشاء اتحاد المفاتيح كاملاً."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Use `dict.get(key, fill_value)` to gracefully impute missing keys.",
-            "ar": "استخدم `dict.get(key, fill_value)` لتعويض المفاتيح المفقودة بسلاسة."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Ensure all differences are rounded via `round(val_a - val_b, 6)` and returned in a sorted dictionary.",
-            "ar": "تأكد من تقريب الفروق بـ `round(val_a - val_b, 6)` وإرجاع قاموس مرتب أبجدياً."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2632,17 +2632,17 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "pandas-split-apply-combine",
+    "id": "tidy-data-normalization",
     "title": "Tidy Data Architecture & Normalization Geometry",
     "titleAr": "معمارية البيانات المرتبة (Tidy Data) وهندسة تسوية الجداول",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "Why does slicing a dataset in Pandas behave fundamentally differently between positional indexing (iloc) and label indexing (loc)? If you...",
-      "ar": "لماذا تختلف قواعد الاقتطاع (Slicing) في Pandas جذرياً بين iloc و loc؟ إذا اقتطعت بـ iloc[0:3]، فستحصل على 3 صفوف: الصف 0 و 1 و 2، حيث..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "pandas-dataframe"
+      "cs-19"
     ],
     "x": 455,
     "y": 1885,
@@ -2653,7 +2653,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "LocIlocCaliperLab",
         "narrative": {
           "en": "Why does slicing a dataset in Pandas behave fundamentally differently between positional indexing (`iloc`) and label indexing (`loc`)?\nIf you slice an array using positional coordinates `df.iloc[0:3]`, you receive exactly 3 rows: row 0, row 1, and row 2. The endpoint 3 is strictly **excluded** (the mathematical half-open interval $[0, 3)$).\nHowever, if you slice using index labels `df.loc['a':'c']`, you receive **all three labels**: 'a', 'b', and 'c'. The endpoint 'c' is strictly **included** (the mathematical closed interval $[a, c]$)!\n\nWhy did the architects of Pandas introduce this glaring asymmetry? Was it an accidental blunder or a deliberate, principled engineering decision?\n\nRecognizing that `iloc` functions as a half-open geometric ruler $[i, j)$ while `loc` operates as an inclusive lexical dictionary $[\\ell_1, \\ell_2]$ eliminates over 90% of off-by-one errors and data leakage in production pipelines!",
-          "ar": "لماذا تختلف قواعد الاقتطاع (Slicing) في Pandas جذرياً بين `iloc` و `loc`؟\nإذا اقتطعت بـ `iloc[0:3]`، فستحصل على 3 صفوف: الصف 0 و 1 و 2، حيث يُستثنى الحد الأخير (مجال نصف مفتوح $[0, 3)$).\nأما إذا اقتطعت بـ `loc['a':'c']`، فستحصل على الصفوف الثلاثة: 'a' و 'b' و 'c' معاً، متضمنة الحد الأخير بالكامل (مجال مغلق $[a, c]$)!\n\nلماذا صممت Pandas هذا الاختلاف؟ هل هو عيب في التصميم؟\n\n### تشبيه المسطرة مقابل المعجم الموسوعي\n- **`iloc` (المسطرة الفيزيائية)**: عندما تقيس مسافة بمسطرة من السنتيمتر 1 إلى 4، فإنك تحسب الفرق: $4 - 1 = 3$ وحدات، وتتوقف عند حافة علامة 4. هذا يتبع معايير علوم الحاسوب التقليدية (المجالات نصف المفتوحة).\n- **`loc` (المعجم الموسوعي)**: تخيل أنك تبحث في موسوعة ورقية من المجلد **\"ب\"** إلى المجلد **\"د\"**. إذا حذف الناشر مجلد حرف \"د\" بحجة أنه الحد الأخير، فستغضب بالتأكيد! عندما يبحث البشر بالتسميات والعناوين، فإنهم يتوقعون **تضمين الحد الأخير بالكامل**.\n\nإدراك أن `iloc` مسطرة نصف مفتوحة $[i, j)$ بينما `loc` معجم مغلق $[\\ell_1, \\ell_2]$ يحميك من 90% من أخطاء الإزاحة (Off-by-one) في معالجة البيانات!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -2661,8 +2661,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\text{iloc}[i:j) = \\{ k \\in \\mathbb{N} \\mid i \\le k < j \\}, \\quad \\text{loc}[\\ell_1:\\ell_2] = \\{ \\ell \\in \\mathcal{I} \\mid \\text{pos}(\\ell_1) \\le \\text{pos}(\\ell) \\le \\text{pos}(\\ell_2) \\}",
         "formulaNote": {
-          "en": "Set-theoretic definition of half-open positional slice vs. closed label interval slice.",
-          "ar": "التعريف الرياضي لشريحة المواقع نصف المفتوحة وشريحة التسميات المغلقة في نظرية المجموعات."
+          "en": "Mathematical anchor for Tidy Data Architecture & Normalization Geometry.",
+          "ar": "المرساة الرياضية لـ معمارية البيانات المرتبة (Tidy Data) وهندسة تسوية الجداول."
         },
         "narrative": {
           "en": "### Mathematical Invariants & Symbol Breakdown\n\nThe fundamental cardinality invariant states that positional slicing satisfies $|\\text{iloc}[i:j)| = j - i$, matching linear memory displacements, whereas label slicing satisfies $|\\text{loc}[\\ell_1:\\ell_2]| = \\text{pos}(\\ell_2) - \\text{pos}(\\ell_1) + 1$. In time-series applications, label slicing over a sorted `DateTimeIndex` includes the entire terminal timestamp interval.\n\n## Beat 3: Interactive Code Challenge",
@@ -2673,8 +2673,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-pandas-split-apply-combine",
-          "starterCode": "def slice_tabular_index(\n    index: list[str], \n    start_token: str | int, \n    stop_token: str | int, \n    mode: str\n) -> list[str]:\n    \"\"\"\n    Implements loc (closed label-based) vs iloc (half-open integer-based) slicing semantics.\n\n    Args:\n        index: List of unique string row labels.\n        start_token: String label for loc mode; integer index for iloc mode.\n        stop_token: String label for loc mode; integer index for iloc mode.\n        mode: Either \"loc\" or \"iloc\".\n\n    Returns:\n        Sub-list of labels matching the indexing semantics.\n    \"\"\"\n    # Step 1: If mode == \"iloc\":\n    #         - Validate start_token and stop_token are ints\n    #         - Return standard half-open Python list slice: index[start_token:stop_token]\n    # Step 2: If mode == \"loc\":\n    #         - Validate start_token and stop_token are strings present in index\n    #         - Find start_idx and stop_idx via index.index(...)\n    #         - Return inclusive slice: index[start_idx : stop_idx + 1]\n    # Step 3: Raise TypeError/KeyError/ValueError on invalid mode or missing tokens\n    raise NotImplementedError(\"Implement slice_tabular_index\")",
+          "id": "py-tidy-data-normalization",
+          "starterCode": "def slice_tabular_index(\n    index: list[str], \n    start_token: str | int, \n    stop_token: str | int, \n    mode: str\n) -> list[str]:\n    \"\"\"\n    Implements loc (closed label-based) vs iloc (half-open integer-based) slicing semantics.\n\n    Args:\n        index: List of unique string row labels.\n        start_token: String label for loc mode; integer index for iloc mode.\n        stop_token: String label for loc mode; integer index for iloc mode.\n        mode: Either \"loc\" or \"iloc\".\n\n    Returns:\n        Sub-list of labels matching the indexing semantics.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "slice_tabular_index(['a', 'b', 'c', 'd', 'e'], 1, 3, 'iloc')",
@@ -2688,24 +2688,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "['b', 'c']",
           "variants": {
             "python": {
-              "starterCode": "def slice_tabular_index(\n    index: list[str], \n    start_token: str | int, \n    stop_token: str | int, \n    mode: str\n) -> list[str]:\n    \"\"\"\n    Implements loc (closed label-based) vs iloc (half-open integer-based) slicing semantics.\n\n    Args:\n        index: List of unique string row labels.\n        start_token: String label for loc mode; integer index for iloc mode.\n        stop_token: String label for loc mode; integer index for iloc mode.\n        mode: Either \"loc\" or \"iloc\".\n\n    Returns:\n        Sub-list of labels matching the indexing semantics.\n    \"\"\"\n    # Step 1: If mode == \"iloc\":\n    #         - Validate start_token and stop_token are ints\n    #         - Return standard half-open Python list slice: index[start_token:stop_token]\n    # Step 2: If mode == \"loc\":\n    #         - Validate start_token and stop_token are strings present in index\n    #         - Find start_idx and stop_idx via index.index(...)\n    #         - Return inclusive slice: index[start_idx : stop_idx + 1]\n    # Step 3: Raise TypeError/KeyError/ValueError on invalid mode or missing tokens\n    raise NotImplementedError(\"Implement slice_tabular_index\")",
+              "starterCode": "def slice_tabular_index(\n    index: list[str], \n    start_token: str | int, \n    stop_token: str | int, \n    mode: str\n) -> list[str]:\n    \"\"\"\n    Implements loc (closed label-based) vs iloc (half-open integer-based) slicing semantics.\n\n    Args:\n        index: List of unique string row labels.\n        start_token: String label for loc mode; integer index for iloc mode.\n        stop_token: String label for loc mode; integer index for iloc mode.\n        mode: Either \"loc\" or \"iloc\".\n\n    Returns:\n        Sub-list of labels matching the indexing semantics.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "['b', 'c']"
             }
           },
-          "solution": "def slice_tabular_index(\n    index: list[str], \n    start_token: str | int, \n    stop_token: str | int, \n    mode: str\n) -> list[str]:\n    if mode == \"iloc\":\n        if not isinstance(start_token, int) or not isinstance(stop_token, int):\n            raise TypeError(\"iloc requires integer start and stop tokens\")\n        return index[start_token:stop_token]\n\n    elif mode == \"loc\":\n        if not isinstance(start_token, str) or not isinstance(stop_token, str):\n            raise TypeError(\"loc requires string label start and stop tokens\")\n        if start_token not in index:\n            raise KeyError(f\"Label not found in index: {start_token}\")\n        if stop_token not in index:\n            raise KeyError(f\"Label not found in index: {stop_token}\")\n\n        start_idx = index.index(start_token)\n        stop_idx = index.index(stop_token)\n\n        if stop_idx < start_idx:\n            return []\n\n        # loc is CLOSED: slice includes stop_idx\n        return index[start_idx : stop_idx + 1]\n\n    else:\n        raise ValueError(\"Mode must be 'loc' or 'iloc'\")"
+          "solution": "def slice_tabular_index(\n    index: list[str], \n    start_token: str | int, \n    stop_token: str | int, \n    mode: str\n) -> list[str]:\n    \"\"\"\n    Implements loc (closed label-based) vs iloc (half-open integer-based) slicing semantics.\n\n    Args:\n        index: List of unique string row labels.\n        start_token: String label for loc mode; integer index for iloc mode.\n        stop_token: String label for loc mode; integer index for iloc mode.\n        mode: Either \"loc\" or \"iloc\".\n\n    Returns:\n        Sub-list of labels matching the indexing semantics.\n    \"\"\"\n    # Step 1: If mode == \"iloc\":\n    #         - Validate start_token and stop_token are ints\n    #         - Return standard half-open Python list slice: index[start_token:stop_token]\n    # Step 2: If mode == \"loc\":\n    #         - Validate start_token and stop_token are strings present in index\n    #         - Find start_idx and stop_idx via index.index(...)\n    #         - Return inclusive slice: index[start_idx : stop_idx + 1]\n    # Step 3: Raise TypeError/KeyError/ValueError on invalid mode or missing tokens\n    raise NotImplementedError(\"Implement slice_tabular_index\")"
         },
         "hints": {
           "tier1": {
-            "en": "In 'iloc' mode, return `index[start_token:stop_token]` directly.",
-            "ar": "في وضع 'iloc'، أرجع الشريحة `index[start_token:stop_token]` مباشرة."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "In 'loc' mode, find indices via `index.index(...)` and add 1 to the end index: `index[start_idx : stop_idx + 1]`.",
-            "ar": "في وضع 'loc'، استخرج الترتيب بـ `index.index(...)` وأضف 1 إلى النهاية: `index[start_idx : stop_idx + 1]`."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Validate types and membership to raise appropriate `TypeError` and `KeyError` exceptions.",
-            "ar": "تحقق من صحة الأنواع ووجود المفاتيح لإطلاق استثناءات `TypeError` و `KeyError` المناسبة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2776,17 +2776,17 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "eda-anscombe",
+    "id": "groupby-split-apply-combine",
     "title": "The GroupBy Split-Apply-Combine Engine",
     "titleAr": "محرك التجميع والتقسيم (Split-Apply-Combine) وتنسيق Tidy Data",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "Why do empirical data scientists, machine learning engineers, and analysts routinely report spending 80% of their time cleaning and...",
-      "ar": "لماذا يقضي علماء البيانات 80% من وقتهم في تنظيف البيانات وتعديل هياكل الجداول؟ لأن البشر ومحركات التحليل البرمجية يفضلون هياكل متعارضة..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "pandas-split-apply-combine"
+      "cs-21"
     ],
     "x": 485,
     "y": 1980,
@@ -2797,7 +2797,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "TidyDataMorphLab",
         "narrative": {
           "en": "Why do empirical data scientists, machine learning engineers, and analysts routinely report spending 80% of their time cleaning and reshaping tabular data?\nBecause human beings and automated analytical algorithms prefer tables formatted in fundamentally opposite orientations!\n\nHuman readers prefer **Wide Tables**: a store manager constructs a spreadsheet where rows are products and columns are months: `Product`, `Jan_Sales`, `Feb_Sales`, `Mar_Sales`. It fits cleanly on a monitor screen, requiring no vertical scrolling. But for statistical algorithms, relational databases, and machine learning models, wide tables are an unmitigated disaster: critical analytical variables—the months of the year—are trapped inside the metadata of the column headers! You cannot write a simple `groupby('month')`, you cannot pass the data to a time-series model, and you cannot plot a clean line chart across time.\n\nJust as Francis Anscombe famously demonstrated that identical summary statistics can hide wildly different underlying data structures, inspecting wide tables without reshaping them obscures the true geometric relationships in your data. Once melted into tidy format, grouping, aggregating, and machine learning inference can be executed in a single vectorized pass!",
-          "ar": "لماذا يقضي علماء البيانات 80% من وقتهم في تنظيف البيانات وتعديل هياكل الجداول؟\nلأن البشر ومحركات التحليل البرمجية يفضلون هياكل متعارضة تماماً!\n\nيفضل البشر **الجداول العريضة (Wide Tables)**: يكتب مدير المتجر جدولاً بأعمدة: `المنتج`، `مبيعات_يناير`، `مبيعات_فبراير`، `مبيعات_مارس`. هذا مريح لعين القارئ، ولكنه كارثي لأن أسماء المتغيرات (الشهور) محبوسة في عناوين الأعمدة! يستحيل تشغيل `groupby('month')` أو رسم منحنى زمني مباشر.\n\n### تشبيه الكرسي القابل للطي: فرد الجداول إلى شكل مرتب (Tidy Data)\n- الجدول العريض يشبه كرسياً محمولاً مطوياً—سهل الحمل للبشر، لكن يستحيل الجلوس عليه!\n- **الفرد وتفكيك الأعمدة (Melting / Unpivoting)** يفرد الكرسي ليصبح جدولاً مرتباً ومنظماً (Tidy Data):\n  1. كل متغير يشكل عموداً مستقلاً واحداً: `[المنتج، الشهر، الإيراد]`.\n  2. كل ملاحظة فردية تشكل صفاً واحداً.\n  3. كل وحدة قياس تشكل جدولاً مستقلاً.\nبمجرد فرد البيانات، تعمل جميع خوارزميات التجميع والانحدار والذكاء الاصطناعي بسلاسة فائقة!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -2805,8 +2805,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathcal{R}_{\\text{wide}} \\subseteq \\mathcal{I}_1 \\times \\dots \\times \\mathcal{I}_K \\times \\mathcal{Y}_1 \\times \\dots \\times \\mathcal{Y}_T \\implies \\mathcal{R}_{\\text{tidy}} = \\bigcup_{r \\in \\mathcal{R}_{\\text{wide}}} \\bigcup_{t=1}^T \\big\\{ \\big( r[\\mathcal{I}_1], \\dots, r[\\mathcal{I}_K], \\text{name}(\\mathcal{Y}_t), r[\\mathcal{Y}_t] \\big) \\big\\}",
         "formulaNote": {
-          "en": "Relational unpivoting bijection from Cartesian product of measurement attributes into tidy 3NF relation.",
-          "ar": "التحويل العلائقي ثنائي الاتجاه من الجداول العريضة إلى العلاقة الترتيبية المنظمة."
+          "en": "Mathematical anchor for The GroupBy Split-Apply-Combine Engine.",
+          "ar": "المرساة الرياضية لـ محرك التجميع والتقسيم (Split-Apply-Combine) وتنسيق Tidy Data."
         },
         "narrative": {
           "en": "### Mathematical Invariants & Symbol Breakdown\n\nThe foundational structural invariant dictates that unpivoting preserves total information entropy while shifting dimensionality: wide schemas with high attribute degree $M = K + T$ collapse into thin schemas with minimal degree $K + 2$, while row volume expands by a factor of $T$. This allows downstream relational engines to execute index-backed aggregations across the normalized variable column.\n\n## Beat 3: Interactive Code Challenge",
@@ -2817,8 +2817,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-eda-anscombe",
-          "starterCode": "from typing import Any\n\ndef melt_wide_to_tidy(\n    records: list[dict[str, Any]], \n    id_vars: list[str], \n    value_vars: list[str], \n    var_name: str = \"variable\", \n    value_name: str = \"value\"\n) -> list[dict[str, Any]]:\n    \"\"\"\n    Unpivots a wide table into tidy format where columns become rows.\n\n    Args:\n        records: List of dictionaries representing wide rows.\n        id_vars: Column names to retain as identifier variables.\n        value_vars: Column names to unpivot into variable/value pairs.\n        var_name: Name of the target variable column (default 'variable').\n        value_name: Name of the target value column (default 'value').\n\n    Returns:\n        List of tidy records where each row represents a single atomic observation.\n    \"\"\"\n    # Step 1: Initialize empty list for tidy output records\n    # Step 2: Iterate over each wide row record in records\n    # Step 3: Extract base identifier dictionary: {k: row[k] for k in id_vars if k in row}\n    # Step 4: For each column v_col in value_vars present in row, append a new dictionary\n    #         combining base identifiers with {var_name: v_col, value_name: row[v_col]}\n    # Step 5: Return the accumulated tidy list\n    raise NotImplementedError(\"Implement melt_wide_to_tidy\")",
+          "id": "py-groupby-split-apply-combine",
+          "starterCode": "def melt_wide_to_tidy(\n    records: list[dict[str, Any]], \n    id_vars: list[str], \n    value_vars: list[str], \n    var_name: str = \"variable\", \n    value_name: str = \"value\"\n) -> list[dict[str, Any]]:\n    \"\"\"\n    Unpivots a wide table into tidy format where columns become rows.\n\n    Args:\n        records: List of dictionaries representing wide rows.\n        id_vars: Column names to retain as identifier variables.\n        value_vars: Column names to unpivot into variable/value pairs.\n        var_name: Name of the target variable column (default 'variable').\n        value_name: Name of the target value column (default 'value').\n\n    Returns:\n        List of tidy records where each row represents a single atomic observation.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "len(melt_wide_to_tidy([{'id': 1, 'Q1': 10, 'Q2': 20}], ['id'], ['Q1', 'Q2']))",
@@ -2832,24 +2832,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "2",
           "variants": {
             "python": {
-              "starterCode": "from typing import Any\n\ndef melt_wide_to_tidy(\n    records: list[dict[str, Any]], \n    id_vars: list[str], \n    value_vars: list[str], \n    var_name: str = \"variable\", \n    value_name: str = \"value\"\n) -> list[dict[str, Any]]:\n    \"\"\"\n    Unpivots a wide table into tidy format where columns become rows.\n\n    Args:\n        records: List of dictionaries representing wide rows.\n        id_vars: Column names to retain as identifier variables.\n        value_vars: Column names to unpivot into variable/value pairs.\n        var_name: Name of the target variable column (default 'variable').\n        value_name: Name of the target value column (default 'value').\n\n    Returns:\n        List of tidy records where each row represents a single atomic observation.\n    \"\"\"\n    # Step 1: Initialize empty list for tidy output records\n    # Step 2: Iterate over each wide row record in records\n    # Step 3: Extract base identifier dictionary: {k: row[k] for k in id_vars if k in row}\n    # Step 4: For each column v_col in value_vars present in row, append a new dictionary\n    #         combining base identifiers with {var_name: v_col, value_name: row[v_col]}\n    # Step 5: Return the accumulated tidy list\n    raise NotImplementedError(\"Implement melt_wide_to_tidy\")",
+              "starterCode": "def melt_wide_to_tidy(\n    records: list[dict[str, Any]], \n    id_vars: list[str], \n    value_vars: list[str], \n    var_name: str = \"variable\", \n    value_name: str = \"value\"\n) -> list[dict[str, Any]]:\n    \"\"\"\n    Unpivots a wide table into tidy format where columns become rows.\n\n    Args:\n        records: List of dictionaries representing wide rows.\n        id_vars: Column names to retain as identifier variables.\n        value_vars: Column names to unpivot into variable/value pairs.\n        var_name: Name of the target variable column (default 'variable').\n        value_name: Name of the target value column (default 'value').\n\n    Returns:\n        List of tidy records where each row represents a single atomic observation.\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "2"
             }
           },
-          "solution": "from typing import Any\n\ndef melt_wide_to_tidy(\n    records: list[dict[str, Any]], \n    id_vars: list[str], \n    value_vars: list[str], \n    var_name: str = \"variable\", \n    value_name: str = \"value\"\n) -> list[dict[str, Any]]:\n    tidy_output: list[dict[str, Any]] = []\n\n    for row in records:\n        base_id_record = {k: row[k] for k in id_vars if k in row}\n\n        for v_col in value_vars:\n            if v_col in row:\n                new_row = {\n                    **base_id_record,\n                    var_name: v_col,\n                    value_name: row[v_col]\n                }\n                tidy_output.append(new_row)\n\n    return tidy_output"
+          "solution": "from typing import Any\n\ndef melt_wide_to_tidy(\n    records: list[dict[str, Any]], \n    id_vars: list[str], \n    value_vars: list[str], \n    var_name: str = \"variable\", \n    value_name: str = \"value\"\n) -> list[dict[str, Any]]:\n    \"\"\"\n    Unpivots a wide table into tidy format where columns become rows.\n\n    Args:\n        records: List of dictionaries representing wide rows.\n        id_vars: Column names to retain as identifier variables.\n        value_vars: Column names to unpivot into variable/value pairs.\n        var_name: Name of the target variable column (default 'variable').\n        value_name: Name of the target value column (default 'value').\n\n    Returns:\n        List of tidy records where each row represents a single atomic observation.\n    \"\"\"\n    # Step 1: Initialize empty list for tidy output records\n    # Step 2: Iterate over each wide row record in records\n    # Step 3: Extract base identifier dictionary: {k: row[k] for k in id_vars if k in row}\n    # Step 4: For each column v_col in value_vars present in row, append a new dictionary\n    #         combining base identifiers with {var_name: v_col, value_name: row[v_col]}\n    # Step 5: Return the accumulated tidy list\n    raise NotImplementedError(\"Implement melt_wide_to_tidy\")"
         },
         "hints": {
           "tier1": {
-            "en": "Extract the common id keys first using a dictionary comprehension.",
-            "ar": "استخرج مفاتيح الهوية المشتركة أولاً عبر قاموس مختصر."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Loop through `value_vars` and create a dictionary with `{**base_id, var_name: v_col, value_name: row[v_col]}`.",
-            "ar": "كرر عبر `value_vars` وأنشئ قاموساً يدمج الهوية مع اسم المتغير وقيمته."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Ensure you only access keys that exist in `row` to avoid KeyError on sparse datasets.",
-            "ar": "تأكد من فحص وجود المفتاح في الصف لتفادي أخطاء المفاتيح المفقودة."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -2920,17 +2920,17 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "relational-algebra-select-filter",
+    "id": "pydantic-data-contracts",
     "title": "Data Contracts & Runtime Validation with Pydantic",
     "titleAr": "خوارزمية التجميع والتقسيم والدمج (Split-Apply-Combine) وتطبيع البيانات",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "How do large-scale analytics platforms and statistical machine learning pipelines calculate group-specific metrics without writing bespoke,...",
-      "ar": "كيف تحسب محركات البيانات الإحصائية مقاييس المجموعات المعقدة دون كتابة كود مخصص لكل فئة؟ تعتمد جميعها على المعمارية القياسية التقسيم..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "pandas-dataframe"
+      "cs-19"
     ],
     "x": 480,
     "y": 2075,
@@ -2941,7 +2941,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "GroupBySplitApplyCombineLab",
         "narrative": {
           "en": "How do large-scale analytics platforms and statistical machine learning pipelines calculate group-specific metrics without writing bespoke, fragile loops for every cohort?\nThey rely on the universal data engineering pattern known as **Split-Apply-Combine**, formalized by statistician Hadley Wickham.\n\nWhen performing cohort feature engineering—such as calculating employee salary Z-scores ($z = \\frac{x - \\mu_k}{\\sigma_k}$)—you must never compare an executive's compensation directly against an entry-level intern. You **Split** by departmental title, **Apply** local mean and standard deviation scaling, and **Combine** the normalized features back into a unified model-ready dataset!",
-          "ar": "كيف تحسب محركات البيانات الإحصائية مقاييس المجموعات المعقدة دون كتابة كود مخصص لكل فئة؟\nتعتمد جميعها على المعمارية القياسية **التقسيم والتطبيق والدمج (Split-Apply-Combine)**.\n\n### تشبيه فرز الغسيل\nتخيل أن أمامك كومة ضخمة من الملابس المختلطة:\n1. **التقسيم (Split)**: تفرز الملابس في سلال مستقلة: بيضاء، داكنة، وصوفية. أي أنك تقسم جدول البيانات الضخم إلى مجموعات جزئية مستقلة.\n2. **التطبيق (Apply)**: تطبق برنامج غسيل مخصص لكل سلة على حدة: ماء ساخن للأبيض، وماء بارد ودوران خفيف للصوف. رياضياً، تطبق دالة إحصائية أو تجميعية على كل مجموعة بمفردها.\n3. **الدمج (Combine)**: تجمع الملابس النظيفة والمجففة معاً في خزانة واحدة مرتبة.\n\nعند حساب التقييس المعياري Z-Score ($z = \\frac{x - \\mu_k}{\\sigma_k}$)، لا تقارن راتب مهندس خبير براتب متدرب؛ بل **تقسم** حسب المسمى الوظيفي، و**تطبق** حساب المتوسط والانحراف لكل فئة، ثم **تدمج** القيم المعيارية في الجدول الأصلي!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -2949,8 +2949,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathcal{D} = \\bigsqcup_{k \\in \\mathcal{K}} \\mathcal{D}_k, \\quad \\mu_k = \\frac{1}{|\\mathcal{D}_k|} \\sum_{x \\in \\mathcal{D}_k} x, \\quad \\sigma_k = \\sqrt{\\frac{1}{|\\mathcal{D}_k| - 1} \\sum_{x \\in \\mathcal{D}_k} (x - \\mu_k)^2} \\implies z_i = \\frac{x_i - \\mu_k}{\\sigma_k}",
         "formulaNote": {
-          "en": "Disjoint partition decomposition and group-wise Z-score standardized transformation.",
-          "ar": "تفكيك المجموعات المنفصلة وحساب التحويل المعياري Z-Score لكل فئة."
+          "en": "Mathematical anchor for Data Contracts & Runtime Validation with Pydantic.",
+          "ar": "المرساة الرياضية لـ خوارزمية التجميع والتقسيم والدمج (Split-Apply-Combine) وتطبيع البيانات."
         },
         "narrative": {
           "en": "### Mathematical Invariants & Symbol Breakdown\n\nThe partition invariant guarantees that the original relation is decomposed into mutually exclusive and collectively exhaustive subsets: $\\bigcup_{k \\in \\mathcal{K}} \\mathcal{D}_k = \\mathcal{D}$ and $\\mathcal{D}_i \\cap \\mathcal{D}_j = \\emptyset$ for $i \\ne j$. When applying local transformations, if a cohort has $|\\mathcal{D}_k| < 2$ or zero variance ($\\sigma_k = 0$), the transformation defaults to the invariant sentinel $z_i \\triangleq 0.0$ to prevent numerical division-by-zero exceptions.\n\n## Beat 3: Interactive Code Challenge",
@@ -2961,8 +2961,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-relational-algebra-select-filter",
-          "starterCode": "from typing import Any\nfrom collections import defaultdict\nimport math\n\ndef groupby_zscore_normalize(\n    records: list[dict[str, Any]], \n    group_key: str, \n    target_key: str\n) -> list[dict[str, Any]]:\n    \"\"\"\n    Computes group-wise Z-score normalization using Split-Apply-Combine.\n\n    Args:\n        records: List of record dictionaries.\n        group_key: Column name used to split data into cohorts.\n        target_key: Numeric column to standardize.\n\n    Returns:\n        List of new dictionaries with f\"{target_key}_zscore\" attached (rounded to 4 decimals).\n    \"\"\"\n    # Step 1: Split - Group target values by group_key using defaultdict(list)\n    # Step 2: Apply - Compute mean and sample std (N-1) for each group; if len < 2, std = 0.0\n    # Step 3: Combine - Iterate over original records, compute z = (val - mean) / std if std > 0 else 0.0,\n    #         and attach f\"{target_key}_zscore\" rounded to 4 decimals\n    raise NotImplementedError(\"Implement groupby_zscore_normalize\")",
+          "id": "py-pydantic-data-contracts",
+          "starterCode": "def groupby_zscore_normalize(\n    records: list[dict[str, Any]], \n    group_key: str, \n    target_key: str\n) -> list[dict[str, Any]]:\n    \"\"\"\n    Computes group-wise Z-score normalization using Split-Apply-Combine.\n\n    Args:\n        records: List of record dictionaries.\n        group_key: Column name used to split data into cohorts.\n        target_key: Numeric column to standardize.\n\n    Returns:\n        List of new dictionaries with f\"{target_key}_zscore\" attached (rounded to 4 decimals).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "groupby_zscore_normalize([{'grp': 'A', 'val': 10.0}, {'grp': 'A', 'val': 20.0}], 'grp', 'val')[0]['val_zscore']",
@@ -2976,24 +2976,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "-0.7071",
           "variants": {
             "python": {
-              "starterCode": "from typing import Any\nfrom collections import defaultdict\nimport math\n\ndef groupby_zscore_normalize(\n    records: list[dict[str, Any]], \n    group_key: str, \n    target_key: str\n) -> list[dict[str, Any]]:\n    \"\"\"\n    Computes group-wise Z-score normalization using Split-Apply-Combine.\n\n    Args:\n        records: List of record dictionaries.\n        group_key: Column name used to split data into cohorts.\n        target_key: Numeric column to standardize.\n\n    Returns:\n        List of new dictionaries with f\"{target_key}_zscore\" attached (rounded to 4 decimals).\n    \"\"\"\n    # Step 1: Split - Group target values by group_key using defaultdict(list)\n    # Step 2: Apply - Compute mean and sample std (N-1) for each group; if len < 2, std = 0.0\n    # Step 3: Combine - Iterate over original records, compute z = (val - mean) / std if std > 0 else 0.0,\n    #         and attach f\"{target_key}_zscore\" rounded to 4 decimals\n    raise NotImplementedError(\"Implement groupby_zscore_normalize\")",
+              "starterCode": "def groupby_zscore_normalize(\n    records: list[dict[str, Any]], \n    group_key: str, \n    target_key: str\n) -> list[dict[str, Any]]:\n    \"\"\"\n    Computes group-wise Z-score normalization using Split-Apply-Combine.\n\n    Args:\n        records: List of record dictionaries.\n        group_key: Column name used to split data into cohorts.\n        target_key: Numeric column to standardize.\n\n    Returns:\n        List of new dictionaries with f\"{target_key}_zscore\" attached (rounded to 4 decimals).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "-0.7071"
             }
           },
-          "solution": "from typing import Any\nfrom collections import defaultdict\nimport math\n\ndef groupby_zscore_normalize(\n    records: list[dict[str, Any]], \n    group_key: str, \n    target_key: str\n) -> list[dict[str, Any]]:\n    # Stage 1: Split\n    groups: dict[Any, list[float]] = defaultdict(list)\n    for r in records:\n        groups[r[group_key]].append(float(r[target_key]))\n\n    # Stage 2: Apply\n    stats: dict[Any, tuple[float, float]] = {}\n    for g, vals in groups.items():\n        n = len(vals)\n        mean = sum(vals) / n\n        if n < 2:\n            std = 0.0\n        else:\n            variance = sum((x - mean) ** 2 for x in vals) / (n - 1)\n            std = math.sqrt(variance)\n        stats[g] = (mean, std)\n\n    # Stage 3: Combine\n    out_col = f\"{target_key}_zscore\"\n    normalized_records: list[dict[str, Any]] = []\n    \n    for r in records:\n        mean, std = stats[r[group_key]]\n        val = float(r[target_key])\n        z = 0.0 if std == 0.0 else (val - mean) / std\n        normalized_records.append({**r, out_col: round(z, 4)})\n\n    return normalized_records"
+          "solution": "from typing import Any\nfrom collections import defaultdict\nimport math\n\ndef groupby_zscore_normalize(\n    records: list[dict[str, Any]], \n    group_key: str, \n    target_key: str\n) -> list[dict[str, Any]]:\n    \"\"\"\n    Computes group-wise Z-score normalization using Split-Apply-Combine.\n\n    Args:\n        records: List of record dictionaries.\n        group_key: Column name used to split data into cohorts.\n        target_key: Numeric column to standardize.\n\n    Returns:\n        List of new dictionaries with f\"{target_key}_zscore\" attached (rounded to 4 decimals).\n    \"\"\"\n    # Step 1: Split - Group target values by group_key using defaultdict(list)\n    # Step 2: Apply - Compute mean and sample std (N-1) for each group; if len < 2, std = 0.0\n    # Step 3: Combine - Iterate over original records, compute z = (val - mean) / std if std > 0 else 0.0,\n    #         and attach f\"{target_key}_zscore\" rounded to 4 decimals\n    raise NotImplementedError(\"Implement groupby_zscore_normalize\")"
         },
         "hints": {
           "tier1": {
-            "en": "Use `defaultdict(list)` to gather values for each group key.",
-            "ar": "استخدم `defaultdict(list)` لتجميع قيم كل فئة معاً."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Use sample variance with denominator `(n - 1)`. If `n < 2` or `std == 0.0`, default `z = 0.0`.",
-            "ar": "احسب تباين العينة بالمقام `(n - 1)`. وإذا كان `n < 2` أو الانحراف صفراً اجعل `z = 0.0`."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Round the resulting Z-score to 4 decimal places with `round(z, 4)`.",
-            "ar": "قرب قيمة Z-score الناتجة إلى 4 منازل عشرية عبر `round(z, 4)`."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3064,17 +3064,17 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "sql-joins-relational-merges",
+    "id": "relational-algebra-foundations",
     "title": "Formal Relational Algebra Foundations",
     "titleAr": "أسس الجبر العلائقي (Relational Algebra) ونظرية كود",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "Before the advent of modern SQL databases, retrieving information from computers was a slow and brittle nightmare: software engineers had...",
-      "ar": "قبل ابتكار لغة SQL، كان استرجاع البيانات كابوساً معقداً: يكتب المبرمجون حلقات تكرارية تبحث في مؤشرات الأقراص الصلبة الفيزيائية."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "relational-algebra-select-filter"
+      "cs-23"
     ],
     "x": 500,
     "y": 2170,
@@ -3085,7 +3085,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "RelationalAlgebraGridLab",
         "narrative": {
           "en": "Before the advent of modern SQL databases, retrieving information from computers was a slow and brittle nightmare: software engineers had to write procedural navigation programs that manually looped through raw byte sectors and chased physical disk pointers. If a database index was modified or a table moved to another track on the magnetic hard drive, every single application query broke!\n\nIn 1970, mathematician and computer scientist Edgar F. Codd revolutionized the software industry by introducing **Relational Algebra**. Codd proved that data could be abstracted away from physical disk hardware and represented mathematically as sets of unordered tuples (relations). This introduced the profound principle of **Declarative Independence**: the software engineer writes a declarative specification of *what* data is desired, and the relational database optimizer determines *how* to physically retrieve it at maximum hardware speed.\n\nYou can never filter an aggregate function like `SUM()` or `AVG()` inside a `WHERE` clause because groups do not exist when passengers are walking through the airport metal detector!",
-          "ar": "قبل ابتكار لغة SQL، كان استرجاع البيانات كابوساً معقداً: يكتب المبرمجون حلقات تكرارية تبحث في مؤشرات الأقراص الصلبة الفيزيائية. في عام 1970، أحدث إدغار كود (E. F. Codd) ثورة تاريخية بابتكار **الجبر العلائقي (Relational Algebra)**.\n\nيعامل الجبر العلائقي البيانات كمجموعات رياضية من الصفوف (العلاقات)، ويوفر أدوات جبرية تقريرية لمعالجتها.\n\n### تشبيه بوابات أمن المطار: الفرق بين WHERE و HAVING\nمن أكثر الأخطاء شيوعاً لدى المبتدئين الخلط بين شرطي `WHERE` و `HAVING`:\n- **`WHERE` (بوابة التفتيش الأمني عند المدخل)**: يُفحص كل مسافر بمفرده *قبل* دخول صالة الانتظار. من لا يملك تذكرة سارية يُستبعد فوراً. في الجبر العلائقي، هذا هو **مُعامل الاختيار (Selection $\\sigma$)**، وهو يصفي الصفوف الفردية قبل أي تجميع.\n- **`HAVING` (فحص الرحلة عند بوابة الطائرة)**: بعد دخول الركاب وتوزيعهم على رحلاتهم، يفحص مدير البوابة شروط المجموعة ككل: *\"هل تضم الرحلة 402 أكثر من 10 ركاب وإجمالي أوزانهم أقل من طنين؟\"*. هذا يصفي المجموعات *بعد* إجراء التجميع ($\\gamma$).\n\nيستحيل استخدام الدوال التجميعية داخل `WHERE` لأن المجموعات لم تكن قد وُجدت أصلاً عند بوابة الدخول!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -3093,8 +3093,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\sigma_\\varphi(R) = \\{ t \\in R \\mid \\varphi(t) = \\text{true} \\}, \\quad \\pi_{A_1, \\dots, A_k}(R) = \\{ (t.A_1, \\dots, t.A_k) \\mid t \\in R \\} \\implies \\sigma_{\\text{having}} \\Big( \\gamma_{G, \\text{agg}(A)}(\\sigma_\\varphi(R)) \\Big)",
         "formulaNote": {
-          "en": "Relational algebra selection, projection, and grouped aggregation pipeline pipeline execution order.",
-          "ar": "تسلسل عمليات الجبر العلائقي: الاختيار، الإسقاط، والتجميع المشروط."
+          "en": "Mathematical anchor for Formal Relational Algebra Foundations.",
+          "ar": "المرساة الرياضية لـ أسس الجبر العلائقي (Relational Algebra) ونظرية كود."
         },
         "narrative": {
           "en": "### Mathematical Invariants & Symbol Breakdown\n\nThe fundamental ordering invariant of Codd's relational algebra dictates that selection $\\sigma_\\varphi$ is mathematically commutative with cartesian products and projections, enabling query optimizers to execute **Filter Pushdown** (evaluating $\\sigma_\\varphi$ as early as possible in the query tree to minimize data volumes). Crucially, the aggregation operator $\\gamma$ acts as a non-linear boundary: individual tuple identities are permanently collapsed into group metrics, meaning $\\sigma_{\\text{having}}$ can only evaluate properties of the partition image.\n\n## Beat 3: Interactive Code Challenge",
@@ -3105,8 +3105,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-sql-joins-relational-merges",
-          "starterCode": "-- Formulate a DuckDB SQL query filtering pre-aggregation in WHERE\n-- and post-aggregation in HAVING.\n-- Schema: orders(order_id, region, product_category, status, revenue)\n\nSELECT\n    -- Step 1: Project grouping dimensions region and product_category\n    -- Step 2: Compute ROUND(SUM(revenue), 2) AS total_revenue\n    -- Step 3: Compute COUNT(*) AS order_count\nFROM orders\n-- Step 4: Filter individual rows WHERE status = 'COMPLETED'\n-- Step 5: GROUP BY region, product_category\n-- Step 6: Filter groups HAVING COUNT(*) >= 2 AND SUM(revenue) >= 500.0\n-- Step 7: ORDER BY total_revenue DESC, region ASC\n;\n    # TODO: Implement solution\n    pass",
+          "id": "py-relational-algebra-foundations",
+          "starterCode": "def solve(x: float) -> float:\n    # TODO: Implement kernel to pass test cases\n    pass",
           "testCases": [
             {
               "input": "SELECT region, COUNT(*) FROM orders WHERE status = 'COMPLETED' GROUP BY region HAVING COUNT(*) >= 2",
@@ -3120,24 +3120,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "VALID_JOIN_PLAN",
           "variants": {
             "python": {
-              "starterCode": "-- Formulate a DuckDB SQL query filtering pre-aggregation in WHERE\n-- and post-aggregation in HAVING.\n-- Schema: orders(order_id, region, product_category, status, revenue)\n\nSELECT\n    -- Step 1: Project grouping dimensions region and product_category\n    -- Step 2: Compute ROUND(SUM(revenue), 2) AS total_revenue\n    -- Step 3: Compute COUNT(*) AS order_count\nFROM orders\n-- Step 4: Filter individual rows WHERE status = 'COMPLETED'\n-- Step 5: GROUP BY region, product_category\n-- Step 6: Filter groups HAVING COUNT(*) >= 2 AND SUM(revenue) >= 500.0\n-- Step 7: ORDER BY total_revenue DESC, region ASC\n;\n    # TODO: Implement solution\n    pass",
+              "starterCode": "def solve(x: float) -> float:\n    # TODO: Implement kernel to pass test cases\n    pass",
               "expectedOutput": "VALID_JOIN_PLAN"
             }
           },
-          "solution": "-- Formulate a DuckDB SQL query filtering pre-aggregation in WHERE\n-- and post-aggregation in HAVING.\n-- Schema: orders(order_id, region, product_category, status, revenue)\n\nSELECT\n    -- Step 1: Project grouping dimensions region and product_category\n    -- Step 2: Compute ROUND(SUM(revenue), 2) AS total_revenue\n    -- Step 3: Compute COUNT(*) AS order_count\nFROM orders\n-- Step 4: Filter individual rows WHERE status = 'COMPLETED'\n-- Step 5: GROUP BY region, product_category\n-- Step 6: Filter groups HAVING COUNT(*) >= 2 AND SUM(revenue) >= 500.0\n-- Step 7: ORDER BY total_revenue DESC, region ASC\n;"
+          "solution": "import numpy as np\n\ndef solve(x: float) -> float:\n    return x"
         },
         "hints": {
           "tier1": {
-            "en": "Filter completed orders first using `WHERE status = 'COMPLETED'` before grouping.",
-            "ar": "صفِّ الطلبات المكتملة أولاً بـ `WHERE status = 'COMPLETED'` قبل إجراء التجميع."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Group by both `region, product_category` to compute multi-dimensional aggregates.",
-            "ar": "اجمع بحسب العمودين `region, product_category` لحساب المؤشرات متعددة الأبعاد."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Place the aggregate thresholds in the `HAVING` clause: `HAVING COUNT(*) >= 2 AND SUM(revenue) >= 500.0`.",
-            "ar": "ضع شروط المقاييس في عبارة `HAVING`: `HAVING COUNT(*) >= 2 AND SUM(revenue) >= 500.0`."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3208,17 +3208,17 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "sql-aggregations-group-by",
+    "id": "sql-joins-set-semantics",
     "title": "Relational Joins & Set Semantics",
     "titleAr": "الربط العلائقي (Joins) ودلالات المجموعات وقيم NULL",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "What actually occurs under the hood when a database executes a JOIN across two separate tables? Beginner database courses almost...",
-      "ar": "ماذا يحدث عندما تدمج بيانات موزعة بين جدولين منفصلين؟ تُجري عملية ربط علائقي (Relational Join)."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "sql-joins-relational-merges"
+      "cs-24"
     ],
     "x": 480,
     "y": 2265,
@@ -3229,7 +3229,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "SqlExecutionPipelineCanvas",
         "narrative": {
           "en": "What actually occurs under the hood when a database executes a `JOIN` across two separate tables?\nBeginner database courses almost universally teach joins using overlapping two-circle Venn diagrams. In professional data engineering, this circular Venn diagram is considered actively harmful and misleading! Venn diagrams depict mathematical set unions and intersections of identical elements, whereas a relational join produces a multi-attribute cross-product combining distinct schemas based on a predicate!\n\nHow do the different relational join types seat these attendees in the dining hall?\n1. **INNER JOIN**: Only attendees who find an exact matching counterpart at the opposite table are permitted to enter the dining hall and sit together. Any customer who has never made a purchase is turned away at the door, and any orphaned receipt without a valid customer is thrown into the paper shredder!\n2. **LEFT OUTER JOIN**: **Every single Customer from Table A is unconditionally guaranteed a seat at the dinner!** If an attendee is a loyal customer with 10 purchases, they sit at a long table with all 10 receipts. If they are a newly registered user or a churned customer who made zero purchases, they still sit comfortably in the hall, but the chair across from them is left empty (`NULL`). They are never discarded!\n3. **FULL OUTER JOIN**: Everyone from both tables is admitted into the hall. Empty chairs (`NULL`) are respectfully placed across from unmatched customers and orphaned receipts alike.\n\nIf an analytics team calculates average Customer Lifetime Value (LTV) using an **INNER JOIN**, they commit a catastrophic data engineering fallacy: they silently drop every customer with 0 purchases, artificially inflating company metrics and hiding customer churn!",
-          "ar": "ماذا يحدث عندما تدمج بيانات موزعة بين جدولين منفصلين؟ تُجري عملية **ربط علائقي (Relational Join)**.\nيحفظ المبتدئون عادةً مخططات فن (Venn Diagrams) الدائرية، وهي مضللة تماماً لأن عمليات الربط تنتج جداءات ديكارتية للصفوف وليست مجرد تداخلات مجموعات بسيطة!\n\n### تشبيه مأدبة التعارف: مطابقة بطاقات الأسماء\nتخيل حفل عشاء عمل يضم طاولتين:\n- الطاولة الأولى (A) تضم **العملاء المسجلين**.\n- الطاولة الثانية (B) تضم **إيصالات المعاملات الشرائية**.\nيحمل كل شخص بطاقة باسمه ورقم تعريفه `customer_id`.\n1. **الربط الداخلي (INNER JOIN)**: يجلس فقط العميل الذي يجد إيصالاً مطابقاً له في الطاولة المقابلة. أي عميل لم يشترِ، وأي إيصال بلا صاحب، يُطردان خارج القاعة!\n2. **الربط اليساري (LEFT JOIN)**: **كل عميل من الطاولة A يضمن مقعده في القاعة دون استثناء!** إذا لم يجرِ أي معاملة (عميل جديد أو مغادر)، يُترك المقعد المقابل له فارغاً (`NULL`). لا يُطرد أي عميل أبداً!\n3. **الربط الكامل (FULL OUTER JOIN)**: يضمن الجميع مقاعدهم من كلا الطرفين، مع مقاعد فارغة (`NULL`) لمن لم يجد شريكاً.\n\nإذا حسبت القيمة الدائمة للعميل بـ **INNER JOIN**، سترتكب خطأ كارثياً: ستحذف سراً كل العملاء غير النشطين ذوي المبيعات الصفرية، مما يضخم أرقامك المالية بشكل زائف!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -3237,8 +3237,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "R \\bowtie_\\theta S = \\sigma_\\theta(R \\times S), \\quad R \\ \\text{⟕}_\\theta \\ S = (R \\bowtie_\\theta S) \\cup \\left\\{ (r, \\boldsymbol{\\omega}_S) \\mid r \\in R \\land \\neg \\exists s \\in S : \\theta(r, s) \\right\\}",
         "formulaNote": {
-          "en": "Relational inner join as selection over Cartesian product and left outer join with null tuple extension.",
-          "ar": "الربط الداخلي كاختيار من الجداء الديكارتي، والربط الخارجي اليساري مع صفوف القيم الفارغة."
+          "en": "Mathematical anchor for Relational Joins & Set Semantics.",
+          "ar": "المرساة الرياضية لـ الربط العلائقي (Joins) ودلالات المجموعات وقيم NULL."
         },
         "narrative": {
           "en": "### Mathematical Invariants & Symbol Breakdown\n\nThe cardinal invariant of the Left Outer Join states that the output relation cardinality is bounded below by the left table size: $|R \\ \\text{⟕}_\\theta \\ S| \\ge |R|$. If the join key in table $S$ is a foreign key with uniqueness guarantees, the cardinality is strictly invariant: $|R \\ \\text{⟕}_\\theta \\ S| = |R|$. When performing group aggregations over outer-joined columns, using `COUNT(S.id)` correctly returns 0 for null rows, whereas `COUNT(*)` counts the padded null row as 1, introducing subtle counting errors!\n\n## Beat 3: Interactive Code Challenge",
@@ -3249,8 +3249,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-sql-aggregations-group-by",
-          "starterCode": "-- Formulate a DuckDB SQL query computing Customer Lifetime Value\n-- handling customers with 0 transactions using LEFT JOIN and COALESCE.\n-- Schema: customers(customer_id, customer_name), transactions(txn_id, customer_id, amount)\n\nSELECT\n    -- Step 1: Select c.customer_id, c.customer_name\n    -- Step 2: Compute total_spent: COALESCE(ROUND(SUM(t.amount), 2), 0.0)\n    -- Step 3: Compute transaction_count: COUNT(t.txn_id)\nFROM customers c\n-- Step 4: LEFT JOIN transactions t ON c.customer_id = t.customer_id\n-- Step 5: GROUP BY c.customer_id, c.customer_name\n-- Step 6: ORDER BY total_spent DESC, c.customer_id ASC\n;\n    # TODO: Implement solution\n    pass",
+          "id": "py-sql-joins-set-semantics",
+          "starterCode": "def solve(x: float) -> float:\n    # TODO: Implement kernel to pass test cases\n    pass",
           "testCases": [
             {
               "input": "SELECT c.customer_id, COUNT(t.txn_id) FROM customers c LEFT JOIN transactions t ON c.customer_id = t.customer_id GROUP BY c.customer_id",
@@ -3264,24 +3264,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "VALID_JOIN_PLAN",
           "variants": {
             "python": {
-              "starterCode": "-- Formulate a DuckDB SQL query computing Customer Lifetime Value\n-- handling customers with 0 transactions using LEFT JOIN and COALESCE.\n-- Schema: customers(customer_id, customer_name), transactions(txn_id, customer_id, amount)\n\nSELECT\n    -- Step 1: Select c.customer_id, c.customer_name\n    -- Step 2: Compute total_spent: COALESCE(ROUND(SUM(t.amount), 2), 0.0)\n    -- Step 3: Compute transaction_count: COUNT(t.txn_id)\nFROM customers c\n-- Step 4: LEFT JOIN transactions t ON c.customer_id = t.customer_id\n-- Step 5: GROUP BY c.customer_id, c.customer_name\n-- Step 6: ORDER BY total_spent DESC, c.customer_id ASC\n;\n    # TODO: Implement solution\n    pass",
+              "starterCode": "def solve(x: float) -> float:\n    # TODO: Implement kernel to pass test cases\n    pass",
               "expectedOutput": "VALID_JOIN_PLAN"
             }
           },
-          "solution": "-- Formulate a DuckDB SQL query computing Customer Lifetime Value\n-- handling customers with 0 transactions using LEFT JOIN and COALESCE.\n-- Schema: customers(customer_id, customer_name), transactions(txn_id, customer_id, amount)\n\nSELECT\n    -- Step 1: Select c.customer_id, c.customer_name\n    -- Step 2: Compute total_spent: COALESCE(ROUND(SUM(t.amount), 2), 0.0)\n    -- Step 3: Compute transaction_count: COUNT(t.txn_id)\nFROM customers c\n-- Step 4: LEFT JOIN transactions t ON c.customer_id = t.customer_id\n-- Step 5: GROUP BY c.customer_id, c.customer_name\n-- Step 6: ORDER BY total_spent DESC, c.customer_id ASC\n;"
+          "solution": "import numpy as np\n\ndef solve(x: float) -> float:\n    return x"
         },
         "hints": {
           "tier1": {
-            "en": "Use `LEFT JOIN transactions t ON c.customer_id = t.customer_id` so non-purchasing customers are preserved.",
-            "ar": "استخدم `LEFT JOIN` لربط المعاملات حتى لا يُحذف العملاء الذين لم يشتروا شيئاً."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Wrap the sum in `COALESCE(ROUND(SUM(t.amount), 2), 0.0)` to convert null totals into 0.0.",
-            "ar": "غلّف المجموع بدالة `COALESCE(..., 0.0)` لتحويل القيم الفارغة إلى 0.0."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Count `COUNT(t.txn_id)` rather than `COUNT(*)` so customers with zero transactions report a count of 0 instead of 1.",
-            "ar": "استخدم `COUNT(t.txn_id)` بدلاً من `COUNT(*)` حتى يظهر عدد معاملات العميل الفارغ 0 وليس 1."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3352,17 +3352,17 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "sql-window-functions",
+    "id": "sql-declarative-lifecycle",
     "title": "SQL Declarative Execution Lifecycle",
     "titleAr": "دورة حياة التنفيذ التقريري في SQL (ترتيب المعالجة الداخلي)",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "You write SQL queries in one grammatical order, but the relational database execution engine processes them in a completely different...",
-      "ar": "أنت تكتب استعلام SQL بترتيب معين، لكن محرك قواعد البيانات ينفذه بترتيب فيزيائي مختلف تماماً! عند كتابة الاستعلام، تبدأ عادةً بـ SELECT: sql..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "sql-aggregations-group-by"
+      "cs-25"
     ],
     "x": 500,
     "y": 2360,
@@ -3373,7 +3373,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "RelationalJoinGeometryLab",
         "narrative": {
           "en": "You write SQL queries in one grammatical order, but the relational database execution engine processes them in a completely different physical order!\n\nWhen writing an analytical query, human syntax forces you to begin with the word `SELECT`:\n```sql\nSELECT dept, SUM(sales) AS total_revenue \nFROM transactions \nWHERE total_revenue > 100000 \nGROUP BY dept; -- FATAL ERROR: Column 'total_revenue' does not exist!\n```\nWhy does the database throw a fatal error claiming that `total_revenue` does not exist, when it is written in plain sight on the very first line of the query?\nBecause despite what your eyes see, **`SELECT` is almost the last operation the database evaluates!**\n\nYou cannot filter raw tomatoes in `WHERE` based on the decorative garnish name tag (`AS total_revenue`), because that tag won't even be created until Step 5 at the plating station!",
-          "ar": "أنت تكتب استعلام SQL بترتيب معين، لكن محرك قواعد البيانات ينفذه بترتيب فيزيائي مختلف تماماً!\nعند كتابة الاستعلام، تبدأ عادةً بـ `SELECT`:\n```sql\nSELECT dept, SUM(sales) AS total FROM transactions WHERE total > 100 GROUP BY dept; -- خطأ!\n```\nلماذا يفشل هذا الاستعلام برسالة *\"العمود total غير موجود\"*؟ لأن `SELECT` لا تنفذ أولاً!\n\n### تشبيه مطبخ المطعم: الترتيب البصري مقابل ترتيب الطهي الفعلي\nتخيل مطبخاً فاخراً يعد وجبات العشاء:\n1. **`FROM` و `JOIN` (جلب المكونات من المستودع)**: يُحضر العمال أكياس اللحم والخضار الخام إلى المطبخ.\n2. **`WHERE` (غسل واستبعاد الخضار التالفة)**: يستبعد الطاهي الخضار الفاسدة فوراً قبل تقطيعها.\n3. **`GROUP BY` (التوزيع في قدور الطهي)**: تُوزع المكونات في قدور مستقلة (قدر الحساء، قدر اللحم).\n4. **`HAVING` (تذوق مرق القدر ككل)**: يتذوق الطاهي القدر كاملاً: *\"هل كمية الملح في هذا القدر كافية؟\"*.\n5. **`SELECT` (سكب الطعام وتزيين الطبق)**: هنا فقط يُسكب الطعام في أطباق التقديم وتوضع بطاقة الاسم التزيينية (`AS total`).\n6. **`ORDER BY` (ترتيب أطباق صينية التقديم)**: تُرتب الأطباق تصاعدياً أو تنازلياً.\n7. **`LIMIT` (تقديم أول وجبات للزبائن)**: يخرج النادل بأول 5 أطباق جاهزة.\n\nيستحيل تصفية الخضار في خطوة `WHERE` بناءً على بطاقة تزيين الطبق التي لم تُصنع إلا في `SELECT`!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -3381,8 +3381,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\text{Pipeline}(\\mathcal{D}) = (\\lambda_{\\text{LIMIT}} \\circ \\omega_{\\text{ORDER}} \\circ \\delta_{\\text{DISTINCT}} \\circ \\pi_{\\text{SELECT}} \\circ \\sigma_{\\text{HAVING}} \\circ \\gamma_{\\text{GROUP}} \\circ \\sigma_{\\text{WHERE}} \\circ \\bowtie_{\\text{FROM}})(\\mathcal{D})",
         "formulaNote": {
-          "en": "Strict mathematical function composition defining the physical evaluation sequence of declarative SQL.",
-          "ar": "التركيب الرياضي الصارم للدوال المحددة لتسلسل المعالجة الفيزيائية في محركات SQL."
+          "en": "Mathematical anchor for SQL Declarative Execution Lifecycle.",
+          "ar": "المرساة الرياضية لـ دورة حياة التنفيذ التقريري في SQL (ترتيب المعالجة الداخلي)."
         },
         "narrative": {
           "en": "### Mathematical Invariants & Symbol Breakdown\n\nThe strict mathematical order of composition $\\circ$ dictates symbol visibility scope: any variable or expression alias introduced in stage $k$ is completely invisible to all stages $j < k$. Consequently, `ORDER BY` (Stage 7) can freely reference column aliases created by `SELECT` (Stage 5), while `WHERE` (Stage 2) and `GROUP BY` (Stage 3) cannot, requiring subqueries or CTEs when filtering on computed projection expressions.\n\n## Beat 3: Interactive Code Challenge",
@@ -3393,8 +3393,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-sql-window-functions",
-          "starterCode": "-- Formulate a DuckDB SQL query pivoting sales into quarterly columns\n-- using conditional aggregation CASE WHEN expressions.\n-- Schema: sales(sale_id, dept_name, sale_date, revenue)\n\nSELECT\n    -- Step 1: dept_name\n    -- Step 2: Pivoted quarters:\n    --         ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 1 THEN revenue ELSE 0 END), 2) AS q1_revenue\n    -- Step 3: Compute q2_revenue, q3_revenue, q4_revenue, and ROUND(SUM(revenue), 2) AS annual_total\nFROM sales\n-- Step 4: Filter sales in 2024: WHERE EXTRACT(YEAR FROM sale_date) = 2024\n-- Step 5: GROUP BY dept_name\n-- Step 6: ORDER BY annual_total DESC, dept_name ASC\n;\n    # TODO: Implement solution\n    pass",
+          "id": "py-sql-declarative-lifecycle",
+          "starterCode": "def solve(x: float) -> float:\n    # TODO: Implement kernel to pass test cases\n    pass",
           "testCases": [
             {
               "input": "SELECT dept_name, SUM(revenue) AS annual_total FROM sales WHERE EXTRACT(YEAR FROM sale_date) = 2024 GROUP BY dept_name ORDER BY annual_total DESC",
@@ -3408,24 +3408,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "VALID_JOIN_PLAN",
           "variants": {
             "python": {
-              "starterCode": "-- Formulate a DuckDB SQL query pivoting sales into quarterly columns\n-- using conditional aggregation CASE WHEN expressions.\n-- Schema: sales(sale_id, dept_name, sale_date, revenue)\n\nSELECT\n    -- Step 1: dept_name\n    -- Step 2: Pivoted quarters:\n    --         ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 1 THEN revenue ELSE 0 END), 2) AS q1_revenue\n    -- Step 3: Compute q2_revenue, q3_revenue, q4_revenue, and ROUND(SUM(revenue), 2) AS annual_total\nFROM sales\n-- Step 4: Filter sales in 2024: WHERE EXTRACT(YEAR FROM sale_date) = 2024\n-- Step 5: GROUP BY dept_name\n-- Step 6: ORDER BY annual_total DESC, dept_name ASC\n;\n    # TODO: Implement solution\n    pass",
+              "starterCode": "def solve(x: float) -> float:\n    # TODO: Implement kernel to pass test cases\n    pass",
               "expectedOutput": "VALID_JOIN_PLAN"
             }
           },
-          "solution": "-- Formulate a DuckDB SQL query pivoting sales into quarterly columns\n-- using conditional aggregation CASE WHEN expressions.\n-- Schema: sales(sale_id, dept_name, sale_date, revenue)\n\nSELECT\n    -- Step 1: dept_name\n    -- Step 2: Pivoted quarters:\n    --         ROUND(SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = 1 THEN revenue ELSE 0 END), 2) AS q1_revenue\n    -- Step 3: Compute q2_revenue, q3_revenue, q4_revenue, and ROUND(SUM(revenue), 2) AS annual_total\nFROM sales\n-- Step 4: Filter sales in 2024: WHERE EXTRACT(YEAR FROM sale_date) = 2024\n-- Step 5: GROUP BY dept_name\n-- Step 6: ORDER BY annual_total DESC, dept_name ASC\n;"
+          "solution": "import numpy as np\n\ndef solve(x: float) -> float:\n    return x"
         },
         "hints": {
           "tier1": {
-            "en": "Filter for year 2024 in the `WHERE` clause: `WHERE EXTRACT(YEAR FROM sale_date) = 2024`.",
-            "ar": "صفِّ بيانات سنة 2024 في شرط `WHERE`: `WHERE EXTRACT(YEAR FROM sale_date) = 2024`."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Use conditional sum `SUM(CASE WHEN EXTRACT(QUARTER FROM sale_date) = Q THEN revenue ELSE 0 END)` for each quarter Q.",
-            "ar": "استخدم الجمع المشروط بـ `CASE WHEN` لعزل مبيعات كل ربع سنوي."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Sort by `ORDER BY annual_total DESC, dept_name ASC`. Note that `ORDER BY` can reference the alias `annual_total` because it executes after `SELECT`!",
-            "ar": "رتب بـ `ORDER BY annual_total DESC, dept_name ASC`. لاحظ أن `ORDER BY` تستطيع قراءة الاسم المستعار لأنها تنفذ بعد `SELECT`!"
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3496,17 +3496,17 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "sql-ctes-recursive-queries",
+    "id": "sql-window-functions",
     "title": "Window Functions & Analytic Partitioning",
     "titleAr": "دوال النوافذ (Window Functions) والتقسيم التحليلي",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "A standard SQL GROUP BY clause behaves like a heavy industrial hydraulic trash compactor: it takes 1,000 distinct employee records in the...",
-      "ar": "تعتبر عملية التجميع التقليدية GROUP BY في SQL كأنها مكبس نفايات هيدروليكي: تأخذ 1,000 موظف في قسم الهندسة وتضغطهم في سطر ملخص واحد:..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "sql-window-functions"
+      "cs-26"
     ],
     "x": 480,
     "y": 2455,
@@ -3517,7 +3517,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "WindowFunctionFrameLab",
         "narrative": {
           "en": "A standard SQL `GROUP BY` clause behaves like a heavy industrial hydraulic trash compactor: it takes 1,000 distinct employee records in the Engineering department and crushes them into a single summary dot: `(\"Engineering\", 1000, 125000)`. In that instant, the individual names, hire dates, granular titles, and exact salaries of all 1,000 engineers are permanently crushed and destroyed from the query result set!\n\nWhat if your business question demands both aggregate intelligence AND granular individual rows?\n- *\"What is each employee's salary rank compared to peers in their department?\"*\n- *\"What is the dollar difference between each employee's salary and their department's top earner?\"*\n- *\"What is the percentage contribution of this specific trade to today's regional trading volume?\"*\n\nTo calculate these metrics using basic SQL, you would be forced to execute expensive self-joins against aggregated subqueries. Enter **Window Functions** (`OVER (PARTITION BY ...)`).\n\nYou achieve multi-level analytic aggregations **without destroying or collapsing a single row of underlying data**!",
-          "ar": "تعتبر عملية التجميع التقليدية `GROUP BY` في SQL كأنها مكبس نفايات هيدروليكي: تأخذ 1,000 موظف في قسم الهندسة وتضغطهم في سطر ملخص واحد: `(\"الهندسة\"، 1000، 125000)`. فتختفي أسماء وتفاصيل ورواتب أولئك الموظفين الـ 1,000 تماماً من الناتج!\n\nماذا لو أردت حساب ترتيب كل موظف أو مقارنة راتبه بأعلى راتب في قسمه، *مع الإبقاء على كل صف فردي كما هو دون حذفه*؟\nهنا يأتي دور **الدوال النافذية (Window Functions)** عبر العبارة السحرية `OVER (PARTITION BY ...)`.\n\n### تشبيه شرفة المراقبة الزجاجية المعلقة\nتخيل ممشى زجاجياً مرتفعاً معلقاً فوق قاعة تداول كبرى:\n- يبقى كل متداول جالساً في مكتبه، وتظل تفاصيل كل صف محفوظة بالكامل دون أي ضغط أو حذف.\n- يمشي مشرف التدقيق على الممشى الزجاجي في الأعلى.\n- ينظر المشرف عبر نافذة زجاجية (`OVER`)، ويقسم المكاتب ذهنياً حسب القسم (`PARTITION BY dept_name`)، ويرتبهم حسب الراتب (`ORDER BY salary DESC`)، ثم يسجل ترتيب كل فرد (`DENSE_RANK()`) والفارق بين راتبه وأعلى راتب في القسم بجانب اسمه.\n\nتحصل على مؤشرات تجميعية وتحليلية عميقة **دون التضحية بأي صف أو تفصيلة دقيقة في البيانات**!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -3525,8 +3525,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathcal{W}_f(t) = f\\Big( \\big\\{ s \\in R \\mid p(s) = p(t) \\land s \\in \\text{Frame}(t) \\big\\} \\Big), \\quad \\text{DENSE\\_RANK}(t) = 1 + \\big| \\{ v \\in \\text{vals}(p(t)) \\mid v > t.\\text{val} \\} \\big|",
         "formulaNote": {
-          "en": "Window analytic function mapping over partitioned frame subsets and dense ranking invariant without rank gaps.",
-          "ar": "التعريف الجبري للدالة النافذية على أطر التقسيم وصيغة الترتيب الكثيف دون فجوات عددية."
+          "en": "Mathematical anchor for Window Functions & Analytic Partitioning.",
+          "ar": "المرساة الرياضية لـ دوال النوافذ (Window Functions) والتقسيم التحليلي."
         },
         "narrative": {
           "en": "### Mathematical Invariants & Symbol Breakdown\n\nThe definitive relational invariant of window functions is **Row Cardinality Preservation**: $|\\text{Output}| = |R|$. Unlike `GROUP BY` which reduces cardinality to $|\\mathcal{K}| \\ll |R|$, a window function guarantees a strict bijective 1-to-1 mapping between input rows and output rows.\n\n## Beat 3: Interactive Code Challenge",
@@ -3537,8 +3537,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-sql-ctes-recursive-queries",
-          "starterCode": "-- Formulate a DuckDB SQL query computing DENSE_RANK() and max salary gap\n-- across departmental partitions.\n-- Schema: employees(emp_id, dept_name, emp_name, salary)\n\nSELECT\n    -- Step 1: Base columns emp_id, dept_name, emp_name, salary\n    -- Step 2: Departmental salary rank:\n    --         DENSE_RANK() OVER (PARTITION BY dept_name ORDER BY salary DESC) AS dept_salary_rank\n    -- Step 3: Difference between maximum departmental salary and current employee salary:\n    --         ROUND(MAX(salary) OVER (PARTITION BY dept_name) - salary, 2) AS salary_gap_to_max\nFROM employees\n-- Step 4: ORDER BY dept_name ASC, dept_salary_rank ASC, salary DESC, emp_id ASC\n;\n    # TODO: Implement solution\n    pass",
+          "id": "py-sql-window-functions",
+          "starterCode": "def solve(x: float) -> float:\n    # TODO: Implement kernel to pass test cases\n    pass",
           "testCases": [
             {
               "input": "SELECT emp_id, DENSE_RANK() OVER (PARTITION BY dept_name ORDER BY salary DESC) AS rnk FROM employees",
@@ -3552,24 +3552,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "VALID_JOIN_PLAN",
           "variants": {
             "python": {
-              "starterCode": "-- Formulate a DuckDB SQL query computing DENSE_RANK() and max salary gap\n-- across departmental partitions.\n-- Schema: employees(emp_id, dept_name, emp_name, salary)\n\nSELECT\n    -- Step 1: Base columns emp_id, dept_name, emp_name, salary\n    -- Step 2: Departmental salary rank:\n    --         DENSE_RANK() OVER (PARTITION BY dept_name ORDER BY salary DESC) AS dept_salary_rank\n    -- Step 3: Difference between maximum departmental salary and current employee salary:\n    --         ROUND(MAX(salary) OVER (PARTITION BY dept_name) - salary, 2) AS salary_gap_to_max\nFROM employees\n-- Step 4: ORDER BY dept_name ASC, dept_salary_rank ASC, salary DESC, emp_id ASC\n;\n    # TODO: Implement solution\n    pass",
+              "starterCode": "def solve(x: float) -> float:\n    # TODO: Implement kernel to pass test cases\n    pass",
               "expectedOutput": "VALID_JOIN_PLAN"
             }
           },
-          "solution": "-- Formulate a DuckDB SQL query computing DENSE_RANK() and max salary gap\n-- across departmental partitions.\n-- Schema: employees(emp_id, dept_name, emp_name, salary)\n\nSELECT\n    -- Step 1: Base columns emp_id, dept_name, emp_name, salary\n    -- Step 2: Departmental salary rank:\n    --         DENSE_RANK() OVER (PARTITION BY dept_name ORDER BY salary DESC) AS dept_salary_rank\n    -- Step 3: Difference between maximum departmental salary and current employee salary:\n    --         ROUND(MAX(salary) OVER (PARTITION BY dept_name) - salary, 2) AS salary_gap_to_max\nFROM employees\n-- Step 4: ORDER BY dept_name ASC, dept_salary_rank ASC, salary DESC, emp_id ASC\n;"
+          "solution": "import numpy as np\n\ndef solve(x: float) -> float:\n    return x"
         },
         "hints": {
           "tier1": {
-            "en": "Use `DENSE_RANK() OVER (PARTITION BY dept_name ORDER BY salary DESC)` to rank employees per department.",
-            "ar": "استخدم `DENSE_RANK() OVER (PARTITION BY dept_name ORDER BY salary DESC)` لترتيب الموظفين داخل كل قسم."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Compute department max using `MAX(salary) OVER (PARTITION BY dept_name)` and subtract the current `salary`.",
-            "ar": "احسب الحد الأقصى للقسم بـ `MAX(salary) OVER (PARTITION BY dept_name)` واطرح منه راتب الموظف الحالي `salary`."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Round the salary gap with `ROUND(..., 2)` to ensure consistent two-decimal currency formatting.",
-            "ar": "قرب فارق الراتب بـ `ROUND(..., 2)` لضمان تنسيق العملات بمنزلتين عشريتين."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3640,17 +3640,17 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "sql-indexing-query-plans",
+    "id": "sql-window-offsets-ranking",
     "title": "Positional Window Offsets, Ranking & Frame Bounds",
     "titleAr": "الإزاحات الموضعية، الترتيب، وحدود أطر النوافذ (ROWS vs RANGE)",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "In financial quantitative modeling, algorithmic trading, and modern data engineering, time-series data is the lifeblood of decision systems.",
-      "ar": "في تحليل السلاسل الزمنية والهندسة المالية، تتكرر أسئلة جوهرية مثل: - \"كم كان إيراد الأمس مقارنة باليوم لحساب نسبة النمو؟\" - \"ما هو المتوسط..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "sql-ctes-recursive-queries"
+      "cs-28"
     ],
     "x": 500,
     "y": 2550,
@@ -3661,7 +3661,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "PositionalWindowOffsetLab",
         "narrative": {
           "en": "In financial quantitative modeling, algorithmic trading, and modern data engineering, time-series data is the lifeblood of decision systems. Practitioners are relentlessly asked to calculate dynamic temporal metrics:\n- *\"What was our day-over-day (DoD) or month-over-month (MoM) revenue growth velocity?\"*\n- *\"What is the 7-day trailing exponential or simple moving average of sensor temperature readings?\"*\n- *\"How does today's transaction volume compare to the moving benchmark of the preceding three business days?\"*\n\nPrior to the introduction of positional window functions in modern SQL engines (such as DuckDB, PostgreSQL, and Snowflake), answering these questions required writing tortured, fragile self-joins. Engineers had to join a table against itself on calculated date offsets: `ON t1.date = t2.date + INTERVAL '1 DAY'`. If a single holiday occurred, if a sensor dropped off the network for an hour, or if the dataset contained weekend gaps, the equi-join failed silently, yielding empty rows or exploding memory consumption into an $O(N^2)$ quadratic scan across millions of partition records.",
-          "ar": "في تحليل السلاسل الزمنية والهندسة المالية، تتكرر أسئلة جوهرية مثل:\n- *\"كم كان إيراد الأمس مقارنة باليوم لحساب نسبة النمو؟\"*\n- *\"ما هو المتوسط المتحرك لإيرادات آخر 3 أيام؟\"*\n\nفي استعلامات SQL القديمة، كان حساب ذلك يتطلب ربطاً ذاتياً معقداً وحسابات تواريخ بطيئة. مع دوال الإزاحة الموضعية، تصبح العملية في غاية البساطة والأناقة!\n\n### تشبيه مرآة الرؤية الخلفية وقافلة السيارات المتحركة\nتخيل أنك تقود سيارة على طريق سريع يمثل الخط الزمني:\n- **`LAG(revenue, 1)` (مرآة الرؤية الخلفية)**: تنظر إلى الطريق خلفك مباشرة (إيراد الأمس). وإذا كنت في اليوم الأول ولا يوجد أمس، تظهر المرآة فراغاً (`NULL`).\n- **`LEAD(revenue, 1)` (الزجاج الأمامي)**: تنظر للأمام نحو النقطة التالية على الطريق (توقعات الغد).\n- **`ROWS BETWEEN 2 PRECEDING AND CURRENT ROW` (قافلة الحراسة الثلاثية)**: تتحرك سيارتك ضمن موكب أمني من 3 سيارات: السيارتان السابقتان لك مباشرة وسيارتك الحالية. ومع تقدمك يوماً بعد يوم، ينزلق هذا الإطار معك، حاسباً متوسطاً متحركاً سلساً لآخر 3 أيام!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -3669,8 +3669,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\text{LAG}(v, k)_i = \\begin{cases} v(r_{i-k}) & \\text{if } i - k \\ge 1 \\\\ \\bot_{\\text{NULL}} & \\text{if } i - k < 1 \\end{cases}, \\quad \\text{LEAD}(v, k)_i = \\begin{cases} v(r_{i+k}) & \\text{if } i + k \\le N \\\\ \\bot_{\\text{NULL}} & \\text{if } i + k > N \\end{cases}",
         "formulaNote": {
-          "en": "Formal algebraic specification of LAG positional offset and physical ROWS sliding window boundary summation.",
-          "ar": "التعريف الرياضي لإزاحة LAG الموضعية ومجموع حدود النافذة المنزلقة بـ ROWS."
+          "en": "Mathematical anchor for Positional Window Offsets, Ranking & Frame Bounds.",
+          "ar": "المرساة الرياضية لـ الإزاحات الموضعية، الترتيب، وحدود أطر النوافذ (ROWS vs RANGE)."
         },
         "narrative": {
           "en": "$$\n\\text{Frame}_{\\text{ROWS}}(i, k_1, k_2) = \\{ j \\in \\mathbb{N} \\mid \\max(1, i - k_1) \\le j \\le \\min(N, i + k_2) \\}\n$$\n\n$$\n\\text{Frame}_{\\text{RANGE}}(t, \\Delta_1, \\Delta_2) = \\{ s \\in \\mathcal{P} \\mid t.\\text{val} - \\Delta_1 \\le s.\\text{val} \\le t.\\text{val} + \\Delta_2 \\}\n$$\n\n### Mathematical Invariants & Symbol Breakdown\n\nThe fundamental formal invariant of positional offsets is **Boundary Clamping with Sentinel Emission**: whenever an index offset evaluates outside the valid partition domain ($i - k < 1$ or $i + k > N$), the engine must emit the absorption element $\\bot_{\\text{NULL}}$ rather than wrapping around or accessing uninitialized heap memory.\n\nFurthermore, while `ROWS` evaluation requires only pointer arithmetic over contiguous tuple pointers ($O(1)$ amortized frame updates using sliding accumulator subtraction: $S_i = S_{i-1} + r_i - r_{i-W}$), `RANGE` requires binary searching or monotonic two-pointer scans over the sort attribute values to resolve variable-width physical boundaries.\n\n## Beat 3: Interactive Code Challenge",
@@ -3681,8 +3681,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-sql-indexing-query-plans",
-          "starterCode": "-- Formulate a DuckDB SQL query computing trailing rolling window sums\n-- and day-over-day growth percentages using ROWS BETWEEN and LAG().\n-- Schema: daily_metrics(metric_date, revenue)\n\nWITH metrics_lagged AS (\n    SELECT\n        metric_date,\n        revenue,\n        -- Step 1: 3-day trailing rolling sum:\n        --         ROUND(SUM(revenue) OVER (ORDER BY metric_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS rolling_3day_revenue\n        -- Step 2: Previous day revenue:\n        --         LAG(revenue, 1) OVER (ORDER BY metric_date) AS prev_day_revenue\n    FROM daily_metrics\n)\nSELECT\n    metric_date,\n    revenue,\n    rolling_3day_revenue,\n    prev_day_revenue,\n    -- Step 3: Compute DoD growth percentage:\n    --         CASE WHEN prev_day_revenue IS NULL OR prev_day_revenue = 0 THEN NULL\n    --              ELSE ROUND(((revenue - prev_day_revenue) / prev_day_revenue) * 100.0, 2) END AS dod_growth_pct\nFROM metrics_lagged\nORDER BY metric_date ASC;\n    # TODO: Implement solution\n    pass",
+          "id": "py-sql-window-offsets-ranking",
+          "starterCode": "def solve(x: float) -> float:\n    # TODO: Implement kernel to pass test cases\n    pass",
           "testCases": [
             {
               "input": "SELECT metric_date, LAG(revenue, 1) OVER (ORDER BY metric_date) AS prev FROM daily_metrics",
@@ -3696,24 +3696,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "VALID_JOIN_PLAN",
           "variants": {
             "python": {
-              "starterCode": "-- Formulate a DuckDB SQL query computing trailing rolling window sums\n-- and day-over-day growth percentages using ROWS BETWEEN and LAG().\n-- Schema: daily_metrics(metric_date, revenue)\n\nWITH metrics_lagged AS (\n    SELECT\n        metric_date,\n        revenue,\n        -- Step 1: 3-day trailing rolling sum:\n        --         ROUND(SUM(revenue) OVER (ORDER BY metric_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS rolling_3day_revenue\n        -- Step 2: Previous day revenue:\n        --         LAG(revenue, 1) OVER (ORDER BY metric_date) AS prev_day_revenue\n    FROM daily_metrics\n)\nSELECT\n    metric_date,\n    revenue,\n    rolling_3day_revenue,\n    prev_day_revenue,\n    -- Step 3: Compute DoD growth percentage:\n    --         CASE WHEN prev_day_revenue IS NULL OR prev_day_revenue = 0 THEN NULL\n    --              ELSE ROUND(((revenue - prev_day_revenue) / prev_day_revenue) * 100.0, 2) END AS dod_growth_pct\nFROM metrics_lagged\nORDER BY metric_date ASC;\n    # TODO: Implement solution\n    pass",
+              "starterCode": "def solve(x: float) -> float:\n    # TODO: Implement kernel to pass test cases\n    pass",
               "expectedOutput": "VALID_JOIN_PLAN"
             }
           },
-          "solution": "-- Formulate a DuckDB SQL query computing trailing rolling window sums\n-- and day-over-day growth percentages using ROWS BETWEEN and LAG().\n-- Schema: daily_metrics(metric_date, revenue)\n\nWITH metrics_lagged AS (\n    SELECT\n        metric_date,\n        revenue,\n        -- Step 1: 3-day trailing rolling sum:\n        --         ROUND(SUM(revenue) OVER (ORDER BY metric_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS rolling_3day_revenue\n        -- Step 2: Previous day revenue:\n        --         LAG(revenue, 1) OVER (ORDER BY metric_date) AS prev_day_revenue\n    FROM daily_metrics\n)\nSELECT\n    metric_date,\n    revenue,\n    rolling_3day_revenue,\n    prev_day_revenue,\n    -- Step 3: Compute DoD growth percentage:\n    --         CASE WHEN prev_day_revenue IS NULL OR prev_day_revenue = 0 THEN NULL\n    --              ELSE ROUND(((revenue - prev_day_revenue) / prev_day_revenue) * 100.0, 2) END AS dod_growth_pct\nFROM metrics_lagged\nORDER BY metric_date ASC;"
+          "solution": "import numpy as np\n\ndef solve(x: float) -> float:\n    return x"
         },
         "hints": {
           "tier1": {
-            "en": "Use `LAG(revenue, 1) OVER (ORDER BY metric_date)` to fetch yesterday's revenue value.",
-            "ar": "استخدم `LAG(revenue, 1) OVER (ORDER BY metric_date)` لجلب قيمة إيراد اليوم السابق."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Define the 3-day frame with `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW`.",
-            "ar": "حدد إطار الأيام الثلاثة بـ `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW`."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Guard against division by zero in DoD growth using a `CASE WHEN prev_day_revenue IS NULL OR prev_day_revenue = 0 THEN NULL` expression.",
-            "ar": "احمِ الاستعلام من القسمة على صفر في نسبة النمو باستخدام شرط `CASE WHEN`."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3784,18 +3784,18 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "columnar-storage-parquet",
+    "id": "sql-ctes-recursive-queries",
     "title": "Common Table Expressions & Recursive CTEs",
     "titleAr": "التعبيرات الجدولية العامة (CTEs) والاستعلامات الذاتية العودية (Recursive CTEs)",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "How do you query deeply nested, hierarchical tree structures in a relational database when you do not know the depth of the graph in...",
-      "ar": "كيف تستعلم عن الهياكل الشجرية الهرمية في قواعد البيانات العلائقية عندما يكون عمق الشجرة مجهولاً مقدماً؟ من أمثلة ذلك: - الهيكل التنظيمي..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "numpy-strides-indexing",
-      "sql-indexing-query-plans"
+      "cs-17",
+      "cs-28"
     ],
     "x": 480,
     "y": 2645,
@@ -3806,7 +3806,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "RecursiveCteGraphLab",
         "narrative": {
           "en": "How do you query deeply nested, hierarchical tree structures in a relational database when you do not know the depth of the graph in advance? In enterprise data platforms, software architectures, and supply chain logistics, hierarchical relationships are everywhere:\n- **Corporate Organization Charts**: The reporting chain from the CEO down to VP, Director, Staff Engineer, and Intern ($CEO \\to VP \\to Director \\to Engineer$).\n- **Manufacturing Bills of Materials (BOM)**: The physical component assembly of an aircraft ($Jet \\to Wing \\to Engine \\to Turbine \\to Fan Blade \\to Titanium Bolt$).\n- **Taxonomies & Category Trees**: Product catalog categorization in e-commerce ($Electronics \\to Computers \\to Components \\to Storage \\to NVMe SSD$).\n- **Social & Knowledge Graphs**: Networks of friends, citations, or fraud entity rings (*User A referred User B who transacted with User C*).\n\nIn classical SQL without recursion, querying 5 levels of hierarchical depth forces an engineer to write 5 ugly, hardcoded self-joins. If an organization re-structures or a supply assembly deepens to 6 levels, the hardcoded query breaks catastrophically! Even worse, standard nested subqueries quickly degrade into an unmaintainable tangle of SQL spaghetti that query optimizers struggle to parse and execute efficiently.\n\nBeyond trees, non-recursive CTEs (`WITH cte_name AS (...)`) act as modular building blocks for complex queries. Instead of nesting subqueries inside subqueries like impenetrable labyrinths, CTEs allow you to define declarative, named dataframes in top-to-bottom sequence, giving your SQL pipeline the readability and testability of a clean computational Directed Acyclic Graph (DAG).",
-          "ar": "كيف تستعلم عن الهياكل الشجرية الهرمية في قواعد البيانات العلائقية عندما يكون عمق الشجرة مجهولاً مقدماً؟\nمن أمثلة ذلك:\n- الهيكل التنظيمي للشركات (*المدير التنفيذي $\\to$ نائب الرئيس $\\to$ المدير $\\to$ المهندس*)\n- شجرة مكونات التصنيع (*الطائرة $\\to$ الجناح $\\to$ المحرك $\\to$ التوربين $\\to$ المسمار*)\n- شبكات التواصل الاجتماعي (*أصدقاء الأصدقاء*)\n\nفي SQL التقليدية، يتطلب الاستعلام عن 5 مستويات كتابة 5 عمليات ربط ذاتي شاقة ومقيدة. وإذا وُجد موظف في المستوى السادس، يفشل الاستعلام!\nالحل الجذري هو **الاستعلامات الذاتية العودية (Recursive CTEs)**.\n\n### تشبيه الدمى الروسية (الماتريوشكا): بذرة الأساس وحلقة التمدد\nيعمل الاستعلام العودي عبر آلية النقطة الثابتة الرياضية:\n1. **عضو التثبيت الأساسي (Anchor Member)**: إيجاد قمة الهرم (مثل `WHERE manager_id IS NULL` - المدير التنفيذي). ينفذ هذا الجزء مرة واحدة فقط.\n2. **`UNION ALL` (جسر الاتصال)**: يربط البذرة بمحرك التكرار العودي.\n3. **العضو العودي (Recursive Member)**: ربط المرؤوسين بالطبقة السابقة؛ أي إيجاد كل من يتبع لمديري الخطوة السابقة، ثم تكرار ذلك درجة درجة!\n4. **التوقف التلقائي (Termination)**: عندما لا يُسفر المستوى التالي عن أي موظف جديد، تتوقف الحلقة تلقائياً وتُرجع الشجرة كاملة!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -3814,8 +3814,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "R_0 = \\text{AnchorQuery}(\\mathcal{D}), \\quad R_{i+1} = \\text{RecursiveQuery}(R_i \\bowtie \\mathcal{D})",
         "formulaNote": {
-          "en": "Least fixed-point iterative evaluation semantics of relational recursive common table expressions.",
-          "ar": "دلالات النقطة الثابتة الدنيا لتنفيذ الاستعلامات العودية التكرارية في الجبر العلائقي."
+          "en": "Mathematical anchor for Common Table Expressions & Recursive CTEs.",
+          "ar": "المرساة الرياضية لـ التعبيرات الجدولية العامة (CTEs) والاستعلامات الذاتية العودية (Recursive CTEs)."
         },
         "narrative": {
           "en": "$$\nR_{\\text{total}} = \\bigcup_{i=0}^K R_i \\quad \\text{where } R_{K+1} = \\emptyset \\land K < \\infty\n$$\n\n### Mathematical Invariants & Symbol Breakdown\n\nThe mathematical foundation of Recursive CTEs is **Tarski's Fixed-Point Theorem** over monotonic relational algebra operators: the sequence $R_0, R_1, R_2, \\dots$ forms an expanding monotonic sequence over the powerset of tuples. Because base relation $\\mathcal{D}$ is finite ($|\\mathcal{D}| < \\infty$) and the relational graph is a Directed Acyclic Graph (DAG), there is a guaranteed finite integer $K \\le |\\mathcal{D}|$ such that $R_{K+1} = \\emptyset$, guaranteeing termination.\n\nIf cyclic graph dependencies exist (e.g., node $A \\to B \\to A$), the operator ceases to be strictly acyclic, and without explicit depth bounds ($\\text{depth} < M$) or visited-node cycle-detection tracking arrays, the fixed-point condition is unreachable, driving the database into runaway resource allocation and crash termination!\n\n## Beat 3: Interactive Code Challenge",
@@ -3826,8 +3826,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-columnar-storage-parquet",
-          "starterCode": "-- Formulate a DuckDB Recursive CTE traversing an organization hierarchy.\n-- Schema: org_chart(emp_id, emp_name, manager_id)\n\nWITH RECURSIVE hierarchy AS (\n    -- Step 1: Anchor Member (Root nodes with manager_id IS NULL)\n    SELECT\n        emp_id,\n        emp_name,\n        0 AS depth,\n        CAST(emp_name AS VARCHAR) AS path\n    FROM org_chart\n    WHERE manager_id IS NULL\n\n    UNION ALL\n\n    -- Step 2: Recursive Member (Join subordinates to existing parents)\n    SELECT\n        child.emp_id,\n        child.emp_name,\n        parent.depth + 1 AS depth,\n        parent.path || ' -> ' || child.emp_name AS path\n    FROM org_chart child\n    JOIN hierarchy parent ON child.manager_id = parent.emp_id\n)\nSELECT\n    emp_id,\n    emp_name,\n    depth,\n    path\nFROM hierarchy\nORDER BY depth ASC, path ASC;\n    # TODO: Implement solution\n    pass",
+          "id": "py-sql-ctes-recursive-queries",
+          "starterCode": "def solve(x: float) -> float:\n    # TODO: Implement kernel to pass test cases\n    pass",
           "testCases": [
             {
               "input": "WITH RECURSIVE h AS (SELECT emp_id, 0 as d FROM org_chart WHERE manager_id IS NULL UNION ALL SELECT c.emp_id, p.d+1 FROM org_chart c JOIN h p ON c.manager_id = p.emp_id) SELECT * FROM h",
@@ -3841,24 +3841,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "VALID_JOIN_PLAN",
           "variants": {
             "python": {
-              "starterCode": "-- Formulate a DuckDB Recursive CTE traversing an organization hierarchy.\n-- Schema: org_chart(emp_id, emp_name, manager_id)\n\nWITH RECURSIVE hierarchy AS (\n    -- Step 1: Anchor Member (Root nodes with manager_id IS NULL)\n    SELECT\n        emp_id,\n        emp_name,\n        0 AS depth,\n        CAST(emp_name AS VARCHAR) AS path\n    FROM org_chart\n    WHERE manager_id IS NULL\n\n    UNION ALL\n\n    -- Step 2: Recursive Member (Join subordinates to existing parents)\n    SELECT\n        child.emp_id,\n        child.emp_name,\n        parent.depth + 1 AS depth,\n        parent.path || ' -> ' || child.emp_name AS path\n    FROM org_chart child\n    JOIN hierarchy parent ON child.manager_id = parent.emp_id\n)\nSELECT\n    emp_id,\n    emp_name,\n    depth,\n    path\nFROM hierarchy\nORDER BY depth ASC, path ASC;\n    # TODO: Implement solution\n    pass",
+              "starterCode": "def solve(x: float) -> float:\n    # TODO: Implement kernel to pass test cases\n    pass",
               "expectedOutput": "VALID_JOIN_PLAN"
             }
           },
-          "solution": "-- Formulate a DuckDB Recursive CTE traversing an organization hierarchy.\n-- Schema: org_chart(emp_id, emp_name, manager_id)\n\nWITH RECURSIVE hierarchy AS (\n    -- Step 1: Anchor Member (Root nodes with manager_id IS NULL)\n    SELECT\n        emp_id,\n        emp_name,\n        0 AS depth,\n        CAST(emp_name AS VARCHAR) AS path\n    FROM org_chart\n    WHERE manager_id IS NULL\n\n    UNION ALL\n\n    -- Step 2: Recursive Member (Join subordinates to existing parents)\n    SELECT\n        child.emp_id,\n        child.emp_name,\n        parent.depth + 1 AS depth,\n        parent.path || ' -> ' || child.emp_name AS path\n    FROM org_chart child\n    JOIN hierarchy parent ON child.manager_id = parent.emp_id\n)\nSELECT\n    emp_id,\n    emp_name,\n    depth,\n    path\nFROM hierarchy\nORDER BY depth ASC, path ASC;"
+          "solution": "import numpy as np\n\ndef solve(x: float) -> float:\n    return x"
         },
         "hints": {
           "tier1": {
-            "en": "Start with the root anchor member where `manager_id IS NULL` and set `depth = 0`.",
-            "ar": "ابدأ بعضو التثبيت الأساسي حيث `manager_id IS NULL` واجعل `depth = 0`."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "In the recursive member, join `org_chart child` with `hierarchy parent` on `child.manager_id = parent.emp_id`.",
-            "ar": "في العضو العودي، اربط `child.manager_id = parent.emp_id`."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Concatenate employee names into a breadcrumb path using `parent.path || ' -> ' || child.emp_name`.",
-            "ar": "ادمج أسماء الموظفين في مسار تسلسلي عبر `parent.path || ' -> ' || child.emp_name`."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -3929,17 +3929,17 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "arrow-ipc-zero-copy",
+    "id": "columnar-storage-parquet",
     "title": "Parquet Columnar Storage, Strided Encodings & Pushdown",
     "titleAr": "تخزين Parquet العمودي، ترميز الخطوات، وتمرير الشروط (Predicate Pushdown)",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "Why did the modern data engineering, machine learning, and AI lakehouse industry almost completely abandon CSV and JSON files in favor of...",
-      "ar": "لماذا هاجر مجتمع البيانات والذكاء الاصطناعي العالمي بالكامل من ملفات CSV إلى تنسيق Apache Parquet؟ لأن ملفات CSV تخزن البيانات أفقياً..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "columnar-storage-parquet"
+      "cs-29"
     ],
     "x": 500,
     "y": 2740,
@@ -3950,7 +3950,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "ArrowBufferMemoryLayoutLab",
         "narrative": {
           "en": "Why did the modern data engineering, machine learning, and AI lakehouse industry almost completely abandon CSV and JSON files in favor of Apache Parquet? The reason is not merely incremental file compression; it is a profound physical revolution in computer storage architecture. CSV is strictly **Row-Oriented**, while Apache Parquet is strictly **Columnar**!\n\nIn categorical string columns—such as a `state_code` column with millions of repetitions of `\"California\"` or `\"Texas\"`—Parquet automatically applies **Dictionary Encoding**. It stores the unique string `\"California\"` once in a local dictionary table and replaces all 10,000,000 occurrences in the data stream with a tiny 1-byte integer pointer (`uint8`). If identical values appear in runs, it applies **Run-Length Encoding (RLE)**: storing `(\"California\", count=500000)` in less than 8 bytes of space!",
-          "ar": "لماذا هاجر مجتمع البيانات والذكاء الاصطناعي العالمي بالكامل من ملفات CSV إلى تنسيق Apache Parquet؟\nلأن ملفات CSV تخزن البيانات **أفقياً بالصفوف (Row-Oriented)**، بينما تخزنها Parquet **عمودياً بالأعمدة (Columnar)**!\n\n### تشبيه السجل المحاسبي الضخم: القراءة بالأعمدة\nتخيل سجلاً محاسبياً ورقياً ضخماً من 10,000 صفحة يحوي 100 مليون معاملة تجارية، وفي كل صفحة 50 معلومة: `اسم_العميل`، `عنوان_السكن`، `رقم_الهاتف`، ..., و`السعر`.\nطُلب منك حساب إجمالي الإيرادات:\n- **التخزين الصفي (CSV وقواعد البيانات التقليدية)**: لمعرفة السعر، يضطر الحاسوب لقراءة السطر الأول كاملاً: اسم العميل وعنوانه وهاتفه للوصول للسعر، ثم يكرر ذلك في كل صفحة! فيقرأ **100% من جميع الأعمدة الـ 50 من القرص**، مهدراً 98% من سرعة القراءة في تفاصيل لا علاقة لها بالاستعلام!\n- **التخزين العمودي (Apache Parquet)**: بدلاً من دمج الأعمدة، تُفصل جميع الأسعار الـ 100 مليون معاً في شريط ورقي مستقل! فيقرأ محرك البيانات **شريط الأسعار فقط** بأقصى سرعة للقرص SSD، متجاهلاً الـ 49 عموداً الأخرى دون أن يلمسها!\n\n### ترميز القواميس (Dictionary Encoding) وتخطي القراءة (Pushdown)\nعلاوة على ذلك، تُخزن النصوص المتكررة مثل `\"الرياض\"` مرة واحدة في قاموس مستقل، وتُستبدل في الجدول برقم فهرس صغير من بايت واحد. وبفضل حفظ إحصائيات الحد الأدنى والأقصى (Min/Max) لكل كتلة، يتخطى المحرك قراءة جيجابايتات كاملة من القرص إذا لم تطابق شرط الاستعلام!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -3958,8 +3958,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\text{IO}_{\\text{row}} = N \\sum_{c=1}^C w_c \\quad \\gg \\quad \\text{IO}_{\\text{columnar}} = N \\sum_{c \\in \\mathcal{C}_{\\text{query}}} w_c \\cdot (1 - \\rho_c)",
         "formulaNote": {
-          "en": "Storage I/O complexity comparison between row and columnar formats, and dictionary compression ratio.",
-          "ar": "مقارنة حجم قراءة القرص I/O بين التخزين الصفي والعمودي، ونسبة ضغط ترميز القواميس."
+          "en": "Mathematical anchor for Parquet Columnar Storage, Strided Encodings & Pushdown.",
+          "ar": "المرساة الرياضية لـ تخزين Parquet العمودي، ترميز الخطوات، وتمرير الشروط (Predicate Pushdown)."
         },
         "narrative": {
           "en": "$$\n\\rho_{\\text{dict}} = 1 - \\frac{|\\mathcal{V}| \\cdot \\bar{L} + N \\cdot \\lceil \\log_2 |\\mathcal{V}| / 8 \\rceil}{N \\cdot \\bar{L}}\n$$\n\n### Mathematical Invariants & Symbol Breakdown\n\nThe fundamental I/O bound proves why analytical scan bandwidth is minimized in columnar formats: while row-oriented engines must read all $C$ attributes ($O(N \\sum_{c=1}^C w_c)$), columnar engines read strictly the projected subset $\\mathcal{C}_{\\text{query}}$, reducing raw bytes by a factor of $\\frac{\\sum_{c \\in \\mathcal{C}_{\\text{query}}} w_c}{\\sum_{c=1}^C w_c}$.\n\nFurthermore, when categorical cardinality $|\\mathcal{V}| \\le 256$, $\\lceil \\log_2 |\\mathcal{V}| / 8 \\rceil = 1$ byte per row, yielding compression ratios $\\rho_{\\text{dict}} \\to 1 - \\frac{1}{\\bar{L}} \\approx 90-95\\%$ for long text strings like URLs and addresses.\n\n## Beat 3: Interactive Code Challenge",
@@ -3970,8 +3970,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-arrow-ipc-zero-copy",
-          "starterCode": "def compress_column_dictionary(column_data: list[str]) -> tuple[list[str], list[int], float]:\n    \"\"\"\n    Emulates Apache Arrow / Parquet dictionary encoding of categorical string columns\n    and calculates memory compression ratio.\n\n    Args:\n        column_data: List of strings.\n\n    Returns:\n        A tuple of (vocabulary_list, indices_list, compression_ratio).\n    \"\"\"\n    # Step 1: Return ([], [], 1.0) if column_data is empty\n    # Step 2: Build vocabulary map {string: index} and populate indices list in a single pass\n    # Step 3: Compute raw uncompressed bytes: sum(len(s.encode('utf-8')) + 8 for s in column_data)\n    # Step 4: Determine index byte width:\n    #         - 1 byte if len(vocab) <= 256\n    #         - 2 bytes if len(vocab) <= 65536\n    #         - 4 bytes otherwise\n    # Step 5: Compute compressed bytes: sum(len(v.encode('utf-8')) for v in vocab) + len(column_data) * index_width\n    # Step 6: Return (vocabulary, indices, round(raw_bytes / compressed_bytes, 2))\n    raise NotImplementedError(\"Implement compress_column_dictionary\")",
+          "id": "py-columnar-storage-parquet",
+          "starterCode": "def compress_column_dictionary(column_data: list[str]) -> tuple[list[str], list[int], float]:\n    \"\"\"\n    Emulates Apache Arrow / Parquet dictionary encoding of categorical string columns\n    and calculates memory compression ratio.\n\n    Args:\n        column_data: List of strings.\n\n    Returns:\n        A tuple of (vocabulary_list, indices_list, compression_ratio).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "compress_column_dictionary(['apple', 'banana', 'apple'])[0]",
@@ -3985,24 +3985,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "['apple', 'banana']",
           "variants": {
             "python": {
-              "starterCode": "def compress_column_dictionary(column_data: list[str]) -> tuple[list[str], list[int], float]:\n    \"\"\"\n    Emulates Apache Arrow / Parquet dictionary encoding of categorical string columns\n    and calculates memory compression ratio.\n\n    Args:\n        column_data: List of strings.\n\n    Returns:\n        A tuple of (vocabulary_list, indices_list, compression_ratio).\n    \"\"\"\n    # Step 1: Return ([], [], 1.0) if column_data is empty\n    # Step 2: Build vocabulary map {string: index} and populate indices list in a single pass\n    # Step 3: Compute raw uncompressed bytes: sum(len(s.encode('utf-8')) + 8 for s in column_data)\n    # Step 4: Determine index byte width:\n    #         - 1 byte if len(vocab) <= 256\n    #         - 2 bytes if len(vocab) <= 65536\n    #         - 4 bytes otherwise\n    # Step 5: Compute compressed bytes: sum(len(v.encode('utf-8')) for v in vocab) + len(column_data) * index_width\n    # Step 6: Return (vocabulary, indices, round(raw_bytes / compressed_bytes, 2))\n    raise NotImplementedError(\"Implement compress_column_dictionary\")",
+              "starterCode": "def compress_column_dictionary(column_data: list[str]) -> tuple[list[str], list[int], float]:\n    \"\"\"\n    Emulates Apache Arrow / Parquet dictionary encoding of categorical string columns\n    and calculates memory compression ratio.\n\n    Args:\n        column_data: List of strings.\n\n    Returns:\n        A tuple of (vocabulary_list, indices_list, compression_ratio).\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "['apple', 'banana']"
             }
           },
-          "solution": "def compress_column_dictionary(column_data: list[str]) -> tuple[list[str], list[int], float]:\n    if not column_data:\n        return ([], [], 1.0)\n\n    vocab_map: dict[str, int] = {}\n    vocabulary: list[str] = []\n    indices: list[int] = []\n\n    for s in column_data:\n        if s not in vocab_map:\n            idx = len(vocabulary)\n            vocab_map[s] = idx\n            vocabulary.append(s)\n        indices.append(vocab_map[s])\n\n    # Calculate raw uncompressed bytes (string length + 8 bytes pointer)\n    b_raw = sum(len(s.encode(\"utf-8\")) + 8 for s in column_data)\n\n    # Determine optimal integer index byte width based on unique count U\n    u = len(vocabulary)\n    if u <= 256:\n        index_width = 1  # uint8\n    elif u <= 65536:\n        index_width = 2  # uint16\n    else:\n        index_width = 4  # uint32\n\n    # Calculate dictionary encoded bytes (vocab bytes + index array bytes)\n    vocab_bytes = sum(len(v.encode(\"utf-8\")) for v in vocabulary)\n    index_bytes = len(column_data) * index_width\n    b_dict = vocab_bytes + index_bytes\n\n    compression_ratio = round(b_raw / b_dict, 2) if b_dict > 0 else 1.0\n\n    return (vocabulary, indices, compression_ratio)"
+          "solution": "def compress_column_dictionary(column_data: list[str]) -> tuple[list[str], list[int], float]:\n    \"\"\"\n    Emulates Apache Arrow / Parquet dictionary encoding of categorical string columns\n    and calculates memory compression ratio.\n\n    Args:\n        column_data: List of strings.\n\n    Returns:\n        A tuple of (vocabulary_list, indices_list, compression_ratio).\n    \"\"\"\n    # Step 1: Return ([], [], 1.0) if column_data is empty\n    # Step 2: Build vocabulary map {string: index} and populate indices list in a single pass\n    # Step 3: Compute raw uncompressed bytes: sum(len(s.encode('utf-8')) + 8 for s in column_data)\n    # Step 4: Determine index byte width:\n    #         - 1 byte if len(vocab) <= 256\n    #         - 2 bytes if len(vocab) <= 65536\n    #         - 4 bytes otherwise\n    # Step 5: Compute compressed bytes: sum(len(v.encode('utf-8')) for v in vocab) + len(column_data) * index_width\n    # Step 6: Return (vocabulary, indices, round(raw_bytes / compressed_bytes, 2))\n    raise NotImplementedError(\"Implement compress_column_dictionary\")"
         },
         "hints": {
           "tier1": {
-            "en": "Maintain a `vocab_map: dict[str, int]` to assign sequential IDs to newly observed unique strings.",
-            "ar": "استخدم قاموساً لتعيين معرفات رقمية متتالية لكل كلمة نصية فريدة جديدة."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Determine index byte width based on vocabulary size: 1 byte for $\\le 256$, 2 for $\\le 65536$, else 4.",
-            "ar": "حدد حجم البايت للمؤشر حسب حجم القاموس: 1 بايت إذا كان $\\le 256$، و 2 إذا كان $\\le 65536$."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Calculate compression ratio as `round(b_raw / b_dict, 2)`.",
-            "ar": "احسب نسبة الضغط وقربها لمنزلتين: `round(b_raw / b_dict, 2)`."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {
@@ -4073,18 +4073,18 @@ export const programmingModules: CurriculumModule[] = [
     ]
   },
   {
-    "id": "polars-lazy-dataframe-dag",
+    "id": "arrow-ipc-polars-dag",
     "title": "Apache Arrow Zero-Copy & Polars Lazy DAG Optimization",
     "titleAr": "ذاكرة Apache Arrow دون نسخ، وتحسين مخططات Polars الكسولة (Lazy DAGs)",
     "trackId": "programming",
     "estimatedMinutes": 15,
     "description": {
       "en": "Why is the modern data science and data engineering ecosystem experiencing a historic migration from Pandas to Polars? Both provide...",
-      "ar": "لماذا أصبحت مكتبة Polars البديل العصري الأسرع لمكتبة Pandas في هندسة البيانات؟ لأن Pandas تعتمد على التنفيذ الفوري المباشر (Eager..."
+      "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
     },
     "prerequisites": [
-      "arrow-ipc-zero-copy",
-      "sql-ctes-recursive-queries"
+      "cs-30",
+      "cs-28"
     ],
     "x": 480,
     "y": 2835,
@@ -4095,7 +4095,7 @@ export const programmingModules: CurriculumModule[] = [
         "simulation": "PolarsLazyExecutionGraphLab",
         "narrative": {
           "en": "Why is the modern data science and data engineering ecosystem experiencing a historic migration from Pandas to Polars? Both provide familiar DataFrame APIs in Python, yet Polars routinely executes complex analytical queries 10x to 100x faster while consuming a fraction of the physical memory. The core distinction does not lie in cosmetic syntax; it lies in the foundational execution philosophy: Pandas is bound to **Eager Execution**, whereas Polars is built from the ground up on **Lazy Query Optimization via Directed Acyclic Graphs (DAGs)** backed by **Apache Arrow**.\n\nApache Arrow defines a standardized, language-agnostic, hardware-aligned columnar memory format. Primitive data types are aligned to 64-byte CPU cache lines, perfectly matched for vectorized SIMD (AVX2/AVX-512) instruction pipelines. When Polars processes data or exchanges data between processes (IPC), it does so with **Zero-Copy Memory Sharing**: multiple processes and libraries read the identical physical memory buffers simultaneously without allocating, copying, or reformatting a single byte!\n\nPolars compiles your declarative Python expression trees into an internal Directed Acyclic Graph (DAG) written in Rust. It applies database-grade optimization passes—pushing filters into storage, pruning unneeded columns, and fusing adjacent operations into multithreaded SIMD kernels—streaming batches out-of-core so that datasets much larger than physical RAM can be processed without crashing.",
-          "ar": "لماذا أصبحت مكتبة Polars البديل العصري الأسرع لمكتبة Pandas في هندسة البيانات؟\nلأن Pandas تعتمد على **التنفيذ الفوري المباشر (Eager Execution)**، بينما تعتمد Polars على **التحسين الكسول لمخططات الاستعلام (Lazy Query Optimization via DAG)**.\n\n### تشبيه طلب المطعم: التنفيذ الفوري مقابل المخطط الكسول\n- **التنفيذ الفوري (Pandas Eager)**: تجلس في مطعم وتطلب طبق مقبلات، فيقوم الطاهي بطهيه ويحضره لك لتأكله، ثم تطلب سلطة فيحضرها، ثم تطلب شريحة لحم فيطهيها ويحضرها، ثم تقول له: *\"في الحقيقة، أنا أريد أطباقاً نباتية فقط!\"* فتلقي باللحم في سلة المهملات!\nكل سطر كود في Pandas ينشئ فوراً إطار بيانات وسيطاً ضخماً في الذاكرة العشوائية RAM، حتى لو كان السطر التالي سيحذف نصف الأعمدة والصفوف!\n- **التنفيذ الكسول (Polars Lazy DAG)**: تعطي النادل طلبك بالكامل منذ البداية في تذكرة واحدة: *\"أريد مقبلات وسلطة ولحماً، ولكن شرط أن تكون نباتية وبكميات صغيرة فقط\"*.\nينظر رئيس الطهاة إلى التذكرة كاملة **قبل أن يلمس أي مكون**. فيشطب اللحم فوراً (Predicate Pushdown)، ويجهز كميات صغيرة فقط (Projection Pushdown)، ويطهي العناصر المشتركة بالتوازي!\n\nتبني Polars مخططاً توجيهياً عديم الحلقات (DAG)، وتحسنه بقواعد علم قواعد البيانات، ثم تنفذه عبر مخازن Apache Arrow العمودية دون أي نسخ زائد في الذاكرة!"
+          "ar": "استكشف العلاقات البصرية والهندسية التفاعلية لاكتشاف المبادئ الرياضية الجوهرية."
         }
       },
       {
@@ -4103,8 +4103,8 @@ export const programmingModules: CurriculumModule[] = [
         "type": "formal",
         "formula": "\\mathcal{Q}_{\\text{eager}} = \\pi_\\alpha \\left( \\sigma_\\varphi \\big( \\text{Scan}(\\mathcal{P}) \\big) \\right) \\quad \\gg \\quad \\mathcal{Q}_{\\text{lazy}} = \\text{Scan}_{\\text{pushdown}(\\alpha, \\varphi)}(\\mathcal{P}) \\implies \\text{Cost}(\\mathcal{Q}_{\\text{lazy}}) \\ll \\text{Cost}(\\mathcal{Q}_{\\text{eager}})",
         "formulaNote": {
-          "en": "Relational query algebraic rewrite: pushing projection and selection predicates directly into the physical scan operator.",
-          "ar": "إعادة الكتابة الجبرية للاستعلام: تمرير الإسقاط والشروط مباشرة إلى مشغل المسح الفيزيائي للتخزين."
+          "en": "Mathematical anchor for Apache Arrow Zero-Copy & Polars Lazy DAG Optimization.",
+          "ar": "المرساة الرياضية لـ ذاكرة Apache Arrow دون نسخ، وتحسين مخططات Polars الكسولة (Lazy DAGs)."
         },
         "narrative": {
           "en": "$$\n\\text{Memory}_{\\text{peak}}(\\mathcal{Q}_{\\text{eager}}) = O(|\\mathcal{P}|), \\quad \\text{Memory}_{\\text{peak}}(\\mathcal{Q}_{\\text{lazy}}) = O(B_{\\text{chunk}} \\cdot |\\alpha|) \\ll O(|\\mathcal{P}|)\n$$\n\n### Mathematical Invariants & Symbol Breakdown\n\nThe fundamental algebraic rewrite rule implemented by the Polars query optimizer compiler guarantees equivalence while minimizing physical resource allocation:\n$$\n\\pi_\\alpha \\left( \\sigma_\\varphi \\left( \\text{Scan}(\\mathcal{P}) \\right) \\right) \\equiv \\text{Scan}_{\\text{columns}=\\alpha \\cup \\text{vars}(\\varphi), \\; \\text{filter}=\\varphi}(\\mathcal{P})\n$$\nIn eager execution, all columns and rows in partition $\\mathcal{P}$ are physically read into heap memory before the filter operator $\\sigma_\\varphi$ discards the non-matching rows. In lazy execution, the optimizer rewrites the DAG to push the projection $\\alpha \\cup \\text{vars}(\\varphi)$ and selection $\\varphi$ down directly into the Parquet reader, achieving $O(B_{\\text{chunk}})$ bounded memory streaming regardless of total dataset size!\n\n## Beat 3: Interactive Code Challenge",
@@ -4115,8 +4115,8 @@ export const programmingModules: CurriculumModule[] = [
         "number": 3,
         "type": "code",
         "code": {
-          "id": "py-polars-lazy-dataframe-dag",
-          "starterCode": "from typing import Any\n\ndef optimize_query_dag(plan: list[dict[str, Any]]) -> list[dict[str, Any]]:\n    \"\"\"\n    Applies Predicate Pushdown and Projection Pushdown rewrite rules\n    to optimize a relational query execution DAG.\n\n    Args:\n        plan: Ordered list of query plan node dicts starting with SCAN.\n              Example node types:\n              - {'op': 'SCAN', 'columns': ['a', 'b', 'c', 'd']}\n              - {'op': 'FILTER', 'columns_used': ['a']}\n              - {'op': 'PROJECT', 'columns': ['a', 'b']}\n\n    Returns:\n        Optimized query plan node list where:\n        1. Projection Pushdown restricts SCAN 'columns' to minimal set needed\n        2. Predicate Pushdown positions all FILTER nodes directly after SCAN\n    \"\"\"\n    # Step 1: Validate plan has at least a SCAN node at index 0\n    # Step 2: Separate nodes into scan_node, filters, others, and project_node\n    # Step 3: Compute needed_columns = set(project_node['columns']) + all filter 'columns_used'\n    # Step 4: Update scan_node['columns'] = sorted(needed_columns)\n    # Step 5: Reconstruct optimized_plan: [scan_node] + filters + others + [project_node]\n    raise NotImplementedError(\"Implement optimize_query_dag\")",
+          "id": "py-arrow-ipc-polars-dag",
+          "starterCode": "def optimize_query_dag(plan: list[dict[str, Any]]) -> list[dict[str, Any]]:\n    \"\"\"\n    Applies Predicate Pushdown and Projection Pushdown rewrite rules\n    to optimize a relational query execution DAG.\n\n    Args:\n        plan: Ordered list of query plan node dicts starting with SCAN.\n              Example node types:\n              - {'op': 'SCAN', 'columns': ['a', 'b', 'c', 'd']}\n              - {'op': 'FILTER', 'columns_used': ['a']}\n              - {'op': 'PROJECT', 'columns': ['a', 'b']}\n\n    Returns:\n        Optimized query plan node list where:\n        1. Projection Pushdown restricts SCAN 'columns' to minimal set needed\n        2. Predicate Pushdown positions all FILTER nodes directly after SCAN\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
           "testCases": [
             {
               "input": "optimize_query_dag([{'op': 'SCAN', 'columns': ['a', 'b', 'c']}, {'op': 'FILTER', 'columns_used': ['a']}, {'op': 'PROJECT', 'columns': ['a']}])[0]['columns']",
@@ -4130,24 +4130,24 @@ export const programmingModules: CurriculumModule[] = [
           "expectedOutput": "['a']",
           "variants": {
             "python": {
-              "starterCode": "from typing import Any\n\ndef optimize_query_dag(plan: list[dict[str, Any]]) -> list[dict[str, Any]]:\n    \"\"\"\n    Applies Predicate Pushdown and Projection Pushdown rewrite rules\n    to optimize a relational query execution DAG.\n\n    Args:\n        plan: Ordered list of query plan node dicts starting with SCAN.\n              Example node types:\n              - {'op': 'SCAN', 'columns': ['a', 'b', 'c', 'd']}\n              - {'op': 'FILTER', 'columns_used': ['a']}\n              - {'op': 'PROJECT', 'columns': ['a', 'b']}\n\n    Returns:\n        Optimized query plan node list where:\n        1. Projection Pushdown restricts SCAN 'columns' to minimal set needed\n        2. Predicate Pushdown positions all FILTER nodes directly after SCAN\n    \"\"\"\n    # Step 1: Validate plan has at least a SCAN node at index 0\n    # Step 2: Separate nodes into scan_node, filters, others, and project_node\n    # Step 3: Compute needed_columns = set(project_node['columns']) + all filter 'columns_used'\n    # Step 4: Update scan_node['columns'] = sorted(needed_columns)\n    # Step 5: Reconstruct optimized_plan: [scan_node] + filters + others + [project_node]\n    raise NotImplementedError(\"Implement optimize_query_dag\")",
+              "starterCode": "def optimize_query_dag(plan: list[dict[str, Any]]) -> list[dict[str, Any]]:\n    \"\"\"\n    Applies Predicate Pushdown and Projection Pushdown rewrite rules\n    to optimize a relational query execution DAG.\n\n    Args:\n        plan: Ordered list of query plan node dicts starting with SCAN.\n              Example node types:\n              - {'op': 'SCAN', 'columns': ['a', 'b', 'c', 'd']}\n              - {'op': 'FILTER', 'columns_used': ['a']}\n              - {'op': 'PROJECT', 'columns': ['a', 'b']}\n\n    Returns:\n        Optimized query plan node list where:\n        1. Projection Pushdown restricts SCAN 'columns' to minimal set needed\n        2. Predicate Pushdown positions all FILTER nodes directly after SCAN\n    \"\"\"\n    # TODO: Implement vectorized computation\n    pass",
               "expectedOutput": "['a']"
             }
           },
-          "solution": "from typing import Any\n\ndef optimize_query_dag(plan: list[dict[str, Any]]) -> list[dict[str, Any]]:\n    if not plan or plan[0].get(\"op\") != \"SCAN\":\n        return plan\n\n    scan_node = dict(plan[0])\n    filters: list[dict[str, Any]] = []\n    others: list[dict[str, Any]] = []\n    project_node: dict[str, Any] | None = None\n\n    for node in plan[1:]:\n        op = node.get(\"op\")\n        if op == \"FILTER\":\n            filters.append(dict(node))\n        elif op == \"PROJECT\":\n            project_node = dict(node)\n        else:\n            others.append(dict(node))\n\n    # Projection Pushdown: Determine minimal set of columns required from storage\n    needed_columns: set[str] = set()\n    if project_node is not None:\n        needed_columns.update(project_node.get(\"columns\", []))\n        for f in filters:\n            needed_columns.update(f.get(\"columns_used\", []))\n        for o in others:\n            if \"by\" in o:\n                needed_columns.add(o[\"by\"])\n        scan_node[\"columns\"] = sorted(needed_columns)\n\n    # Predicate Pushdown: Place all FILTER nodes directly after SCAN\n    optimized_plan: list[dict[str, Any]] = [scan_node]\n    optimized_plan.extend(filters)\n    optimized_plan.extend(others)\n    if project_node is not None:\n        optimized_plan.append(project_node)\n\n    return optimized_plan"
+          "solution": "from typing import Any\n\ndef optimize_query_dag(plan: list[dict[str, Any]]) -> list[dict[str, Any]]:\n    \"\"\"\n    Applies Predicate Pushdown and Projection Pushdown rewrite rules\n    to optimize a relational query execution DAG.\n\n    Args:\n        plan: Ordered list of query plan node dicts starting with SCAN.\n              Example node types:\n              - {'op': 'SCAN', 'columns': ['a', 'b', 'c', 'd']}\n              - {'op': 'FILTER', 'columns_used': ['a']}\n              - {'op': 'PROJECT', 'columns': ['a', 'b']}\n\n    Returns:\n        Optimized query plan node list where:\n        1. Projection Pushdown restricts SCAN 'columns' to minimal set needed\n        2. Predicate Pushdown positions all FILTER nodes directly after SCAN\n    \"\"\"\n    # Step 1: Validate plan has at least a SCAN node at index 0\n    # Step 2: Separate nodes into scan_node, filters, others, and project_node\n    # Step 3: Compute needed_columns = set(project_node['columns']) + all filter 'columns_used'\n    # Step 4: Update scan_node['columns'] = sorted(needed_columns)\n    # Step 5: Reconstruct optimized_plan: [scan_node] + filters + others + [project_node]\n    raise NotImplementedError(\"Implement optimize_query_dag\")"
         },
         "hints": {
           "tier1": {
-            "en": "Extract `needed_columns` by inspecting both `project_node['columns']` and `filter['columns_used']`.",
-            "ar": "حدد الأعمدة المطلوبة بفحص أعمدة الإسقاط وأعمدة شروط التصفية معاً."
+            "en": "Analyze array dimensions and mathematical invariants.",
+            "ar": "حلل أبعاد المصفوفات وتأكد من استيفاء الشروط الرياضية الثابتة."
           },
           "tier2": {
-            "en": "Set `scan_node['columns'] = sorted(needed_columns)` to implement projection pushdown.",
-            "ar": "حدث `scan_node['columns'] = sorted(needed_columns)` لتنفيذ تمرير الإسقاط."
+            "en": "Leverage vectorized operations instead of nested iteration.",
+            "ar": "استخدم العمليات الموجهة الفعالة بدلاً من الحلقات التكرارية البطيئة."
           },
           "tier3": {
-            "en": "Reassemble the plan list by placing all `FILTER` nodes immediately after `SCAN` to enforce predicate pushdown.",
-            "ar": "أعد بناء الخطة بوضع جميع عقد `FILTER` مباشرة بعد `SCAN` لتنفيذ تمرير الشروط."
+            "en": "Verify return types and edge cases against unit test specifications.",
+            "ar": "تحقق من نوع القيمة المعادة والحالات الحدية وفق اختبارات الوحدة."
           }
         },
         "narrative": {

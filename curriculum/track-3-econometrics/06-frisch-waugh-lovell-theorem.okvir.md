@@ -5,7 +5,7 @@ title: "The Frisch-Waugh-Lovell (FWL) Theorem & Partialling Out"
 track: "econometrics"
 module: "mod-20"
 estimated_minutes: 15
-prerequisites: ["multiple-regression-matrix-calculus", "four-fundamental-subspaces"]
+prerequisites: ["multiple-regression-matrix-calculus", "t1-11"]
 i18n:
   ar: "مبرهنة فريش-وو-لوفيل والتجريد الجزئي للمتغيرات"
 ---

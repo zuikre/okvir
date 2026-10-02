@@ -1,11 +1,11 @@
 ---
-id: "central-limit-theorem"
+id: "t1-29"
 version: "1.0.0"
 title: "The Central Limit Theorem & Geometric Convergence of Noise"
 track: "math"
 module: "mod-07"
 estimated_minutes: 15
-prerequisites: ["bayes-theorem", "differentiation-rules-chain"]
+prerequisites: ["bayes-theorem", "t1-18"]
 i18n:
   ar: "مبرهنة النهاية المركزية والتقارب الهندسي للضوضاء"
 ---
@@ -95,7 +95,7 @@ $$
 
 ## Beat 3: Interactive Python Scratchpad
 
-:::python-challenge{id="py-central-limit-theorem"}
+:::python-challenge{id="py-t1-29"}
 ---
 timeout_ms: 3000
 test_cases:

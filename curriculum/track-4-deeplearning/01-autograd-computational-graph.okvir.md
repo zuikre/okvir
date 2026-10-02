@@ -5,7 +5,7 @@ title: "Scalar Autograd Node & Computational Graph Topology"
 track: "deeplearning"
 module: "mod-35"
 estimated_minutes: 15
-prerequisites: ["differentiation-rules-chain", "first-class-closures"]
+prerequisites: ["t1-18", "cs-05"]
 i18n:
   ar: "عقدة التفاضل التلقائي السلمية وطوبولوجيا الرسم البياني الحسابي"
 ---

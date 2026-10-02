@@ -5,7 +5,7 @@ title: "Iteration Protocols, Loop Invariants & State Accumulators"
 track: "programming"
 module: "mod-08"
 estimated_minutes: 15
-prerequisites: ["control-flow-branching"]
+prerequisites: ["cs-02"]
 i18n:
   ar: "بروتوكول التكرار الحلقي، اللامتغيرات، وتراكم الحالة"
 ---

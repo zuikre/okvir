@@ -1,11 +1,11 @@
 ---
-id: "determinant-scaling-factor"
+id: "t1-09"
 version: "1.0.0"
 title: "The Determinant as Area/Volume Scaling Factor"
 track: "math"
 module: "mod-03"
 estimated_minutes: 15
-prerequisites: ["matrix-multiplication-composition"]
+prerequisites: ["t1-08"]
 i18n:
   ar: "المحدد كمعامل تمدد للمساحات والحجوم"
 ---
@@ -111,7 +111,7 @@ $$
 2. **لماذا يمنع المحدد الصفري قلب المصفوفة؟**
    إذا كان المحدد صفراً، فهذا يعني أن مساحة متوازي الأضلاع أصبحت صفراً، وانطبق الفضاء على خط واحد. كل المعلومات في البعد المفقود قد تلاشت تماماً، ومحاولة قلب المصفوفة تتطلب تخمين أي نقطة من المالانهاية كانت الأصل، وهو مستحيل رياضياً.
 
-:::python-challenge{id="py-determinant-scaling-factor"}
+:::python-challenge{id="py-t1-09"}
 ---
 timeout_ms: 3000
 test_cases:

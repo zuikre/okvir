@@ -5,7 +5,7 @@ title: "Sorting Algorithms & Divide-and-Conquer Recurrences"
 track: "programming"
 module: "mod-12"
 estimated_minutes: 15
-prerequisites: ["algorithmic-complexity-big-o"]
+prerequisites: ["cs-13"]
 i18n:
   ar: "خوارزميات الترتيب، فرّق تسُد (Divide and Conquer)، ومبرهنة التكرار"
 ---

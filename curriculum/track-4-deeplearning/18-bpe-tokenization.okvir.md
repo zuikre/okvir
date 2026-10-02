@@ -5,7 +5,7 @@ title: "Byte Pair Encoding (BPE) Subword Tokenization"
 track: "deeplearning"
 module: "mod-41"
 estimated_minutes: 15
-prerequisites: ["hash-tables-dict-internals"]
+prerequisites: ["cs-08"]
 i18n:
   ar: "ترميز أزواج البايت (BPE) وتقطيع الكلمات الفرعية"
 ---

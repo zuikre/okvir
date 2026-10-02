@@ -5,7 +5,7 @@ title: "Bivariate OLS & The Geometry of Orthogonal Residuals"
 track: "econometrics"
 module: "mod-18"
 estimated_minutes: 15
-prerequisites: ["least-squares-approximation", "numpy-vectorization"]
+prerequisites: ["t1-12", "cs-16"]
 i18n:
   ar: "الانحدار الخطي البسيط وهندسة البواقي المتعامدة"
 ---

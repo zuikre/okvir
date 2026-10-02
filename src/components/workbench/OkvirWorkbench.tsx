@@ -31,6 +31,7 @@ import { useOkvirStore } from '@/lib/store';
 import { curriculum, tracks } from '@/lib/curriculum';
 import { SimulationView } from '@/components/simulation/SimulationView';
 import { CodeChallengeEditor } from '@/components/editor/CodeChallengeEditor';
+import { FadedScaffoldCodeEditor } from '@/components/pedagogy/FadedScaffoldCodeEditor';
 import { VariableInspector } from '@/components/editor/VariableInspector';
 import { useCodeCanvasBridge } from '@/lib/pyodide/useCodeCanvasBridge';
 import { useFormulaAnchorStore } from '@/lib/formulaAnchorStore';
@@ -39,7 +40,7 @@ import { MathText } from '@/components/common/MathText';
 import { TactileSlider } from '@/components/common/TactileSlider';
 import { MisconceptionDiagnosticCard } from '@/components/pedagogy/MisconceptionDiagnosticCard';
 import { QuizBatteryComponent } from '@/components/quiz/QuizBatteryComponent';
-import { getQuizBatteryForModule } from '@/lib/curriculum-quizzes';
+import { getQuizBatteryForModule, CURRICULUM_QUIZ_BATTERIES } from '@/lib/curriculum-quizzes';
 import { audio } from '@/lib/audio';
 import type { BeatNumber, SimulationType, DiagnosticQuestion } from '@/lib/types';
 
@@ -441,8 +442,24 @@ export const OkvirWorkbench: React.FC = () => {
 
   // Diagnostic question mapping
   const quizQuestions = useMemo(() => {
+    if (CURRICULUM_QUIZ_BATTERIES[mod.id]) {
+      return CURRICULUM_QUIZ_BATTERIES[mod.id];
+    }
+    if (beat4.question) {
+      return [{
+        id: `${mod.id}-beat4-diagnostic`,
+        depthTier: 2 as const,
+        prompt: beat4.question.prompt,
+        latexAnchor: beat2.formula || '',
+        options: beat4.question.options.map((opt) => ({
+          text: opt.text,
+          correct: opt.correct,
+          diagnosticFeedback: opt.explanation,
+        })),
+      }];
+    }
     return getQuizBatteryForModule(mod.id, mod.title, mod.titleAr);
-  }, [mod.id, mod.title, mod.titleAr]);
+  }, [mod.id, mod.title, mod.titleAr, beat4.question, beat2.formula]);
 
   const [masteryCertified, setMasteryCertified] = useState(() => {
     return lessons[activeLessonId]?.status === 'mastered';
@@ -464,21 +481,6 @@ export const OkvirWorkbench: React.FC = () => {
       setIsDiagnosticSolved(true);
     }
   };
-
-  const diagnosticQuestion: DiagnosticQuestion | null = useMemo(() => {
-    if (!beat4.question) return null;
-    return {
-      id: `${mod.id}-beat4-diagnostic`,
-      depthTier: 2,
-      prompt: beat4.question.prompt,
-      latexAnchor: beat2.formula,
-      options: beat4.question.options.map((opt) => ({
-        text: opt.text,
-        correct: opt.correct,
-        diagnosticFeedback: opt.explanation,
-      })),
-    };
-  }, [beat4.question, beat2.formula, mod.id]);
 
   const [isDiagnosticSolved, setIsDiagnosticSolved] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -1086,12 +1088,23 @@ export const OkvirWorkbench: React.FC = () => {
 
           {/* Full-Width Code Challenge Editor */}
           <div className="w-full rounded-3xl border border-[var(--border-strong)] overflow-hidden shadow-2xl bg-[var(--bg-surface)]">
-            <CodeChallengeEditor
-              challenge={beat3.code}
-              onComplete={() => {
-                if (config.soundEnabled) audio.playVictoryHarmonics();
-              }}
-            />
+            {beat3.code ? (
+              <FadedScaffoldCodeEditor
+                challengeId={beat3.code.id}
+                scaffold={{
+                  tier: 'parsons',
+                  instructions: {
+                    en: 'Complete the algorithm through faded scaffolding.',
+                    ar: 'أكمل الخوارزمية من خلال البناء البرمجي المتدرج.'
+                  },
+                  autonomousStarter: beat3.code.starterCode,
+                  testCases: beat3.code.testCases
+                }}
+                onSuccess={() => {
+                  if (config.soundEnabled) audio.playVictoryHarmonics();
+                }}
+              />
+            ) : null}
           </div>
         </section>
 

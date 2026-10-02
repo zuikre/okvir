@@ -1,11 +1,11 @@
 ---
-id: "matrix-multiplication-composition"
+id: "t1-08"
 version: "1.0.0"
 title: "Matrix Multiplication as Composition of Transformations"
 track: "math"
 module: "mod-03"
 estimated_minutes: 15
-prerequisites: ["linear-maps-transformations"]
+prerequisites: ["t1-07"]
 i18n:
   ar: "ضرب المصفوفات كتركيب متتالٍ للتحويلات"
 ---
@@ -105,7 +105,7 @@ $$
 2. **لماذا يكون ضرب المصفوفات تجميعياً ($(\mathbf{C}\mathbf{B})\mathbf{A} = \mathbf{C}(\mathbf{B}\mathbf{A})$)؟**
    لأن تركيب العمليات متتالية زمنياً تجميعي بطبيعته: تطبيق العمليات الثلاث المتعاقبة $A$ ثم $B$ ثم $C$ يعطي نفس النتيجة سواء دمجت الخطوتين الأولى والثانية أولاً، أو دمجت الخطوتين الثانية والثالثة أولاً.
 
-:::python-challenge{id="py-matrix-multiplication-composition"}
+:::python-challenge{id="py-t1-08"}
 ---
 timeout_ms: 3000
 test_cases:

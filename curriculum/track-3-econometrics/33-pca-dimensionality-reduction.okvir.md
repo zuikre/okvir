@@ -5,7 +5,7 @@ title: "Principal Component Analysis (PCA) & Variance Maximization"
 track: "econometrics"
 module: "mod-33"
 estimated_minutes: 15
-prerequisites: ["singular-value-decomposition", "symmetric-matrices-spectral"]
+prerequisites: ["t1-15", "t1-14"]
 i18n:
   ar: "تحليل المكونات الرئيسية (PCA) وتعظيم التباين الهندسي"
 ---
