@@ -57,6 +57,9 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
   }, [state.currentStep, onStepChange]);
 
   // Update sonifier loss metric
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
   useEffect(() => {
     sonifier.updateLoss(metricValue);
   }, [metricValue]);
@@ -70,32 +73,50 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
     }
   }, [state.status]);
 
-  // Continuous Playback Animation Loop with Delta-Time Accumulator
+  // Playback Animation Loop with Delta-Time Accumulator and strict bounds
   const tick = useCallback(
     (now: number) => {
+      const curState = stateRef.current;
+      if (curState.status !== 'PLAYING') return;
+
+      if (curState.currentStep >= curState.totalSteps) {
+        dispatch({ type: 'PAUSE' });
+        return;
+      }
+
       if (lastTimeRef.current === 0) lastTimeRef.current = now;
       const dt = now - lastTimeRef.current;
       lastTimeRef.current = now;
 
       // Base step duration: 150ms at 1.0x
-      const stepDuration = 150 / state.speed;
+      const stepDuration = 150 / curState.speed;
       accumulatorRef.current += dt;
 
+      let shouldContinue = true;
       while (accumulatorRef.current >= stepDuration) {
         accumulatorRef.current -= stepDuration;
+        if (stateRef.current.currentStep >= stateRef.current.totalSteps) {
+          dispatch({ type: 'PAUSE' });
+          shouldContinue = false;
+          break;
+        }
         dispatch({ type: 'STEP_FORWARD' });
+        sonifier.playStepTick();
       }
 
-      if (state.status === 'PLAYING') {
+      if (shouldContinue && stateRef.current.status === 'PLAYING' && stateRef.current.currentStep < stateRef.current.totalSteps) {
         animFrameRef.current = requestAnimationFrame(tick);
       }
     },
-    [state.speed, state.status]
+    []
   );
 
   useEffect(() => {
     if (state.status === 'PLAYING') {
-      sonifier.startContinuousSonification();
+      if (state.currentStep >= state.totalSteps) {
+        dispatch({ type: 'PAUSE' });
+        return;
+      }
       lastTimeRef.current = 0;
       accumulatorRef.current = 0;
       animFrameRef.current = requestAnimationFrame(tick);
@@ -106,16 +127,8 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
     }
     return () => {
       cancelAnimationFrame(animFrameRef.current);
-      sonifier.stopContinuousSonification();
     };
-  }, [state.status, tick, onPlayStateChange]);
-
-  // Ensure sonification stops on unmount
-  useEffect(() => {
-    return () => {
-      sonifier.stopContinuousSonification();
-    };
-  }, []);
+  }, [state.status, tick, onPlayStateChange, state.currentStep, state.totalSteps]);
 
   // Keyboard Shortcuts (Space: Play/Pause, Arrows: Step, R: Reset)
   useEffect(() => {
@@ -196,11 +209,9 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
           value={state.currentStep}
           onMouseDown={() => {
             dispatch({ type: 'SCRUB_START' });
-            sonifier.startContinuousSonification();
           }}
           onTouchStart={() => {
             dispatch({ type: 'SCRUB_START' });
-            sonifier.startContinuousSonification();
           }}
           onChange={(e) => dispatch({ type: 'SCRUB_MOVE', targetStep: parseInt(e.target.value, 10) })}
           onMouseUp={() => dispatch({ type: 'SCRUB_END' })}

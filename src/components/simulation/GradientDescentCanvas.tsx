@@ -202,16 +202,32 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
           break;
         }
 
-        // Criteria 3: Parameter Displacement Stagnation (Zero Progress)
+        // Criteria 3: Proximity to Known Global Minimum (Optimum Basin Arrival)
+        const distToOpt = Math.hypot(p.x - curSurface.optimum.x, p.y - curSurface.optimum.y);
+        const optTol = Math.max(0.045, stopTol * 1.5);
+        if (autoStopOnConvergence && t > 0 && distToOpt <= optTol) {
+          status = 'converged';
+          convergedStep = t;
+          reason = language === 'ar'
+            ? `تم الوصول إلى جوار القاع الأمثل θ*: المسافة = ${distToOpt.toFixed(4)} ≤ ${optTol.toFixed(3)}`
+            : `Reached neighborhood of optimum θ*: dist = ${distToOpt.toFixed(4)} ≤ ${optTol.toFixed(3)}`;
+          break;
+        }
+
+        // Criteria 4: Parameter Displacement Stagnation (Zero Progress)
         if (autoStopOnConvergence && t > 1) {
           const prev1 = snaps[t - 1];
           const prev2 = snaps[t - 2];
           const disp1 = Math.hypot(p.x - prev1.x, p.y - prev1.y);
           const disp2 = Math.hypot(prev1.x - prev2.x, prev1.y - prev2.y);
-          if (disp1 < 1e-5 && disp2 < 1e-5 && gradNorm < 0.1) {
+          const lossChange = Math.abs(loss - prev1.loss);
+          const stagTol = Math.max(0.003, stopTol * 0.12);
+          if ((disp1 < stagTol && disp2 < stagTol) || (t > 4 && lossChange < 1e-4 && disp1 < 0.015)) {
             status = 'converged';
             convergedStep = t;
-            reason = language === 'ar' ? 'سكون الإحداثيات: ثبات كامل في المعاملات' : 'Parameter stagnation: zero displacement';
+            reason = language === 'ar'
+              ? `سكون الإحداثيات: استقرار التغير في المعاملات (Δθ = ${disp1.toFixed(4)})`
+              : `Parameter stagnation: minimal step displacement (Δθ = ${disp1.toFixed(4)})`;
             break;
           }
         }
@@ -328,57 +344,81 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
 
     const isDark = theme === 'dark';
 
-    // ── 1. MATHEMATICAL LOSS SURFACE HEATMAP (DENSE 80x60 GRID) ──
-    const gridCols = 80;
-    const gridRows = 60;
-    const cellW = width / gridCols;
-    const cellH = height / gridRows;
+    // ── 1. SLEEK DARK MATHEMATICAL TOPOGRAPHIC CANVAS ──
+    ctx.fillStyle = isDark ? '#08090e' : '#f8fafc';
+    ctx.fillRect(0, 0, width, height);
 
-    const zMatrix: number[][] = [];
-    for (let r = 0; r < gridRows; r++) {
-      zMatrix[r] = [];
-      const dataY = b.maxY - ((r + 0.5) / gridRows) * (b.maxY - b.minY);
-      for (let c = 0; c < gridCols; c++) {
-        const dataX = b.minX + ((c + 0.5) / gridCols) * (b.maxX - b.minX);
-        const z = surface.f(dataX, dataY);
-        zMatrix[r][c] = z;
+    const optPx = toPx(surface.optimum.x, surface.optimum.y);
 
-        // Topographic color normalization
-        let norm = 0;
-        if (surfaceType === 'rosenbrock') {
-          norm = Math.log(1 + Math.max(0, z)) / Math.log(1 + surface.zRange.max);
-        } else if (surfaceType === 'bowl') {
-          norm = Math.sqrt(Math.max(0, z) / surface.zRange.max);
-        } else {
-          norm = (z - surface.zRange.min) / (surface.zRange.max - surface.zRange.min);
-        }
-        norm = Math.max(0, Math.min(1, norm));
+    // Subtle atmospheric luminescence centered at optimum basin
+    const glowRadius = Math.max(width, height) * 0.65;
+    const bgGlow = ctx.createRadialGradient(optPx.px, optPx.py, 6, optPx.px, optPx.py, glowRadius);
+    bgGlow.addColorStop(0, isDark ? 'rgba(99, 102, 241, 0.09)' : 'rgba(99, 102, 241, 0.05)');
+    bgGlow.addColorStop(0.4, isDark ? 'rgba(56, 189, 248, 0.035)' : 'rgba(56, 189, 248, 0.02)');
+    bgGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = bgGlow;
+    ctx.fillRect(0, 0, width, height);
 
-        // Scientific terrain palette: Deep Valley (Navy/Cyan) -> Mid Slopes (Emerald/Amber) -> Peak (Rose)
-        if (norm < 0.3) {
-          const t = norm / 0.3;
-          ctx.fillStyle = isDark
-            ? `rgba(${Math.round(15 + t * 20)}, ${Math.round(30 + t * 90)}, ${Math.round(80 + t * 110)}, 0.45)`
-            : `rgba(${Math.round(224 - t * 40)}, ${Math.round(242 - t * 30)}, ${Math.round(254 - t * 20)}, 0.55)`;
-        } else if (norm < 0.65) {
-          const t = (norm - 0.3) / 0.35;
-          ctx.fillStyle = isDark
-            ? `rgba(${Math.round(16 + t * 120)}, ${Math.round(120 + t * 30)}, ${Math.round(120 - t * 70)}, 0.35)`
-            : `rgba(${Math.round(209 + t * 45)}, ${Math.round(250 - t * 30)}, ${Math.round(229 - t * 70)}, 0.45)`;
-        } else {
-          const t = (norm - 0.65) / 0.35;
-          ctx.fillStyle = isDark
-            ? `rgba(${Math.round(160 + t * 80)}, ${Math.round(80 - t * 30)}, ${Math.round(40 + t * 20)}, 0.45)`
-            : `rgba(${Math.round(254 - t * 15)}, ${Math.round(215 - t * 60)}, ${Math.round(170 - t * 70)}, 0.55)`;
-        }
-        ctx.fillRect(c * cellW, r * cellH, cellW + 0.5, cellH + 0.5);
+    // ── 2. SUBTLE COORDINATE GRID & AXES ──
+    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.05)';
+    ctx.lineWidth = 1;
+
+    const xStep = Math.max(1, Math.round((b.maxX - b.minX) / 8));
+    const yStep = Math.max(1, Math.round((b.maxY - b.minY) / 8));
+
+    for (let x = Math.ceil(b.minX); x <= b.maxX; x += xStep) {
+      const p = toPx(x, 0);
+      ctx.beginPath();
+      ctx.moveTo(p.px, 0);
+      ctx.lineTo(p.px, height);
+      ctx.stroke();
+    }
+    for (let y = Math.ceil(b.minY); y <= b.maxY; y += yStep) {
+      const p = toPx(0, y);
+      ctx.beginPath();
+      ctx.moveTo(0, p.py);
+      ctx.lineTo(width, p.py);
+      ctx.stroke();
+    }
+
+    // Main Axes (x=0, y=0)
+    const origin = toPx(0, 0);
+    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.14)';
+    ctx.lineWidth = 1.2;
+    if (origin.px >= 0 && origin.px <= width) {
+      ctx.beginPath();
+      ctx.moveTo(origin.px, 0);
+      ctx.lineTo(origin.px, height);
+      ctx.stroke();
+    }
+    if (origin.py >= 0 && origin.py <= height) {
+      ctx.beginPath();
+      ctx.moveTo(0, origin.py);
+      ctx.lineTo(width, origin.py);
+      ctx.stroke();
+    }
+
+    // ── 3. TRUE SMOOTH TOPOGRAPHIC CONTOUR CURVES (MARCHING SQUARES) ──
+    const gridCols = 56;
+    const gridRows = 42;
+    const gridX: number[] = [];
+    const gridY: number[] = [];
+    for (let c = 0; c <= gridCols; c++) {
+      gridX[c] = b.minX + (c / gridCols) * (b.maxX - b.minX);
+    }
+    for (let r = 0; r <= gridRows; r++) {
+      gridY[r] = b.maxY - (r / gridRows) * (b.maxY - b.minY);
+    }
+
+    const zGrid: number[][] = [];
+    for (let r = 0; r <= gridRows; r++) {
+      zGrid[r] = [];
+      for (let c = 0; c <= gridCols; c++) {
+        zGrid[r][c] = surface.f(gridX[c], gridY[r]);
       }
     }
 
-    // ── 2. TRUE TOPOGRAPHIC LEVEL CONTOUR CURVES ──
     const numLevels = 14;
-    ctx.lineWidth = 1.0;
-
     for (let l = 1; l <= numLevels; l++) {
       const frac = l / (numLevels + 1);
       let levelZ = 0;
@@ -390,43 +430,101 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
         levelZ = surface.zRange.min + frac * (surface.zRange.max - surface.zRange.min);
       }
 
-      ctx.beginPath();
+      const isMajor = l % 3 === 0;
+      ctx.lineWidth = isMajor ? 1.4 : 0.8;
       ctx.strokeStyle = isDark
-        ? `rgba(168, 85, 247, ${0.12 + (l / numLevels) * 0.28})`
-        : `rgba(147, 51, 234, ${0.15 + (l / numLevels) * 0.25})`;
+        ? (isMajor ? 'rgba(168, 85, 247, 0.45)' : 'rgba(147, 51, 234, 0.22)')
+        : (isMajor ? 'rgba(126, 34, 206, 0.55)' : 'rgba(147, 51, 234, 0.25)');
 
+      ctx.beginPath();
       for (let r = 0; r < gridRows; r++) {
         for (let c = 0; c < gridCols; c++) {
-          const z0 = zMatrix[r][c];
-          // Check horizontal level crossing
-          if (c < gridCols - 1) {
-            const z1 = zMatrix[r][c + 1];
-            if ((z0 - levelZ) * (z1 - levelZ) <= 0 && z0 !== z1) {
-              const edgeX = (c + 1) * cellW;
-              ctx.moveTo(edgeX, r * cellH);
-              ctx.lineTo(edgeX, (r + 1) * cellH);
-            }
-          }
-          // Check vertical level crossing
-          if (r < gridRows - 1) {
-            const z2 = zMatrix[r + 1][c];
-            if ((z0 - levelZ) * (z2 - levelZ) <= 0 && z0 !== z2) {
-              const edgeY = (r + 1) * cellH;
-              ctx.moveTo(c * cellW, edgeY);
-              ctx.lineTo((c + 1) * cellW, edgeY);
-            }
+          const zTL = zGrid[r][c];
+          const zTR = zGrid[r][c + 1];
+          const zBR = zGrid[r + 1][c + 1];
+          const zBL = zGrid[r + 1][c];
+
+          let mask = 0;
+          if (zTL >= levelZ) mask |= 1;
+          if (zTR >= levelZ) mask |= 2;
+          if (zBR >= levelZ) mask |= 4;
+          if (zBL >= levelZ) mask |= 8;
+
+          if (mask === 0 || mask === 15) continue;
+
+          const pTL = toPx(gridX[c], gridY[r]);
+          const pTR = toPx(gridX[c + 1], gridY[r]);
+          const pBR = toPx(gridX[c + 1], gridY[r + 1]);
+          const pBL = toPx(gridX[c], gridY[r + 1]);
+
+          const interp = (v1: number, v2: number) => {
+            const denom = v2 - v1;
+            if (Math.abs(denom) < 1e-9) return 0.5;
+            return Math.max(0, Math.min(1, (levelZ - v1) / denom));
+          };
+
+          const topT = interp(zTL, zTR);
+          const eTop = { px: pTL.px + topT * (pTR.px - pTL.px), py: pTL.py };
+
+          const rightT = interp(zTR, zBR);
+          const eRight = { px: pTR.px, py: pTR.py + rightT * (pBR.py - pTR.py) };
+
+          const bottomT = interp(zBL, zBR);
+          const eBottom = { px: pBL.px + bottomT * (pBR.px - pBL.px), py: pBL.py };
+
+          const leftT = interp(zTL, zBL);
+          const eLeft = { px: pTL.px, py: pTL.py + leftT * (pBL.py - pTL.py) };
+
+          const line = (p1: { px: number; py: number }, p2: { px: number; py: number }) => {
+            ctx.moveTo(p1.px, p1.py);
+            ctx.lineTo(p2.px, p2.py);
+          };
+
+          switch (mask) {
+            case 1:
+            case 14:
+              line(eLeft, eTop);
+              break;
+            case 2:
+            case 13:
+              line(eTop, eRight);
+              break;
+            case 3:
+            case 12:
+              line(eLeft, eRight);
+              break;
+            case 4:
+            case 11:
+              line(eRight, eBottom);
+              break;
+            case 5:
+              line(eLeft, eTop);
+              line(eRight, eBottom);
+              break;
+            case 6:
+            case 9:
+              line(eTop, eBottom);
+              break;
+            case 7:
+            case 8:
+              line(eLeft, eBottom);
+              break;
+            case 10:
+              line(eTop, eRight);
+              line(eBottom, eLeft);
+              break;
           }
         }
       }
       ctx.stroke();
     }
 
-    // ── 3. STEEPEST DESCENT VECTOR FIELD ARROWS (-∇f) ──
+    // ── 4. STEEPEST DESCENT VECTOR FIELD ARROWS (-∇f) ──
     if (showVectorField) {
-      const fieldCols = 14;
-      const fieldRows = 10;
-      ctx.fillStyle = isDark ? 'rgba(148, 163, 184, 0.35)' : 'rgba(100, 116, 139, 0.4)';
-      ctx.strokeStyle = isDark ? 'rgba(148, 163, 184, 0.35)' : 'rgba(100, 116, 139, 0.4)';
+      const fieldCols = 15;
+      const fieldRows = 11;
+      ctx.fillStyle = isDark ? 'rgba(148, 163, 184, 0.28)' : 'rgba(100, 116, 139, 0.35)';
+      ctx.strokeStyle = isDark ? 'rgba(148, 163, 184, 0.28)' : 'rgba(100, 116, 139, 0.35)';
       ctx.lineWidth = 1;
 
       for (let fr = 0; fr < fieldRows; fr++) {
@@ -438,10 +536,9 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
 
           if (gNorm > 0.05) {
             const centerPx = toPx(dx, dy);
-            // Vector points downhill (-gx, -gy)
-            const arrowLen = Math.min(13, 4 + Math.log(1 + gNorm) * 2.2);
+            const arrowLen = Math.min(12, 3.5 + Math.log(1 + gNorm) * 2.0);
             const uX = -gx / gNorm;
-            const uY = gy / gNorm; // Flip y for screen coords
+            const uY = gy / gNorm;
 
             const tipX = centerPx.px + uX * arrowLen;
             const tipY = centerPx.py + uY * arrowLen;
@@ -464,8 +561,12 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
       }
     }
 
-    // ── 4. GLOBAL OPTIMUM TARGET MARKER (θ*) ──
-    const optPx = toPx(surface.optimum.x, surface.optimum.y);
+    // ── 5. GLOBAL OPTIMUM TARGET MARKER (θ*) ──
+    ctx.beginPath();
+    ctx.arc(optPx.px, optPx.py, 12, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(245, 158, 11, 0.12)';
+    ctx.fill();
+
     ctx.beginPath();
     ctx.arc(optPx.px, optPx.py, 8, 0, Math.PI * 2);
     ctx.strokeStyle = '#f59e0b';
@@ -477,11 +578,24 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
     ctx.fillStyle = '#f59e0b';
     ctx.fill();
 
+    ctx.beginPath();
+    ctx.moveTo(optPx.px - 14, optPx.py);
+    ctx.lineTo(optPx.px - 5, optPx.py);
+    ctx.moveTo(optPx.px + 5, optPx.py);
+    ctx.lineTo(optPx.px + 14, optPx.py);
+    ctx.moveTo(optPx.px, optPx.py - 14);
+    ctx.lineTo(optPx.px, optPx.py - 5);
+    ctx.moveTo(optPx.px, optPx.py + 5);
+    ctx.lineTo(optPx.px, optPx.py + 14);
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.7)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
     ctx.font = 'bold 10px monospace';
     ctx.fillStyle = '#f59e0b';
-    ctx.fillText('θ* Optimum', optPx.px + 10, optPx.py + 3);
+    ctx.fillText(`θ* (${surface.optimum.x}, ${surface.optimum.y})`, optPx.px + 12, optPx.py + 4);
 
-    // ── 5. GHOST SGD TRAJECTORY (COMPARISON PATH) ──
+    // ── 6. GHOST SGD TRAJECTORY (COMPARISON PATH) ──
     if (showComparison && optimizer !== 'sgd' && ghostSgdTrajectory.length > 0) {
       ctx.beginPath();
       ctx.setLineDash([3, 4]);
@@ -496,7 +610,7 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
       ctx.setLineDash([]);
     }
 
-    // ── 6. ACTIVE OPTIMIZER TRAJECTORY PATH & STEP MARKERS ──
+    // ── 7. ACTIVE OPTIMIZER TRAJECTORY PATH & STEP MARKERS ──
     if (trajectory.length > 0) {
       const activeSnaps = trajectory.slice(0, currentStepIdx + 1);
 

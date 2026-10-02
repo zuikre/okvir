@@ -27,106 +27,53 @@ export class WebAudioSonifier {
     return this.ctx;
   }
 
+  // Continuous drone is disabled to prevent auditory fatigue and headaches
   public startContinuousSonification() {
-    if (this.isActive || this.isMuted) return;
-    const ctx = this.initContext();
-    if (!ctx) return;
-
-    try {
-      const now = ctx.currentTime;
-
-      // Dynamics Compressor (safety limiter)
-      this.compressor = ctx.createDynamicsCompressor();
-      this.compressor.threshold.setValueAtTime(-12, now);
-      this.compressor.knee.setValueAtTime(8, now);
-      this.compressor.ratio.setValueAtTime(12, now);
-      this.compressor.attack.setValueAtTime(0.003, now);
-      this.compressor.release.setValueAtTime(0.15, now);
-      this.compressor.connect(ctx.destination);
-
-      // Master Envelope Gain
-      this.gainNode = ctx.createGain();
-      this.gainNode.gain.setValueAtTime(0.0001, now);
-      this.gainNode.gain.exponentialRampToValueAtTime(0.06, now + 0.04);
-      this.gainNode.connect(this.compressor);
-
-      // Low-pass Filter with gentle resonance
-      this.filter = ctx.createBiquadFilter();
-      this.filter.type = 'lowpass';
-      this.filter.Q.setValueAtTime(1.8, now);
-      this.filter.frequency.setValueAtTime(350, now);
-      this.filter.connect(this.gainNode);
-
-      // Primary Voice: Triangle wave (warm analog timbre)
-      this.osc = ctx.createOscillator();
-      this.osc.type = 'triangle';
-      this.osc.frequency.setValueAtTime(220, now);
-      this.osc.connect(this.filter);
-      this.osc.start();
-
-      // Sub Voice: Sine wave 1 octave lower for foundation
-      this.subOsc = ctx.createOscillator();
-      this.subOsc.type = 'sine';
-      this.subOsc.frequency.setValueAtTime(110, now);
-      this.subOsc.connect(this.filter);
-      this.subOsc.start();
-
-      this.isActive = true;
-    } catch {
-      // Audio context restricted by browser policy until user gesture
-    }
+    this.stopContinuousSonification();
   }
 
-  public updateLoss(loss: number, minLoss = 0.01, maxLoss = 20.0) {
-    if (!this.isActive || !this.ctx || !this.osc || !this.subOsc || !this.filter) return;
-
-    const ctx = this.ctx;
-    const now = ctx.currentTime;
-
-    // Logarithmic curve mapping human perception
-    const beta = 2.0;
-    const clampedLoss = Math.max(minLoss, Math.min(loss, maxLoss));
-    const norm = Math.min(
-      1.0,
-      Math.max(
-        0.0,
-        (Math.log(1 + beta * clampedLoss) - Math.log(1 + beta * minLoss)) /
-          (Math.log(1 + beta * maxLoss) - Math.log(1 + beta * minLoss))
-      )
-    );
-
-    // Map 130 Hz (calm converged bass) to 840 Hz (high tension)
-    const baseFreq = 130;
-    const maxFreq = 840;
-    const targetFreq = baseFreq * Math.pow(maxFreq / baseFreq, norm);
-    const filterFreq = Math.min(targetFreq * 2.6, 2800);
-
-    // Smooth exponential ramp (prevents zipper noise)
-    this.osc.frequency.setTargetAtTime(targetFreq, now, 0.03);
-    this.subOsc.frequency.setTargetAtTime(targetFreq * 0.5, now, 0.03);
-    this.filter.frequency.setTargetAtTime(filterFreq, now, 0.03);
+  public updateLoss(_loss: number, _minLoss = 0.01, _maxLoss = 20.0) {
+    // Continuous acoustic drone disabled
   }
 
   public stopContinuousSonification() {
-    if (!this.isActive || !this.ctx || !this.gainNode) return;
-    const now = this.ctx.currentTime;
+    if (!this.isActive) return;
     try {
-      this.gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
-      setTimeout(() => {
-        try {
-          this.osc?.stop();
-          this.subOsc?.stop();
-          this.osc?.disconnect();
-          this.subOsc?.disconnect();
-        } catch (_err) {
-          // Ignore disconnection error if already stopped
-        }
-        this.osc = null;
-        this.subOsc = null;
-        this.isActive = false;
-      }, 50);
+      this.osc?.stop();
+      this.subOsc?.stop();
+      this.osc?.disconnect();
+      this.subOsc?.disconnect();
     } catch {
-      this.isActive = false;
+      // Ignore cleanup error
+    }
+    this.osc = null;
+    this.subOsc = null;
+    this.isActive = false;
+  }
+
+  // Gentle, subtle 15ms step tick for tactile user feedback without continuous drone
+  public playStepTick() {
+    const ctx = this.initContext();
+    if (!ctx || this.isMuted) return;
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(540, now);
+      osc.frequency.exponentialRampToValueAtTime(320, now + 0.02);
+
+      gain.gain.setValueAtTime(0.02, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.02);
+    } catch {
+      // Audio node playback safely handled
     }
   }
 
