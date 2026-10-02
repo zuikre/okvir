@@ -306,7 +306,7 @@ export function splitIntoSentenceChunks(text: string): string[] {
   });
 
   // Split on sentence boundaries: [.!?؟۔] followed by optional quotes/brackets/markdown, then whitespace, then start of next sentence
-  const SPLIT_REGEX = /([.!?؟۔]+["'\)\]*`_]*)\s+(?=[A-Z\u0621-\u064A0-9("'\*$#])/;
+  const SPLIT_REGEX = /([.!?؟۔]+["')\]*`_]*)\s+(?=[A-Z\u0621-\u064A0-9("'*$#])/;
 
   const rawChunks: string[] = [];
   let remaining = tokenized;
