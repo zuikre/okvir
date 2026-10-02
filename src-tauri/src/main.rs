@@ -22,6 +22,7 @@ Maintenance & Diagnostics:
   okvir doctor, info           Run comprehensive system diagnostic & environment audit
   okvir update, --update       Check for updates & upgrade Okvir desktop app and CLI
   okvir clean                  Clean local package caches and temporary build artifacts
+  okvir uninstall              Completely remove Okvir desktop app, CLI tools & cache
 
 Community & Links:
   okvir rate, star             Open GitHub repository to star and rate Okvir
@@ -185,6 +186,7 @@ fn main() {
             "init" | "dev" | "test" | "pack" | "verify" | "registry"
             | "doctor" | "info" | "update" | "--update" | "rate" | "star"
             | "docs" | "issue" | "bug" | "sponsor" | "donate" | "clean"
+            | "uninstall" | "--uninstall" | "remove"
             | "version" | "-v" | "--version" | "help" | "-h" | "--help" => {
                 // Try forwarding to Framework CLI script first (for rich interactive checks & live updates)
                 if dispatch_cli(&args[1..]) {

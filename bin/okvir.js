@@ -13,7 +13,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { spawn } from 'node:child_process';
+import { spawn, execSync } from 'node:child_process';
+import readline from 'node:readline';
 
 function resolveVersion() {
   try {
@@ -52,6 +53,7 @@ const HELP_TEXT = `
     doctor, info              Run comprehensive system diagnostic & environment audit
     update, --update          Check for updates & upgrade Okvir desktop app and CLI
     clean                     Clean local package caches and temporary build artifacts
+    uninstall                 Completely uninstall Okvir desktop engine, CLI & cache
 
   COMMUNITY & LINKS:
     rate, star                Open GitHub repository to star and rate Okvir
@@ -910,6 +912,85 @@ function runClean() {
   console.log(`\n\x1b[32m✔ Cleanup completed successfully!\x1b[0m\n`);
 }
 
+async function runUninstall(force = false) {
+  logBanner();
+  console.log(`  \x1b[31m\x1b[1m==> OKVIR System Uninstaller\x1b[0m\n`);
+
+  if (!force) {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+    const answer = await new Promise((resolve) => {
+      rl.question('  Are you sure you want to completely uninstall Okvir and all its components? [y/N]: ', (ans) => {
+        rl.close();
+        resolve(ans.trim().toLowerCase());
+      });
+    });
+    if (answer !== 'y' && answer !== 'yes') {
+      console.log(`\n  \x1b[33mUninstallation canceled. Okvir remains installed.\x1b[0m\n`);
+      return;
+    }
+  }
+
+  console.log(`\n  Removing Okvir desktop engine and configuration files...\n`);
+  const home = process.env.HOME || process.env.USERPROFILE || '';
+  const isWin = process.platform === 'win32';
+  const isMac = process.platform === 'darwin';
+
+  let removedCount = 0;
+  const safeRemove = (p, isDir = false) => {
+    try {
+      if (fs.existsSync(p)) {
+        if (isDir) {
+          fs.rmSync(p, { recursive: true, force: true });
+        } else {
+          fs.unlinkSync(p);
+        }
+        console.log(`  \x1b[32m✔ Removed:\x1b[0m ${p}`);
+        removedCount++;
+      }
+    } catch (e) {
+      console.log(`  \x1b[33m! Warning removing ${p}:\x1b[0m ${e.message}`);
+    }
+  };
+
+  if (isMac) {
+    safeRemove('/Applications/Okvir.app', true);
+    safeRemove(path.join(home, 'Applications', 'Okvir.app'), true);
+    safeRemove(path.join(home, '.local', 'bin', 'okvir'));
+    safeRemove(path.join(home, '.okvir'), true);
+  } else if (isWin) {
+    const localAppData = process.env.LOCALAPPDATA || path.join(home, 'AppData', 'Local');
+    safeRemove(path.join(localAppData, 'Programs', 'OKVIR'), true);
+    safeRemove(path.join(localAppData, 'Programs', 'okvir'), true);
+    safeRemove(path.join(home, '.okvir'), true);
+  } else {
+    // Linux
+    safeRemove(path.join(home, '.local', 'bin', 'okvir'));
+    safeRemove(path.join(home, '.local', 'bin', 'okvir-desktop'));
+    safeRemove(path.join(home, '.local', 'share', 'applications', 'okvir.desktop'));
+    safeRemove(path.join(home, '.local', 'share', 'applications', 'OKVIR.desktop'));
+    safeRemove(path.join(home, '.local', 'share', 'icons', 'hicolor', 'scalable', 'apps', 'okvir.svg'));
+    safeRemove(path.join(home, '.local', 'share', 'pixmaps', 'okvir.png'));
+    safeRemove(path.join(home, '.okvir'), true);
+
+    try {
+      execSync(`update-desktop-database "${path.join(home, '.local', 'share', 'applications')}" 2>/dev/null`);
+    } catch (_) {}
+  }
+
+  console.log(`\n\x1b[32m\x1b[1m✔ OKVIR has been completely uninstalled from your system (${removedCount} items removed).\x1b[0m\n`);
+  console.log(`  If you have feedback, bug reports, or feature requests, feel free to submit an issue:`);
+  console.log(`  \x1b[36mhttps://github.com/zuikre/okvir/issues\x1b[0m\n`);
+  console.log(`  To reinstall anytime:`);
+  if (isWin) {
+    console.log(`  \x1b[36mirm https://raw.githubusercontent.com/zuikre/okvir/main/install.ps1 | iex\x1b[0m\n`);
+  } else {
+    console.log(`  \x1b[36mcurl -fsSL https://raw.githubusercontent.com/zuikre/okvir/main/install.sh | bash\x1b[0m\n`);
+  }
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const cmd = args[0] || 'help';
@@ -946,6 +1027,11 @@ async function main() {
     case '--update':
     case 'upgrade':
       await runUpdate(args.includes('--force'));
+      break;
+    case 'uninstall':
+    case '--uninstall':
+    case 'remove':
+      await runUninstall(args.includes('--yes') || args.includes('-y') || args.includes('--force'));
       break;
     case 'rate':
     case 'star':
