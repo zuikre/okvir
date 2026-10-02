@@ -230,21 +230,23 @@ DESKTOP_APP="${APP_DIR}/okvir.AppImage"
 CLI_SCRIPT="${APP_DIR}/bin/okvir.js"
 [ -f "bin/okvir.js" ] && CLI_SCRIPT="bin/okvir.js"
 
-# Configure GStreamer host plugin paths so WebKitGTK inside AppImage discovers audio/video elements
-_HOST_GST="/usr/lib/x86_64-linux-gnu/gstreamer-1.0:/usr/lib/aarch64-linux-gnu/gstreamer-1.0:/usr/lib/gstreamer-1.0:/usr/lib64/gstreamer-1.0:/lib/x86_64-linux-gnu/gstreamer-1.0:/usr/local/lib/gstreamer-1.0"
-export GST_PLUGIN_SYSTEM_PATH_1_0="${GST_PLUGIN_SYSTEM_PATH_1_0:+${GST_PLUGIN_SYSTEM_PATH_1_0}:}${_HOST_GST}"
-export GST_PLUGIN_PATH_1_0="${GST_PLUGIN_PATH_1_0:+${GST_PLUGIN_PATH_1_0}:}${_HOST_GST}"
-export GST_PLUGIN_PATH="${GST_PLUGIN_PATH:+${GST_PLUGIN_PATH}:}${_HOST_GST}"
+# Sanitize GTK and GStreamer environment to prevent host plugin ABI clashes and terminal warnings
+unset GTK_MODULES
+unset GST_PLUGIN_SYSTEM_PATH_1_0
+unset GST_PLUGIN_PATH_1_0
+unset GST_PLUGIN_PATH
+export GST_DEBUG=0
+export GST_DEBUG_NO_COLOR=1
 
-# 1. Desktop GUI Launch (default when no arguments, or explicit 'open' / 'app')
-if [ $# -eq 0 ] || [ "$1" = "open" ] || [ "$1" = "app" ] || [ "$1" = "--app" ] || [ "$1" = "--gui" ] || [ "$1" = "--desktop" ]; then
+# 1. Desktop GUI Launch (default when no arguments, or explicit 'open' / 'launch' / 'app')
+if [ $# -eq 0 ] || [ "$1" = "open" ] || [ "$1" = "launch" ] || [ "$1" = "app" ] || [ "$1" = "--app" ] || [ "$1" = "--gui" ] || [ "$1" = "--desktop" ]; then
   if [ -x "${DESKTOP_APP}" ]; then
-    if [ "$1" = "open" ]; then
-      nohup "${DESKTOP_APP}" >/dev/null 2>&1 &
-      echo "✔ Launched Okvir Desktop Application in background."
-      exit 0
+    if [ "$1" = "--foreground" ] || [ "$1" = "--wait" ]; then
+      exec "${DESKTOP_APP}" "$@" 2> >(grep -v -E "GStreamer|WebKit|gst-plugin|Gtk-Message|atk-bridge|g_object_set|gst_bin_add|gst_element|invalid \(NULL\) pointer|g_signal_connect_data|autoaudiosink|appsrc" >&2)
     else
-      exec "${DESKTOP_APP}" "$@"
+      nohup "${DESKTOP_APP}" "$@" >/dev/null 2>&1 &
+      echo "✔ Launched Okvir Desktop Application."
+      exit 0
     fi
   fi
 fi

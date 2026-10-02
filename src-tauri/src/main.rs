@@ -176,7 +176,24 @@ fn dispatch_cli(args: &[String]) -> bool {
     }
 }
 
+fn sanitize_environment() {
+    #[cfg(target_os = "linux")]
+    {
+        env::remove_var("GTK_MODULES");
+        env::remove_var("GST_PLUGIN_SYSTEM_PATH_1_0");
+        env::remove_var("GST_PLUGIN_PATH_1_0");
+        env::remove_var("GST_PLUGIN_PATH");
+        if env::var("GST_DEBUG").is_err() {
+            env::set_var("GST_DEBUG", "0");
+        }
+        if env::var("GST_DEBUG_NO_COLOR").is_err() {
+            env::set_var("GST_DEBUG_NO_COLOR", "1");
+        }
+    }
+}
+
 fn main() {
+    sanitize_environment();
     let args: Vec<String> = env::args().collect();
     let version = get_version();
 
