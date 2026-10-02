@@ -213,17 +213,7 @@ export const LessonPlayer: React.FC = () => {
 
   const renderNarrative = (narrativeText?: string) => {
     if (!narrativeText) return null;
-    const paragraphs = narrativeText.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
-    if (paragraphs.length === 0) return null;
-    return (
-      <div className="space-y-3">
-        {paragraphs.map((para, idx) => (
-          <p key={idx} className="leading-relaxed">
-            <MathText text={para.trim()} />
-          </p>
-        ))}
-      </div>
-    );
+    return <MathText text={narrativeText} className="space-y-4" />;
   };
 
   if (isLocked) {
