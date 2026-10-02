@@ -1,9 +1,8 @@
-import React, { useEffect, useReducer, useRef, useCallback } from 'react';
-import { playbackReducer } from '@/lib/playback/PlaybackStateMachine';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { sonifier } from '@/lib/audio/WebAudioSonifier';
 import { Volume2, VolumeX, RotateCcw, ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 
-interface TimelinePlaybackBarProps {
+export interface TimelinePlaybackBarProps {
   totalSteps: number;
   currentStep: number;
   stepPhase?: string;
@@ -24,18 +23,27 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
   onStepChange,
   onPlayStateChange,
 }) => {
-  const [state, dispatch] = useReducer(playbackReducer, {
-    status: 'IDLE',
-    currentStep,
-    totalSteps: Math.max(1, totalSteps),
-    speed: 1,
-    wasPlayingBeforeScrub: false,
-  });
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [speed, setSpeed] = useState<number>(1);
+  const [isMuted, setIsMuted] = useState<boolean>(sonifier.getIsMuted());
 
-  const [isMuted, setIsMuted] = React.useState(sonifier.getIsMuted());
   const animFrameRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
   const accumulatorRef = useRef<number>(0);
+  const wasPlayingBeforeScrubRef = useRef<boolean>(false);
+
+  // Keep latest values in refs to avoid recreation of timers and infinite loops
+  const currentStepRef = useRef(currentStep);
+  currentStepRef.current = currentStep;
+
+  const totalStepsRef = useRef(totalSteps);
+  totalStepsRef.current = totalSteps;
+
+  const speedRef = useRef(speed);
+  speedRef.current = speed;
+
+  const isPlayingRef = useRef(isPlaying);
+  isPlayingRef.current = isPlaying;
 
   const onStepChangeRef = useRef(onStepChange);
   onStepChangeRef.current = onStepChange;
@@ -43,58 +51,32 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
   const onPlayStateChangeRef = useRef(onPlayStateChange);
   onPlayStateChangeRef.current = onPlayStateChange;
 
-  const lastReportedStepRef = useRef<number>(currentStep);
-
-  // Sync state.totalSteps when parent changes
-  useEffect(() => {
-    if (totalSteps !== state.totalSteps) {
-      dispatch({ type: 'SET_TOTAL_STEPS', totalSteps });
-    }
-  }, [totalSteps, state.totalSteps]);
-
-  // Sync state.currentStep when parent changes
-  useEffect(() => {
-    if (state.status !== 'SCRUBBING' && state.status !== 'PLAYING') {
-      if (currentStep !== state.currentStep) {
-        lastReportedStepRef.current = currentStep;
-        dispatch({ type: 'GO_TO_STEP', step: currentStep });
-      }
-    }
-  }, [currentStep, state.status, state.currentStep]);
-
-  // Sync parent step callback only when state.currentStep changes internally
-  useEffect(() => {
-    if (state.currentStep !== lastReportedStepRef.current) {
-      lastReportedStepRef.current = state.currentStep;
-      onStepChangeRef.current?.(state.currentStep);
-    }
-  }, [state.currentStep]);
-
-  // Update sonifier loss metric
-  const stateRef = useRef(state);
-  stateRef.current = state;
-
+  // Sonification loss update
   useEffect(() => {
     sonifier.updateLoss(metricValue);
   }, [metricValue]);
 
-  // Handle status sounds
-  useEffect(() => {
-    if (state.status === 'CONVERGED') {
-      sonifier.playConvergenceChime();
-    } else if (state.status === 'DIVERGED') {
-      sonifier.playDivergenceAlarm();
+  // Clean stop helper
+  const stopPlayback = useCallback(() => {
+    setIsPlaying(false);
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = 0;
     }
-  }, [state.status]);
+    onPlayStateChangeRef.current?.(false);
+  }, []);
 
-  // Playback Animation Loop with Delta-Time Accumulator and strict bounds
+  // Animation frame loop with Delta-Time accumulator
   const tick = useCallback(
     (now: number) => {
-      const curState = stateRef.current;
-      if (curState.status !== 'PLAYING') return;
+      if (!isPlayingRef.current) return;
 
-      if (curState.currentStep >= curState.totalSteps) {
-        dispatch({ type: 'PAUSE' });
+      const cur = currentStepRef.current;
+      const tot = totalStepsRef.current;
+
+      if (cur >= tot) {
+        stopPlayback();
+        sonifier.playConvergenceChime();
         return;
       }
 
@@ -103,32 +85,49 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
       lastTimeRef.current = now;
 
       // Base step duration: 150ms at 1.0x
-      const stepDuration = 150 / curState.speed;
+      const stepDuration = 150 / speedRef.current;
       accumulatorRef.current += dt;
 
-      let shouldContinue = true;
+      let advanced = false;
       while (accumulatorRef.current >= stepDuration) {
         accumulatorRef.current -= stepDuration;
-        if (stateRef.current.currentStep >= stateRef.current.totalSteps) {
-          dispatch({ type: 'PAUSE' });
-          shouldContinue = false;
-          break;
+        const current = currentStepRef.current;
+        const maxStep = totalStepsRef.current;
+
+        if (current >= maxStep) {
+          stopPlayback();
+          sonifier.playConvergenceChime();
+          return;
         }
-        dispatch({ type: 'STEP_FORWARD' });
+
+        const next = current + 1;
+        currentStepRef.current = next;
+        onStepChangeRef.current(next);
+        advanced = true;
+
+        if (next >= maxStep) {
+          stopPlayback();
+          sonifier.playConvergenceChime();
+          return;
+        }
+      }
+
+      if (advanced) {
         sonifier.playStepTick();
       }
 
-      if (shouldContinue && stateRef.current.status === 'PLAYING' && stateRef.current.currentStep < stateRef.current.totalSteps) {
+      if (isPlayingRef.current) {
         animFrameRef.current = requestAnimationFrame(tick);
       }
     },
-    []
+    [stopPlayback]
   );
 
+  // Playback lifecycle effect
   useEffect(() => {
-    if (state.status === 'PLAYING') {
-      if (state.currentStep >= state.totalSteps) {
-        dispatch({ type: 'PAUSE' });
+    if (isPlaying) {
+      if (currentStepRef.current >= totalStepsRef.current) {
+        setIsPlaying(false);
         return;
       }
       lastTimeRef.current = 0;
@@ -136,15 +135,90 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
       animFrameRef.current = requestAnimationFrame(tick);
       onPlayStateChangeRef.current?.(true);
     } else {
-      cancelAnimationFrame(animFrameRef.current);
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = 0;
+      }
       onPlayStateChangeRef.current?.(false);
     }
     return () => {
-      cancelAnimationFrame(animFrameRef.current);
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = 0;
+      }
     };
-  }, [state.status, tick]);
+  }, [isPlaying, tick]);
 
-  // Keyboard Shortcuts (Space: Play/Pause, Arrows: Step, R: Reset)
+  // Scrubbing handlers
+  const handleScrubStart = () => {
+    wasPlayingBeforeScrubRef.current = isPlayingRef.current;
+    if (isPlayingRef.current) {
+      setIsPlaying(false);
+    }
+  };
+
+  const handleScrubMove = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value, 10);
+    if (!Number.isNaN(val)) {
+      const clamped = Math.max(0, Math.min(val, totalStepsRef.current));
+      onStepChangeRef.current(clamped);
+    }
+  };
+
+  const handleScrubEnd = () => {
+    if (wasPlayingBeforeScrubRef.current) {
+      wasPlayingBeforeScrubRef.current = false;
+      if (currentStepRef.current < totalStepsRef.current) {
+        setIsPlaying(true);
+      }
+    }
+  };
+
+  // Button actions
+  const handleReset = useCallback(() => {
+    setIsPlaying(false);
+    onStepChangeRef.current(0);
+  }, []);
+
+  const handleStepBackward = useCallback(() => {
+    setIsPlaying(false);
+    const prev = Math.max(0, currentStepRef.current - 1);
+    onStepChangeRef.current(prev);
+    sonifier.playStepTick();
+  }, []);
+
+  const handleStepForward = useCallback(() => {
+    setIsPlaying(false);
+    const next = Math.min(totalStepsRef.current, currentStepRef.current + 1);
+    onStepChangeRef.current(next);
+    sonifier.playStepTick();
+  }, []);
+
+  const handlePlayToggle = useCallback(() => {
+    if (isPlayingRef.current) {
+      setIsPlaying(false);
+    } else {
+      if (currentStepRef.current >= totalStepsRef.current) {
+        onStepChangeRef.current(0);
+      }
+      setIsPlaying(true);
+    }
+  }, []);
+
+  // Keyboard shortcut listeners (bound once, references always current)
+  const keyHandlersRef = useRef({
+    handlePlayToggle,
+    handleStepBackward,
+    handleStepForward,
+    handleReset,
+  });
+  keyHandlersRef.current = {
+    handlePlayToggle,
+    handleStepBackward,
+    handleStepForward,
+    handleReset,
+  };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -152,34 +226,34 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
       switch (e.code) {
         case 'Space':
           e.preventDefault();
-          if (state.status === 'PLAYING') {
-            dispatch({ type: 'PAUSE' });
-          } else {
-            dispatch({ type: 'PLAY' });
-          }
+          keyHandlersRef.current.handlePlayToggle();
           break;
         case 'ArrowLeft':
           e.preventDefault();
-          dispatch({ type: 'STEP_BACKWARD' });
+          keyHandlersRef.current.handleStepBackward();
           break;
         case 'ArrowRight':
           e.preventDefault();
-          dispatch({ type: 'STEP_FORWARD' });
+          keyHandlersRef.current.handleStepForward();
           break;
         case 'KeyR':
           e.preventDefault();
-          dispatch({ type: 'RESET' });
+          keyHandlersRef.current.handleReset();
           break;
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [state.status]);
+  }, []);
 
   const toggleSound = () => {
     const muted = sonifier.toggleMute();
     setIsMuted(muted);
   };
+
+  const isConverged = totalSteps > 0 && currentStep >= totalSteps;
+  const safeTotal = Math.max(1, totalSteps);
+  const safeCurrent = Math.max(0, Math.min(currentStep, safeTotal));
 
   return (
     <div className="flex flex-col gap-2.5 p-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] select-none specular">
@@ -187,13 +261,17 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
       <div className="flex items-center justify-between text-xs font-mono">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-[var(--text-primary)] tabular-nums">
-            Step {state.currentStep} / {state.totalSteps}
+            Step {safeCurrent} / {safeTotal}
           </span>
-          {stepPhase && (
+          {isConverged ? (
+            <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wide">
+              CONVERGED
+            </span>
+          ) : stepPhase ? (
             <span className="px-2 py-0.5 text-[10px] font-medium rounded bg-[var(--math-gradient)]/10 text-[var(--math-gradient)] border border-[var(--math-gradient)]/20 uppercase tracking-wide">
               {stepPhase}
             </span>
-          )}
+          ) : null}
         </div>
 
         <div className="flex items-center gap-3">
@@ -219,17 +297,13 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
         <input
           type="range"
           min={0}
-          max={state.totalSteps}
-          value={state.currentStep}
-          onMouseDown={() => {
-            dispatch({ type: 'SCRUB_START' });
-          }}
-          onTouchStart={() => {
-            dispatch({ type: 'SCRUB_START' });
-          }}
-          onChange={(e) => dispatch({ type: 'SCRUB_MOVE', targetStep: parseInt(e.target.value, 10) })}
-          onMouseUp={() => dispatch({ type: 'SCRUB_END' })}
-          onTouchEnd={() => dispatch({ type: 'SCRUB_END' })}
+          max={safeTotal}
+          value={safeCurrent}
+          onMouseDown={handleScrubStart}
+          onTouchStart={handleScrubStart}
+          onChange={handleScrubMove}
+          onMouseUp={handleScrubEnd}
+          onTouchEnd={handleScrubEnd}
           className="w-full h-1.5 bg-[var(--border-subtle)] rounded-lg appearance-none cursor-pointer accent-[var(--math-gradient)] focus:outline-none"
         />
       </div>
@@ -239,7 +313,7 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
         <div className="flex items-center gap-1.5">
           {/* Reset */}
           <button
-            onClick={() => dispatch({ type: 'RESET' })}
+            onClick={handleReset}
             title="Reset (R)"
             className="p-1.5 rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] transition-all active:scale-95"
           >
@@ -248,8 +322,8 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
 
           {/* Step Back */}
           <button
-            onClick={() => dispatch({ type: 'STEP_BACKWARD' })}
-            disabled={state.currentStep === 0 || state.status === 'PLAYING'}
+            onClick={handleStepBackward}
+            disabled={safeCurrent === 0 || isPlaying}
             title="Step Backward (Left Arrow)"
             className="p-1.5 rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95"
           >
@@ -258,11 +332,11 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
 
           {/* Play / Pause Toggle */}
           <button
-            onClick={() => (state.status === 'PLAYING' ? dispatch({ type: 'PAUSE' }) : dispatch({ type: 'PLAY' }))}
+            onClick={handlePlayToggle}
             title="Play / Pause (Space)"
             className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--math-gradient)] text-black font-mono transition-transform active:scale-95 hover:brightness-110 shadow-sm flex items-center gap-1.5"
           >
-            {state.status === 'PLAYING' ? (
+            {isPlaying ? (
               <>
                 <Pause size={12} fill="currentColor" />
                 <span>Pause</span>
@@ -277,8 +351,8 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
 
           {/* Step Forward */}
           <button
-            onClick={() => dispatch({ type: 'STEP_FORWARD' })}
-            disabled={state.currentStep >= state.totalSteps || state.status === 'PLAYING'}
+            onClick={handleStepForward}
+            disabled={safeCurrent >= safeTotal || isPlaying}
             title="Step Forward (Right Arrow)"
             className="p-1.5 rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95"
           >
@@ -291,9 +365,9 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
           {SPEEDS.map((s) => (
             <button
               key={s}
-              onClick={() => dispatch({ type: 'SET_SPEED', speed: s })}
+              onClick={() => setSpeed(s)}
               className={`px-2 py-0.5 text-[10px] font-mono rounded transition-colors ${
-                state.speed === s
+                speed === s
                   ? 'bg-[var(--math-gradient)] text-black font-bold'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
