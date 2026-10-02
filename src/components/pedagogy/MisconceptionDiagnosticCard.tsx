@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { DiagnosticQuestion, MisconceptionProfile } from '@/lib/types';
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
 import { HelpCircle, CheckCircle2, AlertTriangle, ArrowRight, RotateCcw } from 'lucide-react';
 import { KaTeXMath } from '@/components/common/KaTeXMath';
+
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
 interface MisconceptionDiagnosticCardProps {
   question: DiagnosticQuestion;
@@ -21,10 +30,17 @@ export const MisconceptionDiagnosticCard: React.FC<MisconceptionDiagnosticCardPr
   const { language, config } = useOkvirStore();
   const isAr = language === 'ar';
 
+  const [shuffledOptions, setShuffledOptions] = useState(() => shuffleArray(question.options));
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const selectedOption = selectedIdx !== null ? question.options[selectedIdx] : null;
+  useEffect(() => {
+    setShuffledOptions(shuffleArray(question.options));
+    setSelectedIdx(null);
+    setIsSubmitted(false);
+  }, [question]);
+
+  const selectedOption = selectedIdx !== null ? shuffledOptions[selectedIdx] : null;
   const activeMisconception = selectedOption?.misconceptionId
     ? misconceptions.find((m) => m.id === selectedOption.misconceptionId)
     : null;
@@ -38,7 +54,7 @@ export const MisconceptionDiagnosticCard: React.FC<MisconceptionDiagnosticCardPr
   const handleSubmit = () => {
     if (selectedIdx === null || isSubmitted) return;
     setIsSubmitted(true);
-    const correct = question.options[selectedIdx].correct;
+    const correct = shuffledOptions[selectedIdx]?.correct ?? false;
 
     if (correct) {
       if (config.soundEnabled) audio.playVictoryHarmonics();
@@ -52,6 +68,7 @@ export const MisconceptionDiagnosticCard: React.FC<MisconceptionDiagnosticCardPr
   };
 
   const handleReset = () => {
+    setShuffledOptions(shuffleArray(question.options));
     setSelectedIdx(null);
     setIsSubmitted(false);
   };
@@ -86,7 +103,7 @@ export const MisconceptionDiagnosticCard: React.FC<MisconceptionDiagnosticCardPr
 
       {/* Options */}
       <div className="space-y-2 mb-4">
-        {question.options.map((opt, idx) => {
+        {shuffledOptions.map((opt, idx) => {
           const isSelected = selectedIdx === idx;
           let borderStyle = 'border-[var(--border-subtle)] hover:border-[var(--border-strong)]';
           const bgStyle = 'bg-[var(--bg-app)] text-[var(--text-secondary)]';

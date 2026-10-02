@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Award,
   CheckCircle2,
@@ -52,11 +52,24 @@ export const QuizBatteryComponent: React.FC<QuizBatteryComponentProps> = ({
   const [shuffledOptionsMap, setShuffledOptionsMap] = useState<Record<number, DiagnosticOption[]>>(() => {
     const initialMap: Record<number, DiagnosticOption[]> = {};
     questions.forEach((q, idx) => {
-      initialMap[idx] = [...q.options];
+      initialMap[idx] = shuffleArray(q.options);
     });
     return initialMap;
   });
   const [isCompleted, setIsCompleted] = useState(false);
+
+  // Re-shuffle options whenever the question set or lesson changes
+  useEffect(() => {
+    const freshMap: Record<number, DiagnosticOption[]> = {};
+    questions.forEach((q, idx) => {
+      freshMap[idx] = shuffleArray(q.options);
+    });
+    setShuffledOptionsMap(freshMap);
+    setSelectedAnswers({});
+    setIsAnswerSubmitted({});
+    setCurrentIndex(0);
+    setIsCompleted(false);
+  }, [lessonId, questions]);
 
   const currentQuestion = questions[currentIndex];
   const currentOptions = shuffledOptionsMap[currentIndex] || currentQuestion?.options || [];

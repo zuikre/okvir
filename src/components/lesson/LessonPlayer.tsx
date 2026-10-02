@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRight, Check, Lightbulb, Sparkles, Lock, X, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Lightbulb, Sparkles, Lock, X, AlertTriangle, RotateCcw } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
 import { curriculum } from '@/lib/curriculum';
@@ -8,7 +8,54 @@ import { CodeChallengeEditor } from '@/components/editor/CodeChallengeEditor';
 import { KaTeXMath } from '@/components/common/KaTeXMath';
 import { MathText } from '@/components/common/MathText';
 import { audio } from '@/lib/audio';
-import type { BeatNumber } from '@/lib/types';
+import type { BeatNumber, QuizQuestion } from '@/lib/types';
+
+type TransferOption = QuizQuestion['options'][number];
+
+function shuffleOptions<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+const DEFAULT_TRANSFER_OPTIONS: TransferOption[] = [
+  {
+    text: {
+      en: 'L1 loss produces non-unique solutions and is non-differentiable at zero, preventing smooth gradient descent.',
+      ar: 'دالة L1 غير قابلة للاشتقاق عند الصفر ولا تقدم حلاً تحليلياً مغلقاً وفريداً ومباشراً.',
+    },
+    correct: false,
+    explanation: {
+      en: 'Reconsider: L1 provides sparsity, but L2 provides smooth differentiability.',
+      ar: 'أعد التفكير: دالة L1 توفر التناثر، لكن دالة L2 توفر قابلية اشتقاق سلسة.',
+    },
+  },
+  {
+    text: {
+      en: 'L2 loss provides an analytical closed-form solution (Normal Equations) and smooth, continuous derivatives everywhere.',
+      ar: 'دالة L2 توفر حلاً تحليلياً مغلقاً مباشراً (المعادلات الطبيعية) وتدرجات سلسة مستمرة في كل مكان.',
+    },
+    correct: true,
+    explanation: {
+      en: 'Correct! L2 loss is globally convex, smooth, and yields the Gauss-Markov Best Linear Unbiased Estimator (BLUE).',
+      ar: 'صحيح! دالة L2 تربيعية ومحدبة مما يتيح إيجاد الحل المغلق المباشر (Gauss-Markov) بدقة رياضية عالية.',
+    },
+  },
+  {
+    text: {
+      en: 'L2 loss completely ignores the influence of extreme outlier observations.',
+      ar: 'دالة L2 تتجاهل تماماً تأثير المشاهدات الشاذة والمتطرفة.',
+    },
+    correct: false,
+    explanation: {
+      en: 'Reconsider: Squaring magnifies outlier penalties quadratically; it does not ignore them.',
+      ar: 'أعد التفكير: دالة L2 تعاقب القيم المتطرفة بشدة (تربيعياً) وليس بالعكس.',
+    },
+  },
+];
 
 export const LessonPlayer: React.FC = () => {
   const {
@@ -49,12 +96,23 @@ export const LessonPlayer: React.FC = () => {
   const currentBeat = progress.currentBeat || 1;
   const [highlightedScrubber, setHighlightedScrubber] = useState<'slope' | 'intercept' | 'residuals' | null>(null);
   const [selectedTransferOption, setSelectedTransferOption] = useState<number | null>(null);
+  const [shuffledTransferOptions, setShuffledTransferOptions] = useState<TransferOption[]>([]);
   const [isHintOpen, setIsHintOpen] = useState(false);
   const [hintTier, setHintTier] = useState<1 | 2 | 3>(1);
   const [hasPassedCode, setHasPassedCode] = useState(false);
 
-  // Reset selected option, hint, and sync passed code state when active lesson or beat changes
+  // Compute active options for Beat 4 (shuffled)
+  const beat4 = mod.beats.find((b) => b.number === 4);
+  const activeTransferOptions =
+    shuffledTransferOptions.length > 0
+      ? shuffledTransferOptions
+      : beat4?.question?.options || DEFAULT_TRANSFER_OPTIONS;
+
+  // Reset selected option, hint, sync passed code, and shuffle options when active lesson changes
   useEffect(() => {
+    const b4 = mod.beats.find((b) => b.number === 4);
+    const rawOptions = b4?.question?.options || DEFAULT_TRANSFER_OPTIONS;
+    setShuffledTransferOptions(shuffleOptions(rawOptions));
     setSelectedTransferOption(null);
     setIsHintOpen(false);
     setHasPassedCode(Boolean(progress.completedBeats?.includes(3)));
@@ -95,8 +153,8 @@ export const LessonPlayer: React.FC = () => {
       if (config.soundEnabled) audio.playSuccessChime();
     } else {
       // Beat 4: Verify correct answer is selected before completion
-      const beat4 = mod.beats.find((b) => b.number === 4);
-      const isCorrect = selectedTransferOption !== null && (beat4?.question?.options[selectedTransferOption]?.correct ?? (selectedTransferOption === 1));
+      const isCorrect =
+        selectedTransferOption !== null && Boolean(activeTransferOptions[selectedTransferOption]?.correct);
       if (!isCorrect) return;
 
       completeLesson(mod.id);
@@ -116,8 +174,7 @@ export const LessonPlayer: React.FC = () => {
 
   const handleTransferSubmit = (idx: number) => {
     setSelectedTransferOption(idx);
-    const beat4 = mod.beats.find((b) => b.number === 4);
-    const isCorrect = beat4?.question?.options[idx]?.correct ?? (idx === 1);
+    const isCorrect = Boolean(activeTransferOptions[idx]?.correct);
     if (isCorrect) {
       if (config.soundEnabled) audio.playSuccessChime();
     } else {
@@ -690,42 +747,7 @@ export const LessonPlayer: React.FC = () => {
                 ? 'لماذا نفضل تقليل مربعات البواقي (L2 Loss) بدلاً من القيمة المطلقة (L1 Loss) في نماذج الانحدار الكلاسيكية؟'
                 : 'Why do we minimize squared residuals (L2 Loss) instead of absolute residuals |y - ŷ| (L1 Loss) in classical econometrics?');
 
-          const options = question?.options || [
-            {
-              text: {
-                en: 'L1 loss produces non-unique solutions and is non-differentiable at zero, preventing smooth gradient descent.',
-                ar: 'دالة L1 غير قابلة للاشتقاق عند الصفر ولا تقدم حلاً تحليلياً مغلقاً وفريداً ومباشراً.',
-              },
-              correct: false,
-              explanation: {
-                en: 'Reconsider: L1 provides sparsity, but L2 provides smooth differentiability.',
-                ar: 'أعد التفكير: دالة L1 توفر التناثر، لكن دالة L2 توفر قابلية اشتقاق سلسة.',
-              },
-            },
-            {
-              text: {
-                en: 'L2 loss provides an analytical closed-form solution (Normal Equations) and smooth, continuous derivatives everywhere.',
-                ar: 'دالة L2 توفر حلاً تحليلياً مغلقاً مباشراً (المعادلات الطبيعية) وتدرجات سلسة مستمرة في كل مكان.',
-              },
-              correct: true,
-              explanation: {
-                en: 'Correct! L2 loss is globally convex, smooth, and yields the Gauss-Markov Best Linear Unbiased Estimator (BLUE).',
-                ar: 'صحيح! دالة L2 تربيعية ومحدبة مما يتيح إيجاد الحل المغلق المباشر (Gauss-Markov) بدقة رياضية عالية.',
-              },
-            },
-            {
-              text: {
-                en: 'L2 loss completely ignores the influence of extreme outlier observations.',
-                ar: 'دالة L2 تتجاهل تماماً تأثير المشاهدات الشاذة والمتطرفة.',
-              },
-              correct: false,
-              explanation: {
-                en: 'Reconsider: Squaring magnifies outlier penalties quadratically; it does not ignore them.',
-                ar: 'أعد التفكير: دالة L2 تعاقب القيم المتطرفة بشدة (تربيعياً) وليس بالعكس.',
-              },
-            },
-          ];
-
+          const options = activeTransferOptions;
           const selectedOptionObj = selectedTransferOption !== null ? options[selectedTransferOption] : null;
           const isSelectedCorrect = selectedOptionObj?.correct ?? false;
 
@@ -738,7 +760,24 @@ export const LessonPlayer: React.FC = () => {
                     {tr('beat4', language)}
                   </span>
                 </div>
-                <span className="text-xs font-mono text-emerald-400 font-semibold">+50 XP Award</span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const b4 = mod.beats.find((b) => b.number === 4);
+                      const raw = b4?.question?.options || DEFAULT_TRANSFER_OPTIONS;
+                      setShuffledTransferOptions(shuffleOptions(raw));
+                      setSelectedTransferOption(null);
+                      if (config.soundEnabled) audio.playClick();
+                    }}
+                    className="flex items-center gap-1.5 text-[11px] font-mono text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors px-2.5 py-1 rounded-lg border border-[var(--border-subtle)] hover:bg-[var(--bg-surface-hover)]"
+                    title={language === 'ar' ? 'إعادة خلط وترتيب الخيارات عشوائياً' : 'Reshuffle options randomly'}
+                  >
+                    <RotateCcw size={12} />
+                    <span>{language === 'ar' ? 'خلط الخيارات' : 'Reshuffle'}</span>
+                  </button>
+                  <span className="text-xs font-mono text-emerald-400 font-semibold">+50 XP Award</span>
+                </div>
               </div>
 
               <h2 className="text-base font-semibold text-[var(--text-primary)] leading-relaxed">

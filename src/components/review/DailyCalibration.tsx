@@ -22,6 +22,15 @@ import {
   type DrillFormat,
 } from '@/lib/drill-registry';
 
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export const DailyCalibration: React.FC = () => {
   const {
     language,
@@ -87,6 +96,11 @@ export const DailyCalibration: React.FC = () => {
   const currentItem = activeDrills[currentIndex];
   const isComplete = currentIndex >= activeDrills.length;
 
+  const currentOptions = useMemo(() => {
+    if (!currentItem?.options) return [];
+    return shuffleArray(currentItem.options);
+  }, [currentItem]);
+
   const currentCardState = useMemo(() => {
     if (!currentItem) return null;
     return fsrsCards[currentItem.id] || createNewCard(currentItem.id);
@@ -109,18 +123,18 @@ export const DailyCalibration: React.FC = () => {
 
   // Handle MCQ selection
   const handleSelectOption = useCallback((idx: number) => {
-    if (isAnswerRevealed || !currentItem || !currentItem.options) return;
+    if (isAnswerRevealed || !currentItem || currentOptions.length === 0) return;
     setSelectedOptionIdx(idx);
     setIsAnswerRevealed(true);
 
-    const isCorrect = currentItem.options[idx]?.correct;
+    const isCorrect = currentOptions[idx]?.correct;
     if (isCorrect) {
       if (useOkvirStore.getState().config.soundEnabled) audio.playSuccess();
       setSessionStats((s) => ({ ...s, correct: s.correct + 1 }));
     } else {
       if (useOkvirStore.getState().config.soundEnabled) audio.playErrorTick();
     }
-  }, [isAnswerRevealed, currentItem]);
+  }, [isAnswerRevealed, currentItem, currentOptions]);
 
   // Handle Boolean True/False selection
   const handleSelectBoolean = useCallback((answer: boolean) => {
@@ -179,10 +193,10 @@ export const DailyCalibration: React.FC = () => {
         if (currentItem?.format === 'flashcard' && (e.code === 'Space' || e.key === 'Enter')) {
           e.preventDefault();
           handleFlipCard();
-        } else if ((currentItem?.format === 'mcq' || currentItem?.format === 'formula_fill') && currentItem.options) {
+        } else if ((currentItem?.format === 'mcq' || currentItem?.format === 'formula_fill') && currentOptions.length > 0) {
           if (['1', '2', '3', '4'].includes(e.key)) {
             const idx = parseInt(e.key, 10) - 1;
-            if (idx < currentItem.options.length) {
+            if (idx < currentOptions.length) {
               e.preventDefault();
               handleSelectOption(idx);
             }
@@ -442,7 +456,7 @@ export const DailyCalibration: React.FC = () => {
             {/* ====================================================================
                 FORMAT 2: MULTIPLE CHOICE QUESTION (MCQ)
                ==================================================================== */}
-            {currentItem.format === 'mcq' && currentItem.options && (
+            {currentItem.format === 'mcq' && currentOptions.length > 0 && (
               <div className="rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-surface)] specular p-6 space-y-5">
                 <div>
                   <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-tertiary)] block mb-1.5">
@@ -454,7 +468,7 @@ export const DailyCalibration: React.FC = () => {
                 </div>
 
                 <div className="space-y-2.5">
-                  {currentItem.options.map((opt, idx) => {
+                  {currentOptions.map((opt, idx) => {
                     const isSelected = selectedOptionIdx === idx;
                     const isCorrect = opt.correct;
                     const showFeedback = isAnswerRevealed;
@@ -496,7 +510,7 @@ export const DailyCalibration: React.FC = () => {
                 {isAnswerRevealed && selectedOptionIdx !== null && (
                   <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-2 slide-up text-xs leading-relaxed">
                     <div className="flex items-center gap-1.5 font-bold font-mono">
-                      {currentItem.options[selectedOptionIdx].correct ? (
+                      {currentOptions[selectedOptionIdx]?.correct ? (
                         <span className="text-emerald-400 flex items-center gap-1">
                           <Check size={14} /> {language === 'ar' ? 'إجابة صحيحة ومتقنة!' : 'Correct!'}
                         </span>
@@ -508,8 +522,8 @@ export const DailyCalibration: React.FC = () => {
                     </div>
                     <p className="text-[var(--text-secondary)]">
                       {language === 'ar'
-                        ? currentItem.options[selectedOptionIdx].explanationAr || currentItem.options.find((o) => o.correct)?.explanationAr
-                        : currentItem.options[selectedOptionIdx].explanation || currentItem.options.find((o) => o.correct)?.explanation}
+                        ? currentOptions[selectedOptionIdx]?.explanationAr || currentOptions.find((o) => o.correct)?.explanationAr
+                        : currentOptions[selectedOptionIdx]?.explanation || currentOptions.find((o) => o.correct)?.explanation}
                     </p>
                   </div>
                 )}
@@ -593,7 +607,7 @@ export const DailyCalibration: React.FC = () => {
             {/* ====================================================================
                 FORMAT 4: FORMULA FILL-IN-THE-BLANK
                ==================================================================== */}
-            {currentItem.format === 'formula_fill' && currentItem.options && (
+            {currentItem.format === 'formula_fill' && currentOptions.length > 0 && (
               <div className="rounded-2xl border border-[var(--border-strong)] bg-[var(--bg-surface)] specular p-6 space-y-5">
                 <div>
                   <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-tertiary)] block mb-1.5">
@@ -618,7 +632,7 @@ export const DailyCalibration: React.FC = () => {
 
                 {/* Options Token Chips */}
                 <div className="grid grid-cols-2 gap-2.5">
-                  {currentItem.options.map((opt, idx) => {
+                  {currentOptions.map((opt, idx) => {
                     const isSelected = selectedOptionIdx === idx;
                     const isCorrect = opt.correct;
                     const showFeedback = isAnswerRevealed;
@@ -650,14 +664,14 @@ export const DailyCalibration: React.FC = () => {
                 {isAnswerRevealed && selectedOptionIdx !== null && (
                   <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] space-y-1.5 slide-up text-xs leading-relaxed">
                     <span className="font-bold text-[var(--text-primary)] font-mono block">
-                      {currentItem.options[selectedOptionIdx].correct
+                      {currentOptions[selectedOptionIdx]?.correct
                         ? language === 'ar' ? '✓ تم التحقق الرياضي بنجاح:' : '✓ Mathematically verified:'
                         : language === 'ar' ? '✗ الرمز الصحيح والتفسير:' : '✗ Correct token derivation:'}
                     </span>
                     <p className="text-[var(--text-secondary)]">
                       {language === 'ar'
-                        ? currentItem.options[selectedOptionIdx].explanationAr || currentItem.options.find((o) => o.correct)?.explanationAr
-                        : currentItem.options[selectedOptionIdx].explanation || currentItem.options.find((o) => o.correct)?.explanation}
+                        ? currentOptions[selectedOptionIdx]?.explanationAr || currentOptions.find((o) => o.correct)?.explanationAr
+                        : currentOptions[selectedOptionIdx]?.explanation || currentOptions.find((o) => o.correct)?.explanation}
                     </p>
                   </div>
                 )}
