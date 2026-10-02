@@ -27,7 +27,7 @@ function resolveVersion() {
       }
     }
   } catch (_) {}
-  return '1.0.4';
+  return '1.0.5';
 }
 
 const VERSION = resolveVersion();
