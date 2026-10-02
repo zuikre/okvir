@@ -19,7 +19,7 @@ export interface SkillNodeComponentProps {
   completedBeatsCount?: number;
   mode: 'roadmap' | 'dag';
   language: 'en' | 'ar';
-  labelPosition?: 'left' | 'right' | 'bottom';
+  labelPosition?: 'left' | 'right';
   isHovered?: boolean;
   isSelected?: boolean;
   accentColor?: string;
@@ -34,7 +34,7 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
   completedBeatsCount = 0,
   mode,
   language,
-  labelPosition = 'bottom',
+  labelPosition = 'left',
   isHovered = false,
   isSelected = false,
   accentColor,
@@ -68,7 +68,7 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
         )}
 
         {/* 3D Round Node Pedestal */}
-        <div className="relative w-20 h-20 shrink-0 z-10">
+        <div className="relative w-18 h-18 sm:w-20 sm:h-20 shrink-0 z-10">
           {/* Solid background backing disc to prevent any underlying SVG pipe from leaking through */}
           <div className="absolute inset-0 rounded-full bg-[var(--bg-app)] pointer-events-none" />
 
@@ -78,7 +78,7 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
 
           <button
             onClick={onClick}
-            className={`relative w-20 h-20 rounded-full flex flex-col items-center justify-center font-mono select-none pedestal-3d cursor-pointer transition-transform duration-150 ${
+            className={`relative w-18 h-18 sm:w-20 sm:h-20 rounded-full flex flex-col items-center justify-center font-mono select-none pedestal-3d cursor-pointer transition-transform duration-150 ${
               isMastered
                 ? 'bg-gradient-to-b from-emerald-400 to-emerald-600 shadow-[0_6px_0_#065f46,0_12px_24px_rgba(16,185,129,0.35)] text-white hover:scale-105 active:scale-95'
                 : isInProgress
@@ -120,64 +120,58 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
         <div
           className={`absolute z-20 ${
             labelPosition === 'left'
-              ? 'right-full mr-3.5 top-1/2 -translate-y-1/2 w-40 sm:w-48'
-              : labelPosition === 'right'
-              ? 'left-full ml-3.5 top-1/2 -translate-y-1/2 w-40 sm:w-48'
-              : 'top-full mt-3 left-1/2 -translate-x-1/2 w-40 sm:w-48'
+              ? 'right-full mr-2.5 sm:mr-3.5 top-1/2 -translate-y-1/2 w-36 sm:w-48'
+              : 'left-full ml-2.5 sm:ml-3.5 top-1/2 -translate-y-1/2 w-36 sm:w-48'
           }`}
         >
           <button
             type="button"
             onClick={onClick}
-            className={`w-full relative px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-2xl border text-start backdrop-blur-md shadow-md transition-all cursor-pointer group/card ${
+            className={`w-full relative p-2 sm:p-3 rounded-2xl border text-start backdrop-blur-md shadow-md transition-all cursor-pointer group/card ${
               isHovered || isSelected
                 ? 'border-sky-500/60 bg-[var(--bg-surface)] shadow-lg scale-102'
-                : 'border-[var(--border-subtle)] bg-[var(--bg-surface)]/90 hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface)]'
+                : 'border-[var(--border-subtle)] bg-[var(--bg-surface)]/95 hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface)]'
             }`}
           >
             {/* Directional Connector Notch */}
-            {labelPosition === 'left' && (
+            {labelPosition === 'left' ? (
               <div className="absolute -right-1.5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rotate-45 bg-[var(--bg-surface)] border-t border-r border-[var(--border-subtle)] group-hover/card:border-[var(--border-strong)]" />
-            )}
-            {labelPosition === 'right' && (
+            ) : (
               <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rotate-45 bg-[var(--bg-surface)] border-b border-l border-[var(--border-subtle)] group-hover/card:border-[var(--border-strong)]" />
-            )}
-            {labelPosition === 'bottom' && (
-              <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45 bg-[var(--bg-surface)] border-t border-l border-[var(--border-subtle)] group-hover/card:border-[var(--border-strong)]" />
             )}
 
             {/* Status / Category Header */}
-            <div className="flex items-center justify-between gap-1.5 mb-1 relative z-10">
+            <div className="flex items-center justify-between gap-1 mb-1 relative z-10">
               <div className="flex items-center gap-1 min-w-0">
                 {isMastered ? (
-                  <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-400">
+                  <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-emerald-400">
                     <CheckCircle2 size={11} className="shrink-0" />
                     <span className="truncate">{language === 'ar' ? 'متقن' : 'Mastered'}</span>
                   </span>
                 ) : isInProgress ? (
-                  <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-amber-400">
+                  <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-amber-400">
                     <Play size={10} fill="currentColor" className="shrink-0" />
                     <span className="truncate">{language === 'ar' ? 'قيد الإنجاز' : 'In Progress'}</span>
                   </span>
                 ) : isAvailable ? (
-                  <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-sky-400">
+                  <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-sky-400">
                     <Zap size={11} className="shrink-0" />
-                    <span className="truncate">{language === 'ar' ? 'المفهوم التالي' : 'Next Concept'}</span>
+                    <span className="truncate">{language === 'ar' ? 'المفهوم التالي' : 'Next'}</span>
                   </span>
                 ) : isDecaying ? (
-                  <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-rose-400">
+                  <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-rose-400">
                     <AlertTriangle size={11} className="shrink-0" />
                     <span className="truncate">{language === 'ar' ? 'مراجعة' : 'Review'}</span>
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 text-[10px] font-mono text-[var(--text-tertiary)]">
+                  <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono text-[var(--text-tertiary)]">
                     <Lock size={10} className="shrink-0" />
                     <span className="truncate">{language === 'ar' ? track?.titleAr : track?.title}</span>
                   </span>
                 )}
               </div>
 
-              <span className="text-[10px] font-mono text-[var(--text-tertiary)] flex items-center gap-0.5 shrink-0">
+              <span className="text-[9px] sm:text-[10px] font-mono text-[var(--text-tertiary)] flex items-center gap-0.5 shrink-0">
                 <Clock size={9} />
                 <span>{module.estimatedMinutes}m</span>
               </span>
@@ -185,7 +179,7 @@ export const SkillNodeComponent: React.FC<SkillNodeComponentProps> = ({
 
             {/* Concept Title */}
             <h4
-              className={`text-xs sm:text-[13px] font-bold leading-snug line-clamp-2 relative z-10 transition-colors ${
+              className={`text-[11px] sm:text-xs font-bold leading-snug line-clamp-2 relative z-10 transition-colors ${
                 isLocked
                   ? 'text-[var(--text-secondary)]'
                   : 'text-[var(--text-primary)] group-hover/card:text-sky-400'

@@ -431,24 +431,24 @@ export const SkillTree: React.FC = () => {
             const milestoneBadge = MILESTONE_BADGES.find((b) => b.id === unit.badgeId);
 
             // Container dimensions for analytical SVG mapping
-            const ROW_HEIGHT = 140;
-            const CONTAINER_WIDTH = 480;
-            const TOTAL_HEIGHT = unit.modules.length * ROW_HEIGHT + 50;
+            const ROW_HEIGHT = 165;
+            const CONTAINER_WIDTH = 500;
+            const TOTAL_HEIGHT = unit.modules.length * ROW_HEIGHT + 60;
 
             // Multi-harmonic terrain curve producing an authentic, organic winding road
             // Combines macro-meanders (valley turns), hillside curves, and micro-contour
             const nodeCoords = unit.modules.map((_, i) => {
               const u = unit.unitNumber - 1;
-              const h1 = Math.sin(i * 0.78 + 0.5 + u * 1.6) * 56;
-              const h2 = Math.sin(i * 1.55 + 1.1 + u * 0.95) * 30;
-              const h3 = Math.cos(i * 0.38 + u * 0.75) * 16;
+              const h1 = Math.sin(i * 0.72 + 0.4 + u * 1.5) * 65;
+              const h2 = Math.sin(i * 1.45 + 1.2 + u * 0.9) * 32;
+              const h3 = Math.cos(i * 0.35 + u * 0.7) * 18;
               const raw = h1 + h2 + h3;
-              // Smooth hyperbolic tangent collar strictly bounds within ±85px
-              const boundedOffset = 85 * Math.tanh(raw / 78);
+              // Smooth hyperbolic tangent collar strictly bounds within ±92px
+              const boundedOffset = 92 * Math.tanh(raw / 78);
               const xOffset = boundedOffset * (language === 'ar' ? -1 : 1);
               return {
                 x: CONTAINER_WIDTH / 2 + xOffset,
-                y: 70 + i * ROW_HEIGHT,
+                y: 80 + i * ROW_HEIGHT,
                 xOffset,
               };
             });
@@ -524,7 +524,7 @@ export const SkillTree: React.FC = () => {
 
                 {/* 2. Unified Serpentine Winding Canvas with Exact Mathematical Links */}
                 <div
-                  className="relative w-[480px] max-w-full mx-auto select-none overflow-visible"
+                  className="relative w-[500px] max-w-full mx-auto select-none overflow-visible"
                   style={{ height: `${TOTAL_HEIGHT}px` }}
                 >
                   {/* Single Unified Full-Unit SVG Overlay connecting all nodes */}
@@ -646,15 +646,8 @@ export const SkillTree: React.FC = () => {
                       progress?.status ||
                       (modIdx === 0 && unit.unitNumber === 1 ? 'available' : 'locked');
 
-                    // Compute inward-facing signpost placement
-                    let labelPosition: 'left' | 'right' | 'bottom' = 'bottom';
-                    if (coord.xOffset > 18) {
-                      labelPosition = 'left';
-                    } else if (coord.xOffset < -18) {
-                      labelPosition = 'right';
-                    } else {
-                      labelPosition = 'bottom';
-                    }
+                    // Pure lateral placement: project inward into the open central clearing
+                    const labelPosition: 'left' | 'right' = coord.xOffset >= 0 ? 'left' : 'right';
 
                     return (
                       <div
