@@ -98,19 +98,21 @@ export class ProceduralAudioEngine {
 
     if (ctx.state === 'suspended') {
       ctx.resume().then(() => {
-        if (ctx.state === 'running') callback(ctx);
-      }).catch(() => {});
+        callback(ctx);
+      }).catch(() => {
+        callback(ctx);
+      });
       return;
     }
     callback(ctx);
   }
 
   // 1. TACTILE MICRO-SWITCH CLICK (Buttons, Toggles)
-  // Transient Dirac pulse approximation: 10ms downward sweep
+  // Transient Dirac pulse approximation: 25ms downward sweep
   public playClick(pitchMultiplier = 1.0) {
     this.ensureRunning((ctx) => {
       try {
-        const now = Math.max(ctx.currentTime, 0.001);
+        const now = ctx.currentTime + 0.005;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
 
@@ -119,16 +121,16 @@ export class ProceduralAudioEngine {
         const endFreq = 320 * pitchMultiplier;
 
         osc.frequency.setValueAtTime(startFreq, now);
-        osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.012);
+        osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.025);
 
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
 
         osc.connect(gain);
         gain.connect(this.masterGain!);
 
         osc.start(now);
-        osc.stop(now + 0.012);
+        osc.stop(now + 0.025);
         this.triggerHaptic(8);
       } catch {}
     });
@@ -138,7 +140,7 @@ export class ProceduralAudioEngine {
   // Velocity-damped 6ms pulse with anti-chattering threshold
   public playScrubTick(velocity = 1.0) {
     this.ensureRunning((ctx) => {
-      const now = Math.max(ctx.currentTime, 0.001);
+      const now = ctx.currentTime + 0.005;
       // Chattering prevention: minimum 18ms between scrub ticks
       if (now - this.lastTickTime < 0.018) return;
       this.lastTickTime = now;
@@ -179,7 +181,7 @@ export class ProceduralAudioEngine {
   public playErrorDissonance() {
     this.ensureRunning((ctx) => {
       try {
-        const now = Math.max(ctx.currentTime, 0.001);
+        const now = ctx.currentTime + 0.005;
         // Dissonant Cluster: F#3 (185 Hz), G3 (196 Hz), C4 (261.63 Hz)
         const freqs = [185.0, 196.0, 261.63];
 
@@ -288,7 +290,7 @@ export class ProceduralAudioEngine {
   public playVictoryHarmonics() {
     this.ensureRunning((ctx) => {
       try {
-        const now = Math.max(ctx.currentTime, 0.001);
+        const now = ctx.currentTime + 0.005;
         // Radiant Lydian/Major 9th Chord: C5 (523.25), E5 (659.25), G5 (783.99), B5 (987.77), D6 (1174.66)
         const chord = [523.25, 659.25, 783.99, 987.77, 1174.66];
 

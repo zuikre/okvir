@@ -186,38 +186,59 @@ if [ "${PLATFORM}" = "linux" ]; then
 
   TMP_DIR="$(mktemp -d)"
 
-  echo "    • Fetching Linux bundle for ${ARCH_SUFFIX} (~85 MB desktop binary, please wait)..."
-  DESKTOP_TARGET="${APP_DIR}/okvir.AppImage"
-  DESKTOP_TMP="${TMP_DIR}/okvir.download"
+  # Prefer native Linux package (.deb) on Debian/Ubuntu/Mint systems for direct hardware audio & low latency
+  if command -v dpkg-deb >/dev/null 2>&1; then
+    echo "    • Fetching native Linux package for ${ARCH_SUFFIX} (~7 MB native package)..."
+    DEB_TMP="${TMP_DIR}/okvir.deb"
+    if download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.deb" "${DEB_TMP}" || \
+       download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.deb" "${DEB_TMP}"; then
+      mkdir -p "${APP_DIR}/native"
+      dpkg-deb -x "${DEB_TMP}" "${APP_DIR}/native"
+      if [ -x "${APP_DIR}/native/usr/bin/okvir-desktop" ]; then
+        chmod +x "${APP_DIR}/native/usr/bin/okvir-desktop"
+        DESKTOP_TARGET="${APP_DIR}/native/usr/bin/okvir-desktop"
+        ln -sf "${DESKTOP_TARGET}" "${INSTALL_DIR}/okvir-desktop"
+        INSTALLED=true
+      fi
+    fi
+  fi
+
+  if [ "${INSTALLED}" != "true" ]; then
+    echo "    • Fetching Linux AppImage bundle for ${ARCH_SUFFIX} (~85 MB desktop binary, please wait)..."
+    DESKTOP_TARGET="${APP_DIR}/okvir.AppImage"
+    DESKTOP_TMP="${TMP_DIR}/okvir.download"
+    mkdir -p "${APP_DIR}/bin"
+
+    if download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TMP}" || \
+       download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TMP}" || \
+       download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" || \
+       download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" || \
+       download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir" "${DESKTOP_TMP}"; then
+
+      if [ -f "${TMP_DIR}/okvir.tar.gz" ]; then
+        tar -xzf "${TMP_DIR}/okvir.tar.gz" -C "${TMP_DIR}"
+        chmod +x "${TMP_DIR}/okvir"
+        mv -f "${TMP_DIR}/okvir" "${DESKTOP_TARGET}"
+      elif [ -f "${DESKTOP_TMP}" ]; then
+        mv -f "${DESKTOP_TMP}" "${DESKTOP_TARGET}"
+      fi
+      chmod +x "${DESKTOP_TARGET}"
+      ln -sf "${DESKTOP_TARGET}" "${INSTALL_DIR}/okvir-desktop"
+    fi
+  fi
+
+  # Install Framework CLI script and Node module descriptor to ~/.okvir
   mkdir -p "${APP_DIR}/bin"
+  if [ -f "${TMP_DIR}/okvir.js" ]; then
+    cp -f "${TMP_DIR}/okvir.js" "${APP_DIR}/bin/okvir.js"
+  else
+    download_file "https://raw.githubusercontent.com/${OKVIR_REPO}/main/bin/okvir.js" "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
+  fi
+  chmod +x "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
+  echo '{"type": "module"}' > "${APP_DIR}/package.json" 2>/dev/null || true
 
-  if download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TMP}" || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/OKVIR_${RESOLVED_VERSION}_${ARCH_SUFFIX}.AppImage" "${DESKTOP_TMP}" || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/download/v${RESOLVED_VERSION}/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir-linux-${TARGET_ARCH}.tar.gz" "${TMP_DIR}/okvir.tar.gz" || \
-     download_file "https://github.com/${OKVIR_REPO}/releases/latest/download/okvir" "${DESKTOP_TMP}"; then
-
-    if [ -f "${TMP_DIR}/okvir.tar.gz" ]; then
-      tar -xzf "${TMP_DIR}/okvir.tar.gz" -C "${TMP_DIR}"
-      chmod +x "${TMP_DIR}/okvir"
-      mv -f "${TMP_DIR}/okvir" "${DESKTOP_TARGET}"
-    elif [ -f "${DESKTOP_TMP}" ]; then
-      mv -f "${DESKTOP_TMP}" "${DESKTOP_TARGET}"
-    fi
-    chmod +x "${DESKTOP_TARGET}"
-    ln -sf "${DESKTOP_TARGET}" "${INSTALL_DIR}/okvir-desktop"
-
-    # Install Framework CLI script and Node module descriptor to ~/.okvir
-    if [ -f "${TMP_DIR}/okvir.js" ]; then
-      cp -f "${TMP_DIR}/okvir.js" "${APP_DIR}/bin/okvir.js"
-    else
-      download_file "https://raw.githubusercontent.com/${OKVIR_REPO}/main/bin/okvir.js" "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
-    fi
-    chmod +x "${APP_DIR}/bin/okvir.js" 2>/dev/null || true
-    echo '{"type": "module"}' > "${APP_DIR}/package.json" 2>/dev/null || true
-
-    # Create the unified CLI & desktop launcher at ${INSTALL_DIR}/okvir
-    cat << 'LAUNCHER_EOF' > "${INSTALL_DIR}/okvir"
+  # Create the unified CLI & desktop launcher at ${INSTALL_DIR}/okvir
+  cat << 'LAUNCHER_EOF' > "${INSTALL_DIR}/okvir"
 #!/usr/bin/env bash
 # ==============================================================================
 # OKVIR Unified CLI & Desktop Launcher
@@ -225,8 +246,15 @@ if [ "${PLATFORM}" = "linux" ]; then
 # ==============================================================================
 
 APP_DIR="${OKVIR_APP_DIR:-${HOME}/.okvir}"
-DESKTOP_APP="${APP_DIR}/okvir.AppImage"
-[ ! -f "${DESKTOP_APP}" ] && DESKTOP_APP="${HOME}/.local/bin/okvir-desktop"
+NATIVE_DESKTOP="${APP_DIR}/native/usr/bin/okvir-desktop"
+[ ! -f "${NATIVE_DESKTOP}" ] && NATIVE_DESKTOP="/usr/bin/okvir-desktop"
+[ ! -f "${NATIVE_DESKTOP}" ] && [ -f "${HOME}/.local/bin/okvir-desktop" ] && [ ! -L "${HOME}/.local/bin/okvir-desktop" ] && NATIVE_DESKTOP="${HOME}/.local/bin/okvir-desktop"
+
+if [ -x "${NATIVE_DESKTOP}" ]; then
+  DESKTOP_APP="${NATIVE_DESKTOP}"
+else
+  DESKTOP_APP="${APP_DIR}/okvir.AppImage"
+fi
 CLI_SCRIPT="${APP_DIR}/bin/okvir.js"
 [ -f "bin/okvir.js" ] && CLI_SCRIPT="bin/okvir.js"
 
