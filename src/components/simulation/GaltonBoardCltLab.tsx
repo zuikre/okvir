@@ -31,6 +31,10 @@ interface ActiveBall {
   color: string;
   radius: number;
   settled: boolean;
+  spin: number;        // Angular rotation (radians)
+  spinRate: number;     // Spin velocity (rad/frame)
+  squash: number;       // Squash/stretch factor (1.0 = normal, <1 = squashed, >1 = stretched)
+  trailAlpha: number;   // Trail opacity multiplier
   history: Array<{ x: number; y: number }>;
 }
 
@@ -267,6 +271,7 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
       const newBalls: ActiveBall[] = [];
       for (let i = 0; i < toSpawn; i++) {
+        const spinInit = (Math.random() - 0.5) * 0.15;
         if (labMode === 'galton') {
           // Drops from funnel targeting the top apex pin (row 0, col 0)
           newBalls.push({
@@ -283,6 +288,10 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
             color: BALL_PALETTE[Math.floor(Math.random() * BALL_PALETTE.length)],
             radius: 3.8,
             settled: false,
+            spin: 0,
+            spinRate: spinInit,
+            squash: 1.0,
+            trailAlpha: 1.0,
             history: [],
           });
         } else if (labMode === 'dice') {
@@ -311,6 +320,10 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
             color: BALL_PALETTE[Math.floor(Math.random() * BALL_PALETTE.length)],
             radius: 3.8,
             settled: false,
+            spin: 0,
+            spinRate: spinInit,
+            squash: 1.0,
+            trailAlpha: 1.0,
             history: [],
           });
         } else if (labMode === 'skew') {
@@ -339,6 +352,10 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
             color: BALL_PALETTE[Math.floor(Math.random() * BALL_PALETTE.length)],
             radius: 3.8,
             settled: false,
+            spin: 0,
+            spinRate: spinInit,
+            squash: 1.0,
+            trailAlpha: 1.0,
             history: [],
           });
         }
@@ -558,21 +575,32 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
       ctx.clearRect(0, 0, w, h);
 
       const layout = getLayout(w, h);
+      const pegRadius = 3.2;
 
-      // 1. Draw Top Dropper Funnel (Polished Beveled Metal Guide)
-      ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.25)';
-      ctx.lineWidth = 1.5;
+      // ── 1. POLISHED METAL FUNNEL ──
+      const funnelGrad = ctx.createLinearGradient(layout.cx - 32, 0, layout.cx + 32, 0);
+      funnelGrad.addColorStop(0, isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)');
+      funnelGrad.addColorStop(0.5, isLight ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.22)');
+      funnelGrad.addColorStop(1, isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)');
+
+      ctx.strokeStyle = funnelGrad;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.moveTo(layout.cx - 32, 10);
-      ctx.lineTo(layout.cx - 10, layout.topFunnelY);
-      ctx.lineTo(layout.cx - 10, layout.topFunnelY + 16);
-      ctx.moveTo(layout.cx + 32, 10);
-      ctx.lineTo(layout.cx + 10, layout.topFunnelY);
-      ctx.lineTo(layout.cx + 10, layout.topFunnelY + 16);
+      ctx.moveTo(layout.cx - 34, 6);
+      ctx.quadraticCurveTo(layout.cx - 18, layout.topFunnelY - 4, layout.cx - 8, layout.topFunnelY + 18);
+      ctx.moveTo(layout.cx + 34, 6);
+      ctx.quadraticCurveTo(layout.cx + 18, layout.topFunnelY - 4, layout.cx + 8, layout.topFunnelY + 18);
       ctx.stroke();
 
-      // 2. Draw Brass / Steel Pin Lattice (Pascal Triangle)
-      const pegRadius = 3.0;
+      // Funnel opening glow
+      const funnelGlow = ctx.createRadialGradient(layout.cx, layout.topFunnelY + 4, 2, layout.cx, layout.topFunnelY + 4, 18);
+      funnelGlow.addColorStop(0, isLight ? 'rgba(56,189,248,0.12)' : 'rgba(56,189,248,0.15)');
+      funnelGlow.addColorStop(1, 'rgba(56,189,248,0)');
+      ctx.fillStyle = funnelGlow;
+      ctx.fillRect(layout.cx - 20, layout.topFunnelY - 6, 40, 28);
+
+      // ── 2. PREMIUM PIN LATTICE (METALLIC 3D PINS) ──
       for (let r = 0; r < numRows; r++) {
         const rowCount = r + 1;
         const py = layout.getPegY(r);
@@ -580,108 +608,139 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
         for (let c = 0; c < rowCount; c++) {
           const px = layout.getPegX(r, c);
 
-          // Subtle drop shadow under pin
+          // Drop shadow
           ctx.beginPath();
-          ctx.arc(px, py + 1.2, pegRadius, 0, Math.PI * 2);
-          ctx.fillStyle = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.6)';
+          ctx.arc(px + 0.5, py + 1.8, pegRadius + 0.3, 0, Math.PI * 2);
+          ctx.fillStyle = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.55)';
           ctx.fill();
 
-          // Pin Body
+          // Pin body with metallic gradient
+          const pinGrad = ctx.createRadialGradient(px - 1, py - 1, 0.3, px, py, pegRadius);
+          pinGrad.addColorStop(0, isLight ? '#d4d4d8' : '#fafafa');
+          pinGrad.addColorStop(0.5, isLight ? '#a1a1aa' : '#d4d4d8');
+          pinGrad.addColorStop(1, isLight ? '#71717a' : '#71717a');
           ctx.beginPath();
           ctx.arc(px, py, pegRadius, 0, Math.PI * 2);
-          ctx.fillStyle = isLight ? '#71717a' : '#e4e4e7';
+          ctx.fillStyle = pinGrad;
           ctx.fill();
 
-          // Specular Glint Highlight
+          // Rim stroke
           ctx.beginPath();
-          ctx.arc(px - 0.8, py - 0.8, 0.9, 0, Math.PI * 2);
-          ctx.fillStyle = '#ffffff';
+          ctx.arc(px, py, pegRadius, 0, Math.PI * 2);
+          ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.08)';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+
+          // Crisp specular highlight
+          ctx.beginPath();
+          ctx.arc(px - 0.9, py - 0.9, 1.0, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,255,255,0.85)';
           ctx.fill();
         }
       }
 
-      // 3. Draw Peg Glow Impact Ripples
+      // ── 3. PEG COLLISION RIPPLES ──
       const glows = pegGlowsRef.current;
       for (let i = glows.length - 1; i >= 0; i--) {
         const g = glows[i];
+        const expandR = (1 - g.life) * 16 + pegRadius;
         ctx.strokeStyle = g.color;
-        ctx.globalAlpha = g.life * 0.8;
-        ctx.lineWidth = 1.6;
+        ctx.globalAlpha = g.life * 0.6;
+        ctx.lineWidth = 1.8;
         ctx.beginPath();
-        ctx.arc(g.x, g.y, (1 - g.life) * 14 + pegRadius, 0, Math.PI * 2);
+        ctx.arc(g.x, g.y, expandR, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.fillStyle = g.color;
+        ctx.globalAlpha = g.life * 0.15;
+        ctx.beginPath();
+        ctx.arc(g.x, g.y, expandR * 0.6, 0, Math.PI * 2);
+        ctx.fill();
 
-        g.life -= 0.07;
+        g.life -= 0.06;
         if (g.life <= 0) glows.splice(i, 1);
       }
       ctx.globalAlpha = 1.0;
 
-      // 4. Draw Collection Bins Vertical Divider Bars
-      ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.15)';
-      ctx.lineWidth = 1.2;
+      // ── 4. COLLECTION BIN DIVIDERS (frosted glass gradient) ──
       for (let b = 0; b <= numBins; b++) {
         const bx = layout.binStartX + b * layout.pegPitchX;
+        const divGrad = ctx.createLinearGradient(bx, layout.binTopY, bx, layout.binBottomY);
+        divGrad.addColorStop(0, isLight ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.2)');
+        divGrad.addColorStop(0.5, isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)');
+        divGrad.addColorStop(1, isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)');
+        ctx.strokeStyle = divGrad;
+        ctx.lineWidth = 1.3;
         ctx.beginPath();
         ctx.moveTo(bx, layout.binTopY);
         ctx.lineTo(bx, layout.binBottomY);
         ctx.stroke();
       }
 
-      // Base Floor Line
-      ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.25)' : 'rgba(255, 255, 255, 0.3)';
+      // Base Floor
+      const floorGrad = ctx.createLinearGradient(layout.binStartX, 0, layout.binStartX + numBins * layout.pegPitchX, 0);
+      floorGrad.addColorStop(0, isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)');
+      floorGrad.addColorStop(0.5, isLight ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.35)');
+      floorGrad.addColorStop(1, isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)');
+      ctx.strokeStyle = floorGrad;
       ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.moveTo(layout.binStartX, layout.binBottomY);
       ctx.lineTo(layout.binStartX + numBins * layout.pegPitchX, layout.binBottomY);
       ctx.stroke();
 
-      // 5. Draw Bar Bounce Spark Flashes
+      // ── 5. BAR BOUNCE SPARKS ──
       const flashes = barFlashesRef.current;
       for (let i = flashes.length - 1; i >= 0; i--) {
         const f = flashes[i];
-        ctx.strokeStyle = '#ffffff';
         ctx.globalAlpha = f.life * 0.9;
-        ctx.lineWidth = 1.2;
+        ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(f.x, f.y, (1 - f.life) * 7 + 1, 0, Math.PI * 2);
+        ctx.arc(f.x, f.y, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = isLight ? 'rgba(14,165,233,0.7)' : 'rgba(56,189,248,0.7)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, (1 - f.life) * 8 + 2, 0, Math.PI * 2);
         ctx.stroke();
-        f.life -= 0.14;
+        f.life -= 0.12;
         if (f.life <= 0) flashes.splice(i, 1);
       }
       ctx.globalAlpha = 1.0;
 
-      // 6. UPDATE & RENDER PHYSICAL CASCADING BALLS
+      // ── 6. PHYSICS UPDATE & BALL RENDERING ──
       const balls = activeBallsRef.current;
       let binUpdated = false;
 
       for (let i = balls.length - 1; i >= 0; i--) {
         const ball = balls[i];
 
-        ball.vx *= 0.99; // Air damping
+        ball.spin += ball.spinRate;
+        ball.squash += (1.0 - ball.squash) * 0.18;
+        ball.vx *= 0.992;
 
         if (!ball.inChute) {
-          // --- Phase 1: In the Pascal Pin Field ---
           ball.vy += gravity;
           ball.y += ball.vy;
           ball.x += ball.vx;
 
-          // Gentle magnetic guidance towards current target peg
-          const dx = ball.targetX - ball.x;
-          ball.vx += dx * 0.05;
+          ball.vx += (Math.random() - 0.5) * 0.04;
 
-          // Record trajectory trail for single ball drops
-          if (balls.length <= 4) {
+          const dx = ball.targetX - ball.x;
+          ball.vx += dx * 0.045;
+
+          if (balls.length <= 6) {
             ball.history.push({ x: ball.x, y: ball.y });
-            if (ball.history.length > 25) ball.history.shift();
+            if (ball.history.length > 30) ball.history.shift();
           }
 
-          // Check if ball has reached the dome of target peg
           const hitThreshold = ball.targetY - (pegRadius + ball.radius);
           if (ball.y >= hitThreshold) {
             ball.y = hitThreshold;
             ball.x = ball.targetX;
 
-            // Trigger ripple glow
+            ball.squash = 0.6;
+            ball.spinRate = (Math.random() - 0.5) * 0.35;
+
             pegGlowsRef.current.push({
               x: ball.targetX,
               y: ball.targetY,
@@ -689,16 +748,14 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
               color: ball.color,
             });
 
-            // Audio click
             if (config.soundEnabled) {
               const now = performance.now();
-              if (now - lastSoundTimeRef.current > 55) {
+              if (now - lastSoundTimeRef.current > 45) {
                 audio.playClick();
                 lastSoundTimeRef.current = now;
               }
             }
 
-            // Stochastic Bernoulli step
             const bounceRight = Math.random() < pBias;
 
             if (ball.targetRow < numRows - 1) {
@@ -707,22 +764,19 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
               const nextPegX = layout.getPegX(nextRow, nextCol);
               const nextPegY = layout.getPegY(nextRow);
 
-              // Upward rebound
-              ball.vy = -restitutionVal * 2.2 - 0.7;
+              ball.vy = -restitutionVal * (2.0 + Math.random() * 0.6) - 0.5;
 
-              // Parabolic trajectory computation
               const deltaY = nextPegY - ball.y;
               const disc = Math.sqrt(Math.max(0.1, ball.vy * ball.vy + 2 * gravity * deltaY));
               const timeFrames = Math.max(1, (-ball.vy + disc) / gravity);
               const deltaX = nextPegX - ball.x;
-              ball.vx = deltaX / timeFrames;
+              ball.vx = deltaX / timeFrames + (Math.random() - 0.5) * 0.12;
 
               ball.targetRow = nextRow;
               ball.targetCol = nextCol;
               ball.targetX = nextPegX;
               ball.targetY = nextPegY;
             } else {
-              // Reached bottom row of pegs! Transition to collection chute
               const finalBin = bounceRight ? ball.targetCol + 1 : ball.targetCol;
               const chuteX = layout.getChuteCenterX(finalBin);
 
@@ -731,42 +785,40 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
               ball.targetY = layout.binTopY;
               ball.inChute = true;
 
-              ball.vy = -restitutionVal * 1.5 - 0.4;
-              ball.vx = (bounceRight ? 1 : -1) * (1.1 + Math.random() * 0.3);
+              ball.vy = -restitutionVal * 1.4 - 0.3;
+              ball.vx = (bounceRight ? 1 : -1) * (0.9 + Math.random() * 0.4);
             }
           }
         } else {
-          // --- Phase 2: In the Vertical Collection Chute ---
           const targetBin = Math.max(0, Math.min(numBins - 1, ball.targetCol));
           const leftBarX = layout.binStartX + targetBin * layout.pegPitchX;
           const rightBarX = leftBarX + layout.pegPitchX;
           const chuteCenter = leftBarX + layout.pegPitchX / 2;
 
-          ball.vy += gravity * 1.15;
+          ball.vy += gravity * 1.1;
           ball.y += ball.vy;
           ball.x += ball.vx;
 
-          // Bounce off left vertical bar
           if (ball.x - ball.radius <= leftBarX) {
             ball.x = leftBarX + ball.radius;
-            ball.vx = Math.abs(ball.vx) * restitutionVal + 0.2;
+            ball.vx = Math.abs(ball.vx) * restitutionVal + 0.15;
+            ball.squash = 0.7;
+            ball.spinRate = -Math.abs(ball.spinRate) - 0.05;
             barFlashesRef.current.push({ x: leftBarX, y: ball.y, life: 1.0 });
-          }
-          // Bounce off right vertical bar
-          else if (ball.x + ball.radius >= rightBarX) {
+          } else if (ball.x + ball.radius >= rightBarX) {
             ball.x = rightBarX - ball.radius;
-            ball.vx = -Math.abs(ball.vx) * restitutionVal - 0.2;
+            ball.vx = -Math.abs(ball.vx) * restitutionVal - 0.15;
+            ball.squash = 0.7;
+            ball.spinRate = Math.abs(ball.spinRate) + 0.05;
             barFlashesRef.current.push({ x: rightBarX, y: ball.y, life: 1.0 });
           }
 
-          // Gentle channel damping
-          ball.vx += (chuteCenter - ball.x) * 0.05;
-          ball.vx *= 0.94;
+          ball.vx += (chuteCenter - ball.x) * 0.04;
+          ball.vx *= 0.93;
 
-          // Landing on stack or floor
           const currentCount = binsRef.current[targetBin];
           const ballDiam = ball.radius * 2;
-          const stackY = layout.binBottomY - Math.min(layout.binH - 22, currentCount * (ballDiam * 0.65) + ball.radius);
+          const stackY = layout.binBottomY - Math.min(layout.binH - 22, currentCount * (ballDiam * 0.62) + ball.radius);
 
           if (ball.y >= stackY) {
             ball.settled = true;
@@ -775,10 +827,9 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
             binsRef.current = newBins;
             binUpdated = true;
 
-            // Retain visual settled bead in bin
-            if (settledBallsRef.current.length < 450) {
+            if (settledBallsRef.current.length < 500) {
               settledBallsRef.current.push({
-                x: chuteCenter + (Math.random() - 0.5) * (layout.pegPitchX * 0.35),
+                x: chuteCenter + (Math.random() - 0.5) * (layout.pegPitchX * 0.32),
                 y: stackY,
                 color: ball.color,
                 radius: ball.radius,
@@ -790,61 +841,103 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
           }
         }
 
-        // Render trajectory motion trail
-        if (ball.history.length > 2) {
-          ctx.strokeStyle = ball.color;
-          ctx.lineWidth = 1.2;
-          ctx.beginPath();
-          for (let hIdx = 0; hIdx < ball.history.length; hIdx++) {
-            const pt = ball.history[hIdx];
-            ctx.globalAlpha = (hIdx / ball.history.length) * 0.35;
-            if (hIdx === 0) ctx.moveTo(pt.x, pt.y);
-            else ctx.lineTo(pt.x, pt.y);
+        // ── Motion trail (tapered width + fading) ──
+        if (ball.history.length > 3) {
+          for (let hIdx = 1; hIdx < ball.history.length; hIdx++) {
+            const prev = ball.history[hIdx - 1];
+            const curr = ball.history[hIdx];
+            const t = hIdx / ball.history.length;
+            ctx.strokeStyle = ball.color;
+            ctx.globalAlpha = t * 0.4;
+            ctx.lineWidth = t * 2.2;
+            ctx.beginPath();
+            ctx.moveTo(prev.x, prev.y);
+            ctx.lineTo(curr.x, curr.y);
+            ctx.stroke();
           }
-          ctx.stroke();
           ctx.globalAlpha = 1.0;
         }
 
-        // Render Spherical Ball Bearing with Radial 3D Specular Sheen
-        const grad = ctx.createRadialGradient(
-          ball.x - ball.radius * 0.35,
-          ball.y - ball.radius * 0.35,
-          ball.radius * 0.1,
-          ball.x,
-          ball.y,
-          ball.radius
-        );
-        grad.addColorStop(0, '#ffffff');
-        grad.addColorStop(0.35, ball.color);
-        grad.addColorStop(1, '#000000');
+        // ── Ball: drop shadow + spin + squash/stretch ──
+        const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+        const angle = Math.atan2(ball.vy, ball.vx);
 
-        ctx.fillStyle = grad;
+        const stretchFactor = Math.min(1.35, 1.0 + speed * 0.025);
+        const bsx = ball.squash < 1.0 ? (2 - ball.squash) : stretchFactor;
+        const bsy = ball.squash < 1.0 ? ball.squash : (2 - stretchFactor);
+
+        ctx.fillStyle = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.35)';
         ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.ellipse(ball.x + 1, ball.y + 2, ball.radius * bsx * 0.9, ball.radius * bsy * 0.6, angle, 0, Math.PI * 2);
         ctx.fill();
+
+        ctx.save();
+        ctx.translate(ball.x, ball.y);
+        ctx.rotate(ball.spin);
+        if (ball.squash < 1.0) {
+          ctx.scale(bsx, bsy);
+        } else if (speed > 2.5) {
+          ctx.rotate(angle - ball.spin);
+          ctx.scale(bsx, bsy);
+          ctx.rotate(-(angle - ball.spin));
+        }
+
+        const ballGrad = ctx.createRadialGradient(
+          -ball.radius * 0.3, -ball.radius * 0.3, ball.radius * 0.08,
+          0, 0, ball.radius
+        );
+        ballGrad.addColorStop(0, '#ffffff');
+        ballGrad.addColorStop(0.25, ball.color);
+        ballGrad.addColorStop(0.85, ball.color);
+        ballGrad.addColorStop(1, isLight ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.8)');
+
+        ctx.fillStyle = ballGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, ball.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.beginPath();
+        ctx.ellipse(-ball.radius * 0.25, -ball.radius * 0.3, ball.radius * 0.35, ball.radius * 0.2, -0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
       }
 
       if (binUpdated) {
         setBins([...binsRef.current]);
       }
 
-      // 7. Draw Settled Physical Beads in Bins
+      // ── 7. SETTLED BEADS (depth shadows + 3D gradient) ──
       const settled = settledBallsRef.current;
       for (let s = 0; s < settled.length; s++) {
         const sb = settled[s];
-        ctx.fillStyle = sb.color;
+        ctx.fillStyle = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.25)';
+        ctx.beginPath();
+        ctx.ellipse(sb.x + 0.5, sb.y + 1.2, sb.radius * 0.85, sb.radius * 0.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        const beadGrad = ctx.createRadialGradient(
+          sb.x - sb.radius * 0.25, sb.y - sb.radius * 0.25, sb.radius * 0.1,
+          sb.x, sb.y, sb.radius
+        );
+        beadGrad.addColorStop(0, '#ffffff');
+        beadGrad.addColorStop(0.35, sb.color);
+        beadGrad.addColorStop(1, isLight ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.65)');
+        ctx.fillStyle = beadGrad;
         ctx.beginPath();
         ctx.arc(sb.x, sb.y, sb.radius, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // 8. Draw Smooth Fluid Histogram Bars (Translucent Underneath Beads)
+      // ── 8. HISTOGRAM BARS (rounded caps + glass shine) ──
       const maxBinVal = Math.max(1, ...binsRef.current);
+      const barInset = 2;
       for (let b = 0; b < numBins; b++) {
         const count = binsRef.current[b];
         const bx = layout.binStartX + b * layout.pegPitchX;
+        const barW = layout.pegPitchX - barInset * 2;
 
-        // Draw bin index number below the floor line
         ctx.fillStyle = isLight ? '#71717a' : '#a1a1aa';
         ctx.font = 'bold 10px monospace';
         ctx.textAlign = 'center';
@@ -852,31 +945,53 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
 
         if (count === 0) continue;
 
-        const barH = (count / maxBinVal) * (layout.binH - 26);
+        const barH = (count / maxBinVal) * (layout.binH - 28);
         const by = layout.binBottomY - barH;
+        const barRadius = Math.min(4, barW / 4);
 
-        const grad = ctx.createLinearGradient(0, by, 0, layout.binBottomY);
+        ctx.beginPath();
+        ctx.moveTo(bx + barInset, layout.binBottomY);
+        ctx.lineTo(bx + barInset, by + barRadius);
+        ctx.quadraticCurveTo(bx + barInset, by, bx + barInset + barRadius, by);
+        ctx.lineTo(bx + barInset + barW - barRadius, by);
+        ctx.quadraticCurveTo(bx + barInset + barW, by, bx + barInset + barW, by + barRadius);
+        ctx.lineTo(bx + barInset + barW, layout.binBottomY);
+        ctx.closePath();
+
+        const barGrad = ctx.createLinearGradient(0, by, 0, layout.binBottomY);
         if (isLight) {
-          grad.addColorStop(0, 'rgba(14, 165, 233, 0.65)');
-          grad.addColorStop(1, 'rgba(16, 185, 129, 0.45)');
+          barGrad.addColorStop(0, 'rgba(14, 165, 233, 0.75)');
+          barGrad.addColorStop(0.6, 'rgba(16, 185, 129, 0.55)');
+          barGrad.addColorStop(1, 'rgba(16, 185, 129, 0.35)');
         } else {
-          grad.addColorStop(0, 'rgba(56, 189, 248, 0.7)');
-          grad.addColorStop(1, 'rgba(168, 85, 247, 0.4)');
+          barGrad.addColorStop(0, 'rgba(56, 189, 248, 0.8)');
+          barGrad.addColorStop(0.5, 'rgba(139, 92, 246, 0.5)');
+          barGrad.addColorStop(1, 'rgba(168, 85, 247, 0.3)');
         }
+        ctx.fillStyle = barGrad;
+        ctx.fill();
 
-        ctx.fillStyle = grad;
-        ctx.fillRect(bx + 1.5, by, layout.pegPitchX - 3, barH);
+        ctx.save();
+        ctx.clip();
+        const shineGrad = ctx.createLinearGradient(bx + barInset, 0, bx + barInset + barW, 0);
+        shineGrad.addColorStop(0, 'rgba(255,255,255,0)');
+        shineGrad.addColorStop(0.3, 'rgba(255,255,255,0.08)');
+        shineGrad.addColorStop(0.5, 'rgba(255,255,255,0.15)');
+        shineGrad.addColorStop(0.7, 'rgba(255,255,255,0.05)');
+        shineGrad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = shineGrad;
+        ctx.fillRect(bx + barInset, by, barW, barH);
+        ctx.restore();
 
-        // Individual count label atop each bin
         if (layout.pegPitchX > 16) {
           ctx.fillStyle = isLight ? '#09090b' : '#fafafa';
           ctx.font = 'bold 9px monospace';
           ctx.textAlign = 'center';
-          ctx.fillText(`${count}`, bx + layout.pegPitchX / 2, by - 6);
+          ctx.fillText(`${count}`, bx + layout.pegPitchX / 2, by - 7);
         }
       }
 
-      // 9. DRAW THEORETICAL GAUSSIAN NORMAL CURVE WITH 68-95-99.7% EMPIRICAL CONFIDENCE REGIONS
+      // ── 9. GAUSSIAN NORMAL CURVE (glowing dual-stroke + confidence bands) ──
       const totalCount = binsRef.current.reduce((a, b) => a + b, 0);
       if (totalCount >= 5) {
         let mu = numRows * pBias;
@@ -890,61 +1005,83 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
           sigma = 1.0;
         }
 
-        // Draw 1-Sigma Confidence Band (68.2% of Mass)
         const sigma1Left = layout.binStartX + Math.max(0, mu - sigma) * layout.pegPitchX + layout.pegPitchX / 2;
         const sigma1Right = layout.binStartX + Math.min(numBins - 1, mu + sigma) * layout.pegPitchX + layout.pegPitchX / 2;
-        ctx.fillStyle = isLight ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.1)';
+        const bandGrad = ctx.createLinearGradient(sigma1Left, layout.binTopY, sigma1Right, layout.binTopY);
+        bandGrad.addColorStop(0, 'rgba(16,185,129,0)');
+        bandGrad.addColorStop(0.3, isLight ? 'rgba(16,185,129,0.08)' : 'rgba(16,185,129,0.12)');
+        bandGrad.addColorStop(0.5, isLight ? 'rgba(16,185,129,0.1)' : 'rgba(16,185,129,0.15)');
+        bandGrad.addColorStop(0.7, isLight ? 'rgba(16,185,129,0.08)' : 'rgba(16,185,129,0.12)');
+        bandGrad.addColorStop(1, 'rgba(16,185,129,0)');
+        ctx.fillStyle = bandGrad;
         ctx.fillRect(sigma1Left, layout.binTopY, sigma1Right - sigma1Left, layout.binH);
 
-        // Path for smooth Gaussian bell curve
-        ctx.beginPath();
-        const curvePoints: Array<{ x: number; y: number }> = [];
+        ctx.setLineDash([2, 4]);
+        ctx.strokeStyle = isLight ? 'rgba(16,185,129,0.3)' : 'rgba(16,185,129,0.35)';
+        ctx.lineWidth = 1;
+        [sigma1Left, sigma1Right].forEach((lx) => {
+          ctx.beginPath();
+          ctx.moveTo(lx, layout.binTopY);
+          ctx.lineTo(lx, layout.binBottomY);
+          ctx.stroke();
+        });
+        ctx.setLineDash([]);
 
-        const stepCount = 60;
+        const curvePoints: Array<{ x: number; y: number }> = [];
+        const stepCount = 80;
         for (let s = 0; s <= stepCount; s++) {
           const binCoord = (s / stepCount) * (numBins - 1);
           const px = layout.binStartX + binCoord * layout.pegPitchX + layout.pegPitchX / 2;
           const z = (binCoord - mu) / sigma;
           const pdf = (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * z * z);
           const theoCount = pdf * totalCount;
-          const barH = (theoCount / maxBinVal) * (layout.binH - 26);
-          const py = Math.max(layout.binTopY, layout.binBottomY - barH);
-
+          const curveBarH = (theoCount / maxBinVal) * (layout.binH - 28);
+          const py = Math.max(layout.binTopY, layout.binBottomY - curveBarH);
           curvePoints.push({ x: px, y: py });
-          if (s === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
         }
 
-        // Soft Amber Glow Area under curve
-        ctx.save();
+        ctx.beginPath();
+        curvePoints.forEach((pt, idx) => idx === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y));
         ctx.lineTo(curvePoints[curvePoints.length - 1].x, layout.binBottomY);
         ctx.lineTo(curvePoints[0].x, layout.binBottomY);
         ctx.closePath();
-        ctx.fillStyle = isLight ? 'rgba(245, 158, 11, 0.12)' : 'rgba(251, 191, 36, 0.15)';
+        const areaGrad = ctx.createLinearGradient(0, layout.binTopY, 0, layout.binBottomY);
+        areaGrad.addColorStop(0, isLight ? 'rgba(251,191,36,0.18)' : 'rgba(251,191,36,0.2)');
+        areaGrad.addColorStop(1, isLight ? 'rgba(245,158,11,0.03)' : 'rgba(245,158,11,0.04)');
+        ctx.fillStyle = areaGrad;
         ctx.fill();
-        ctx.restore();
 
-        // Stroke the golden Gaussian curve line
+        ctx.beginPath();
+        curvePoints.forEach((pt, idx) => idx === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y));
+        ctx.strokeStyle = isLight ? 'rgba(245,158,11,0.2)' : 'rgba(251,191,36,0.25)';
+        ctx.lineWidth = 5;
+        ctx.stroke();
+
+        ctx.beginPath();
+        curvePoints.forEach((pt, idx) => idx === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y));
         ctx.strokeStyle = '#f59e0b';
         ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        // Theoretical Mean (μ) Vertical Marker
         const meanX = layout.binStartX + mu * layout.pegPitchX + layout.pegPitchX / 2;
         ctx.strokeStyle = '#f59e0b';
         ctx.lineWidth = 1.5;
-        ctx.setLineDash([3, 3]);
+        ctx.setLineDash([4, 4]);
         ctx.beginPath();
         ctx.moveTo(meanX, layout.binTopY - 6);
         ctx.lineTo(meanX, layout.binBottomY);
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // Label for μ
         ctx.fillStyle = '#f59e0b';
-        ctx.font = 'bold 9px monospace';
+        ctx.font = 'bold 10px monospace';
         ctx.textAlign = 'center';
-        ctx.fillText(`μ=${mu.toFixed(1)}`, meanX, layout.binTopY - 9);
+        ctx.fillText(`μ=${mu.toFixed(1)}`, meanX, layout.binTopY - 10);
+
+        ctx.fillStyle = isLight ? 'rgba(16,185,129,0.7)' : 'rgba(16,185,129,0.8)';
+        ctx.font = 'bold 8px monospace';
+        ctx.fillText('-1σ', sigma1Left, layout.binTopY - 4);
+        ctx.fillText('+1σ', sigma1Right, layout.binTopY - 4);
       }
 
       ctx.restore();
