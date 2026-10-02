@@ -5,19 +5,20 @@
 
 [![CI / CD Status](https://img.shields.io/badge/CI%2FCD-Passing-10b981.svg?style=flat-square&logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
 [![Release](https://img.shields.io/badge/release-v1.0.1-emerald.svg?style=flat-square)](https://github.com/zuikre/okvir/releases)
+[![Sponsor](https://img.shields.io/badge/Sponsor-USDT%20(TRC--20)-26a17b.svg?style=flat-square&logo=tether&logoColor=white)](#support--sponsorship)
 [![License: MIT or Apache-2.0](https://img.shields.io/badge/Engine-MIT%20%7C%20Apache--2.0-3b82f6.svg?style=flat-square)](LICENSE-MIT)
 [![Curriculum: CC-BY-SA 4.0](https://img.shields.io/badge/Curriculum-CC--BY--SA%204.0-f59e0b.svg?style=flat-square)](https://creativecommons.org/licenses/by-sa/4.0/)
-[![Platforms](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-8b5cf6.svg?style=flat-square)](#-download--installation)
-[![Language](https://img.shields.io/badge/Language-English%20%7C%20%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9-ec4899.svg?style=flat-square)](#-bilingual-experience-english--العربية)
+[![Platforms](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-8b5cf6.svg?style=flat-square)](#download--installation)
+[![Language](https://img.shields.io/badge/Language-English%20%7C%20%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9-ec4899.svg?style=flat-square)](#bilingual-experience-english--العربية)
 [![Tauri v2](https://img.shields.io/badge/Built%20With-Tauri%20v2%20%2B%20Rust%201.80-ef4444.svg?style=flat-square&logo=tauri&logoColor=white)](https://tauri.app/)
 [![Python WASM](https://img.shields.io/badge/Python-CPython%203.12%20(Pyodide%20WASM)-eab308.svg?style=flat-square&logo=python&logoColor=white)](https://pyodide.org/)
-[![Contrast](https://img.shields.io/badge/Accessibility-WCAG%20AAA%20(≥7:1)-14b8a6.svg?style=flat-square)](#-instrument-grade-design-system)
+[![Contrast](https://img.shields.io/badge/Accessibility-WCAG%20AAA%20(≥7:1)-14b8a6.svg?style=flat-square)](#instrument-grade-design-system)
 
 <p align="center">
   <strong>Zero DevOps Setup. 100% Local-First. 60 FPS Visual Physics. Procedural Web Audio. Bilingual EN/AR. Under 28MB.</strong>
 </p>
 
-[**Download Desktop App**](https://github.com/zuikre/okvir/releases) • [**Architecture Specs**](ARCHITECTURE.md) • [**Curriculum Guide**](CURRICULUM_SPEC.md) • [**Contributing**](CONTRIBUTING.md)
+[**Download Desktop App**](https://github.com/zuikre/okvir/releases) • [**Sponsor**](#support--sponsorship) • [**Architecture Specs**](ARCHITECTURE.md) • [**Curriculum Guide**](CURRICULUM_SPEC.md) • [**Contributing**](CONTRIBUTING.md)
 
 <br><br>
 <img src=".github/assets/okvir-hero.svg" alt="OKVIR Interactive Desktop Learning Engine" width="100%" />
@@ -359,6 +360,15 @@ For vulnerability reporting, see [SECURITY.md](SECURITY.md).
 *Founder & Benevolent Dictator for Life (BDFL) of Okvir*
 
 > *"Let’s build the next generation of data scientists on intuition, not memorization."*
+
+---
+
+## <a id="support--sponsorship"></a>Support & Sponsorship
+
+If Okvir has accelerated your learning, research, or engineering, consider supporting independent development:
+
+* **USDT (TRC-20 Network):** [`TPT7y8iGjArHS7PtwpgT7F13umzxFriUWB`](https://tronscan.org/#/address/TPT7y8iGjArHS7PtwpgT7F13umzxFriUWB)
+* **Token Contract:** [`TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t` (Tether USD on TRON)](https://tronscan.org/#/token20/TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t)
 
 ---
 

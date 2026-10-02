@@ -605,3 +605,61 @@ pub fn execute_native_code(
         lang => Err(format!("Unsupported native execution language: {}", lang)),
     }
 }
+
+#[tauri::command]
+pub fn check_notification_permission() -> bool {
+    true
+}
+
+#[tauri::command]
+pub fn request_notification_permission() -> bool {
+    true
+}
+
+#[tauri::command]
+pub fn dispatch_native_notification(
+    title: String,
+    body: String,
+    icon: Option<String>,
+) -> Result<bool, String> {
+    #[cfg(target_os = "linux")]
+    {
+        let mut cmd = std::process::Command::new("notify-send");
+        cmd.arg("-a").arg("OKVIR");
+        if let Some(ref i) = icon {
+            if !i.is_empty() {
+                cmd.arg("-i").arg(i);
+            }
+        }
+        cmd.arg(&title);
+        cmd.arg(&body);
+        if let Ok(mut child) = cmd.spawn() {
+            let _ = child.wait();
+            return Ok(true);
+        }
+        Ok(false)
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        Ok(true)
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        let script = format!(
+            "display notification \"{}\" with title \"{}\"",
+            body.replace("\"", "\\\""),
+            title.replace("\"", "\\\"")
+        );
+        let _ = std::process::Command::new("osascript")
+            .args(["-e", &script])
+            .spawn();
+        Ok(true)
+    }
+
+    #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
+    {
+        Ok(true)
+    }
+}

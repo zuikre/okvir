@@ -26,7 +26,7 @@ function resolveVersion() {
       }
     }
   } catch (_) {}
-  return '1.0.1';
+  return '1.0.2';
 }
 
 const VERSION = resolveVersion();
