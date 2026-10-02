@@ -196,7 +196,7 @@ export class OkvirNotifier {
     }
 
     return {
-      title: isRtl ? 'حافز الاستمرار: سلسلتك في خطر! 🔥' : 'Streak at Risk! Keep your momentum 🔥',
+      title: isRtl ? 'حافز الاستمرار: سلسلتك في خطر!' : 'Streak at Risk! Keep your momentum',
       body: isRtl
         ? `لديك سلسلة تدريب متواصلة لمدة ${streakDays} يوم. خصص ٥ دقائق الآن لحماية إنجازك الأكاديمي.`
         : `You have an active ${streakDays}-day streak. Take 5 minutes to solve a challenge and protect your progress!`,
@@ -212,7 +212,7 @@ export class OkvirNotifier {
     if (dueCount < 3) return null;
 
     return {
-      title: isRtl ? 'مفاهيم بانتظار المراجعة الفاصلة 🧠' : 'Cognitive Calibration Due 🧠',
+      title: isRtl ? 'مفاهيم بانتظار المراجعة الفاصلة' : 'Cognitive Calibration Due',
       body: isRtl
         ? `هناك ${dueCount} بطاقة تكرار متباعد تتطلب المعايرة اليوم وفق خوارزمية FSRS-4.5.`
         : `${dueCount} concepts are ready for spaced retrieval calibration in your Daily Review deck.`,

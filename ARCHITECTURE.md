@@ -272,6 +272,20 @@ Pinned directly in the title bar is an instrument-grade Hardware Telemetry monit
 * **RAM Allocation Breakdown:** Tracks estimated resident memory against the 350MB ceiling (Rust backend ~18MB, WebView ~85MB, JS DOM ~28MB, Pyodide WASM ~100MB, Canvas ~22MB).
 * **Linear Memory Recycling:** Provides one-click worker termination and reinstatement to return WASM linear memory to the operating system.
 
+### 5.8 2-Tier Adaptive Faded Scaffolding & Code Challenge Engine
+Beat 3 integrates an adaptive, distraction-free code editor (`FadedScaffoldCodeEditor.tsx`):
+* **Tier 1: Guided Skeleton (`Guided Skeleton / القالب التوجيهي`):** Fill-in-the-blank critical algorithmic expressions and parameters with structural guardrails and immediate visual feedback. Includes an instant *"Skip to full editor ➔"* bypass.
+* **Tier 2: Autonomous Lab (`Autonomous Lab / المختبر المستقل`):** Full Monaco/CodeMirror editor running user code directly against automated unit test assertions in client-side Pyodide or DuckDB WASM.
+* **Streamlined Focus:** Parsons reordering has been deliberately eliminated to minimize syntactic manipulation friction and guide learners directly into writing and executing vectorized code.
+
+### 5.9 Bret Victor Live Reactive Math & Targeted Goal Feedback
+* **`<ReactiveFormulaAnnotator />` (Beat 2):** Mathematical equations feature live reactive symbol pills. Hovering or clicking decomposes symbols into functional classes (`parameter`, `observation`, `loss`, `hyperparameter`), linked to the reactive store (`useFormulaAnchorStore`).
+* **`<TargetedGoalManipulator />` (Beat 1 / Section 3):** Real-time goal-directed invariant challenges (e.g. Gauss-Markov BLUE error orthogonality, KNN bias-variance tradeoff calibration, Lipschitz step-size bounds) featuring an interactive proximity gauge ($\Delta$ error delta) and celebratory procedural audio harmonics.
+
+### 5.10 100% Acyclic Prerequisite DAG Topology
+* **166 Validated Acyclic Directed Edges:** The 125-node global dependency graph is strictly acyclic with 0 cycles.
+* **Semantic Slugs:** All legacy shorthand identifiers have been canonicalized into semantic slugs (`dot-product-geometry`, `numpy-strides-zero-copy`), ensuring clean constellation graph rendering and reliable unlock progression.
+
 ---
 
 ## 6. Spaced Repetition: FSRS v5 Mathematics

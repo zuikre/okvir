@@ -70,10 +70,9 @@ Human working memory is severely bounded, capable of holding only $4 \pm 1$ nove
 Okvir optimizes cognitive load via three mechanisms:
 1. **Extraneous Load Elimination:** Zero environment setup. The student writes Python code inside a zero-latency WebAssembly sandbox. All mathematical terms have interactive hover definitions; equations and visualizations update bidirectionally.
 2. **Intrinsic Load Management (Faded Scaffolding):** Complex problem spaces are segmented using Renkl & Atkinson's faded scaffolding framework:
-   - *Stage 1 (Worked Example):* Fully solved algorithm with interactive tactile exploration.
-   - *Stage 2 (Parsons Puzzle):* Drag-and-drop code blocks to assemble algorithmic flow without syntax friction.
-   - *Stage 3 (Skeleton Completion):* Student fills critical computational holes (e.g. implementing the derivative or residual step).
-   - *Stage 4 (Independent Implementation):* Student constructs the solution from scratch with passing assertions.
+   - *Stage 1 (Worked Example & Physical Grounding):* Fully solved algorithm with interactive tactile exploration and Jargon Decoders.
+   - *Stage 2 (Guided Skeleton Completion):* Student fills critical computational holes (e.g. vectorization operations, matrix dot products, or residual calculations) with structural guardrails.
+   - *Stage 3 (Independent Implementation):* Student constructs the solution from scratch in the full IDE editor with passing test assertions.
 3. **Germane Load Maximization:** Working memory is focused on schema construction through the **4-Beat Micro-Loop**.
 
 ```

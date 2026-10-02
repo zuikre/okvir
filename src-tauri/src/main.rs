@@ -5,18 +5,6 @@ use std::env;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command};
 
-const VERSION: &str = "1.0.1";
-
-const BANNER: &str = "\x1b[36m
- ▄████▄   ██   ██  ██      ██  ██████  ██████ 
-██▀  ▀██  ██  ██   ██      ██    ██    ██   ██
-██    ██  █████     ██    ██     ██    ██████ 
-██▄  ▄██  ██  ██     ██  ██      ██    ██   ██
- ▀████▀   ██   ██     ▀██▀     ██████  ██    ██
- ─────────────────────────────────────────────\x1b[0m
-  \x1b[1mOKVIR (إطار)\x1b[0m \x1b[90mv1.0.1\x1b[0m — Interactive AI & Econometrics Framework
-";
-
 const HELP_TEXT: &str = "Usage:
   okvir [command] [options]
 
@@ -46,17 +34,63 @@ Examples:
   okvir registry causal        Search community curriculum packages
 ";
 
-fn print_banner() {
-    print!("{}", BANNER);
+/// Resolve version dynamically:
+/// 1. ~/.okvir/version (set by install.sh / updater based on downloaded GitHub release)
+/// 2. OKVIR_BUILD_VERSION (injected during GitHub Actions release workflow)
+/// 3. Cargo package version
+fn get_version() -> String {
+    // 1. Check ~/.okvir/version (Linux / macOS)
+    if let Ok(home) = env::var("HOME") {
+        let version_path = PathBuf::from(home).join(".okvir").join("version");
+        if let Ok(content) = std::fs::read_to_string(&version_path) {
+            let trimmed = content.trim().trim_start_matches('v');
+            if !trimmed.is_empty() {
+                return trimmed.to_string();
+            }
+        }
+    }
+
+    // Check %USERPROFILE%\.okvir\version (Windows)
+    if let Ok(userprofile) = env::var("USERPROFILE") {
+        let version_path = PathBuf::from(userprofile).join(".okvir").join("version");
+        if let Ok(content) = std::fs::read_to_string(&version_path) {
+            let trimmed = content.trim().trim_start_matches('v');
+            if !trimmed.is_empty() {
+                return trimmed.to_string();
+            }
+        }
+    }
+
+    // 2. Check build-time environment variable injected during GitHub release build
+    if let Some(build_ver) = option_env!("OKVIR_BUILD_VERSION") {
+        let trimmed = build_ver.trim().trim_start_matches('v');
+        if !trimmed.is_empty() {
+            return trimmed.to_string();
+        }
+    }
+
+    // 3. Fallback to Cargo package version
+    env!("CARGO_PKG_VERSION").to_string()
 }
 
-fn print_help() {
-    print_banner();
+fn print_banner(version: &str) {
+    println!("\x1b[36m
+ ▄████▄   ██   ██  ██      ██  ██████  ██████ 
+██▀  ▀██  ██  ██   ██      ██    ██    ██   ██
+██    ██  █████     ██    ██     ██    ██████ 
+██▄  ▄██  ██  ██     ██  ██      ██    ██   ██
+ ▀████▀   ██   ██     ▀██▀     ██████  ██    ██
+ ─────────────────────────────────────────────\x1b[0m
+  \x1b[1mOKVIR (إطار)\x1b[0m \x1b[90mv{}\x1b[0m — Interactive AI & Econometrics Framework", version);
+}
+
+fn print_help(version: &str) {
+    print_banner(version);
     println!("{}", HELP_TEXT);
 }
 
-fn print_version() {
-    println!("okvir {}", VERSION);
+fn print_version(version: &str) {
+    println!("okvir {}", version);
 }
 
 fn find_okvir_js() -> Option<PathBuf> {
@@ -118,17 +152,18 @@ fn dispatch_cli(args: &[String]) {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
+    let version = get_version();
 
     if args.len() > 1 {
         let first_arg = args[1].as_str();
 
         match first_arg {
             "-h" | "--help" | "help" => {
-                print_help();
+                print_help(&version);
                 process::exit(0);
             }
             "-v" | "--version" | "version" => {
-                print_version();
+                print_version(&version);
                 process::exit(0);
             }
             "init" | "dev" | "test" | "pack" | "verify" | "registry" => {
@@ -142,12 +177,11 @@ fn main() {
             }
             arg if arg.starts_with('-') => {
                 eprintln!("\x1b[31mUnknown option:\x1b[0m {}\n", arg);
-                print_help();
+                print_help(&version);
                 process::exit(1);
             }
             _ => {
-                // Any other positional arg could be passed to desktop app or CLI
-                // If it looks like a subcommand or file, fallback to GUI
+                // Default: unrecognized non-flag arg falls back to desktop app
                 okvir_desktop::run();
                 return;
             }

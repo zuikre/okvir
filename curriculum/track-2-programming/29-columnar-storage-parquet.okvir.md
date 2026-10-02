@@ -32,6 +32,57 @@ Parquet files are partitioned into self-contained vertical chunks called **Row G
 1. **Projection Pushdown**: The query engine reads the footer, identifies the exact byte range of the requested columns (`price_usd`), and issues targeted OS `pread()` disk calls that skip 95%+ of unreferenced column bytes.
 2. **Predicate Pushdown**: If your query includes `WHERE transaction_date >= '2024-01-01'`, the engine inspects the min/max statistics in the footer before reading the actual data. If a Row Group's maximum date is `2023-12-31`, the engine skips that entire Row Group without reading a single byte from disk!
 
+### Jargon Decoder Table
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Columnar Storage** / التخزين العمودي | Storing values by attribute stripe rather than complete records; like organizing index cards by subject drawer instead of chronological heap. | تنظيم البيانات في شرائط عمودية لكل خاصية بدلاً من السطور الكاملة؛ مثل تصنيف بطاقات المكتبة حسب الموضوع بدلاً من تاريخ الطباعة. |
+| **Row Group** / مجموعة الصفوف | A self-contained horizontal partition of data chunks containing all column stripes for a chunk of rows (e.g. 100K-1M rows). | حزمة تخزين أفقية مستقلة تضم شرائط جميع الأعمدة لعدد محدد من الصفوف (مثلاً 100 ألف إلى مليون صف). |
+| **Dictionary Encoding** / ترميز القواميس | Replacing bulky recurring strings with tiny integer IDs, storing the lookup table once in the header. | استبدال النصوص الطويلة المتكررة بأرقام فهارس صغيرة جداً (1 بايت)، وحفظ جدول الكلمات مرة واحدة فقط. |
+| **Run-Length Encoding (RLE)** / ترميز التكرار المتتابع | Compressing contiguous repeating values into a compact `(value, run_count)` pair. | ضغط القيم المتطابقة المتتابعة إلى زوج واحد يحدد `(القيمة، عدد التكرارات)` لتوفير مساحة الذاكرة. |
+| **Projection Pushdown** / تمرير الإسقاط | Asking the storage reader to physically seek and transfer only the requested columns, skipping unused columns. | توجيه قارئ الأقراص لجلب بايتات الأعمدة المطلوبة للاستعلام فقط وتخطي قراءة باقي الأعمدة تماماً. |
+| **Predicate Pushdown** / تمرير الشروط | Using file footer min/max statistics to skip reading entire row groups that cannot satisfy the query `WHERE` filter. | فحص البيانات الوصفية لتخطي قراءة كتل صفوف بأكملها يثبت مسبقاً عدم احتوائها على قيم تحقق شرط التصفية. |
+
+### Visual ASCII Data Transformation: Row vs. Columnar Physical Layout
+
+```text
+========================================================================================
+1. ROW-ORIENTED PHYSICAL DISK LAYOUT (CSV / TRADITIONAL HEAP)
+----------------------------------------------------------------------------------------
+Query: SELECT SUM(price) FROM transactions WHERE ...
+
+Disk Buffer Sequence:
+[Row 0: ID=1, User="Alice",   City="Riyadh", Price=100.0] ->
+[Row 1: ID=2, User="Bob",     City="Cairo",  Price=250.0] ->
+[Row 2: ID=3, User="Charlie", City="Riyadh", Price=75.0 ]
+
+Physical Hardware Reality:
+- To read 'Price', CPU must stream 'ID', 'User', and 'City' across NVMe bus into RAM!
+- Bandwidth Utilization: ~15% payload, ~85% discarded bytes!
+
+========================================================================================
+2. PARQUET COLUMNAR PHYSICAL LAYOUT (ROW GROUP + COLUMN STRIPES)
+----------------------------------------------------------------------------------------
+Parquet File Buffer Structure:
++--------------------------------------------------------------------------------------+
+| ROW GROUP #0 (e.g. 500,000 Rows)                                                     |
+|  - Column Stripe 'ID':    [1, 2, 3, 4, ...] (Snappy / Bit-packed)                    |
+|  - Column Stripe 'User':  ["Alice", "Bob", "Charlie", ...] (Dictionary Encoded)       |
+|  - Column Stripe 'City':  Dict: [0:"Riyadh", 1:"Cairo"] | Indices: [0, 1, 0, ...]    |
+|  - Column Stripe 'Price': [100.0, 250.0, 75.0, ...] (Contiguous 64-bit IEEE Floats) |
++--------------------------------------------------------------------------------------+
+| FILE FOOTER (Metadata & Min/Max Statistics)                                         |
+|  - RowGroup #0 Stats: City[min="Cairo", max="Riyadh"], Price[min=10.0, max=500.0]   |
+|  - Byte Offsets: ID: 0..4MB | User: 4..18MB | City: 18..20MB | Price: 20..24MB       |
++--------------------------------------------------------------------------------------+
+
+Query Execution: SELECT SUM(price) FROM transactions WHERE City = 'Dubai'
+  Step 1: Read Footer (Tiny 64 KB read)
+  Step 2: Check Footer Stats for RG#0: City min/max doesn't match 'Dubai'!
+  Step 3: Skip RG#0 entirely! (Zero bytes read from NVMe disk!)
+========================================================================================
+```
+
 :::simulation-widget{engine="canvas2d" component="ArrowBufferMemoryLayoutLab"}
 ---
 interactive: true
@@ -80,9 +131,33 @@ $$
 | $\bar{L}$ | $\bar{L} \in \mathbb{R}^+$ bytes | Mean string length in bytes for raw uncompressed vocabulary words | متوسط طول النصوص الأصلية بالبايت قبل الترميز |
 | $\text{RowGroup}$ | Bounded storage partition | Physical chunking unit (e.g. 100K-1M rows) with autonomous footer stats | وحدة التخزين المستقلة ذات الإحصائيات الذاتية في ملف Parquet |
 
-The fundamental I/O bound proves why analytical scan bandwidth is minimized in columnar formats: while row-oriented engines must read all $C$ attributes ($O(N \sum_{c=1}^C w_c)$), columnar engines read strictly the projected subset $\mathcal{C}_{\text{query}}$, reducing raw bytes by a factor of $\frac{\sum_{c \in \mathcal{C}_{\text{query}}} w_c}{\sum_{c=1}^C w_c}$. 
+### Step-by-Step Arithmetic Cost & Invariant Breakdown
 
-Furthermore, when categorical cardinality $|\mathcal{V}| \le 256$, $\lceil \log_2 |\mathcal{V}| / 8 \rceil = 1$ byte per row, yielding compression ratios $\rho_{\text{dict}} \to 1 - \frac{1}{\bar{L}} \approx 90-95\%$ for long text strings like URLs and addresses.
+Let us trace the physical hardware I/O and memory cost for scanning a realistic analytical table where $N = 100{,}000{,}000$ rows, $C = 50$ columns, with an average column width $w_c = 10$ bytes ($500$ bytes per row):
+
+1. **Step 1: Row-Oriented Full Scan Baseline ($\text{IO}_{\text{row}}$)**
+   - Physical bytes transferred:
+     $$\text{IO}_{\text{row}} = 100{,}000{,}000 \times (50 \times 10 \text{ B}) = 50{,}000{,}000{,}000 \text{ bytes} = 50 \text{ GB}$$
+   - On an enterprise cloud storage network with $100 \text{ MB/s}$ throughput:
+     $$\text{Transfer Time} = \frac{50 \text{ GB}}{0.1 \text{ GB/s}} = 500 \text{ seconds} \approx 8.33 \text{ minutes}$$
+
+2. **Step 2: Projection Pushdown Reduction ($\mathcal{C}_{\text{query}} = \{ \text{price} \}$, $w_{\text{price}} = 8$ bytes)**
+   - Only column ribbon #50 is read from disk:
+     $$\text{IO}_{\text{projected}} = 100{,}000{,}000 \times 8 \text{ B} = 800{,}000{,}000 \text{ bytes} = 800 \text{ MB}$$
+   - Pure Projection Pushdown saves $98.4\%$ of disk/network transfer without any compression applied!
+
+3. **Step 3: Dictionary Encoding Compression Ratio Calculation ($\rho_{\text{dict}}$)**
+   - Suppose column `state_code` has $|\mathcal{V}| = 50$ unique strings of length $\bar{L} = 10$ bytes.
+   - Raw bytes = $100{,}000{,}000 \times 10 \text{ B} = 1 \text{ GB}$.
+   - Dictionary width: since $|\mathcal{V}| = 50 \le 256$, each index needs $\lceil \log_2(50) / 8 \rceil = 1$ byte.
+   - Compressed size = Vocabulary ($50 \times 10 = 500$ bytes) $+$ Indices ($100{,}000{,}000 \times 1 = 100 \text{ MB}$).
+   - Compression ratio:
+     $$\rho_{\text{dict}} = 1 - \frac{500 \text{ B} + 100 \text{ MB}}{1 \text{ GB}} = 1 - 0.1000005 \approx 89.99\% \text{ reduction!}$$
+
+4. **Step 4: Predicate Pushdown Row Group Pruning**
+   - If the file is divided into $100$ Row Groups of $1{,}000{,}000$ rows each, and your query filter is satisfied in only $2$ Row Groups:
+   - $98$ out of $100$ Row Groups are skipped completely at zero I/O cost via Footer Min/Max evaluation.
+   - Total bytes read across the network drops from $50 \text{ GB} \to 16 \text{ MB}$, yielding a $\mathbf{3{,}125\times}$ reduction in network transfer!
 
 تثبت المعادلات الرياضية تفوق التخزين العمودي في تقليل استهلاك ناقل القراءة من الأقراص: فبينما تقرأ المحركات الصفية كامل الأعمدة $C$ إجبارياً، تقرأ المحركات العمودية الأعمدة المطلوبة للاستعلام فقط $\mathcal{C}_{\text{query}}$، مما يوفر نطاق القراءة بنسبة تطابق نسبة الأعمدة المطلوبة إلى إجمالي الأعمدة.
 
@@ -112,15 +187,42 @@ def compress_column_dictionary(column_data: list[str]) -> tuple[list[str], list[
         A tuple of (vocabulary_list, indices_list, compression_ratio).
     """
     # Step 1: Return ([], [], 1.0) if column_data is empty
+    if not column_data:
+        return ([], [], 1.0)
+
     # Step 2: Build vocabulary map {string: index} and populate indices list in a single pass
+    vocab_map: dict[str, int] = {}
+    vocab_list: list[str] = []
+    indices_list: list[int] = []
+
+    for item in column_data:
+        if item not in vocab_map:
+            vocab_map[item] = len(vocab_list)
+            vocab_list.append(item)
+        indices_list.append(vocab_map[item])
+
     # Step 3: Compute raw uncompressed bytes: sum(len(s.encode('utf-8')) + 8 for s in column_data)
+    raw_bytes = sum(len(s.encode("utf-8")) + 8 for s in column_data)
+
     # Step 4: Determine index byte width:
     #         - 1 byte if len(vocab) <= 256
     #         - 2 bytes if len(vocab) <= 65536
     #         - 4 bytes otherwise
+    vocab_size = len(vocab_list)
+    if vocab_size <= 256:
+        index_width = 1
+    elif vocab_size <= 65536:
+        index_width = 2
+    else:
+        index_width = 4
+
     # Step 5: Compute compressed bytes: sum(len(v.encode('utf-8')) for v in vocab) + len(column_data) * index_width
+    dict_payload_bytes = sum(len(v.encode("utf-8")) for v in vocab_list)
+    compressed_bytes = dict_payload_bytes + (len(column_data) * index_width)
+
     # Step 6: Return (vocabulary, indices, round(raw_bytes / compressed_bytes, 2))
-    raise NotImplementedError("Implement compress_column_dictionary")
+    compression_ratio = round(raw_bytes / compressed_bytes, 2)
+    return (vocab_list, indices_list, compression_ratio)
 ```
 :::
 

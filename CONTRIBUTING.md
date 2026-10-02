@@ -31,8 +31,8 @@ All contributors and community participants are expected to uphold our [Code of 
 When contributing to Okvir, keep our core principles in mind:
 
 1. **Zero DevOps Tax:** The learner should never spend hours configuring toolchains. Everything runs out of the box via WebAssembly and Tauri.
-2. **The 4-Beat Micro-Loop:** Every lesson must follow:  
-   `[1. Tactile Intuition Slider]` ➔ `[2. Formal KaTeX Anchor]` ➔ `[3. Vectorized Code Challenge]` ➔ `[4. Reality Transfer Quiz]`.
+2. **The 4-Beat Micro-Loop & Intuition-First Pedagogy:** Every lesson must follow:  
+   `[1. Tactile Simulation & Jargon Decoder]` ➔ `[2. Reactive KaTeX Anchor & Derivation]` ➔ `[3. 2-Tier Code Lab (Skeleton & Autonomous)]` ➔ `[4. Authentic Reality Transfer Challenge]`.
 3. **Instrument-Grade Neo-Minimalism (Anti-"AI Slop"):**
    * Dense, professional information hierarchy inspired by **Linear.app, Raycast, and Zed Editor**.
    * Zero glowing purple blobs, zero childish cartoon mascots, zero bubbly rounded buttons.
@@ -44,11 +44,11 @@ When contributing to Okvir, keep our core principles in mind:
 
 ## Ways to Contribute
 
-* 📚 **Curriculum Authors:** Write new micro-lessons in `.okvir.md` covering linear algebra, causal inference, time series, or reinforcement learning.
-* 🎨 **Interactive Simulation Developers:** Create new tactile HTML5 Canvas or WebGL visualizers for complex algorithms.
-* 🌐 **Translators:** Help improve our Arabic (العربية) translations or add support for French (Français) and other languages.
-* 🦀 **Rust & Desktop Engineers:** Optimize the Tauri v2 desktop shell, SQLite WAL database, and `.okvir` chunk package manager.
-* 🐛 **Bug Hunters:** Identify edge cases in Python WASM execution, RTL layout mirroring, or window resizing.
+* **Curriculum Authors:** Write new micro-lessons in `.okvir.md` covering linear algebra, causal inference, time series, or reinforcement learning.
+* **Interactive Simulation Developers:** Create new tactile HTML5 Canvas or WebGL visualizers for complex algorithms.
+* **Translators:** Help improve our Arabic (العربية) translations or add support for French (Français) and other languages.
+* **Rust & Desktop Engineers:** Optimize the Tauri v2 desktop shell, SQLite WAL database, and `.okvir` chunk package manager.
+* **Bug Hunters:** Identify edge cases in Python WASM execution, RTL layout mirroring, or window resizing.
 
 ---
 

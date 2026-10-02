@@ -52,7 +52,7 @@ When you learn Linear Regression in Okvir, you don't memorize the OLS equation. 
 
 ---
 
-## 🚀 Download & Installation
+## Download & Installation
 
 ### One-Liner Quick Install
 
@@ -84,7 +84,7 @@ npm run tauri dev
 
 ---
 
-## 🔬 Comparison Matrix: Why Okvir Wins
+## Comparison Matrix: Why Okvir Wins
 
 | Feature / Dimension | Brilliant.org | Duolingo | Jupyter / Colab | Coursera / Udemy | **OKVIR** |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -99,7 +99,7 @@ npm run tauri dev
 
 ---
 
-## 🎯 The 4-Beat Cognitive Learning Loop & Scaffolding System
+## The 4-Beat Cognitive Learning Loop & Scaffolding System
 
 Every lesson in Okvir strictly adheres to Cognitive Load Theory ($4 \pm 1$ working memory limit) and executes the **4-Beat Micro-Loop**:
 
@@ -110,10 +110,9 @@ Every lesson in Okvir strictly adheres to Cognitive Load Theory ($4 \pm 1$ worki
 
 1. **Beat 1: Tactile Intuition Simulation:** Explore geometry, distributions, and dynamics with real-time goal invariant tracking (`TargetedGoalManipulator` with $\Delta$ error feedback and audio celebration harmonics) *before* seeing formal notation.
 2. **Beat 2: Bret Victor Reactive Formula Anchor:** The mathematical equation appears with live reactive symbol pills (`ReactiveFormulaAnnotator`). Hovering or clicking decomposes symbols into functional classes (parameters, observations, losses, hyperparameters) linked directly to the simulation state.
-3. **Beat 3: 3-Tier Faded Scaffolding Code Lab:** Implement the computational kernel in Python (Pyodide WASM + Offline AST Micro-Evaluator) or DuckDB SQL with adaptive pedagogical scaffolding:
-   * **Tier 1 (Parsons Puzzle):** Reorder and indent scrambled code blocks to master algorithmic control flow without syntax fatigue.
-   * **Tier 2 (Skeleton Completion):** Fill-in-the-blank critical vectorization statements with structural guardrails.
-   * **Tier 3 (Autonomous Lab):** Write production-grade implementations from scratch against real automated test assertions.
+3. **Beat 3: 2-Tier Faded Scaffolding Code Lab:** Implement the computational kernel in Python (Pyodide WASM + Offline AST Micro-Evaluator) or DuckDB SQL with adaptive pedagogical scaffolding:
+   * **Tier 1 (Guided Skeleton):** Fill-in-the-blank critical vectorization statements and parameters with structural guardrails.
+   * **Tier 2 (Autonomous Lab):** Write production-grade implementations from scratch in the full IDE editor against real automated test assertions.
 4. **Beat 4: Authentic Reality Transfer Challenge:** Dynamic conceptual diagnostic anchored directly to the module's mathematical invariant, featuring rigorous domain-specific distractors.
 
 ### 3-Tier Socratic Hint Ladder `[H]`
@@ -124,13 +123,13 @@ Never get stuck. Press `H` at any time to reveal a 3-tier scaffolding ladder:
 
 ---
 
-## 🌌 The 4 Foundational Curriculum Tracks & Knowledge Constellation
+## The 4 Foundational Curriculum Tracks & Knowledge Constellation
 
 Okvir features **125 comprehensive lessons** across 4 interconnected tracks (29 in Math, 30 in Programming, 33 in Econometrics, and 33 in Deep Learning), visualized through an interactive **3-mode pedagogical roadmap system**:
 
 ```
                   ┌───────────────────────────────┐
-                  │ 📐 MATHEMATICAL FOUNDATIONS   │
+                  │ MATHEMATICAL FOUNDATIONS      │
                   │ • Vectors as Geometry         │
                   │ • Dot Product & Projections   │
                   │ • The Gradient Vector         │
@@ -142,7 +141,7 @@ Okvir features **125 comprehensive lessons** across 4 interconnected tracks (29 
                  ┌───────────────┴───────────────┐
                  ▼                               ▼
   ┌──────────────────────────────┐┌──────────────────────────────┐
-  │ 💻 PROGRAMMING & DATA        ││ 📈 ECONOMETRICS & ML         │
+  │ PROGRAMMING & DATA           ││ ECONOMETRICS & ML            │
   │ • SIMD NumPy Vectorization   ││ • OLS Residual Geometry      │
   │ • Columnar DataFrame Anatomy ││ • KNN Search Radar           │
   │ • SQL Window Functions & CTEs││ • K-Means Voronoi Tessellation│
@@ -156,7 +155,7 @@ Okvir features **125 comprehensive lessons** across 4 interconnected tracks (29 
                  └───────────────┬───────────────┘
                                  ▼
                   ┌───────────────────────────────┐
-                  │ 🧠 DEEP LEARNING & MODERN AI  │
+                  │ DEEP LEARNING & MODERN AI     │
                   │ • Perceptrons & Activations   │
                   │ • 3D Loss Manifolds & Momentum│
                   │ • Spatial 2D Convolutions     │
@@ -169,7 +168,7 @@ Okvir features **125 comprehensive lessons** across 4 interconnected tracks (29 
                   └───────────────────────────────┘
 ```
 
-### 🗺️ Tri-Modal Knowledge Navigation
+### Tri-Modal Knowledge Navigation
 1. **Organic Multi-Harmonic Serpentine Roadmap (`Roadmap`):** A natural topographic spline driven by multi-tier harmonic terrain equations ($h_1 + h_2 + h_3$) connecting modular checkpoints with tactile 3D pedestals, flowing energy particle dashes (`river-flow`), beacon ping animations for active lessons, and inward-facing lateral signpost cards (`w-36 sm:w-48`) featuring directional connector notches and zero-collision vertical pacing (`ROW_HEIGHT = 150px`).
 2. **Interactive 2D Prerequisite DAG (`Constellation DAG`):** A cosmic 2D star-map spanning all 4 tracks with **166 validated acyclic directed prerequisite splines (0 cycles)**, reactive dependency highlights upon node hover/selection, and topological prerequisite resolution.
 3. **Track Matrix Architecture (`Matrix`):** A side-by-side columnar view visualizing parallel track progression, mastery percentages, and curriculum completion.
@@ -177,7 +176,7 @@ Okvir features **125 comprehensive lessons** across 4 interconnected tracks (29 
 
 ---
 
-## 🎨 Tactile 60 FPS Algorithmic Visualizations
+## Tactile 60 FPS Algorithmic Visualizations
 
 Okvir includes **24 dedicated, zero-garbage-collection interactive simulation lab engines** mapping 97 unique simulation environments across the curriculum with zero unhandled fallbacks:
 
@@ -210,7 +209,7 @@ Okvir includes **24 dedicated, zero-garbage-collection interactive simulation la
 
 ---
 
-## 🎹 Procedural Web Audio API Synthesizer
+## Procedural Web Audio API Synthesizer
 
 Okvir contains **zero recorded audio files (0 MP3/WAV assets)**. All auditory feedback is synthesized mathematically in real time via the browser Web Audio API:
 * **Mechanical Click:** 10ms damped triangle wave (1200Hz ➔ 300Hz) with 8ms subtle haptic pulse.
@@ -220,7 +219,7 @@ Okvir contains **zero recorded audio files (0 MP3/WAV assets)**. All auditory fe
 
 ---
 
-## 🌐 Bilingual Experience: English & العربية
+## Bilingual Experience: English & العربية
 
 Okvir treats **Arabic (العربية)** alongside English as a first-class language:
 * **Bidirectional Layout via CSS Logical Properties:** Sidebars, progress trees, and drawers mirror seamlessly when switching languages.
@@ -229,7 +228,7 @@ Okvir treats **Arabic (العربية)** alongside English as a first-class lang
 
 ---
 
-## <a id="instrument-grade-design-system"></a>📐 Instrument-Grade Design System
+## <a id="instrument-grade-design-system"></a>Instrument-Grade Design System
 
 Okvir rejects the generic "AI Slop" aesthetic (purple gradients, glowing blobs, rounded cartoon buttons). Instead, it implements a dense, technical design language inspired by **Linear.app, Raycast, and Zed Editor**:
 
@@ -258,7 +257,7 @@ OKVIR DESKTOP CLIENT
 │   ├── Typographic Math: KaTeX with strict LTR isolation & Bret Victor pills
 │   ├── Procedural Audio: Web Audio API mathematical synthesizer
 │   ├── 24 Tactile 60 FPS Visual Canvases: HTML5 2D Canvas + WebGL (0 unhandled fallbacks)
-│   └── Adaptive Scaffolding: 3-Tier Faded Scaffolding (Parsons, Skeleton, Autonomous Lab)
+│   └── Adaptive Scaffolding: 2-Tier Faded Scaffolding (Guided Skeleton, Autonomous Lab)
 └── In-App Dual Execution Sandbox (Dedicated Web Worker)
     ├── WebAssembly CPython 3.12 (Pyodide v0.26+)
     │   ├── 5-Second Infinite Loop Hard Watchdog & Linear Memory Recycling
@@ -308,7 +307,7 @@ Okvir features a keyboard-first ergonomics system inspired by Linear, Raycast, a
 
 ---
 
-## 🛠️ Framework CLI (`okvir-cli`)
+## Framework CLI (`okvir-cli`)
 
 Okvir ships with a dedicated developer CLI (`bin/okvir.js`) implementing PRD Section 15 for authoring, linting, testing, and compiling community curriculum modules:
 
@@ -336,7 +335,7 @@ For authoring guidelines, see our [Curriculum Authoring Specification](CURRICULU
 
 ---
 
-## 🛡️ Security & Privacy
+## Security & Privacy
 
 * **100% Offline & Local-First:** All progress, code submissions, and spaced repetition intervals are stored in local SQLite. Zero tracking, zero telemetry.
 * **WASM Sandboxing:** Python executes strictly inside a sandboxed Web Worker without host filesystem access.
@@ -346,14 +345,14 @@ For vulnerability reporting, see [SECURITY.md](SECURITY.md).
 
 ---
 
-## 📜 Licensing
+## Licensing
 
 * **Application Engine (Rust, Tauri, React, Simulators):** Dual-licensed under [MIT](LICENSE-MIT) OR [Apache-2.0](LICENSE-APACHE).
 * **Pedagogical Curriculum & Educational Assets:** Licensed under [Creative Commons Attribution-ShareAlike 4.0 International (CC-BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/).
 
 ---
 
-## 👨‍💻 Founder & Architectural Vision
+## Founder & Architectural Vision
 
 **Zakarya Roubhi (روبحي زكرياء)**  
 *Data Scientist • Valedictorian MSc Data Science (ESE Oran) • Co-Founder & CTO of Podacium*  
@@ -365,5 +364,5 @@ For vulnerability reporting, see [SECURITY.md](SECURITY.md).
 
 <div align="center">
   <sub>Built with precision for students, researchers, and engineers worldwide.</sub><br>
-  <sub>⭐ Star us on GitHub to support free, open-source AI education!</sub>
+  <sub>Star us on GitHub to support free, open-source AI education!</sub>
 </div>

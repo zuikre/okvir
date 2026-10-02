@@ -49,7 +49,7 @@ my-course/
 
 ## 3. Lesson File Anatomy (`.okvir.md`)
 
-Each `.okvir.md` file corresponds to a single 5-to-8 minute micro-lesson and implements the **4-Beat Micro-Loop**:
+Each `.okvir.md` file corresponds to a single 5-to-8 minute micro-lesson and implements the **4-Beat Micro-Loop** with an intuition-first pedagogical ramp-up:
 
 ```markdown
 ---
@@ -67,6 +67,24 @@ i18n:
 # The Geometry of Squared Residuals
 
 ## Beat 1: Tactile Intuition
+
+Imagine throwing darts at a bullseye. When you miss by 2 centimeters, you are slightly annoyed; when you miss by 10 centimeters, you are off the board. In regression, your line tries to hit every point, and the gap between where the point sits and where the line predicted is the **residual**.
+
+#### Jargon Decoder
+| Technical Term / المصطلح التقني | Plain English Translation | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Residual ($e_i$)** | The gap between prediction and reality | الفارق بين القيمة المتوقعة والحقيقية (مقدار الخطأ) |
+| **SSR** | The sum of all squared error boxes | مجموع مساحات مربعات الخطأ التي نريد تصغيرها |
+
+#### Geometric & Visual Flow
+```text
+  Data Point (y)  ●
+                  │
+                  │  ◄── Residual Gap: e_i = y_i - ŷ_i
+                  ▼
+  Predicted (ŷ) ──■──────── Line of Best Fit
+```
+
 Drag the slope and intercept handles to observe how each individual residual square physically contracts:
 
 :::simulation-widget{engine="canvas2d" component="LinearRegressionResiduals"}

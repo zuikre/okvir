@@ -30,6 +30,62 @@ Apache Arrow defines a standardized, language-agnostic, hardware-aligned columna
 
 Polars compiles your declarative Python expression trees into an internal Directed Acyclic Graph (DAG) written in Rust. It applies database-grade optimization passes—pushing filters into storage, pruning unneeded columns, and fusing adjacent operations into multithreaded SIMD kernels—streaming batches out-of-core so that datasets much larger than physical RAM can be processed without crashing.
 
+### Jargon Decoder Table
+
+| Technical Term / المصطلح التقني | Plain English Translation & Analogy | المعنى المبسط والتشبيه اليومي |
+| :--- | :--- | :--- |
+| **Apache Arrow IPC** / تواصل Arrow بين العمليات | Inter-Process Communication format where processes share memory pointers directly without serialization. | بروتوكول اتصال بين البرامج يشارك مؤشرات الذاكرة مباشرة دون الحاجة لتشفير وفك تشفير البيانات. |
+| **Zero-Copy Memory** / مشاركة الذاكرة دون نسخ | Reading data directly from another process's RAM buffer without duplicating memory bytes; like reading a book over someone's shoulder. | قراءة البيانات مباشرة من نفس عنوان الذاكرة دون استنساخ البايتات؛ مثل قراءة كتاب يمسكه زميلك دون طباعة نسخة جديدة. |
+| **Polars LazyFrame** / إطار بيانات Polars الكسول | A declarative computation plan representation that builds a query graph rather than executing immediately. | كائن برمجي يسجل تسلسل العمليات المطلوبة كمخطط نظري دون تنفيذ أي حسابات حتى يُطلب منه ذلك صراحة. |
+| **Query Plan DAG** / المخطط التوجيهي عديم الحلقات | A directed tree of logical relational operators that the query optimizer rearranges for maximum execution speed. | شجرة بيانية تمثل خطوات الاستعلام، يعيد المحسن ترتيب فروعها لتقليل استهلاك الذاكرة وزمن المعالجة. |
+| **Predicate Pushdown** / تمرير الشروط | Moving `filter` operations as close to the initial data scan as possible to discard useless rows early. | نقل شروط التصفية إلى بداية خطة المعالجة لتجنب قراءة أو تحميل الصفوف غير المطابقة من الأساس. |
+| **Out-of-Core Streaming** / التدفق الحسابي خارج الذاكرة | Processing huge datasets in small chunks (e.g. 64K rows) through CPU caches so total data can exceed physical RAM. | معالجة ملفات عملاقة على دفعات صغيرة متدفقة تتسع في ذاكرة الكاش، مما يمنع انهيار النظام حتى لو فاقت البيانات سعة RAM. |
+
+### Visual ASCII Data Transformation: Pandas Eager vs. Polars Lazy DAG
+
+```text
+========================================================================================
+1. PANDAS EAGER EXECUTION (MEMORY BLOAT & WASTED CYCLES)
+----------------------------------------------------------------------------------------
+Code: df = pd.read_parquet("data.parquet"); sub = df[df["status"]=="ACTIVE"][["user"]]
+
+Step 1: Read full table into RAM
+[Parquet Disk (40 GB)] === EAGER READ ===> [RAM: DataFrame #1 (40 GB allocated!)]
+                                                  |
+Step 2: Evaluate boolean mask                      v
+[RAM: Mask Array (200M booleans = 200 MB)] -------> Intermediate filtering
+                                                  |
+Step 3: Materialize filtered copy                  v
+[RAM: DataFrame #2 (Filtered active rows = 4 GB allocated!)]
+                                                  |
+Step 4: Projection copy                            v
+[RAM: DataFrame #3 (Single column = 800 MB)] ===> Result (Peak RAM > 45 GB -> OOM!)
+
+========================================================================================
+2. POLARS LAZY DAG COMPILATION & STREAMING EXECUTION
+----------------------------------------------------------------------------------------
+Code: q = pl.scan_parquet("data.parquet").filter(pl.col("status")=="ACTIVE").select("user")
+
+[Declarative Python API] -> Builds Unoptimized Logical Plan:
+    Project ["user"]
+       ^
+    Filter [status == "ACTIVE"]
+       ^
+    Scan [all 50 columns]
+
+Optimizer DAG Rewrite Rules (Pushdown & Pruning):
+    Rule 1 (Projection Pushdown): Scan only {"status", "user"} (Prunes 48 columns!)
+    Rule 2 (Predicate Pushdown): Push filter into Storage Scan Reader
+    
+Optimized Physical Streaming DAG:
+    ScanParquet(columns=["user"], filter=(status=="ACTIVE"))
+       |
+       |--> Streams 64K row Arrow Buffers through CPU L3 Cache (Zero-Copy)
+       v
+    Result DataFrame (Peak RAM: ~280 MB! Execution Time: 3.1 seconds!)
+========================================================================================
+```
+
 :::simulation-widget{engine="canvas2d" component="PolarsLazyExecutionGraphLab"}
 ---
 interactive: true
@@ -80,7 +136,37 @@ The fundamental algebraic rewrite rule implemented by the Polars query optimizer
 $$
 \pi_\alpha \left( \sigma_\varphi \left( \text{Scan}(\mathcal{P}) \right) \right) \equiv \text{Scan}_{\text{columns}=\alpha \cup \text{vars}(\varphi), \; \text{filter}=\varphi}(\mathcal{P})
 $$
-In eager execution, all columns and rows in partition $\mathcal{P}$ are physically read into heap memory before the filter operator $\sigma_\varphi$ discards the non-matching rows. In lazy execution, the optimizer rewrites the DAG to push the projection $\alpha \cup \text{vars}(\varphi)$ and selection $\varphi$ down directly into the Parquet reader, achieving $O(B_{\text{chunk}})$ bounded memory streaming regardless of total dataset size!
+
+### Step-by-Step Arithmetic Cost & Invariant Breakdown
+
+Let us compare the arithmetic physical costs when processing an enterprise dataset of $N = 200{,}000{,}000$ rows with $C = 50$ columns of 4-byte integers/floats (total uncompressed volume $\approx 40 \text{ GB}$):
+
+1. **Step 1: Eager Execution Memory Allocation (Pandas)**
+   - Scan step loads all $50$ columns into memory:
+     $$\text{RAM}_{\text{scan}} = 200{,}000{,}000 \times 50 \times 4 \text{ B} = 40 \text{ GB}$$
+   - Boolean mask creation allocates:
+     $$\text{RAM}_{\text{mask}} = 200{,}000{,}000 \times 1 \text{ B} = 200 \text{ MB}$$
+   - Applying mask copies filtered rows into a new intermediate DataFrame:
+     $$\text{RAM}_{\text{filtered}} \approx 0.10 \times 40 \text{ GB} = 4 \text{ GB}$$
+   - Peak memory consumption:
+     $$\text{Memory}_{\text{peak}}(\mathcal{Q}_{\text{eager}}) = 40 \text{ GB} + 0.2 \text{ GB} + 4 \text{ GB} = \mathbf{44.2 \text{ GB}}$$
+   - On a machine with $8 \text{ GB}$ RAM, this guarantees an immediate kernel Out-Of-Memory (`SIGKILL`).
+
+2. **Step 2: Lazy DAG Compilation Cost**
+   - Polars builds the symbolic AST expression tree in Rust without executing any data loads:
+     $$\text{Time}_{\text{compile}} \approx 100 \ \mu\text{s}, \quad \text{Memory}_{\text{compile}} < 1 \text{ MB}$$
+
+3. **Step 3: Pushed Projection & Predicate Calculation**
+   - Suppose the query requires only $2$ projected columns and $1$ filter predicate column ($|\alpha \cup \text{vars}(\varphi)| = 3$):
+   - Unreferenced columns pruned at the storage layer: $47$ out of $50$ columns ($94\%$ of all columns ignored!).
+   - Data scanned from disk drops from $40 \text{ GB} \to 2.4 \text{ GB}$.
+
+4. **Step 4: Out-of-Core Bounded Chunk Streaming ($B_{\text{chunk}} = 64{,}000$ rows)**
+   - Polars executes with fixed streaming chunk buffers:
+     $$\text{Memory}_{\text{chunk}} = 64{,}000 \times 3 \times 4 \text{ B} = 768 \text{ KB per thread}$$
+   - Across an 8-core CPU, active working memory is bounded at:
+     $$\text{Memory}_{\text{active}} \approx 8 \times 768 \text{ KB} \approx 6.14 \text{ MB}$$
+   - Total peak process footprint remains flat at $\mathbf{280 \text{ MB}}$ regardless of whether the dataset is $40 \text{ GB}$ or $4 \text{ TB}$!
 
 تثبت قواعد التحسين الجبرية التي يطبقها مترجم Polars تطابق النتائج الرياضية مع خفض استهلاك الموارد الفيزيائية إلى الحد الأدنى. ففي التنفيذ الفوري، تُسحب كافة صفوف وأعمدة الملف $\mathcal{P}$ في الذاكرة العشوائية قبل أن يستبعد مشغل التصفية $\sigma_\varphi$ السجلات غير المطلوبة. أما في التنفيذ الكسول، فيعيد المحسن كتابة المخطط التوجيهي DAG ليمرر شرط التصفية والأعمدة المطلوبة مباشرة إلى داخل مشغل قراءة الملفات، محققاً تدفقاً مستمراً بدفعات محدودة الحجم $O(B_{\text{chunk}})$ مهما بلغت ضخامة البيانات الأصلية!
 
@@ -116,11 +202,44 @@ def optimize_query_dag(plan: list[dict[str, Any]]) -> list[dict[str, Any]]:
         2. Predicate Pushdown positions all FILTER nodes directly after SCAN
     """
     # Step 1: Validate plan has at least a SCAN node at index 0
+    if not plan or plan[0].get("op") != "SCAN":
+        return plan
+
     # Step 2: Separate nodes into scan_node, filters, others, and project_node
+    scan_node = dict(plan[0])
+    filters: list[dict[str, Any]] = []
+    others: list[dict[str, Any]] = []
+    project_node: dict[str, Any] | None = None
+
+    for node in plan[1:]:
+        op = node.get("op")
+        if op == "FILTER":
+            filters.append(dict(node))
+        elif op == "PROJECT":
+            project_node = dict(node)
+        else:
+            others.append(dict(node))
+
     # Step 3: Compute needed_columns = set(project_node['columns']) + all filter 'columns_used'
-    # Step 4: Update scan_node['columns'] = sorted(needed_columns)
+    needed_columns: set[str] = set()
+    if project_node and "columns" in project_node:
+        needed_columns.update(project_node["columns"])
+    for f in filters:
+        if "columns_used" in f:
+            needed_columns.update(f["columns_used"])
+
+    # Step 4: Update scan_node['columns'] = sorted(needed_columns restricted to original scan)
+    orig_scan_cols = set(scan_node.get("columns", []))
+    if needed_columns:
+        filtered_cols = [c for c in sorted(needed_columns) if c in orig_scan_cols]
+        scan_node["columns"] = filtered_cols if filtered_cols else sorted(needed_columns)
+
     # Step 5: Reconstruct optimized_plan: [scan_node] + filters + others + [project_node]
-    raise NotImplementedError("Implement optimize_query_dag")
+    optimized_plan: list[dict[str, Any]] = [scan_node] + filters + others
+    if project_node:
+        optimized_plan.append(project_node)
+
+    return optimized_plan
 ```
 :::
 

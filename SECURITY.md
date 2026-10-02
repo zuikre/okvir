@@ -32,11 +32,12 @@ If you discover a potential security vulnerability in Okvir (including the deskt
 
 Okvir's architecture is built around defense-in-depth principles:
 
-### 1. WebAssembly Sandbox Isolation (Pyodide Worker)
-* User-written Python code executes **exclusively inside a dedicated Web Worker** running WebAssembly CPython 3.12.
-* Python code cannot access host filesystem paths, host network sockets, or the desktop OS kernel.
+### 1. WebAssembly Sandbox Isolation (Dual Workers: Pyodide & DuckDB)
+* User-written Python code executes **exclusively inside a dedicated Web Worker** running WebAssembly CPython 3.12 (Pyodide v0.26+).
+* SQL analytical queries execute within an in-memory **DuckDB WebAssembly (v1.28.0)** worker sandbox.
+* Neither Python nor SQL code can access host filesystem paths, host network sockets, or the desktop OS kernel.
 * Filesystem access is strictly sandboxed inside Emscripten MEMFS and the browser Origin Private File System (`OPFS`) at `/workspace`.
-* Infinite loops or runaway code execution can be interrupted non-destructively via `SharedArrayBuffer` signal buffers without freezing the UI thread or compromising the host machine.
+* Infinite loops or runaway code execution are bounded by a 5-second hard watchdog timer and non-destructive `SharedArrayBuffer` interrupt signals without freezing the UI thread or compromising the host machine.
 
 ### 2. Cryptographic Package Verification (.okvir Chunks)
 * Downloaded curriculum bundles and community packs must carry an **Ed25519 digital signature** generated with `minisign`.

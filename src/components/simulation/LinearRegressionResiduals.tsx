@@ -12,6 +12,7 @@ import { PreCanvasBriefing, PostCanvasConsolidation, type TierContent } from '@/
 import { audio } from '@/lib/audio';
 import { powerGovernor } from '@/lib/powerGovernor';
 import { Sparkles, RotateCcw, Plus, Square, Shield } from 'lucide-react';
+import { useFormulaAnchorStore } from '@/lib/formulaAnchorStore';
 
 const OLS_TIER_CONTENT: TierContent = {
   intuition: {
@@ -102,6 +103,17 @@ export const LinearRegressionResiduals: React.FC<{
   const [showResidualSquares, setShowResidualSquares] = useState(true);
   const [showConfidenceBands, setShowConfidenceBands] = useState(true);
   const [activeMathToken, setActiveMathToken] = useState<'slope' | 'intercept' | 'residual' | null>(null);
+  const { activeToken: globalActiveToken, setActiveToken: setGlobalActiveToken } = useFormulaAnchorStore();
+
+  const effectiveMathToken = useMemo<'slope' | 'intercept' | 'residual' | null>(() => {
+    if (activeMathToken) return activeMathToken;
+    if (!globalActiveToken) return null;
+    const t = globalActiveToken.toLowerCase();
+    if (t.includes('slope') || t.includes('m') || t.includes('beta') || t === 'β' || t === 'w') return 'slope';
+    if (t.includes('intercept') || t.includes('b') || t === 'α') return 'intercept';
+    if (t.includes('res') || t.includes('e') || t.includes('loss') || t.includes('error')) return 'residual';
+    return null;
+  }, [activeMathToken, globalActiveToken]);
 
   const transformerRef = useRef(
     new CanvasCoordinateTransformer(
@@ -340,7 +352,7 @@ export const LinearRegressionResiduals: React.FC<{
         ctx.rect(px, sqY, sidePx, sidePx);
       });
 
-      const isResActive = highlightedElement === 'residuals' || activeMathToken === 'residual';
+      const isResActive = highlightedElement === 'residuals' || effectiveMathToken === 'residual';
       ctx.fillStyle =
         theme === 'dark'
           ? isResActive
@@ -401,8 +413,8 @@ export const LinearRegressionResiduals: React.FC<{
     }
 
     // 6. Active Regression Line: y_hat = mx + b
-    const isSlopeActive = highlightedElement === 'slope' || activeMathToken === 'slope';
-    const isIntActive = highlightedElement === 'intercept' || activeMathToken === 'intercept';
+    const isSlopeActive = highlightedElement === 'slope' || effectiveMathToken === 'slope';
+    const isIntActive = highlightedElement === 'intercept' || effectiveMathToken === 'intercept';
 
     const lineP1 = transformer.dataToScreen(0, intercept, width, height);
     const lineP2 = transformer.dataToScreen(20, slope * 20 + intercept, width, height);

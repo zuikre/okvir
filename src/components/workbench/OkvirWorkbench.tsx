@@ -1203,7 +1203,7 @@ export const OkvirWorkbench: React.FC = () => {
               <FadedScaffoldCodeEditor
                 challengeId={beat3.code.id}
                 scaffold={{
-                  tier: 'parsons',
+                  tier: 'skeleton_fill',
                   instructions: {
                     en: 'Complete the algorithm through faded scaffolding.',
                     ar: 'أكمل الخوارزمية من خلال البناء البرمجي المتدرج.'

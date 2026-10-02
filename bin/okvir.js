@@ -15,7 +15,21 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 
-const VERSION = '1.0.1';
+function resolveVersion() {
+  try {
+    const home = process.env.HOME || process.env.USERPROFILE;
+    if (home) {
+      const versionFile = path.join(home, '.okvir', 'version');
+      if (fs.existsSync(versionFile)) {
+        const v = fs.readFileSync(versionFile, 'utf8').trim().replace(/^v/, '');
+        if (v) return v;
+      }
+    }
+  } catch (_) {}
+  return '1.0.1';
+}
+
+const VERSION = resolveVersion();
 
 const HELP_TEXT = `
   OKVIR CLI v${VERSION}

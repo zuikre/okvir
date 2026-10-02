@@ -35,6 +35,7 @@ import {
   Bell,
   Clock,
   RefreshCw,
+  X,
 } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import {
@@ -295,7 +296,7 @@ export const SettingsView: React.FC = () => {
       return;
     }
     const success = await OkvirNotifier.dispatch({
-      title: isRtl ? 'أوكفير: قناة التنبيهات نشطة بنجاح! 🔔' : 'OKVIR: Desktop Notifications Active! 🔔',
+      title: isRtl ? 'أوكفير: قناة التنبيهات نشطة بنجاح!' : 'OKVIR: Desktop Notifications Active!',
       body: isRtl
         ? 'تعمل التنبيهات النظامية الآن بتوافق تام لحماية عاداتك الدراسية وسلسلتك اليومية.'
         : 'Desktop notification channel is operating at 100% capacity to safeguard your daily learning habits.',
@@ -1090,7 +1091,13 @@ export const SettingsView: React.FC = () => {
                   disabled={notificationTestStatus === 'requesting'}
                   className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[var(--bg-app)] hover:bg-[var(--bg-surface-active)] border border-[var(--border-strong)] text-xs font-mono font-medium text-[var(--text-primary)] transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                 >
-                  <Bell size={14} className="text-[var(--math-gradient)]" />
+                  {notificationTestStatus === 'sent' ? (
+                    <Check size={14} className="text-emerald-400" />
+                  ) : notificationTestStatus === 'denied' ? (
+                    <X size={14} className="text-rose-400" />
+                  ) : (
+                    <Bell size={14} className="text-[var(--math-gradient)]" />
+                  )}
                   <span>
                     {notificationTestStatus === 'requesting'
                       ? isRtl
@@ -1098,12 +1105,12 @@ export const SettingsView: React.FC = () => {
                         : 'Requesting OS Permission...'
                       : notificationTestStatus === 'sent'
                       ? isRtl
-                        ? 'تم الإرسال بنجاح! 🔔'
-                        : 'Notification Sent! 🔔'
+                        ? 'تم الإرسال بنجاح!'
+                        : 'Notification Sent!'
                       : notificationTestStatus === 'denied'
                       ? isRtl
-                        ? 'تم رفض الإذن من النظام ✕'
-                        : 'Permission Denied in OS Settings ✕'
+                        ? 'تم رفض الإذن من النظام'
+                        : 'Permission Denied in OS Settings'
                       : isRtl
                       ? 'إرسال إشعار تجريبي الآن'
                       : 'Test Desktop Notification'}

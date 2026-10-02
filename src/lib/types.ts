@@ -216,7 +216,7 @@ export type StagePhase =
   | 'experiment'    // Stage 2: Targeted Goal-Directed Micro-Experiments
   | 'geometry'      // Stage 3: Spatial & Physical Invariant Grounding (60 FPS)
   | 'formal'        // Stage 4: Reactive Mathematical De-formalization (Scrubbers & Anchors)
-  | 'scaffold_code' // Stage 5: Faded Worked-Example & Vectorized Kernel (Parsons ➔ Skeleton ➔ Lab)
+  | 'scaffold_code' // Stage 5: Faded Worked-Example & Vectorized Kernel (Skeleton ➔ Lab)
   | 'stress_test'   // Stage 6: Adversarial Boundary Exploration (Breaking the Model)
   | 'transfer';     // Stage 7: Diagnostic Misconception Transfer Ladder (Playable Proofs)
 
@@ -279,9 +279,8 @@ export interface ReactiveFormulaToken {
 }
 
 export interface FadedCodeStep {
-  tier: 'parsons' | 'skeleton_fill' | 'autonomous';
+  tier: 'skeleton_fill' | 'autonomous';
   instructions: { en: string; ar: string };
-  parsonsBlocks?: { id: string; code: string; correctOrderIndex: number }[];
   skeletonTemplate?: string;
   solutionHoles?: Record<string, string>;
   autonomousStarter: string;
