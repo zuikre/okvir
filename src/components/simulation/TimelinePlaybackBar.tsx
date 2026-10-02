@@ -37,24 +37,38 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
   const lastTimeRef = useRef<number>(0);
   const accumulatorRef = useRef<number>(0);
 
+  const onStepChangeRef = useRef(onStepChange);
+  onStepChangeRef.current = onStepChange;
+
+  const onPlayStateChangeRef = useRef(onPlayStateChange);
+  onPlayStateChangeRef.current = onPlayStateChange;
+
+  const lastReportedStepRef = useRef<number>(currentStep);
+
   // Sync state.totalSteps when parent changes
   useEffect(() => {
-    dispatch({ type: 'SET_TOTAL_STEPS', totalSteps });
-  }, [totalSteps]);
+    if (totalSteps !== state.totalSteps) {
+      dispatch({ type: 'SET_TOTAL_STEPS', totalSteps });
+    }
+  }, [totalSteps, state.totalSteps]);
 
   // Sync state.currentStep when parent changes
   useEffect(() => {
     if (state.status !== 'SCRUBBING' && state.status !== 'PLAYING') {
       if (currentStep !== state.currentStep) {
+        lastReportedStepRef.current = currentStep;
         dispatch({ type: 'GO_TO_STEP', step: currentStep });
       }
     }
   }, [currentStep, state.status, state.currentStep]);
 
-  // Sync parent step callback
+  // Sync parent step callback only when state.currentStep changes internally
   useEffect(() => {
-    onStepChange(state.currentStep);
-  }, [state.currentStep, onStepChange]);
+    if (state.currentStep !== lastReportedStepRef.current) {
+      lastReportedStepRef.current = state.currentStep;
+      onStepChangeRef.current?.(state.currentStep);
+    }
+  }, [state.currentStep]);
 
   // Update sonifier loss metric
   const stateRef = useRef(state);
@@ -120,15 +134,15 @@ export const TimelinePlaybackBar: React.FC<TimelinePlaybackBarProps> = ({
       lastTimeRef.current = 0;
       accumulatorRef.current = 0;
       animFrameRef.current = requestAnimationFrame(tick);
-      onPlayStateChange?.(true);
+      onPlayStateChangeRef.current?.(true);
     } else {
       cancelAnimationFrame(animFrameRef.current);
-      onPlayStateChange?.(false);
+      onPlayStateChangeRef.current?.(false);
     }
     return () => {
       cancelAnimationFrame(animFrameRef.current);
     };
-  }, [state.status, tick, onPlayStateChange, state.currentStep, state.totalSteps]);
+  }, [state.status, tick]);
 
   // Keyboard Shortcuts (Space: Play/Pause, Arrows: Step, R: Reset)
   useEffect(() => {

@@ -671,7 +671,7 @@ export const KMeansVoronoi: React.FC<{ compact?: boolean }> = ({ compact = true 
         stepPhase={activeSnapshot.phase}
         metricLabel="Inertia"
         metricValue={activeSnapshot.inertia}
-        onStepChange={(step) => setCurrentStepIdx(step)}
+        onStepChange={setCurrentStepIdx}
       />
 
       {/* Post-Canvas Mathematical & Code Consolidation */}

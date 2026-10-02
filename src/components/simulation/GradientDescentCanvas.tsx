@@ -1049,7 +1049,7 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
         stepPhase={optimizer.toUpperCase()}
         metricLabel="Loss"
         metricValue={activeSnap?.loss || 0}
-        onStepChange={(step) => setCurrentStepIdx(step)}
+        onStepChange={setCurrentStepIdx}
       />
 
       {/* Hardware-Style Precision Parameter Sliders (Spacious 2-Tier Responsive Layout) */}
