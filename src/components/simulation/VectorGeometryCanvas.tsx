@@ -506,7 +506,7 @@ export const VectorGeometryCanvas: React.FC<{ compact?: boolean }> = ({ compact 
           </span>
           <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
             {isOrthogonal
-              ? (language === 'ar' ? '⚡ متعامدان (Orthogonal)' : '⚡ Orthogonal (Perpendicular)')
+              ? (language === 'ar' ? 'متعامدان (Orthogonal)' : 'Orthogonal (Perpendicular)')
               : dotProduct > 0
               ? (language === 'ar' ? 'زاوية حادة (Acute)' : 'Acute Angle')
               : (language === 'ar' ? 'زاوية منفرجة (Obtuse)' : 'Obtuse Angle')}

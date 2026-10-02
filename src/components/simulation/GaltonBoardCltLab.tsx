@@ -1127,8 +1127,8 @@ export const GaltonBoardCltLab: React.FC<{ compact?: boolean }> = ({ compact }) 
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-sky-500/30 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 text-xs font-mono font-bold transition-colors cursor-pointer"
               title="Instantly simulate to target N without waiting"
             >
-              <Zap size={13} />
-              <span>{language === 'ar' ? 'محاكاة فورية' : 'Instant ⚡'}</span>
+              <Zap size={13} className="shrink-0" />
+              <span className="whitespace-nowrap">{language === 'ar' ? 'محاكاة فورية' : 'Instant'}</span>
             </button>
 
             <button

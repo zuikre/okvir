@@ -1276,8 +1276,9 @@ export const SettingsView: React.FC = () => {
                     ? 'سيؤدي هذا الإجراء إلى محو كافة تقدم الدروس الـ 125، ومصفوفة الذاكرة التكرارية FSRS، وسجلات نقاط الخبرة، وإعادة ضبط قاعدة البيانات المحلية بالكامل إلى الحالة الأولية.'
                     : 'This destructive operation resets all 125 curriculum progress records, FSRS-4.5 spaced repetition stability parameters, streak history, and local preferences to a clean installation state.'}
                 </p>
-                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[var(--math-loss)] text-[11px] font-mono font-semibold">
-                  ⚠ Warning: This operation is local and non-reversible. Please export a JSON backup beforehand if you wish to preserve your records.
+                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[var(--math-loss)] text-[11px] font-mono font-semibold flex items-center gap-1.5">
+                  <AlertTriangle size={13} className="shrink-0 text-rose-500" />
+                  <span>Warning: This operation is local and non-reversible. Please export a JSON backup beforehand if you wish to preserve your records.</span>
                 </div>
               </div>
 

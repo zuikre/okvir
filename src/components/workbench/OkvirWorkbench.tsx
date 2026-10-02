@@ -371,8 +371,8 @@ const HypothesisPrimingCard: React.FC<HypothesisPrimingCardProps> = ({
           <div className="flex items-center gap-2 font-bold">
             {hypotheses[committedPrediction].correct ? (
               <span className="text-[var(--math-vector)] flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4" />
-                {isAr ? 'فرضية علمية دقيقة ومثبتة!' : 'Hypothesis Confirmed! ★'}
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>{isAr ? 'فرضية علمية دقيقة ومثبتة!' : 'Hypothesis Confirmed!'}</span>
               </span>
             ) : (
               <span className="text-[var(--math-gradient)] flex items-center gap-1.5">

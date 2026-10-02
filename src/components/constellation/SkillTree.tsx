@@ -18,6 +18,10 @@ import {
   Star,
   AlertTriangle,
   Network,
+  Sigma,
+  Code2,
+  TrendingUp,
+  Brain,
 } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
@@ -789,20 +793,20 @@ export const SkillTree: React.FC = () => {
               <div className="relative w-[1260px] select-none" style={{ height: `${canvasH}px` }}>
                 {/* Disciplinary Track Column Headers */}
                 <div className="absolute top-0 left-0 right-0 h-10 flex pointer-events-none z-10 border-b border-[var(--border-subtle)]/40">
-                  <div className="absolute left-[175px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-mono font-bold">
-                    <span>📐</span>
+                  <div className="absolute left-[175px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-mono font-bold whitespace-nowrap">
+                    <Sigma size={13} className="shrink-0" />
                     <span>{language === 'ar' ? 'الأسس الرياضية' : 'Mathematical Foundations'}</span>
                   </div>
-                  <div className="absolute left-[470px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold">
-                    <span>💻</span>
+                  <div className="absolute left-[470px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold whitespace-nowrap">
+                    <Code2 size={13} className="shrink-0" />
                     <span>{language === 'ar' ? 'البرمجة والبيانات' : 'Programming & Data'}</span>
                   </div>
-                  <div className="absolute left-[790px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold">
-                    <span>📈</span>
+                  <div className="absolute left-[790px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold whitespace-nowrap">
+                    <TrendingUp size={13} className="shrink-0" />
                     <span>{language === 'ar' ? 'الاقتصاد القياسي والتعلم' : 'Econometrics & ML'}</span>
                   </div>
-                  <div className="absolute left-[1110px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-bold">
-                    <span>🧠</span>
+                  <div className="absolute left-[1110px] -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-bold whitespace-nowrap">
+                    <Brain size={13} className="shrink-0" />
                     <span>{language === 'ar' ? 'التعلم العميق والذكاء الاصطناعي' : 'Deep Learning & AI'}</span>
                   </div>
                 </div>

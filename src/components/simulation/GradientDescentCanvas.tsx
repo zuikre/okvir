@@ -962,8 +962,8 @@ export const GradientDescentCanvas: React.FC<{ compact?: boolean }> = ({ compact
                 : `Loss exploded at Step ${convergenceInfo.step}. Reduce Learning Rate η.`}
             </span>
           </div>
-          <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold text-[10px] shrink-0">
-            {language === 'ar' ? 'تشتت ⚠' : 'Diverged ⚠'}
+          <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold text-[10px] shrink-0 whitespace-nowrap">
+            {language === 'ar' ? 'تشتت (Diverged)' : 'Diverged'}
           </span>
         </div>
       )}

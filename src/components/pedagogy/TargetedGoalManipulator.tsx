@@ -61,7 +61,7 @@ export const TargetedGoalManipulator: React.FC<TargetedGoalManipulatorProps> = (
         {isAchieved ? (
           <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 animate-fade-in">
             <CheckCircle className="w-3.5 h-3.5" />
-            {isAr ? 'تم تحقيق الهدف! ★' : 'GOAL REACHED! ★'}
+            <span>{isAr ? 'تم تحقيق الهدف بنجاح!' : 'GOAL REACHED!'}</span>
           </span>
         ) : (
           <span className="text-[11px] font-mono text-[var(--text-tertiary)]">

@@ -155,7 +155,7 @@ export const MisconceptionDiagnosticCard: React.FC<MisconceptionDiagnosticCardPr
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
               <div>
                 <span className="font-bold">
-                  {isAr ? 'إجابة دقيقة وصحيحة علمياً! ★' : 'Accurate & Rigorous Deduction! ★'}
+                  {isAr ? 'إجابة دقيقة وصحيحة علمياً!' : 'Accurate & Rigorous Deduction!'}
                 </span>
                 <p className="mt-1 leading-relaxed">
                   {isAr

@@ -223,8 +223,8 @@ export const CommandPalette: React.FC = () => {
       base.push({
         id: `lesson-${mod.id}`,
         label: {
-          en: isLocked ? `🔒 [Locked] ${mod.title}` : `Start Lesson: ${mod.title}`,
-          ar: isLocked ? `🔒 [مقفل] ${mod.titleAr}` : `ابدأ الدرس: ${mod.titleAr}`,
+          en: isLocked ? `[Locked] ${mod.title}` : `Start Lesson: ${mod.title}`,
+          ar: isLocked ? `[مقفل] ${mod.titleAr}` : `ابدأ الدرس: ${mod.titleAr}`,
         },
         icon: isLocked ? 'Lock' : 'BookOpen',
         action: () => {

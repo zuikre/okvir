@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { audio } from '@/lib/audio';
 import { PreCanvasBriefing, PostCanvasConsolidation, TierContent } from '@/components/pedagogy/MultiTierDisclosure';
@@ -505,16 +506,19 @@ export const NeuralActivationCanvas: React.FC<{ compact?: boolean }> = ({ compac
             </div>
             <div className="text-[11px] font-mono font-semibold">
               {isDeadRelu ? (
-                <span className="text-rose-400">
-                  {language === 'ar' ? '⚠️ عصبون ميت (Dead ReLU: Gradient = 0)' : '⚠️ Dead ReLU (Gradient = 0)'}
+                <span className="text-rose-400 inline-flex items-center gap-1">
+                  <AlertTriangle size={12} className="shrink-0" />
+                  <span>{language === 'ar' ? 'عصبون ميت (Dead ReLU: Gradient = 0)' : 'Dead ReLU (Gradient = 0)'}</span>
                 </span>
               ) : isVanishingSigmoid ? (
-                <span className="text-rose-400">
-                  {language === 'ar' ? '⚠️ تلاشي التدرج (Vanishing Gradient)' : '⚠️ Vanishing Gradient (f\' < 0.05)'}
+                <span className="text-rose-400 inline-flex items-center gap-1">
+                  <AlertTriangle size={12} className="shrink-0" />
+                  <span>{language === 'ar' ? 'تلاشي التدرج (Vanishing Gradient)' : 'Vanishing Gradient (f\' < 0.05)'}</span>
                 </span>
               ) : (
-                <span className="text-[var(--math-prediction)]">
-                  {language === 'ar' ? `✓ تدرج سليم (f' = ${grad.toFixed(2)})` : `✓ Healthy Gradient (f' = ${grad.toFixed(2)})`}
+                <span className="text-[var(--math-prediction)] inline-flex items-center gap-1">
+                  <CheckCircle2 size={12} className="shrink-0" />
+                  <span>{language === 'ar' ? `تدرج سليم (f' = ${grad.toFixed(2)})` : `Healthy Gradient (f' = ${grad.toFixed(2)})`}</span>
                 </span>
               )}
             </div>

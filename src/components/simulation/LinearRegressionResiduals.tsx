@@ -459,7 +459,7 @@ export const LinearRegressionResiduals: React.FC<{
         // Draw prominent outlier tag on canvas
         if (isExplicitOutlier || (diag && diag.isInfluential)) {
           ctx.font = 'bold 9px monospace';
-          const tag = `⚠ Outlier (h=${diag?.leverage.toFixed(2) || '?'}, D=${diag?.cooksDistance.toFixed(2) || '?'})`;
+          const tag = `Outlier (h=${diag?.leverage.toFixed(2) || '?'}, D=${diag?.cooksDistance.toFixed(2) || '?'})`;
           const tagWidth = ctx.measureText(tag).width;
           const tagX = Math.max(10, Math.min(width - tagWidth - 10, px - tagWidth / 2));
           const tagY = py < 45 ? py + 22 : py - 12;

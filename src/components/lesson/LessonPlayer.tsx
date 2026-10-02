@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRight, Check, Lightbulb, Sparkles, Lock, X, AlertTriangle, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Lightbulb, Compass, Target, Sparkles, Lock, X, AlertTriangle, RotateCcw } from 'lucide-react';
 import { useOkvirStore } from '@/lib/store';
 import { tr } from '@/lib/i18n';
 import { curriculum } from '@/lib/curriculum';
@@ -448,10 +448,25 @@ export const LessonPlayer: React.FC = () => {
             {/* Hint Content Display */}
             <div className="text-xs text-[var(--text-secondary)] font-mono leading-relaxed bg-[var(--bg-app)] p-3 rounded-lg border border-[var(--border-subtle)]">
               <div>
-                <span className="text-amber-400 font-bold me-1">
-                  {hintTier === 1 && '💡 [Tier 1]:'}
-                  {hintTier === 2 && '📐 [Tier 2]:'}
-                  {hintTier === 3 && '🎯 [Tier 3]:'}
+                <span className="text-amber-400 font-bold me-1.5 inline-flex items-center gap-1">
+                  {hintTier === 1 && (
+                    <>
+                      <Lightbulb size={12} className="shrink-0" />
+                      <span>[Tier 1]:</span>
+                    </>
+                  )}
+                  {hintTier === 2 && (
+                    <>
+                      <Compass size={12} className="shrink-0" />
+                      <span>[Tier 2]:</span>
+                    </>
+                  )}
+                  {hintTier === 3 && (
+                    <>
+                      <Target size={12} className="shrink-0" />
+                      <span>[Tier 3]:</span>
+                    </>
+                  )}
                 </span>
                 <MathText text={getHintContent(hintTier)} />
               </div>

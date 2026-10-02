@@ -218,14 +218,14 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
 
         if (testCases && testCases.length > 0) {
           testCases.forEach((tc, idx) => {
-            logs.push(`✓ Test Case ${idx + 1}: ${tc.input} -> ${tc.expected} (PASSED)`);
+            logs.push(`[PASS] Test Case ${idx + 1}: ${tc.input} -> ${tc.expected}`);
           });
           if (!hasForLoop) {
-            logs.push('✓ Vectorized check: Zero for-loops detected in AST (PASSED)');
+            logs.push('[PASS] Vectorized check: Zero for-loops detected in AST');
           }
           logs.push('--------------------------------------------------');
         } else {
-          logs.push('✓ Test Case 1: Baseline assertions satisfied (PASSED)');
+          logs.push('[PASS] Test Case 1: Baseline assertions satisfied');
         }
       }
     }
@@ -233,7 +233,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
     const elapsed = Math.max(2, Math.round(performance.now() - startTime));
     const memoryBytes = isSql ? 420000 : 850000;
 
-    logs.push(`✨ Execution time: ${elapsed}ms | Memory allocated: ${(memoryBytes / (1024 * 1024)).toFixed(2)}MB`);
+    logs.push(`Execution time: ${elapsed}ms | Memory allocated: ${(memoryBytes / (1024 * 1024)).toFixed(2)}MB`);
     logs.push('All tests verified! Concept compiled successfully.');
 
     self.postMessage({
@@ -252,7 +252,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageRequest>) => {
       `  File "<stdin>", line 1, in <module>`,
       `${errorType}: ${errorMsg}`,
       `--------------------------------------------------`,
-      `✖ Test verification failed. Review your implementation and try again.`,
+      `[FAIL] Test verification failed. Review your implementation and try again.`,
     ];
 
     self.postMessage({
