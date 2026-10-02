@@ -1041,7 +1041,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
       const leaf = activeSnapshot.leaves.find(
         (l) => x >= l.box.minX && x <= l.box.maxX && y >= l.box.minY && y <= l.box.maxY
       );
-      if (leaf !== hoveredNode) {
+      if (leaf?.id !== hoveredNode?.id) {
         setHoveredNode(leaf || null);
       }
     } else {
@@ -1363,7 +1363,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
               if (!leftChild || !rightChild) return null;
 
               return (
-                <g key={`branch-${node.id}`}>
+                <g key={`branch-${node.id}`} pointerEvents="none">
                   {/* Left Branch */}
                   <path
                     d={`M ${x},${y + 22} C ${x},${(y + leftChild.y) / 2} ${leftChild.x},${(y + leftChild.y) / 2} ${leftChild.x},${leftChild.y - 22}`}
@@ -1378,6 +1378,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
                     fontFamily="monospace"
                     fill="#38bdf8"
                     fontWeight="bold"
+                    pointerEvents="none"
                   >
                     Yes
                   </text>
@@ -1396,6 +1397,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
                     fontFamily="monospace"
                     fill="#f59e0b"
                     fontWeight="bold"
+                    pointerEvents="none"
                   >
                     No
                   </text>
@@ -1424,19 +1426,25 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
                 <g
                   key={node.id}
                   transform={`translate(${x - cardW / 2}, ${y - cardH / 2})`}
-                  className="cursor-pointer transition-transform duration-150 hover:scale-105"
-                  onMouseEnter={() => setHoveredNode(node)}
-                  onMouseLeave={() => setHoveredNode(null)}
+                  className="cursor-pointer"
+                  onMouseEnter={() => {
+                    if (hoveredNode?.id !== node.id) {
+                      setHoveredNode(node);
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    setHoveredNode((prev) => (prev?.id === node.id ? null : prev));
+                  }}
                   onClick={() => setSelectedNode(node)}
                 >
                   <rect
                     width={cardW}
                     height={cardH}
                     rx="8"
-                    fill={theme === 'dark' ? '#18181b' : '#ffffff'}
+                    fill={theme === 'dark' ? (isHovered ? '#27272a' : '#18181b') : isHovered ? '#f4f4f5' : '#ffffff'}
                     stroke={isHovered || isSelected ? '#f59e0b' : nodeColor}
                     strokeWidth={isHovered || isSelected ? 2.5 : 1.5}
-                    className="shadow-xs"
+                    className="shadow-xs transition-colors duration-150"
                   />
 
                   {/* Top Split Condition or Class Badge */}
@@ -1448,6 +1456,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
                     fontFamily="monospace"
                     fontWeight="bold"
                     fill={nodeColor}
+                    pointerEvents="none"
                   >
                     {isLeaf
                       ? `Class ${node.predictedClass}`
@@ -1462,6 +1471,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
                     fontSize="8.5"
                     fontFamily="monospace"
                     fill={theme === 'dark' ? '#a1a1aa' : '#71717a'}
+                    pointerEvents="none"
                   >
                     [{node.numClass0}, {node.numClass1}] (N={node.numClass0 + node.numClass1})
                   </text>
@@ -1475,6 +1485,7 @@ export const DecisionTreeLaser: React.FC<{ compact?: boolean }> = ({ compact = t
                     fontFamily="monospace"
                     fill={node.impurity === 0 ? '#10b981' : theme === 'dark' ? '#71717a' : '#a1a1aa'}
                     fontWeight={node.impurity === 0 ? 'bold' : 'normal'}
+                    pointerEvents="none"
                   >
                     {criterion === 'gini' ? 'Gini' : 'H'}: {node.impurity.toFixed(2)}
                   </text>
