@@ -372,24 +372,24 @@ export const SkillTree: React.FC = () => {
           HERO NEXT LESSON SPOTLIGHT CARD
          ========================================================================= */}
       {nextRecommendedModule && (
-        <div className="max-w-2xl mx-auto px-6 pt-6">
-          <div className="p-4 sm:p-5 rounded-2xl border border-sky-500/40 bg-gradient-to-r from-sky-500/10 via-[var(--bg-surface)] to-[var(--bg-surface)] shadow-lg flex items-center justify-between gap-4 slide-up">
-            <div className="flex items-center gap-3.5 min-w-0">
-              <div className="w-12 h-12 rounded-xl bg-sky-500/20 border border-sky-500/40 text-sky-400 flex items-center justify-center shrink-0 shadow-sm animate-pulse">
-                <Play size={22} fill="currentColor" />
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-6">
+          <div className="p-4 sm:p-5 rounded-2xl border border-sky-500/40 bg-gradient-to-r from-sky-500/10 via-[var(--bg-surface)] to-[var(--bg-surface)] shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 slide-up">
+            <div className="flex items-center gap-3.5 min-w-0 flex-1">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-sky-500/20 border border-sky-500/40 text-sky-400 flex items-center justify-center shrink-0 shadow-sm animate-pulse">
+                <Play size={20} fill="currentColor" />
               </div>
 
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-sky-400 font-bold">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-sky-400 font-bold whitespace-nowrap">
                     {language === 'ar' ? 'المفهوم الموصى به تالياً' : 'Recommended Next Concept'}
                   </span>
-                  <span className="text-[10px] font-mono text-[var(--text-tertiary)] flex items-center gap-1">
-                    <Clock size={10} />
+                  <span className="text-[10px] font-mono text-[var(--text-tertiary)] flex items-center gap-1 whitespace-nowrap">
+                    <Clock size={10} className="shrink-0" />
                     ~{nextRecommendedModule.estimatedMinutes}m
                   </span>
                 </div>
-                <h2 className="text-sm sm:text-base font-bold text-[var(--text-primary)] truncate">
+                <h2 className="text-sm sm:text-base font-bold text-[var(--text-primary)] leading-snug line-clamp-2">
                   {language === 'ar' ? nextRecommendedModule.titleAr : nextRecommendedModule.title}
                 </h2>
               </div>
@@ -400,15 +400,15 @@ export const SkillTree: React.FC = () => {
                 if (config.soundEnabled) audio.playSuccess();
                 startLesson(nextRecommendedModule.id);
               }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-mono text-xs font-bold hover:brightness-110 active:scale-95 shadow-md shrink-0 whitespace-nowrap transition-transform cursor-pointer"
+              className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white font-mono text-xs font-bold hover:brightness-110 active:scale-95 shadow-md shrink-0 whitespace-nowrap transition-transform cursor-pointer w-full sm:w-auto"
             >
               <span className="whitespace-nowrap">
                 {lessons[nextRecommendedModule.id]?.status === 'in_progress'
                   ? (language === 'ar' ? 'متابعة الدرس' : 'Continue Lesson')
                   : (language === 'ar' ? 'ابدأ الدرس' : 'Start Lesson')}
               </span>
-              <kbd className="hidden sm:inline-block px-1.5 py-0.2 rounded bg-black/20 text-[10px]">Space</kbd>
-              <ArrowRight size={13} className={language === 'ar' ? 'rotate-180' : ''} />
+              <kbd className="hidden md:inline-block px-1.5 py-0.2 rounded bg-black/20 text-[10px]">Space</kbd>
+              <ArrowRight size={13} className={`shrink-0 ${language === 'ar' ? 'rotate-180' : ''}`} />
             </button>
           </div>
         </div>
